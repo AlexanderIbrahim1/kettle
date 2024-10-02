@@ -56,13 +56,8 @@ function(add_test_target)
     catch_discover_tests(${add_test_target_TARGET})
 endfunction()
 
-# add_executable(mini-qiskit_test source/mini-qiskit_test.cpp)
-# target_link_libraries(mini-qiskit_test PRIVATE mini-qiskit::mini-qiskit)
-# target_compile_features(mini-qiskit_test PRIVATE cxx_std_20)
-
-# add_test(NAME mini-qiskit_test COMMAND mini-qiskit_test)
-
 add_test_target(TARGET mini-qiskit_test SOURCES "source/mini-qiskit_test.cpp")
+add_test_target(TARGET gate_test SOURCES "source/gate_test.cpp")
 
 # ---- End-of-file commands ----
 
