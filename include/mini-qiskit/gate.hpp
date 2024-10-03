@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <tuple>
 
-
 namespace mqis
 {
 

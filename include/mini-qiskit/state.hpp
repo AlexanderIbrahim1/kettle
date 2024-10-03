@@ -6,38 +6,38 @@
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace impl_mqis
 {
-    constexpr static auto NORMALIZATION_TOLERANCE = double{1.0e-6};
+constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
 
-    constexpr auto norm_squared(double real, double imag) -> double
-    {
-        return real * real + imag * imag;
-    }
-
-    constexpr auto pow_2_int(std::size_t exponent) -> std::size_t
-    {
-        // there are slightly faster ways to do this, but w/e
-        // - if the exponent is too large, the simulation won't run anyways
-        auto output = std::size_t {1};
-        for (std::size_t i {0}; i < exponent; ++i) {
-            output *= 2;
-        }
-
-        return output;
-    }
-
-    constexpr auto is_power_of_2(std::size_t value) -> bool
-    {
-        const auto is_positive = value > 0;
-        const auto has_one_bit_set = (value & (value - 1)) == 0;
-
-        return is_positive && has_one_bit_set;
-    }
+constexpr auto norm_squared(double real, double imag) -> double
+{
+    return real * real + imag * imag;
 }
+
+constexpr auto pow_2_int(std::size_t exponent) -> std::size_t
+{
+    // there are slightly faster ways to do this, but w/e
+    // - if the exponent is too large, the simulation won't run anyways
+    auto output = std::size_t {1};
+    for (std::size_t i {0}; i < exponent; ++i) {
+        output *= 2;
+    }
+
+    return output;
+}
+
+constexpr auto is_power_of_2(std::size_t value) -> bool
+{
+    const auto is_positive = value > 0;
+    const auto has_one_bit_set = (value & (value - 1)) == 0;
+
+    return is_positive && has_one_bit_set;
+}
+}  // namespace impl_mqis
 
 namespace mqis
 {
@@ -117,7 +117,8 @@ private:
     void check_power_of_2_with_at_least_one_qubit_() const
     {
         if (coefficients_.size() < 2) {
-            throw std::runtime_error {"There must be at least 2 coefficients, representing the states for one qubit.\n"};
+            throw std::runtime_error {
+                "There must be at least 2 coefficients, representing the states for one qubit.\n"};
         }
 
         if (!impl_mqis::is_power_of_2(coefficients_.size())) {

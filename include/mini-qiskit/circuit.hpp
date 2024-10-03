@@ -123,5 +123,5 @@ private:
         }
     }
 };
-    
+
 }  // namespace mqis
