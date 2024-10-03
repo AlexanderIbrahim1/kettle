@@ -47,11 +47,11 @@ TEST_CASE("Test create and unpack gate functions")
 
     SECTION("CRX gate")
     {
-        const auto theta = 1.23;
         const auto source_index = std::size_t {4};
         const auto target_index = std::size_t {5};
-        const auto gate_info = mqis::create_crx_gate(theta, source_index, target_index);
-        const auto [unpacked_theta, unpacked_source, unpacked_target] = mqis::unpack_crx_gate(gate_info);
+        const auto theta = 1.23;
+        const auto gate_info = mqis::create_crx_gate(source_index, target_index, theta);
+        const auto [unpacked_source, unpacked_target, unpacked_theta] = mqis::unpack_crx_gate(gate_info);
 
         REQUIRE(unpacked_source == source_index);
         REQUIRE(unpacked_target == target_index);

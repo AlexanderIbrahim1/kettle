@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -18,9 +19,29 @@ public:
         , n_bits_ {n_bits}
     {}
 
+    constexpr auto n_qubits() const noexcept -> std::size_t
+    {
+        return n_qubits_;
+    }
+
+    constexpr auto n_bits() const noexcept -> std::size_t
+    {
+        return n_bits_;
+    }
+
     constexpr auto operator[](std::size_t index) const noexcept -> const GateInfo&
     {
         return gates_[index];
+    }
+
+    constexpr auto begin() const noexcept
+    {
+        return std::begin(gates_);
+    }
+
+    constexpr auto end() const noexcept
+    {
+        return std::end(gates_);
     }
 
     constexpr void add_x_gate(std::size_t qubit_index)

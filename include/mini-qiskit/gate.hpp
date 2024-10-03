@@ -93,15 +93,15 @@ constexpr auto unpack_cx_gate(GateInfo info) -> std::tuple<std::size_t, std::siz
 }
 
 /* Apply the CRX-gate with a rotation `theta` to qubits at the `source_index` and `target_index` */
-constexpr auto create_crx_gate(double theta, std::size_t source_index, std::size_t target_index) -> GateInfo
+constexpr auto create_crx_gate(std::size_t source_index, std::size_t target_index, double theta) -> GateInfo
 {
     return {Gate::CRX, source_index, target_index, theta};
 }
 
 /* Parse the relevant information for the CRX-gate */
-constexpr auto unpack_crx_gate(GateInfo info) -> std::tuple<double, std::size_t, std::size_t>
+constexpr auto unpack_crx_gate(GateInfo info) -> std::tuple<std::size_t, std::size_t, double>
 {
-    return {info.arg2, info.arg0, info.arg1};  // theta, source index, target index
+    return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
 }
 
 /* Apply a measurement gate to a given qubit and bit */
@@ -114,6 +114,26 @@ constexpr auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> 
 constexpr auto unpack_m_gate(GateInfo info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};  // qubit index, bit index
+}
+
+constexpr auto unpack_single_qubit_gate_index(GateInfo info) -> std::size_t
+{
+    return info.arg0;
+}
+
+constexpr auto unpack_double_qubit_gate_indices(GateInfo info) -> std::tuple<std::size_t, std::size_t>
+{
+    return {info.arg0, info.arg1};
+}
+
+constexpr auto unpack_rx_gate_angle(GateInfo info) -> double
+{
+    return info.arg2;
+}
+
+constexpr auto unpack_crx_gate_angle(GateInfo info) -> double
+{
+    return info.arg2;
 }
 
 }  // namespace mqis
