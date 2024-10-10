@@ -15,80 +15,210 @@ template <typename T>
 struct always_false : std::false_type
 {};
 
+/*
+    The SingleQubitGatePairIterator loops over all pairs of computational states which
+    differ on bit `qubit_index`, and yields them using the `next()` member function.
+
+    Separating the index looping from the simulation code makes it easier to test if the
+    correct pairs of indices are being chosen.
+
+    C++20 doesn't support generators :(
+*/
+class SingleQubitGatePairIterator
+{
+public:
+    SingleQubitGatePairIterator(std::size_t qubit_index, std::size_t n_qubits)
+        : i0_max_ {impl_mqis::pow_2_int(qubit_index)}
+        , i1_max_ {impl_mqis::pow_2_int(n_qubits - qubit_index - 1)}
+    {}
+    
+    constexpr auto size() const noexcept -> std::size_t
+    {
+        return i0_max_ * i1_max_;
+    }
+
+    constexpr auto next() noexcept -> std::tuple<std::size_t, std::size_t>
+    {
+        const auto current_i0 = i0_;
+        const auto current_i1 = i1_;
+
+        ++i1_;
+        if (i1_ == i1_max_) {
+            ++i0_;
+            i1_ = 0;
+        }
+
+        // indices corresponding to the computational basis states where the [i1]^th digit
+        // are 0 and 1, respectively
+        const auto state0_index = current_i0 + 2 * current_i1 * i0_max_;
+        const auto state1_index = state0_index + i0_max_;
+
+        return {state0_index, state1_index};
+    }
+
+private:
+    std::size_t i0_max_;
+    std::size_t i1_max_;
+    std::size_t i0_ {0};
+    std::size_t i1_ {0};
+};
+
+
+/*
+    The DoubleQubitGatePairIterator loops over all pairs of computational states where
+      - the qubit at `source_index` is 1
+      - the qubit at `target_index` differs
+    and yields them using the `next()` member function.
+
+    Separating the index looping from the simulation code makes it easier to test if the
+    correct pairs of indices are being chosen.
+
+    C++20 doesn't support generators :(
+*/
+class DoubleQubitGatePairIterator
+{
+public:
+    DoubleQubitGatePairIterator(std::size_t source_index, std::size_t target_index, std::size_t n_qubits)
+        : lower_index_ {std::min({source_index, target_index})}
+        , upper_index_ {std::max({source_index, target_index})}
+        , lower_shift_ {impl_mqis::pow_2_int(lower_index_ + 1)}
+        , upper_shift_ {impl_mqis::pow_2_int(upper_index_ + 1)}
+        , source_shift_ {impl_mqis::pow_2_int(source_index)}
+        , target_shift_ {impl_mqis::pow_2_int(target_index)}
+        , i0_max_ {impl_mqis::pow_2_int(lower_index_)}
+        , i1_max_ {impl_mqis::pow_2_int(upper_index_ - lower_index_ - 1)}
+        , i2_max_ {impl_mqis::pow_2_int(n_qubits - upper_index_ - 1)}
+    {}
+    
+    constexpr auto size() const noexcept -> std::size_t
+    {
+        return i0_max_ * i1_max_ * i2_max_;
+    }
+
+    constexpr auto next() noexcept -> std::tuple<std::size_t, std::size_t>
+    {
+        const auto current_i0 = i0_;
+        const auto current_i1 = i1_;
+        const auto current_i2 = i2_;
+
+        ++i2_;
+        if (i2_ == i2_max_) {
+            ++i1_;
+            i2_ = 0;
+
+            if (i1_ == i1_max_) {
+                ++i0_;
+                i1_ = 0;
+            }
+        }
+
+        const auto state0_index = current_i0 + current_i1 * lower_shift_ + current_i2 * upper_shift_ + source_shift_;
+        const auto state1_index = state0_index + target_shift_;
+
+        return {state0_index, state1_index};
+    }
+
+private:
+    std::size_t lower_index_;
+    std::size_t upper_index_;
+    std::size_t lower_shift_;
+    std::size_t upper_shift_;
+    std::size_t source_shift_;
+    std::size_t target_shift_;
+    std::size_t i0_max_;
+    std::size_t i1_max_;
+    std::size_t i2_max_;
+    std::size_t i0_ {0};
+    std::size_t i1_ {0};
+    std::size_t i2_ {0};
+};
+
 template <Gate GateType>
 void simulate_single_qubit_gate(QuantumState& state, const GateInfo& info, std::size_t n_qubits)
 {
     const auto qubit_index = unpack_single_qubit_gate_index(info);
 
-    // values chosen and looped over such that all resulting pairs of computational states
-    // are those which only differ on bit `qubit_index`
-    const auto i0_max = impl_mqis::pow_2_int(qubit_index);
-    const auto i1_max = impl_mqis::pow_2_int(n_qubits - qubit_index - 1);
+    auto pair_iterator = SingleQubitGatePairIterator {qubit_index, n_qubits};
 
-    for (std::size_t i0 {0}; i0 < i0_max; ++i0) {
-        for (std::size_t i1 {0}; i1 < i1_max; ++i1) {
-            // indices corresponding to the computational basis states where the j^th digit
-            // are 0 and 1, respectively
-            const auto state0_index = i0_ + 2 * i1_ * bit0_max_;
-            const auto state1_index = state0_index + bit0_max_;
+    for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
+        const auto [state0_index, state1_index] = pair_iterator.next();
 
-            if constexpr (GateType == Gate::X) {
-                swap_states(state, state_index0, state_index1);
-            }
-            else if constexpr (GateType == Gate::H) {
-                superpose_states(state, state_index0, state_index1);
-            }
-            else if constexpr (GateType == Gate::RX) {
-                const auto theta = unpack_rx_gate_angle(info);
-                turn_states(state, state_index0, state_index1, theta);
-            }
-            else {
-                static_assert(always_false<void>::value, "Invalid single qubit gate: must be one of {X, H, RX}.");
-            }
+        if constexpr (GateType == Gate::X) {
+            swap_states(state, state_index0, state_index1);
+        }
+        else if constexpr (GateType == Gate::H) {
+            superpose_states(state, state_index0, state_index1);
+        }
+        else if constexpr (GateType == Gate::RX) {
+            const auto theta = unpack_rx_gate_angle(info);
+            turn_states(state, state_index0, state_index1, theta);
+        }
+        else {
+            static_assert(always_false<void>::value, "Invalid single qubit gate: must be one of {X, H, RX}.");
         }
     }
 }
+//    // values chosen and looped over such that all resulting pairs of computational states
+//    // are those which only differ on bit `qubit_index`
+//    const auto i0_max = impl_mqis::pow_2_int(qubit_index);
+//    const auto i1_max = impl_mqis::pow_2_int(n_qubits - qubit_index - 1);
+//
+//    for (std::size_t i0 {0}; i0 < i0_max; ++i0) {
+//        for (std::size_t i1 {0}; i1 < i1_max; ++i1) {
+//            const auto state0_index = i0_ + 2 * i1_ * i0_max;
+//            const auto state1_index = state0_index + i0_max;
+//
+//        }
+//    }
 
 template <Gate GateType>
 void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::size_t n_qubits)
 {
     const auto [source_index, target_index] = unpack_double_qubit_gate_indices(info);
 
-    const auto lower_index = std::min({source_index, target_index});
-    const auto upper_index = std::max({source_index, target_index});
+    auto pair_iterator = DoubleQubitGatePairIterator {source_index, target_index, n_qubits};
 
-    // values chosen and looped over such that the only pairs of computational states chosen are those where
-    // - the qubit at `source_index` is 1
-    // - the qubit at `target_index` differs
-    const auto i0_max = impl_mqis::pow_2_int(lower_index);
-    const auto i1_max = impl_mqis::pow_2_int(upper_index - lower_index - 1);
-    const auto i2_max = impl_mqis::pow_2_int(n_qubits - upper_index - 1);
+    for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
+        const auto [state0_index, state1_index] = pair_iterator.next();
 
-    const auto lower_shift = impl_mqis::pow_2_int(lower_index + 1);
-    const auto upper_shift = impl_mqis::pow_2_int(upper_index + 1);
-    const auto source_shift = impl_mqis::pow_2_int(source_shift);
-    const auto target_shift = impl_mqis::pow_2_int(target_shift);
-
-    for (std::size_t i0 {0}; i0 < i0_max; ++i0) {
-        for (std::size_t i1 {0}; i1 < i1_max; ++i1) {
-            for (std::size_t i2 {0}; i2 < i2_max; ++i2) {
-                const auto state0_index = i0 + i1 * lower_shift + i2 * upper_shift + source_shift;
-                const auto state1_index = state0_index + target_shift;
-
-                if constexpr (GateType == Gate::CX) {
-                    swap_states(state, state0_index, state1_index);
-                }
-                else if constexpr (GateType == Gate::CRX) {
-                    const auto theta = unpack_crx_gate_angle(info);
-                    turn_states(state, state0_index, state1_index, theta);
-                }
-                else {
-                    static_assert(always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
-                }
-            }
+        if constexpr (GateType == Gate::CX) {
+            swap_states(state, state0_index, state1_index);
+        }
+        else if constexpr (GateType == Gate::CRX) {
+            const auto theta = unpack_crx_gate_angle(info);
+            turn_states(state, state0_index, state1_index, theta);
+        }
+        else {
+            static_assert(always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
         }
     }
 }
+// 
+//     const auto lower_index = std::min({source_index, target_index});
+//     const auto upper_index = std::max({source_index, target_index});
+// 
+//     // values chosen and looped over such that the only pairs of computational states chosen are those where
+//     // - the qubit at `source_index` is 1
+//     // - the qubit at `target_index` differs
+//     const auto i0_max = impl_mqis::pow_2_int(lower_index);
+//     const auto i1_max = impl_mqis::pow_2_int(upper_index - lower_index - 1);
+//     const auto i2_max = impl_mqis::pow_2_int(n_qubits - upper_index - 1);
+// 
+//     const auto lower_shift = impl_mqis::pow_2_int(lower_index + 1);
+//     const auto upper_shift = impl_mqis::pow_2_int(upper_index + 1);
+//     const auto source_shift = impl_mqis::pow_2_int(source_index);
+//     const auto target_shift = impl_mqis::pow_2_int(target_index);
+// 
+//     for (std::size_t i0 {0}; i0 < i0_max; ++i0) {
+//         for (std::size_t i1 {0}; i1 < i1_max; ++i1) {
+//             for (std::size_t i2 {0}; i2 < i2_max; ++i2) {
+//                 const auto state0_index = i0 + i1 * lower_shift + i2 * upper_shift + source_shift;
+//                 const auto state1_index = state0_index + target_shift;
+// 
+//             }
+//         }
+//     }
+// }
 
 inline auto simulate(const QuantumCircuit& circuit, QuantumState& state, std::size_t n_shots)
 {

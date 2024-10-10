@@ -13,24 +13,21 @@ namespace impl_mqis
 {
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
 
-constexpr auto norm_squared(double real, double imag) -> double
+constexpr auto norm_squared(double real, double imag) noexcept -> double
 {
     return real * real + imag * imag;
 }
 
-constexpr auto pow_2_int(std::size_t exponent) -> std::size_t
+constexpr auto pow_2_int(std::size_t exponent) noexcept -> std::size_t
 {
-    // there are slightly faster ways to do this, but w/e
-    // - if the exponent is too large, the simulation won't run anyways
-    auto output = std::size_t {1};
-    for (std::size_t i {0}; i < exponent; ++i) {
-        output *= 2;
+    if (exponent == 0) {
+        return 0;
+    } else {
+        return 1 << (exponent - 1);
     }
-
-    return output;
 }
 
-constexpr auto is_power_of_2(std::size_t value) -> bool
+constexpr auto is_power_of_2(std::size_t value) noexcept -> bool
 {
     const auto is_positive = value > 0;
     const auto has_one_bit_set = (value & (value - 1)) == 0;
