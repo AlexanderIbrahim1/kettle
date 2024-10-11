@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace impl_mqis
 {
 

@@ -5,10 +5,10 @@
 #include <unordered_map>
 
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/common/traits.hpp"
 #include "mini-qiskit/gate_pair_generator.hpp"
 #include "mini-qiskit/operations.hpp"
 #include "mini-qiskit/state.hpp"
-#include "mini-qiskit/common/traits.hpp"
 
 namespace mqis
 {
@@ -73,28 +73,28 @@ void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::
         }
     }
 }
-// 
+//
 //     const auto lower_index = std::min({source_index, target_index});
 //     const auto upper_index = std::max({source_index, target_index});
-// 
+//
 //     // values chosen and looped over such that the only pairs of computational states chosen are those where
 //     // - the qubit at `source_index` is 1
 //     // - the qubit at `target_index` differs
 //     const auto i0_max = impl_mqis::pow_2_int(lower_index);
 //     const auto i1_max = impl_mqis::pow_2_int(upper_index - lower_index - 1);
 //     const auto i2_max = impl_mqis::pow_2_int(n_qubits - upper_index - 1);
-// 
+//
 //     const auto lower_shift = impl_mqis::pow_2_int(lower_index + 1);
 //     const auto upper_shift = impl_mqis::pow_2_int(upper_index + 1);
 //     const auto source_shift = impl_mqis::pow_2_int(source_index);
 //     const auto target_shift = impl_mqis::pow_2_int(target_index);
-// 
+//
 //     for (std::size_t i0 {0}; i0 < i0_max; ++i0) {
 //         for (std::size_t i1 {0}; i1 < i1_max; ++i1) {
 //             for (std::size_t i2 {0}; i2 < i2_max; ++i2) {
 //                 const auto state0_index = i0 + i1 * lower_shift + i2 * upper_shift + source_shift;
 //                 const auto state1_index = state0_index + target_shift;
-// 
+//
 //             }
 //         }
 //     }

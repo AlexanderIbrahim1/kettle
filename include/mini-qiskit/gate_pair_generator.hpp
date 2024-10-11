@@ -57,7 +57,6 @@ private:
     std::size_t i1_ {0};
 };
 
-
 /*
     The DoubleQubitGatePairIterator loops over all pairs of computational states where
       - the qubit at `source_index` is 1
@@ -83,7 +82,7 @@ public:
         , i1_max_ {impl_mqis::pow_2_int(upper_index_ - lower_index_ - 1)}
         , i2_max_ {impl_mqis::pow_2_int(n_qubits - upper_index_ - 1)}
     {}
-    
+
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_ * i2_max_;
@@ -126,5 +125,5 @@ private:
     std::size_t i1_ {0};
     std::size_t i2_ {0};
 };
-    
+
 }  // namespace mqis

@@ -35,14 +35,15 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
         {"11", 3},
     };
 
-    SECTION("loop over qubit at index 0") {
-        auto generator = mqis::SingleQubitGatePairGenerator{0, n_qubits};
+    SECTION("loop over qubit at index 0")
+    {
+        auto generator = mqis::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == impl_mqis::pow_2_int(n_qubits - 1));
 
         auto expected = std::vector<IndexPair> {
             IndexPair {coeff_map.at("00"), coeff_map.at("10")},
-            IndexPair {coeff_map.at("01"), coeff_map.at("11")}
+             IndexPair {coeff_map.at("01"), coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -54,14 +55,15 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
         REQUIRE(expected == actual);
     }
 
-    SECTION("loop over qubit at index 1") {
-        auto generator = mqis::SingleQubitGatePairGenerator{1, n_qubits};
+    SECTION("loop over qubit at index 1")
+    {
+        auto generator = mqis::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == impl_mqis::pow_2_int(n_qubits - 1));
 
         auto expected = std::vector<IndexPair> {
             IndexPair {coeff_map.at("00"), coeff_map.at("01")},
-            IndexPair {coeff_map.at("10"), coeff_map.at("11")}
+             IndexPair {coeff_map.at("10"), coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);

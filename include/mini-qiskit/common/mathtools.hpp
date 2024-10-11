@@ -2,7 +2,6 @@
 
 #include <cstddef>
 
-
 namespace impl_mqis
 {
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
