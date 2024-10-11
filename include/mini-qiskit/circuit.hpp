@@ -115,7 +115,7 @@ public:
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
-    std::vector<GateInfo> gates_;
+    std::vector<GateInfo> gates_ {};
 
     void check_qubit_range_(std::size_t qubit_index, std::string_view qubit_name, std::string_view gate_name)
     {

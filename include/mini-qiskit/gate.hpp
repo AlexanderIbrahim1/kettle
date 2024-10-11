@@ -3,7 +3,8 @@
 #include <cstddef>
 #include <tuple>
 
-namespace mqis
+
+namespace impl_mqis
 {
 
 /*
@@ -13,6 +14,11 @@ namespace mqis
 constexpr static auto DUMMY_ARG0 = std::size_t {0};
 constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
+
+}  // namespace impl_mqis
+
+namespace mqis
+{
 
 enum class Gate
 {
@@ -47,7 +53,7 @@ struct GateInfo
 /* Apply the X-gate to the qubit at index `qubit_index` */
 constexpr auto create_x_gate(std::size_t qubit_index) -> GateInfo
 {
-    return {Gate::X, qubit_index, DUMMY_ARG1, DUMMY_ARG2};
+    return {Gate::X, qubit_index, impl_mqis::DUMMY_ARG1, impl_mqis::DUMMY_ARG2};
 }
 
 /* Parse the relevant information for the X-gate */
@@ -59,7 +65,7 @@ constexpr auto unpack_x_gate(GateInfo info) -> std::size_t
 /* Apply the RX-gate with a rotation `theta` to the qubit at index `qubit_index` */
 constexpr auto create_rx_gate(double theta, std::size_t qubit_index) -> GateInfo
 {
-    return {Gate::RX, qubit_index, DUMMY_ARG1, theta};
+    return {Gate::RX, qubit_index, impl_mqis::DUMMY_ARG1, theta};
 }
 
 /* Parse the relevant information for the RX-gate */
@@ -71,7 +77,7 @@ constexpr auto unpack_rx_gate(GateInfo info) -> std::tuple<double, std::size_t>
 /* Apply the H-gate to the qubit at index `qubit_index` */
 constexpr auto create_h_gate(std::size_t qubit_index) -> GateInfo
 {
-    return {Gate::H, qubit_index, DUMMY_ARG1, DUMMY_ARG2};
+    return {Gate::H, qubit_index, impl_mqis::DUMMY_ARG1, impl_mqis::DUMMY_ARG2};
 }
 
 /* Parse the relevant information for the H-gate */
@@ -83,7 +89,7 @@ constexpr auto unpack_h_gate(GateInfo info) -> std::size_t
 /* Apply the CX-gate to qubits at the `source_index` and `target_index` */
 constexpr auto create_cx_gate(std::size_t source_index, std::size_t target_index) -> GateInfo
 {
-    return {Gate::CX, source_index, target_index, DUMMY_ARG2};
+    return {Gate::CX, source_index, target_index, impl_mqis::DUMMY_ARG2};
 }
 
 /* Parse the relevant information for the CX-gate */
@@ -107,7 +113,7 @@ constexpr auto unpack_crx_gate(GateInfo info) -> std::tuple<std::size_t, std::si
 /* Apply a measurement gate to a given qubit and bit */
 constexpr auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> GateInfo
 {
-    return {Gate::M, qubit_index, bit_index, DUMMY_ARG2};
+    return {Gate::M, qubit_index, bit_index, impl_mqis::DUMMY_ARG2};
 }
 
 /* Parse the relevant information for the M-gate */
