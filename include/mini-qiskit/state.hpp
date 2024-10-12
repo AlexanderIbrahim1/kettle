@@ -81,6 +81,11 @@ public:
         return n_states_;
     }
 
+    constexpr auto n_qubits() const noexcept -> std::size_t
+    {
+        return n_qubits_;
+    }
+
 private:
     std::size_t n_qubits_;
     std::size_t n_states_;
