@@ -13,6 +13,8 @@ namespace mqis
     The SingleQubitGatePairGenerator loops over all pairs of computational states which
     differ on bit `qubit_index`, and yields them using the `next()` member function.
 
+    The number of yielded pairs is always 2^(n_qubits - 1).
+
     Separating the index looping from the simulation code makes it easier to test if the
     correct pairs of indices are being chosen.
 
@@ -59,9 +61,11 @@ private:
 
 /*
     The DoubleQubitGatePairIterator loops over all pairs of computational states where
-      - the qubit at `source_index` is 1
-      - the qubit at `target_index` differs
+      - in the first state, the qubits at (source_index, target_index) are (1, 0)
+      - in the second state, the qubits at (source_index, target_index) are (1, 1)
     and yields them using the `next()` member function.
+
+    The number of yielded pairs is always 2^(n_qubits - 2).
 
     Separating the index looping from the simulation code makes it easier to test if the
     correct pairs of indices are being chosen.
