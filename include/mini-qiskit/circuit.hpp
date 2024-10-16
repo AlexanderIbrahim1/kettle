@@ -76,10 +76,14 @@ public:
         gates_.emplace_back(create_crx_gate(theta, source_index, target_index));
     }
 
-    constexpr void add_m_gate(std::size_t qubit_index, std::size_t bit_index)
+    constexpr void add_m_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "M");
-        check_bit_range_(bit_index);
+
+        // MicroQiskit only allows measurements where the bit index and qubit index are
+        // the same, and I'll be following the same convention
+        const auto bit_index = qubit_index;
+
         gates_.emplace_back(create_m_gate(qubit_index, bit_index));
     }
 

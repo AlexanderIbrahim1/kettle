@@ -140,4 +140,22 @@ private:
     }
 };
 
+auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+{
+    const auto n_states = impl_mqis::pow_2_int(n_qubits);
+    if (i_state >= n_states) {
+        throw std::runtime_error {"The index for the requested state is greater than the number of possible states."};
+    }
+
+    auto dyn_bitset = std::vector<std::uint8_t> (n_qubits, 0);
+    for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
+        const auto bit_position = impl_mqis::pow_2_int(i_qubit);
+
+        // the computational states are ordered in a little-endian manner
+        dyn_bitset[n_qubits - i_qubit - 1] = bit_position & i_state;
+    }
+
+    return dyn_bitset;
+}
+
 }  // namespace mqis

@@ -121,6 +121,11 @@ constexpr auto unpack_m_gate(GateInfo info) -> std::tuple<std::size_t, std::size
     return {info.arg0, info.arg1};  // qubit index, bit index
 }
 
+constexpr auto unpack_m_gate_qubit_index(GateInfo info) -> std::size_t
+{
+    return info.arg0;  // qubit index
+}
+
 constexpr auto unpack_single_qubit_gate_index(GateInfo info) -> std::size_t
 {
     return info.arg0;

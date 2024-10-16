@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/gate.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -41,6 +42,25 @@ auto get_prng(std::optional<int> seed) -> std::mt19937
 
 namespace mqis
 {
+
+/*
+    Check that each qubit is measured once and only once during the circuit.
+*/
+auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
+{
+    auto measurement_flags = std::vector<std::uint64_t> (circuit.n_qubits(), 0);
+
+    for (const auto& gate : circuit) {
+        if (gate.gate == Gate::M) {
+            const auto qubit_index = unpack_m_gate_qubit_index(gate);
+            measurement_flags[qubit_index] += 1;
+        }
+    }
+
+    const auto equals_one = [](std::uint64_t x) { return x == 1; };
+
+    return std::all_of(measurement_flags.begin(), measurement_flags.end(), equals_one);
+}
 
 /*
     Performs measurements of the QuantumState using its probabilities. The measurements
@@ -98,7 +118,7 @@ auto measurements_to_counts(const std::vector<std::size_t>& measurements)
 {
     auto map = std::unordered_map<std::size_t, std::size_t> {};
 
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
     for (auto i_state : measurements) {
         ++map[i_state];
     }
