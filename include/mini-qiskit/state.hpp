@@ -9,21 +9,11 @@
 #include <utility>
 #include <vector>
 
+#include "mini-qiskit/common/complex.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 
 namespace mqis
 {
-
-/*
-    We use a struct of two doubles to represent the complex number rather than `std::complex`; at the
-    time of implementing this I am not 100% sure if this is the best idea, but it looks like doing
-    this makes it easier to translate their functions to my own.
-*/
-struct Complex
-{
-    double real;
-    double imag;
-};
 
 class QuantumState
 {
@@ -42,7 +32,7 @@ public:
         coefficients_[0] = {1, 0};
     }
 
-    explicit QuantumState(std::vector<Complex> coefficients)
+    QuantumState(std::vector<Complex> coefficients)
         : n_qubits_ {0}
         , n_states_ {coefficients.size()}
         , coefficients_ {std::move(coefficients)}
@@ -147,15 +137,34 @@ auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::
         throw std::runtime_error {"The index for the requested state is greater than the number of possible states."};
     }
 
-    auto dyn_bitset = std::vector<std::uint8_t> (n_qubits, 0);
+    auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
     for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
         const auto bit_position = impl_mqis::pow_2_int(i_qubit);
 
         // the computational states are ordered in a little-endian manner
-        dyn_bitset[n_qubits - i_qubit - 1] = bit_position & i_state;
+        dyn_bitset[n_qubits - i_qubit - 1] = static_cast<std::uint8_t>(bit_position & i_state);
     }
 
     return dyn_bitset;
+}
+
+constexpr auto almost_eq(
+    const QuantumState& left,
+    const QuantumState& right,
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+) noexcept -> bool
+{
+    if (left.n_qubits() != right.n_qubits()) {
+        return false;
+    }
+
+    for (std::size_t i {0}; i < left.n_states(); ++i) {
+        if (!almost_eq(left[i], right[i], tolerance_sq)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 }  // namespace mqis

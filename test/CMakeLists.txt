@@ -61,6 +61,7 @@ add_test_target(TARGET gate_test SOURCES "source/gate_test.cpp")
 add_test_target(TARGET state_test SOURCES "source/state_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/operations_test.cpp")
 add_test_target(TARGET gate_pair_generator_test SOURCES "source/gate_pair_generator_test.cpp")
+add_test_target(TARGET simulate_test SOURCES "source/simulate_test.cpp")
 
 # ---- End-of-file commands ----
 

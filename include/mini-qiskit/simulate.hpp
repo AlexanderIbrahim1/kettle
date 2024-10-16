@@ -24,17 +24,19 @@ void simulate_single_qubit_gate(QuantumState& state, const GateInfo& info, std::
         const auto [state0_index, state1_index] = pair_iterator.next();
 
         if constexpr (GateType == Gate::X) {
-            swap_states(state, state_index0, state_index1);
+            swap_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::H) {
-            superpose_states(state, state_index0, state_index1);
+            superpose_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::RX) {
             const auto theta = unpack_rx_gate_angle(info);
-            turn_states(state, state_index0, state_index1, theta);
+            turn_states(state, state0_index, state1_index, theta);
         }
         else {
-            static_assert(always_false<void>::value, "Invalid single qubit gate: must be one of {X, H, RX}.");
+            static_assert(
+                impl_mqis::always_false<void>::value, "Invalid single qubit gate: must be one of {X, H, RX}."
+            );
         }
     }
 }
@@ -57,7 +59,7 @@ void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::
             turn_states(state, state0_index, state1_index, theta);
         }
         else {
-            static_assert(always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
+            static_assert(impl_mqis::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
         }
     }
 }

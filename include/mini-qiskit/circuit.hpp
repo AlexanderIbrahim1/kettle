@@ -19,6 +19,11 @@ public:
         , n_bits_ {n_bits}
     {}
 
+    explicit QuantumCircuit(std::size_t n_qubits)
+        : n_qubits_ {n_qubits}
+        , n_bits_ {n_qubits}
+    {}
+
     constexpr auto n_qubits() const noexcept -> std::size_t
     {
         return n_qubits_;
@@ -44,39 +49,39 @@ public:
         return std::end(gates_);
     }
 
-    constexpr void add_x_gate(std::size_t qubit_index)
+    void add_x_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "X");
         gates_.emplace_back(create_x_gate(qubit_index));
     }
 
-    constexpr void add_rx_gate(double theta, std::size_t qubit_index)
+    void add_rx_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RX");
         gates_.emplace_back(create_rx_gate(theta, qubit_index));
     }
 
-    constexpr void add_h_gate(std::size_t qubit_index)
+    void add_h_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "H");
         gates_.emplace_back(create_h_gate(qubit_index));
     }
 
-    constexpr void add_cx_gate(std::size_t source_index, std::size_t target_index)
+    void add_cx_gate(std::size_t source_index, std::size_t target_index)
     {
         check_qubit_range_(source_index, "source qubit", "CX");
         check_qubit_range_(target_index, "target qubit", "CX");
         gates_.emplace_back(create_cx_gate(source_index, target_index));
     }
 
-    constexpr void add_crx_gate(double theta, std::size_t source_index, std::size_t target_index)
+    void add_crx_gate(double theta, std::size_t source_index, std::size_t target_index)
     {
         check_qubit_range_(source_index, "source qubit", "CRX");
         check_qubit_range_(target_index, "target qubit", "CRX");
-        gates_.emplace_back(create_crx_gate(theta, source_index, target_index));
+        gates_.emplace_back(create_crx_gate(source_index, target_index, theta));
     }
 
-    constexpr void add_m_gate(std::size_t qubit_index)
+    void add_m_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "M");
 
@@ -87,7 +92,7 @@ public:
         gates_.emplace_back(create_m_gate(qubit_index, bit_index));
     }
 
-    constexpr void add_rz_gate(double theta, std::size_t qubit_index)
+    void add_rz_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RZ");
         gates_.emplace_back(create_h_gate(qubit_index));
@@ -95,7 +100,7 @@ public:
         gates_.emplace_back(create_h_gate(qubit_index));
     }
 
-    constexpr void add_ry_gate(double theta, std::size_t qubit_index)
+    void add_ry_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RY");
         gates_.emplace_back(create_rx_gate(M_PI_2, qubit_index));
@@ -103,13 +108,13 @@ public:
         gates_.emplace_back(create_rx_gate(-M_PI_2, qubit_index));
     }
 
-    constexpr void add_z_gate(std::size_t qubit_index)
+    void add_z_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "Z");
         add_rz_gate(M_PI, qubit_index);
     }
 
-    constexpr void add_y_gate(std::size_t qubit_index)
+    void add_y_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "Y");
         add_z_gate(qubit_index);

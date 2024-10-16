@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include "mini-qiskit/common/complex.hpp"
 #include "mini-qiskit/state.hpp"
 
 /*

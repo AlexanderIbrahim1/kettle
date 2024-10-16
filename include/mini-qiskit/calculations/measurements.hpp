@@ -48,7 +48,7 @@ namespace mqis
 */
 auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
 {
-    auto measurement_flags = std::vector<std::uint64_t> (circuit.n_qubits(), 0);
+    auto measurement_flags = std::vector<std::uint64_t>(circuit.n_qubits(), 0);
 
     for (const auto& gate : circuit) {
         if (gate.gate == Gate::M) {
