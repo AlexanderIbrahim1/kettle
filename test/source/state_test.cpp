@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/state.hpp"
@@ -158,5 +159,99 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {0.0, 0.0}
         };
         REQUIRE_THROWS_AS(mqis::QuantumState {coefficients}, std::runtime_error);
+    }
+}
+
+TEST_CASE("state_as_dynamic_bitset")
+{
+    struct InputAndOutput
+    {
+        std::size_t i_state;
+        std::size_t n_qubits;
+        std::vector<std::uint8_t> bits;
+    };
+
+    SECTION("little endian")
+    {
+        SECTION("1 qubit")
+        {
+            auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
+
+            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
+
+        SECTION("2 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {
+                    0, 2, {0, 0}
+            },
+                InputAndOutput {1, 2, {1, 0}},
+                InputAndOutput {2, 2, {0, 1}},
+                InputAndOutput {3, 2, {1, 1}}
+            );
+
+            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
+
+        SECTION("3 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {
+                    0, 3, {0, 0, 0}
+            },
+                InputAndOutput {1, 3, {1, 0, 0}},
+                InputAndOutput {2, 3, {0, 1, 0}},
+                InputAndOutput {3, 3, {1, 1, 0}},
+                InputAndOutput {4, 3, {0, 0, 1}},
+                InputAndOutput {5, 3, {1, 0, 1}},
+                InputAndOutput {6, 3, {0, 1, 1}},
+                InputAndOutput {7, 3, {1, 1, 1}}
+            );
+
+            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
+    }
+
+    SECTION("big endian")
+    {
+        SECTION("1 qubit")
+        {
+            auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
+
+            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
+
+        SECTION("2 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {
+                    0, 2, {0, 0}
+            },
+                InputAndOutput {1, 2, {0, 1}},
+                InputAndOutput {2, 2, {1, 0}},
+                InputAndOutput {3, 2, {1, 1}}
+            );
+
+            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
+
+        SECTION("3 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {
+                    0, 3, {0, 0, 0}
+            },
+                InputAndOutput {1, 3, {0, 0, 1}},
+                InputAndOutput {2, 3, {0, 1, 0}},
+                InputAndOutput {3, 3, {0, 1, 1}},
+                InputAndOutput {4, 3, {1, 0, 0}},
+                InputAndOutput {5, 3, {1, 0, 1}},
+                InputAndOutput {6, 3, {1, 1, 0}},
+                InputAndOutput {7, 3, {1, 1, 1}}
+            );
+
+            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+        }
     }
 }

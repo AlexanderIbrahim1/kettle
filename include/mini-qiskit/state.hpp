@@ -12,6 +12,36 @@
 #include "mini-qiskit/common/complex.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 
+namespace impl_mqis
+{
+
+template <bool LittleEndian>
+constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+{
+    const auto n_states = impl_mqis::pow_2_int(n_qubits);
+    if (i_state >= n_states) {
+        throw std::runtime_error {"The index for the requested state is greater than the number of possible states."};
+    }
+
+    auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
+    for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
+        const auto bit_position = impl_mqis::pow_2_int(i_qubit);
+
+        // internally, the computational states are ordered in a little-endian manner
+        // - most people expect a big-endian representation
+        if constexpr (LittleEndian) {
+            dyn_bitset[i_qubit] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
+        }
+        else {
+            dyn_bitset[n_qubits - i_qubit - 1] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
+        }
+    }
+
+    return dyn_bitset;
+}
+
+}  // namespace impl_mqis
+
 namespace mqis
 {
 
@@ -130,22 +160,16 @@ private:
     }
 };
 
-auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+constexpr auto state_as_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits)
+    -> std::vector<std::uint8_t>
 {
-    const auto n_states = impl_mqis::pow_2_int(n_qubits);
-    if (i_state >= n_states) {
-        throw std::runtime_error {"The index for the requested state is greater than the number of possible states."};
-    }
+    return impl_mqis::state_as_dynamic_bitset_helper_<true>(i_state, n_qubits);
+}
 
-    auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
-    for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
-        const auto bit_position = impl_mqis::pow_2_int(i_qubit);
-
-        // the computational states are ordered in a little-endian manner
-        dyn_bitset[n_qubits - i_qubit - 1] = static_cast<std::uint8_t>(bit_position & i_state);
-    }
-
-    return dyn_bitset;
+constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits)
+    -> std::vector<std::uint8_t>
+{
+    return impl_mqis::state_as_dynamic_bitset_helper_<false>(i_state, n_qubits);
 }
 
 constexpr auto almost_eq(
