@@ -1,11 +1,14 @@
 #pragma once
 
+#include <algorithm>
 #include <bit>
+#include <bitset>
 #include <cmath>
 #include <iomanip>
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -45,6 +48,12 @@ constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t 
 namespace mqis
 {
 
+enum class QuantumStateEndian
+{
+    LITTLE,
+    BIG
+};
+
 class QuantumState
 {
 public:
@@ -55,14 +64,14 @@ public:
     explicit QuantumState(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , n_states_ {impl_mqis::pow_2_int(n_qubits)}
-        , coefficients_(n_states_, {0, 0})
+        , coefficients_(n_states_, {0.0, 0.0})
     {
         // we can ignore the global phase factor, so the entire weight is on the real component
         check_at_least_one_qubit_();
         coefficients_[0] = {1, 0};
     }
 
-    QuantumState(std::vector<Complex> coefficients)
+    QuantumState(std::vector<Complex> coefficients, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
         : n_qubits_ {0}
         , n_states_ {coefficients.size()}
         , coefficients_ {std::move(coefficients)}
@@ -72,6 +81,34 @@ public:
 
         // the size of the coefficients vector is 2^{number of 0's in bit rep of the size}
         n_qubits_ = static_cast<std::size_t>(std::countr_zero(coefficients_.size()));
+
+        // the user passed the vector of coefficients in big endian format, but the
+        // internal mapping of the indices to the states is in little endian format,
+        // so we need to perform a conversion
+        if (input_endian == QuantumStateEndian::BIG) {
+            perform_endian_flip_on_coefficients_();
+        }
+    }
+
+    QuantumState(const std::string& computational_state, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
+        : n_qubits_ {computational_state.size()}
+        , n_states_ {impl_mqis::pow_2_int(computational_state.size())}
+        , coefficients_ {n_states_, {0.0, 0.0}}
+    {
+        const auto is_binary = [](char c) { return c == '0' || c == '1'; };
+        if (!std::all_of(computational_state.begin(), computational_state.end(), is_binary)) {
+            throw std::runtime_error {"Can only build QuantumState from string with all '0's and/or '1's"};
+        }
+
+        const auto index = impl_mqis::qubit_string_to_state_index(computational_state);
+
+        if (input_endian == QuantumStateEndian::BIG) {
+            coefficients_[index] = {1.0, 0.0};
+        }
+        else {
+            const auto little_endian_index = impl_mqis::endian_flip(index, n_qubits_);
+            coefficients_[little_endian_index] = {1.0, 0.0};
+        }
     }
 
     constexpr auto operator[](std::size_t index) const noexcept -> const Complex&
@@ -156,6 +193,16 @@ private:
     {
         if (n_qubits_ == 0) {
             throw std::runtime_error {"There must be at least 1 qubit in the QuantumState.\n"};
+        }
+    }
+
+    constexpr void perform_endian_flip_on_coefficients_() noexcept
+    {
+        for (std::size_t i {0}; i < n_states_; ++i) {
+            const auto i_flip = impl_mqis::endian_flip(i, n_qubits_);
+            if (i < i_flip) {
+                std::swap(coefficients_[i], coefficients_[i_flip]);
+            }
         }
     }
 };

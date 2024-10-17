@@ -4,6 +4,133 @@
 
 #include "mini-qiskit/state.hpp"
 
+TEST_CASE("QuantumState endian representation")
+{
+    SECTION("2 qubits, state |10>")
+    {
+        const auto state_via_little = mqis::QuantumState {
+            {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            mqis::QuantumStateEndian::LITTLE
+        };
+
+        const auto state_via_big = mqis::QuantumState {
+            {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
+            mqis::QuantumStateEndian::BIG
+        };
+
+        REQUIRE(mqis::almost_eq(state_via_little, state_via_big));
+    }
+}
+
+TEST_CASE("QuantumState from string")
+{
+    SECTION("1 qubit")
+    {
+        SECTION("|0>, big endian")
+        {
+            const auto state = mqis::QuantumState {"0", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+        }
+
+        SECTION("|1>, big endian")
+        {
+            const auto state = mqis::QuantumState {"1", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+        }
+
+        SECTION("|0>, little endian")
+        {
+            const auto state = mqis::QuantumState {"0", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+        }
+
+        SECTION("|1>, little endian")
+        {
+            const auto state = mqis::QuantumState {"1", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+        }
+    }
+
+    SECTION("2 qubits")
+    {
+        SECTION("|00>, big endian")
+        {
+            const auto state = mqis::QuantumState {"00", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|00>, little endian")
+        {
+            const auto state = mqis::QuantumState {"00", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|01>, big endian")
+        {
+            const auto state = mqis::QuantumState {"01", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|01>, little endian")
+        {
+            const auto state = mqis::QuantumState {"01", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|10>, big endian")
+        {
+            const auto state = mqis::QuantumState {"10", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|10>, little endian")
+        {
+            const auto state = mqis::QuantumState {"10", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+        }
+
+        SECTION("|11>, big endian")
+        {
+            const auto state = mqis::QuantumState {"11", mqis::QuantumStateEndian::BIG};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {1.0, 0.0}));
+        }
+
+        SECTION("|11>, little endian")
+        {
+            const auto state = mqis::QuantumState {"11", mqis::QuantumStateEndian::LITTLE};
+            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(mqis::almost_eq(state[3], {1.0, 0.0}));
+        }
+    }
+}
+
 TEST_CASE("QuantumState with 3 qubits")
 {
     const auto n_qubits = 3;
