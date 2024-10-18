@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -18,6 +20,8 @@
 namespace impl_mqis
 {
 
+constexpr static auto CUMULATIVE_END_OFFSET_FRACTION = double {1.0e-4};
+
 constexpr void apply_noise(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
 {
     auto generator = mqis::SingleQubitGatePairGenerator {i_qubit, n_qubits};
@@ -32,6 +36,45 @@ constexpr void apply_noise(double noise, std::size_t i_qubit, std::size_t n_qubi
         probabilities[state0_index] = new_prob0;
         probabilities[state1_index] = new_prob1;
     }
+}
+
+constexpr auto calculate_cumulative_sum(const std::vector<double>& probabilities) -> std::vector<double>
+{
+    auto cumulative = std::vector<double> {};
+    cumulative.reserve(probabilities.size());
+
+    std::partial_sum(probabilities.begin(), probabilities.end(), std::back_inserter(cumulative));
+
+    return cumulative;
+}
+
+/*
+    We want to avoid sampling entries beyond the end of the probability distribution,
+    because this correponds to an index for a computational state that does not exist.
+
+    To prevent this, we need to offset the largest value produced by the random number
+    generator by a small amount, to make sure the largest value is never sampled.
+*/
+constexpr auto cumulative_end_offset(const std::vector<double>& cumulative_probabilities) -> double
+{
+    // a circuit requires at least 1 qubit, with at least two computational states; thus
+    // there should be at least two entries in the vector of cumulative probabilities
+    const auto size = cumulative_probabilities.size();
+
+    const auto last = cumulative_probabilities[size - 1];
+
+    // find the first probability from the end that is strictly less than the last probability
+    const auto second_last = [&]() {
+        for (std::size_t i {size - 1}; i > 0; --i) {
+            if (cumulative_probabilities[i - 1] < last) {
+                return cumulative_probabilities[i - 1];
+            }
+        }
+
+        return 0.0;
+    }();
+
+    return (last - second_last) * CUMULATIVE_END_OFFSET_FRACTION;
 }
 
 }  // namespace impl_mqis

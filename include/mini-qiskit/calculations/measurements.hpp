@@ -9,6 +9,7 @@
 
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/gate.hpp"
+#include "mini-qiskit/calculations/probabilities.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -17,20 +18,11 @@
 namespace impl_mqis
 {
 
-constexpr auto calculate_cumulative_sum(const std::vector<double>& probabilities) -> std::vector<double>
-{
-    auto cumulative = std::vector<double> {};
-    cumulative.reserve(probabilities.size());
-
-    std::partial_sum(probabilities.begin(), probabilities.end(), cumulative.begin());
-
-    return cumulative;
-}
-
-auto get_prng(std::optional<int> seed) -> std::mt19937
+inline auto get_prng(std::optional<int> seed) -> std::mt19937
 {
     if (seed) {
-        return std::mt19937 {seed.value()};
+        const auto seed_val = static_cast<std::mt19937::result_type>(seed.value());
+        return std::mt19937 {seed_val};
     }
     else {
         auto device = std::random_device {};
@@ -46,7 +38,7 @@ namespace mqis
 /*
     Check that each qubit is measured once and only once during the circuit.
 */
-auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
+inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
 {
     auto measurement_flags = std::vector<std::uint64_t>(circuit.n_qubits(), 0);
 
@@ -79,17 +71,17 @@ auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
       - memory complexity: O(max(2^n, k))
       - time complexity: O(k * 2^n)
 */
-auto perform_measurements(
-    const QuantumCircuit& circuit,
+inline auto perform_measurements(
     const std::vector<double>& probabilities,
     std::size_t n_shots,
-    std::optional<int> seed
+    std::optional<int> seed = std::nullopt
 ) -> std::vector<std::size_t>
 {
     const auto cumulative = impl_mqis::calculate_cumulative_sum(probabilities);
 
     const auto max_prob = cumulative.back();
-    auto uniform_dist = std::uniform_real_distribution<double> {0.0, max_prob};
+    const auto offset = impl_mqis::cumulative_end_offset(cumulative);
+    auto uniform_dist = std::uniform_real_distribution<double> {0.0, max_prob - offset};
 
     auto prng = impl_mqis::get_prng(seed);
 
@@ -107,13 +99,15 @@ auto perform_measurements(
                 "probability distribution, which shouldn't happen?"};
         }
 
-        measurements.push_back(*it_state);
+        const auto i_state = static_cast<std::size_t>(std::distance(cumulative.begin(), it_state));
+
+        measurements.push_back(i_state);
     }
 
     return measurements;
 }
 
-auto measurements_to_counts(const std::vector<std::size_t>& measurements)
+inline auto measurements_to_counts(const std::vector<std::size_t>& measurements)
     -> std::unordered_map<std::size_t, std::size_t>
 {
     auto map = std::unordered_map<std::size_t, std::size_t> {};
@@ -121,6 +115,24 @@ auto measurements_to_counts(const std::vector<std::size_t>& measurements)
     // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
     for (auto i_state : measurements) {
         ++map[i_state];
+    }
+
+    return map;
+}
+
+inline auto measurements_to_fractions(const std::vector<std::size_t>& measurements)
+    -> std::unordered_map<std::size_t, double>
+{
+    auto map = std::unordered_map<std::size_t, double> {};
+
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    for (auto i_state : measurements) {
+        map[i_state] += 1.0;
+    }
+
+    const auto n_measurements = static_cast<double>(measurements.size());
+    for (auto& pair : map) {
+        map[pair.first] /= n_measurements;
     }
 
     return map;
