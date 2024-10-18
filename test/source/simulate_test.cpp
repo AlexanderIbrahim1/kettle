@@ -364,6 +364,8 @@ TEST_CASE("simulate RZ gate")
 
 TEST_CASE("simulate CX gate")
 {
+    using QSE = mqis::QuantumStateEndian;
+
     SECTION("two qubits, CX(source=0, target=1)")
     {
         const auto n_qubits = 2;
@@ -374,56 +376,40 @@ TEST_CASE("simulate CX gate")
         SECTION("applied to state |00>")
         {
             // expectation: |00> -> |00>
-            auto state = mqis::QuantumState {
-                {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
-            };
+            auto state = mqis::QuantumState {"00"};
             mqis::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
-                {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
-            };
+            const auto expected_state = mqis::QuantumState {"00"};
             REQUIRE(mqis::almost_eq(state, expected_state));
         }
 
         SECTION("applied to state |01>")
         {
             // expectation: |01> -> |01>
-            auto state = mqis::QuantumState {
-                {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}}
-            };
+            auto state = mqis::QuantumState {"01"};
             mqis::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
-                {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}}
-            };
+            const auto expected_state = mqis::QuantumState {"01"};
             REQUIRE(mqis::almost_eq(state, expected_state));
         }
 
         SECTION("applied to state |10>")
         {
             // expectation: |10> -> |11>
-            auto state = mqis::QuantumState {
-                {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
-            };
+            auto state = mqis::QuantumState {"10"};
             mqis::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
-                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}}
-            };
+            const auto expected_state = mqis::QuantumState {"11"};
             REQUIRE(mqis::almost_eq(state, expected_state));
         }
 
         SECTION("applied to state |11>")
         {
             // expectation: |11> -> |10>
-            auto state = mqis::QuantumState {
-                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}}
-            };
+            auto state = mqis::QuantumState {"11"};
             mqis::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
-                {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
-            };
+            const auto expected_state = mqis::QuantumState {"10"};
             REQUIRE(mqis::almost_eq(state, expected_state));
         }
     }
