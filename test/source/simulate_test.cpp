@@ -381,10 +381,10 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState{"00"}, mqis::QuantumState{"00"}},
-                InputAndOutput {mqis::QuantumState{"01"}, mqis::QuantumState{"01"}},
-                InputAndOutput {mqis::QuantumState{"10"}, mqis::QuantumState{"11"}},
-                InputAndOutput {mqis::QuantumState{"11"}, mqis::QuantumState{"10"}}
+                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
+                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"01"}},
+                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"11"}},
+                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {"10"}}
             );
 
             mqis::simulate(circuit, pair.state);
@@ -396,10 +396,10 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(1, 0);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState{"00"}, mqis::QuantumState{"00"}},
-                InputAndOutput {mqis::QuantumState{"01"}, mqis::QuantumState{"11"}},
-                InputAndOutput {mqis::QuantumState{"10"}, mqis::QuantumState{"10"}},
-                InputAndOutput {mqis::QuantumState{"11"}, mqis::QuantumState{"01"}}
+                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
+                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"11"}},
+                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"10"}},
+                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {"01"}}
             );
 
             mqis::simulate(circuit, pair.state);
@@ -416,14 +416,14 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState{"000"}, mqis::QuantumState{"000"}},
-                InputAndOutput {mqis::QuantumState{"100"}, mqis::QuantumState{"110"}},
-                InputAndOutput {mqis::QuantumState{"010"}, mqis::QuantumState{"010"}},
-                InputAndOutput {mqis::QuantumState{"110"}, mqis::QuantumState{"100"}},
-                InputAndOutput {mqis::QuantumState{"001"}, mqis::QuantumState{"001"}},
-                InputAndOutput {mqis::QuantumState{"101"}, mqis::QuantumState{"111"}},
-                InputAndOutput {mqis::QuantumState{"011"}, mqis::QuantumState{"011"}},
-                InputAndOutput {mqis::QuantumState{"111"}, mqis::QuantumState{"101"}}
+                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
+                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"110"}},
+                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
+                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {"100"}},
+                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
+                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {"111"}},
+                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
+                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {"101"}}
             );
 
             mqis::simulate(circuit, pair.state);
@@ -435,14 +435,14 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 2);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState{"000"}, mqis::QuantumState{"000"}},
-                InputAndOutput {mqis::QuantumState{"100"}, mqis::QuantumState{"101"}},
-                InputAndOutput {mqis::QuantumState{"010"}, mqis::QuantumState{"010"}},
-                InputAndOutput {mqis::QuantumState{"110"}, mqis::QuantumState{"111"}},
-                InputAndOutput {mqis::QuantumState{"001"}, mqis::QuantumState{"001"}},
-                InputAndOutput {mqis::QuantumState{"101"}, mqis::QuantumState{"100"}},
-                InputAndOutput {mqis::QuantumState{"011"}, mqis::QuantumState{"011"}},
-                InputAndOutput {mqis::QuantumState{"111"}, mqis::QuantumState{"110"}}
+                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
+                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"101"}},
+                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
+                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {"111"}},
+                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
+                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {"100"}},
+                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
+                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {"110"}}
             );
 
             mqis::simulate(circuit, pair.state);

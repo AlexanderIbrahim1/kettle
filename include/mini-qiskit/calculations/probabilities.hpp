@@ -54,7 +54,7 @@ public:
         , noise_(n_qubits, 0.0)
     {}
 
-    constexpr auto set(std::size_t index, double noise) -> double&
+    constexpr void set(std::size_t index, double noise)
     {
         check_index_(index);
         check_noise_value_(noise);
@@ -88,7 +88,7 @@ private:
     }
 };
 
-constexpr auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise) noexcept
+constexpr auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
     -> std::vector<double>
 {
     const auto n_states = state.n_states();

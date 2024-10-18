@@ -63,6 +63,7 @@ add_test_target(TARGET operations_test SOURCES "source/operations_test.cpp")
 add_test_target(TARGET gate_pair_generator_test SOURCES "source/gate_pair_generator_test.cpp")
 add_test_target(TARGET simulate_test SOURCES "source/simulate_test.cpp")
 add_test_target(TARGET mathtools_test SOURCES "source/common/mathtools_test.cpp")
+add_test_target(TARGET probabilities_test SOURCES "source/calculations/probabilities_test.cpp")
 
 # ---- End-of-file commands ----
 
