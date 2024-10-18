@@ -30,7 +30,7 @@ void simulate_single_qubit_gate(QuantumState& state, const GateInfo& info, std::
             superpose_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::RX) {
-            const auto theta = unpack_rx_gate_angle(info);
+            [[maybe_unused]] const auto [theta, ignore] = unpack_rx_gate(info);
             turn_states(state, state0_index, state1_index, theta);
         }
         else {
@@ -55,7 +55,7 @@ void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::
             swap_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CRX) {
-            const auto theta = unpack_crx_gate_angle(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crx_gate(info);
             turn_states(state, state0_index, state1_index, theta);
         }
         else {

@@ -1,11 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/state.hpp"
-#include "mini-qiskit/simulate.hpp"
-#include "mini-qiskit/calculations/probabilities.hpp"
 #include "mini-qiskit/calculations/measurements.hpp"
+#include "mini-qiskit/calculations/probabilities.hpp"
+#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/simulate.hpp"
+#include "mini-qiskit/state.hpp"
 
 constexpr static auto FRACTION_TOLERANCE = double {0.02};
 

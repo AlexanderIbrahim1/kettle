@@ -64,7 +64,8 @@ constexpr auto cumulative_end_offset(const std::vector<double>& cumulative_proba
     const auto last = cumulative_probabilities[size - 1];
 
     // find the first probability from the end that is strictly less than the last probability
-    const auto second_last = [&]() {
+    const auto second_last = [&]()
+    {
         for (std::size_t i {size - 1}; i > 0; --i) {
             if (cumulative_probabilities[i - 1] < last) {
                 return cumulative_probabilities[i - 1];

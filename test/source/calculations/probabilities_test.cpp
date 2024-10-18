@@ -14,7 +14,7 @@
 
 TEST_CASE("cumulative probabilities")
 {
-    const auto probabilities = std::vector<double> (4, 0.25);
+    const auto probabilities = std::vector<double>(4, 0.25);
     const auto cumulative = impl_mqis::calculate_cumulative_sum(probabilities);
 
     REQUIRE_THAT(cumulative[0], Catch::Matchers::WithinRel(0.25));

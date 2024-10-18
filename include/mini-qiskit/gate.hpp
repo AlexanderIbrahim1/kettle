@@ -121,11 +121,6 @@ constexpr auto unpack_m_gate(GateInfo info) -> std::tuple<std::size_t, std::size
     return {info.arg0, info.arg1};  // qubit index, bit index
 }
 
-constexpr auto unpack_m_gate_qubit_index(GateInfo info) -> std::size_t
-{
-    return info.arg0;  // qubit index
-}
-
 constexpr auto unpack_single_qubit_gate_index(GateInfo info) -> std::size_t
 {
     return info.arg0;
@@ -134,16 +129,6 @@ constexpr auto unpack_single_qubit_gate_index(GateInfo info) -> std::size_t
 constexpr auto unpack_double_qubit_gate_indices(GateInfo info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};
-}
-
-constexpr auto unpack_rx_gate_angle(GateInfo info) -> double
-{
-    return info.arg2;
-}
-
-constexpr auto unpack_crx_gate_angle(GateInfo info) -> double
-{
-    return info.arg2;
 }
 
 }  // namespace mqis
