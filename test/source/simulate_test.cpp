@@ -450,3 +450,47 @@ TEST_CASE("simulate CX gate")
         }
     }
 }
+
+TEST_CASE("simulate H and CX")
+{
+    SECTION("2 qubits, CX(0, 1) H(0)")
+    {
+        // expectation
+        // APPLY H(0)     : |00> -> (1/sqrt2) |00> + (1/sqrt2) |10>
+        // APPLY CX(0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) |11>
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_h_gate(0);
+        circuit.add_cx_gate(0, 1);
+
+        auto state = mqis::QuantumState {"00"};
+        mqis::simulate(circuit, state);
+
+        const auto expected_state = mqis::QuantumState {
+            {{M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}},
+            mqis::QuantumStateEndian::LITTLE
+        };
+
+        REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+
+    SECTION("2 qubits, CX(0, 1) CX(1, 0) CX(0, 1) X(0)")
+    {
+        // expectation
+        // APPLY X(0)     : |00> -> |10>
+        // APPLY CX(0, 1) :      -> |11>
+        // APPLY CX(1, 0) :      -> |01>
+        // APPLY CX(0, 1) :      -> |01>
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_x_gate(0);
+        circuit.add_cx_gate(0, 1);
+        circuit.add_cx_gate(1, 0);
+        circuit.add_cx_gate(0, 1);
+
+        auto state = mqis::QuantumState {"00"};
+        mqis::simulate(circuit, state);
+
+        const auto expected_state = mqis::QuantumState {"01"};
+
+        REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+}
