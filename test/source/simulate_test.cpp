@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/common/complex.hpp"
@@ -364,53 +365,88 @@ TEST_CASE("simulate RZ gate")
 
 TEST_CASE("simulate CX gate")
 {
-    using QSE = mqis::QuantumStateEndian;
-
-    SECTION("two qubits, CX(source=0, target=1)")
+    struct InputAndOutput
     {
-        const auto n_qubits = 2;
+        mqis::QuantumState state;
+        mqis::QuantumState expected;
+    };
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_cx_gate(0, 1);
+    // expectation is that qubit 1 flips if qubit 0 is set
+    SECTION("two qubits")
+    {
+        auto circuit = mqis::QuantumCircuit {2};
 
-        SECTION("applied to state |00>")
+        SECTION("CX(source=0, target=1)")
         {
-            // expectation: |00> -> |00>
-            auto state = mqis::QuantumState {"00"};
-            mqis::simulate(circuit, state);
+            circuit.add_cx_gate(0, 1);
 
-            const auto expected_state = mqis::QuantumState {"00"};
-            REQUIRE(mqis::almost_eq(state, expected_state));
+            auto pair = GENERATE(
+                InputAndOutput {mqis::QuantumState{"00"}, mqis::QuantumState{"00"}},
+                InputAndOutput {mqis::QuantumState{"01"}, mqis::QuantumState{"01"}},
+                InputAndOutput {mqis::QuantumState{"10"}, mqis::QuantumState{"11"}},
+                InputAndOutput {mqis::QuantumState{"11"}, mqis::QuantumState{"10"}}
+            );
+
+            mqis::simulate(circuit, pair.state);
+            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
 
-        SECTION("applied to state |01>")
+        SECTION("CX(source=1, target=0)")
         {
-            // expectation: |01> -> |01>
-            auto state = mqis::QuantumState {"01"};
-            mqis::simulate(circuit, state);
+            circuit.add_cx_gate(1, 0);
 
-            const auto expected_state = mqis::QuantumState {"01"};
-            REQUIRE(mqis::almost_eq(state, expected_state));
+            auto pair = GENERATE(
+                InputAndOutput {mqis::QuantumState{"00"}, mqis::QuantumState{"00"}},
+                InputAndOutput {mqis::QuantumState{"01"}, mqis::QuantumState{"11"}},
+                InputAndOutput {mqis::QuantumState{"10"}, mqis::QuantumState{"10"}},
+                InputAndOutput {mqis::QuantumState{"11"}, mqis::QuantumState{"01"}}
+            );
+
+            mqis::simulate(circuit, pair.state);
+            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+        }
+    }
+
+    SECTION("three qubits")
+    {
+        auto circuit = mqis::QuantumCircuit {3};
+
+        SECTION("CX(source=0, target=1)")
+        {
+            circuit.add_cx_gate(0, 1);
+
+            auto pair = GENERATE(
+                InputAndOutput {mqis::QuantumState{"000"}, mqis::QuantumState{"000"}},
+                InputAndOutput {mqis::QuantumState{"100"}, mqis::QuantumState{"110"}},
+                InputAndOutput {mqis::QuantumState{"010"}, mqis::QuantumState{"010"}},
+                InputAndOutput {mqis::QuantumState{"110"}, mqis::QuantumState{"100"}},
+                InputAndOutput {mqis::QuantumState{"001"}, mqis::QuantumState{"001"}},
+                InputAndOutput {mqis::QuantumState{"101"}, mqis::QuantumState{"111"}},
+                InputAndOutput {mqis::QuantumState{"011"}, mqis::QuantumState{"011"}},
+                InputAndOutput {mqis::QuantumState{"111"}, mqis::QuantumState{"101"}}
+            );
+
+            mqis::simulate(circuit, pair.state);
+            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
 
-        SECTION("applied to state |10>")
+        SECTION("CX(source=0, target=2)")
         {
-            // expectation: |10> -> |11>
-            auto state = mqis::QuantumState {"10"};
-            mqis::simulate(circuit, state);
+            circuit.add_cx_gate(0, 2);
 
-            const auto expected_state = mqis::QuantumState {"11"};
-            REQUIRE(mqis::almost_eq(state, expected_state));
-        }
+            auto pair = GENERATE(
+                InputAndOutput {mqis::QuantumState{"000"}, mqis::QuantumState{"000"}},
+                InputAndOutput {mqis::QuantumState{"100"}, mqis::QuantumState{"101"}},
+                InputAndOutput {mqis::QuantumState{"010"}, mqis::QuantumState{"010"}},
+                InputAndOutput {mqis::QuantumState{"110"}, mqis::QuantumState{"111"}},
+                InputAndOutput {mqis::QuantumState{"001"}, mqis::QuantumState{"001"}},
+                InputAndOutput {mqis::QuantumState{"101"}, mqis::QuantumState{"100"}},
+                InputAndOutput {mqis::QuantumState{"011"}, mqis::QuantumState{"011"}},
+                InputAndOutput {mqis::QuantumState{"111"}, mqis::QuantumState{"110"}}
+            );
 
-        SECTION("applied to state |11>")
-        {
-            // expectation: |11> -> |10>
-            auto state = mqis::QuantumState {"11"};
-            mqis::simulate(circuit, state);
-
-            const auto expected_state = mqis::QuantumState {"10"};
-            REQUIRE(mqis::almost_eq(state, expected_state));
+            mqis::simulate(circuit, pair.state);
+            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
     }
 }
