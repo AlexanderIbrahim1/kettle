@@ -65,7 +65,8 @@ inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
 
     This method (n = number of qubits, k = number of shots)
       - memory complexity: O(max(2^n, k))
-      - time complexity: O(max(2^n, k))
+      - time complexity: O(max(2^n, k*n))
+        - reason: `std::lower_bound()` has a time complexity of log(2^n) = n, and we do it `k` times
 
     Reference MicroQiskit
       - memory complexity: O(max(2^n, k))
