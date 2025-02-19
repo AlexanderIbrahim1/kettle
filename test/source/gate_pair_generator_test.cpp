@@ -73,7 +73,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = mqis::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = impl_mqis::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -93,7 +93,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = mqis::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = impl_mqis::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -130,7 +130,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = mqis::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = impl_mqis::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -152,7 +152,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = mqis::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = impl_mqis::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -174,7 +174,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 2")
     {
-        auto generator = mqis::SingleQubitGatePairGenerator {2, n_qubits};
+        auto generator = impl_mqis::SingleQubitGatePairGenerator {2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -209,7 +209,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("source is 0, target is 1")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -228,7 +228,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("source is 1, target is 0")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -264,7 +264,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(source, target) = (0, 1)")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -284,7 +284,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(source, target) = (1, 0)")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -304,7 +304,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(source, target) = (0, 2)")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {0, 2, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -324,7 +324,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(source, target) = (1, 2)")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {1, 2, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -371,7 +371,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with four qubits")
 
     SECTION("(source, target) = (0, 1)")
     {
-        auto generator = mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 

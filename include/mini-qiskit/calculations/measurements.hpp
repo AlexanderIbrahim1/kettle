@@ -9,6 +9,7 @@
 
 #include "mini-qiskit/calculations/probabilities.hpp"
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/gate.hpp"
 
 /*
@@ -44,7 +45,7 @@ inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
 
     for (const auto& gate : circuit) {
         if (gate.gate == Gate::M) {
-            [[maybe_unused]] const auto [qubit_index, ignore] = unpack_m_gate(gate);
+            [[maybe_unused]] const auto [qubit_index, ignore] = impl_mqis::unpack_m_gate(gate);
             measurement_flags[qubit_index] += 1;
         }
     }

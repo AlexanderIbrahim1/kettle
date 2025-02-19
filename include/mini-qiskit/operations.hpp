@@ -10,15 +10,15 @@
     QuantumState object.
 */
 
-namespace mqis
+namespace impl_mqis
 {
 
-constexpr void swap_states(QuantumState& state, std::size_t i0, std::size_t i1)
+constexpr void swap_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     std::swap(state[i0], state[i1]);
 }
 
-constexpr void superpose_states(QuantumState& state, std::size_t i0, std::size_t i1)
+constexpr void superpose_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -28,11 +28,11 @@ constexpr void superpose_states(QuantumState& state, std::size_t i0, std::size_t
     const auto real_sub = M_SQRT1_2 * (state0.real - state1.real);
     const auto imag_sub = M_SQRT1_2 * (state0.imag - state1.imag);
 
-    state[i0] = Complex {real_add, imag_add};
-    state[i1] = Complex {real_sub, imag_sub};
+    state[i0] = mqis::Complex {real_add, imag_add};
+    state[i1] = mqis::Complex {real_sub, imag_sub};
 }
 
-constexpr void turn_states(QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+constexpr void turn_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -45,11 +45,11 @@ constexpr void turn_states(QuantumState& state, std::size_t i0, std::size_t i1, 
     const auto real1 = state1.real * cost + state0.imag * sint;
     const auto imag1 = state1.imag * cost - state0.real * sint;
 
-    state[i0] = Complex {real0, imag0};
-    state[i1] = Complex {real1, imag1};
+    state[i0] = mqis::Complex {real0, imag0};
+    state[i1] = mqis::Complex {real1, imag1};
 }
 
-constexpr void phaseturn_states(QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+constexpr void phaseturn_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -62,8 +62,8 @@ constexpr void phaseturn_states(QuantumState& state, std::size_t i0, std::size_t
     const auto real1 = state1.real * cost - state1.imag * sint;
     const auto imag1 = state1.imag * cost + state1.real * sint;
 
-    state[i0] = Complex {real0, imag0};
-    state[i1] = Complex {real1, imag1};
+    state[i0] = mqis::Complex {real0, imag0};
+    state[i1] = mqis::Complex {real1, imag1};
 }
 
-}  // namespace mqis
+}  // namespace impl_mqis

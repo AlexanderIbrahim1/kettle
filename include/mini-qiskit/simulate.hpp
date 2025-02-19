@@ -10,12 +10,14 @@
 #include "mini-qiskit/operations.hpp"
 #include "mini-qiskit/state.hpp"
 
-namespace mqis
+namespace impl_mqis
 {
 
-template <Gate GateType>
-void simulate_single_qubit_gate(QuantumState& state, const GateInfo& info, std::size_t n_qubits)
+template <mqis::Gate GateType>
+void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo& info, std::size_t n_qubits)
 {
+    using Gate = mqis::Gate;
+
     const auto qubit_index = unpack_single_qubit_gate_index(info);
 
     auto pair_iterator = SingleQubitGatePairGenerator {qubit_index, n_qubits};
@@ -41,9 +43,11 @@ void simulate_single_qubit_gate(QuantumState& state, const GateInfo& info, std::
     }
 }
 
-template <Gate GateType>
-void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::size_t n_qubits)
+template <mqis::Gate GateType>
+void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo& info, std::size_t n_qubits)
 {
+    using Gate = mqis::Gate;
+
     const auto [source_index, target_index] = unpack_double_qubit_gate_indices(info);
 
     auto pair_iterator = DoubleQubitGatePairGenerator {source_index, target_index, n_qubits};
@@ -64,6 +68,12 @@ void simulate_double_qubit_gate(QuantumState& state, const GateInfo& info, std::
     }
 }
 
+}  // namespace impl_mqis
+
+namespace mqis
+{
+
+// TOOD: MAKE PUBLIC
 inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
 {
     auto measured_clbit_to_qubit = std::unordered_map<std::size_t, std::size_t> {};
@@ -71,28 +81,28 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
     for (const auto& gate : circuit) {
         switch (gate.gate) {
             case Gate::M : {
-                const auto [qubit_index, bit_index] = unpack_m_gate(gate);
+                const auto [qubit_index, bit_index] = impl_mqis::unpack_m_gate(gate);
                 measured_clbit_to_qubit[bit_index] = qubit_index;
                 break;
             }
             case Gate::X : {
-                simulate_single_qubit_gate<Gate::X>(state, gate, circuit.n_qubits());
+                impl_mqis::simulate_single_qubit_gate<Gate::X>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::H : {
-                simulate_single_qubit_gate<Gate::H>(state, gate, circuit.n_qubits());
+                impl_mqis::simulate_single_qubit_gate<Gate::H>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::RX : {
-                simulate_single_qubit_gate<Gate::RX>(state, gate, circuit.n_qubits());
+                impl_mqis::simulate_single_qubit_gate<Gate::RX>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::CX : {
-                simulate_double_qubit_gate<Gate::CX>(state, gate, circuit.n_qubits());
+                impl_mqis::simulate_double_qubit_gate<Gate::CX>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::CRX : {  // replace with default?
-                simulate_double_qubit_gate<Gate::CRX>(state, gate, circuit.n_qubits());
+                impl_mqis::simulate_double_qubit_gate<Gate::CRX>(state, gate, circuit.n_qubits());
                 break;
             }
         }

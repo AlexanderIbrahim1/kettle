@@ -5,6 +5,8 @@
 #include <limits>
 #include <string>
 
+#include "mini-qiskit/common/complex.hpp"
+
 namespace impl_mqis
 {
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
@@ -12,6 +14,11 @@ constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
 constexpr auto norm_squared(double real, double imag) noexcept -> double
 {
     return real * real + imag * imag;
+}
+
+constexpr auto norm_squared(const mqis::Complex& complex) noexcept -> double
+{
+    return complex.real * complex.real + complex.imag * complex.imag;
 }
 
 constexpr auto pow_2_int(std::size_t exponent) noexcept -> std::size_t

@@ -56,7 +56,6 @@ function(add_test_target)
     catch_discover_tests(${add_test_target_TARGET})
 endfunction()
 
-add_test_target(TARGET mini-qiskit_test SOURCES "source/mini-qiskit_test.cpp")
 add_test_target(TARGET gate_test SOURCES "source/gate_test.cpp")
 add_test_target(TARGET state_test SOURCES "source/state_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/operations_test.cpp")

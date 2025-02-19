@@ -1,11 +1,9 @@
 #pragma once
 
-#include <string>
-
-/**
- * @brief Return the name of this header-only library
- */
-inline auto name() -> std::string
-{
-    return "mini-qiskit";
-}
+#include <mini-qiskit/calculations/measurements.hpp>
+#include <mini-qiskit/calculations/probabilities.hpp>
+#include <mini-qiskit/circuit.hpp>
+#include <mini-qiskit/common/complex.hpp>
+#include <mini-qiskit/gate.hpp>
+#include <mini-qiskit/simulate.hpp>
+#include <mini-qiskit/state.hpp>

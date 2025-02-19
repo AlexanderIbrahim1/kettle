@@ -22,9 +22,9 @@ namespace impl_mqis
 
 constexpr static auto CUMULATIVE_END_OFFSET_FRACTION = double {1.0e-4};
 
-constexpr void apply_noise(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
+constexpr void apply_noise_(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
 {
-    auto generator = mqis::SingleQubitGatePairGenerator {i_qubit, n_qubits};
+    auto generator = impl_mqis::SingleQubitGatePairGenerator {i_qubit, n_qubits};
     for (std::size_t i_pair {0}; i_pair < generator.size(); ++i_pair) {
         const auto [state0_index, state1_index] = generator.next();
 
@@ -142,15 +142,14 @@ constexpr auto calculate_probabilities(const QuantumState& state, const QuantumN
     probabilities.reserve(n_states);
 
     for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-        const auto& coeff = state[i_state];
-        const auto prob = impl_mqis::norm_squared(coeff.real, coeff.imag);
+        const auto prob = impl_mqis::norm_squared(state[i_state]);
         probabilities.push_back(prob);
     }
 
     if (noise) {
         for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
             const auto prob_noise = noise->get(i_qubit);
-            impl_mqis::apply_noise(prob_noise, i_qubit, n_qubits, probabilities);
+            impl_mqis::apply_noise_(prob_noise, i_qubit, n_qubits, probabilities);
         }
     }
 

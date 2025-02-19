@@ -25,7 +25,7 @@ TEST_CASE("Swap states operation")
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    mqis::swap_states(quantum_state, 0, 1);
+    impl_mqis::swap_states(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -43,7 +43,7 @@ TEST_CASE("Superpose states operation")
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    mqis::superpose_states(quantum_state, 0, 1);
+    impl_mqis::superpose_states(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -61,7 +61,7 @@ TEST_CASE("Turn states operation")
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    mqis::turn_states(quantum_state, 0, 1, M_PI);
+    impl_mqis::turn_states(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -79,7 +79,7 @@ TEST_CASE("Phase turn states operation")
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    mqis::phaseturn_states(quantum_state, 0, 1, M_PI);
+    impl_mqis::phaseturn_states(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];

@@ -6,7 +6,7 @@
 
 #include "mini-qiskit/common/mathtools.hpp"
 
-namespace mqis
+namespace impl_mqis
 {
 
 /*
@@ -130,4 +130,4 @@ private:
     std::size_t i2_ {0};
 };
 
-}  // namespace mqis
+}  // namespace impl_mqis
