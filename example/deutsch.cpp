@@ -47,7 +47,7 @@ auto main() -> int
     const auto query = QueryCase::CONSTANT_1;
 
     // construct the initial state, in this case using a bitstring
-    auto state = mqis::QuantumState {"01"};
+    auto statevector = mqis::QuantumState {"01"};
 
     // include the gates needed for the Deutsch algorithm
     // NOTE: in the current version of mini-qiskit, it is assumed that a measurement gate is
@@ -59,24 +59,17 @@ auto main() -> int
     circuit.add_h_gate(0);
 
     // propagate the state through the circuit
-    mqis::simulate(circuit, state);
+    mqis::simulate(circuit, statevector);
 
     // get the probabilities from the state; then perform the measurements
-    const auto probabilities = mqis::calculate_probabilities(state);
-    const auto measurements = mqis::perform_measurements(probabilities, 1000);
+    const auto probabilities = mqis::calculate_probabilities(statevector);
 
-    // the measurements come out by default as a vector of all the results; for an easier
-    // time viewing the results, convert it to a map of counts
-    const auto counts = mqis::measurements_to_counts(measurements);
+    // convert the probabilities to a map of the bitstrings to counts
+    const auto counts = mqis::perform_measurements_as_counts(probabilities, 1000);
 
-    // by default, the keys that represent the states are just integers corresponding to
-    // how the state maps integers to bitstrings; we need to convert the integers to the
-    // bitstrings themselves
-    for (const auto [i_state, count] : counts) {
-        const auto bitstring = mqis::state_as_bitstring(i_state, 2);
+    for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
     }
-
     // using `QueryCase::CONSTANT_1` for the query function, an example output is:
     // ```
     // (state, count) = (00, 528)
