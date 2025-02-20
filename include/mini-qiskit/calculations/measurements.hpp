@@ -137,7 +137,8 @@ inline auto perform_measurements_as_counts(
 ) -> std::unordered_map<std::string, std::size_t>
 {
     if (!impl_mqis::is_power_of_2(probabilities.size())) {
-        throw std::runtime_error {"The number of probabilities must be a power of 2 to correspond to valid qubit counts."};
+        throw std::runtime_error {
+            "The number of probabilities must be a power of 2 to correspond to valid qubit counts."};
     }
     const auto n_qubits = impl_mqis::log_2_int(probabilities.size());
 
@@ -186,8 +187,7 @@ inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
     return map;
 }
 
-inline auto memory_to_fractions(const std::vector<std::size_t>& measurements)
-    -> std::unordered_map<std::size_t, double>
+inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::unordered_map<std::size_t, double>
 {
     auto map = std::unordered_map<std::size_t, double> {};
 

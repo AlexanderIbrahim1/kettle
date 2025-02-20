@@ -10,7 +10,6 @@ enum class QueryCase
     BALANCED_SWAP = 3
 };
 
-
 void apply_query(mqis::QuantumCircuit& circuit, QueryCase parity)
 {
     // NOTE: I could simplify this into two separate if-statements, but:
@@ -18,8 +17,7 @@ void apply_query(mqis::QuantumCircuit& circuit, QueryCase parity)
     // - there aren't that many cases, so the downside of repetition isn't that bad
     using QC = QueryCase;
 
-    switch (parity)
-    {
+    switch (parity) {
         case QC::CONSTANT_0 : {
             break;
         }

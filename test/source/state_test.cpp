@@ -434,10 +434,7 @@ TEST_CASE("state_as_bitstring")
     {
         SECTION("1 qubit")
         {
-            auto pair = GENERATE(
-                InputAndOutput {0, 1, "0"},
-                InputAndOutput {1, 1, "1"}
-            );
+            auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
 
             REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }

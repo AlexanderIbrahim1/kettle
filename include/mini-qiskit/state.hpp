@@ -43,16 +43,15 @@ constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t 
     return dyn_bitset;
 }
 
-
-auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits)
-    -> std::string
+auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std::string
 {
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
     for (auto bit : bits) {
         if (bit == 0) {
             bitstring.push_back('0');
-        } else {
+        }
+        else {
             bitstring.push_back('1');
         }
     }
@@ -237,29 +236,25 @@ constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size
 }
 
 // the internal mapping in the quantum state is little endian, so this should be the default function
-constexpr auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits)
-    -> std::vector<std::uint8_t>
+constexpr auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     return state_as_dynamic_bitset_little_endian(i_state, n_qubits);
 }
 
-inline auto state_as_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits)
-    -> std::string
+inline auto state_as_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     const auto bits = state_as_dynamic_bitset_little_endian(i_state, n_qubits);
     return impl_mqis::dynamic_bitset_to_bitstring_(bits);
 }
 
-inline auto state_as_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits)
-    -> std::string
+inline auto state_as_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     const auto bits = state_as_dynamic_bitset_big_endian(i_state, n_qubits);
     return impl_mqis::dynamic_bitset_to_bitstring_(bits);
 }
 
 // the internal mapping in the quantum state is little endian, so this should be the default function
-inline auto state_as_bitstring(std::size_t i_state, std::size_t n_qubits)
-    -> std::string
+inline auto state_as_bitstring(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     return state_as_bitstring_little_endian(i_state, n_qubits);
 }
