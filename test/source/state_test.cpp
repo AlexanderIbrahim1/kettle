@@ -382,3 +382,92 @@ TEST_CASE("state_as_dynamic_bitset")
         }
     }
 }
+
+TEST_CASE("state_as_bitstring")
+{
+    struct InputAndOutput
+    {
+        std::size_t i_state;
+        std::size_t n_qubits;
+        std::string bitstring;
+    };
+
+    SECTION("little endian")
+    {
+        SECTION("1 qubit")
+        {
+            auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
+
+            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+
+        SECTION("2 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {0, 2, "00"},
+                InputAndOutput {1, 2, "10"},
+                InputAndOutput {2, 2, "01"},
+                InputAndOutput {3, 2, "11"}
+            );
+
+            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+
+        SECTION("3 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {0, 3, "000"},
+                InputAndOutput {1, 3, "100"},
+                InputAndOutput {2, 3, "010"},
+                InputAndOutput {3, 3, "110"},
+                InputAndOutput {4, 3, "001"},
+                InputAndOutput {5, 3, "101"},
+                InputAndOutput {6, 3, "011"},
+                InputAndOutput {7, 3, "111"}
+            );
+
+            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+    }
+
+    SECTION("big endian")
+    {
+        SECTION("1 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {0, 1, "0"},
+                InputAndOutput {1, 1, "1"}
+            );
+
+            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+
+        SECTION("2 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {0, 2, "00"},
+                InputAndOutput {1, 2, "01"},
+                InputAndOutput {2, 2, "10"},
+                InputAndOutput {3, 2, "11"}
+            );
+
+            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+
+        SECTION("3 qubit")
+        {
+            auto pair = GENERATE(
+                InputAndOutput {0, 3, "000"},
+                InputAndOutput {1, 3, "001"},
+                InputAndOutput {2, 3, "010"},
+                InputAndOutput {3, 3, "011"},
+                InputAndOutput {4, 3, "100"},
+                InputAndOutput {5, 3, "101"},
+                InputAndOutput {6, 3, "110"},
+                InputAndOutput {7, 3, "111"}
+            );
+
+            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+        }
+    }
+}
