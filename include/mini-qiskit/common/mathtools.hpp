@@ -3,6 +3,7 @@
 #include <bitset>
 #include <cstddef>
 #include <limits>
+#include <stdexcept>
 #include <string>
 
 #include "mini-qiskit/common/complex.hpp"
@@ -32,6 +33,18 @@ constexpr auto is_power_of_2(std::size_t value) noexcept -> bool
     const auto has_one_bit_set = (value & (value - 1)) == 0;
 
     return is_positive && has_one_bit_set;
+}
+
+constexpr auto log_2_int(std::size_t power) noexcept -> std::size_t
+{
+    // assumes that power > 0
+    auto log2 = std::size_t {0};
+    while (power > 0) {
+        ++log2;
+        power = (power >> 1);
+    }
+
+    return log2 - 1;
 }
 
 auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t

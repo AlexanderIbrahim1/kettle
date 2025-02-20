@@ -32,11 +32,11 @@ TEST_CASE("measurements")
         mqis::simulate(circuit, state);
 
         const auto probabilities = mqis::calculate_probabilities(state);
-        const auto measurements = mqis::perform_measurements(probabilities, n_shots);
+        const auto measurements = mqis::perform_measurements_as_memory(probabilities, n_shots);
 
         REQUIRE(measurements.size() == n_shots);
 
-        const auto counts = mqis::measurements_to_fractions(measurements);
+        const auto counts = mqis::memory_to_fractions(measurements);
 
         REQUIRE_THAT(counts.at(0), Catch::Matchers::WithinAbs(0.25, FRACTION_TOLERANCE));
         REQUIRE_THAT(counts.at(1), Catch::Matchers::WithinAbs(0.25, FRACTION_TOLERANCE));
@@ -61,11 +61,11 @@ TEST_CASE("measurements")
         mqis::simulate(circuit, state);
 
         const auto probabilities = mqis::calculate_probabilities(state);
-        const auto measurements = mqis::perform_measurements(probabilities, n_shots);
+        const auto measurements = mqis::perform_measurements_as_memory(probabilities, n_shots);
 
         REQUIRE(measurements.size() == n_shots);
 
-        const auto counts = mqis::measurements_to_fractions(measurements);
+        const auto counts = mqis::memory_to_fractions(measurements);
 
         REQUIRE_THAT(counts.at(0), Catch::Matchers::WithinAbs(0.5, FRACTION_TOLERANCE));
         REQUIRE_THAT(counts.at(1), Catch::Matchers::WithinAbs(0.5, FRACTION_TOLERANCE));

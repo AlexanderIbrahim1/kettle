@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <optional>
 #include <random>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -11,6 +13,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/gate.hpp"
+#include "mini-qiskit/state.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -19,7 +22,7 @@
 namespace impl_mqis
 {
 
-inline auto get_prng(std::optional<int> seed) -> std::mt19937
+inline auto get_prng_(std::optional<int> seed) -> std::mt19937
 {
     if (seed) {
         const auto seed_val = static_cast<std::mt19937::result_type>(seed.value());
@@ -30,6 +33,41 @@ inline auto get_prng(std::optional<int> seed) -> std::mt19937
         return std::mt19937 {device()};
     }
 }
+
+class ProbabilitySampler_
+{
+public:
+    ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed = std::nullopt)
+        : cumulative_ {calculate_cumulative_sum(probabilities)}
+        , prng_ {get_prng_(seed)}
+    {
+        const auto max_prob = cumulative_.back();
+        const auto offset = impl_mqis::cumulative_end_offset(cumulative_);
+        uniform_dist_ = std::uniform_real_distribution<double> {0.0, max_prob - offset};
+    }
+
+    auto operator()() -> std::size_t
+    {
+        const auto prob = uniform_dist_(prng_);
+
+        const auto it_state = std::lower_bound(cumulative_.begin(), cumulative_.end(), prob);
+
+        if (it_state == cumulative_.end()) {
+            throw std::runtime_error {
+                "LOGIC BUG: Ended up with measurement of state past end of cumulative\n"
+                "probability distribution, which shouldn't happen?"};
+        }
+
+        const auto i_state = static_cast<std::size_t>(std::distance(cumulative_.begin(), it_state));
+
+        return i_state;
+    }
+
+private:
+    std::vector<double> cumulative_;
+    std::mt19937 prng_;
+    std::uniform_real_distribution<double> uniform_dist_;
+};
 
 }  // namespace impl_mqis
 
@@ -73,43 +111,69 @@ inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
       - memory complexity: O(max(2^n, k))
       - time complexity: O(k * 2^n)
 */
-inline auto perform_measurements(
+inline auto perform_measurements_as_memory(
     const std::vector<double>& probabilities,
     std::size_t n_shots,
     std::optional<int> seed = std::nullopt
 ) -> std::vector<std::size_t>
 {
-    const auto cumulative = impl_mqis::calculate_cumulative_sum(probabilities);
-
-    const auto max_prob = cumulative.back();
-    const auto offset = impl_mqis::cumulative_end_offset(cumulative);
-    auto uniform_dist = std::uniform_real_distribution<double> {0.0, max_prob - offset};
-
-    auto prng = impl_mqis::get_prng(seed);
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
 
     auto measurements = std::vector<std::size_t> {};
     measurements.reserve(n_shots);
 
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
-        const auto prob = uniform_dist(prng);
-
-        const auto it_state = std::lower_bound(cumulative.begin(), cumulative.end(), prob);
-
-        if (it_state == cumulative.end()) {
-            throw std::runtime_error {
-                "LOGIC BUG: Ended up with measurement of state past end of cumulative\n"
-                "probability distribution, which shouldn't happen?"};
-        }
-
-        const auto i_state = static_cast<std::size_t>(std::distance(cumulative.begin(), it_state));
-
+        const auto i_state = sampler();
         measurements.push_back(i_state);
     }
 
     return measurements;
 }
 
-inline auto measurements_to_counts(const std::vector<std::size_t>& measurements)
+inline auto perform_measurements_as_counts(
+    const std::vector<double>& probabilities,
+    std::size_t n_shots,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::string, std::size_t>
+{
+    if (!impl_mqis::is_power_of_2(probabilities.size())) {
+        throw std::runtime_error {"The number of probabilities must be a power of 2 to correspond to valid qubit counts."};
+    }
+    const auto n_qubits = impl_mqis::log_2_int(probabilities.size());
+
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
+    auto measurements = std::unordered_map<std::string, std::size_t> {};
+
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
+        const auto state = sampler();
+        const auto bitstring = state_as_bitstring(state, n_qubits);
+        ++measurements[bitstring];
+    }
+
+    return measurements;
+}
+
+inline auto perform_measurements_as_counts_raw(
+    const std::vector<double>& probabilities,
+    std::size_t n_shots,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::size_t, std::size_t>
+{
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
+
+    auto measurements = std::unordered_map<std::size_t, std::size_t> {};
+
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
+        const auto i_state = sampler();
+        ++measurements[i_state];
+    }
+
+    return measurements;
+}
+
+inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
     -> std::unordered_map<std::size_t, std::size_t>
 {
     auto map = std::unordered_map<std::size_t, std::size_t> {};
@@ -122,7 +186,7 @@ inline auto measurements_to_counts(const std::vector<std::size_t>& measurements)
     return map;
 }
 
-inline auto measurements_to_fractions(const std::vector<std::size_t>& measurements)
+inline auto memory_to_fractions(const std::vector<std::size_t>& measurements)
     -> std::unordered_map<std::size_t, double>
 {
     auto map = std::unordered_map<std::size_t, double> {};
