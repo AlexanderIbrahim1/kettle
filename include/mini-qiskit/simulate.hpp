@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/common/traits.hpp"
+#include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gate_pair_generator.hpp"
 #include "mini-qiskit/operations.hpp"
 #include "mini-qiskit/state.hpp"

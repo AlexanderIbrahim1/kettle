@@ -14,6 +14,7 @@
 
 #include "mini-qiskit/common/complex.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/utils.hpp"
 
 namespace impl_mqis
 {
@@ -49,6 +50,28 @@ auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std:
     bitstring.reserve(bits.size());
     for (auto bit : bits) {
         if (bit == 0) {
+            bitstring.push_back('0');
+        }
+        else {
+            bitstring.push_back('1');
+        }
+    }
+
+    return bitstring;
+}
+
+inline auto state_as_bitstring_little_endian_marginal_(std::size_t i_state, const std::vector<std::uint8_t>& marginal_bitmask) -> std::string
+{
+    const auto n_qubits = marginal_bitmask.size();
+    const auto bits = state_as_dynamic_bitset_helper_<true>(i_state, n_qubits);
+
+    auto bitstring = std::string {};
+    bitstring.reserve(bits.size());
+    for (std::size_t i_bit {0}; i_bit < bits.size(); ++i_bit) {
+        if (marginal_bitmask[i_bit]) {
+            bitstring.push_back(MARGINALIZED_QUBIT);
+        }
+        else if (bits[i_bit] == 0) {
             bitstring.push_back('0');
         }
         else {
