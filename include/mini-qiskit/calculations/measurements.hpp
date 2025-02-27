@@ -240,7 +240,7 @@ inline auto perform_measurements_as_counts_raw(
 inline auto perform_measurements_as_counts_marginal(
     const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
-    const std::vector<std::uint8_t>& marginal_bitmask,
+    const std::vector<std::uint8_t>& measure_bitmask,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::string, std::size_t>
 {
@@ -250,7 +250,7 @@ inline auto perform_measurements_as_counts_marginal(
     }
     const auto n_qubits = impl_mqis::log_2_int(probabilities_raw.size());
 
-    if (marginal_bitmask.size() != n_qubits) {
+    if (measure_bitmask.size() != n_qubits) {
         throw std::runtime_error {"The length of the marginal bitmask must match the number of qubits."};
     }
 
@@ -260,7 +260,7 @@ inline auto perform_measurements_as_counts_marginal(
     // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
         const auto state = sampler();
-        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(state, marginal_bitmask);
+        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(state, measure_bitmask);
         ++measurements[bitstring];
     }
 

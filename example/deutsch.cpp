@@ -60,7 +60,7 @@ auto main() -> int
     mqis::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts (probabilities are calculated within the function)
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {0, 1});
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {1, 0});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

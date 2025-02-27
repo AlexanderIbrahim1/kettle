@@ -62,16 +62,16 @@ auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std:
 
 inline auto state_as_bitstring_little_endian_marginal_(
     std::size_t i_state,
-    const std::vector<std::uint8_t>& marginal_bitmask
+    const std::vector<std::uint8_t>& measure_bitmask
 ) -> std::string
 {
-    const auto n_qubits = marginal_bitmask.size();
+    const auto n_qubits = measure_bitmask.size();
     const auto bits = state_as_dynamic_bitset_helper_<true>(i_state, n_qubits);
 
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
     for (std::size_t i_bit {0}; i_bit < bits.size(); ++i_bit) {
-        if (marginal_bitmask[i_bit]) {
+        if (!measure_bitmask[i_bit]) {
             bitstring.push_back(MARGINALIZED_QUBIT);
         }
         else if (bits[i_bit] == 0) {
