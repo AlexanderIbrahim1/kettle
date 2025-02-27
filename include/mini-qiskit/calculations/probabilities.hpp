@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
+#include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -132,7 +134,7 @@ private:
     }
 };
 
-constexpr auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
+constexpr auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
     -> std::vector<double>
 {
     const auto n_states = state.n_states();
@@ -150,6 +152,35 @@ constexpr auto calculate_probabilities(const QuantumState& state, const QuantumN
         for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
             const auto prob_noise = noise->get(i_qubit);
             impl_mqis::apply_noise_(prob_noise, i_qubit, n_qubits, probabilities);
+        }
+    }
+
+    return probabilities;
+}
+
+auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
+    -> std::unordered_map<std::string, double>
+{
+    const auto n_states = state.n_states();
+    const auto n_qubits = state.n_qubits();
+    auto probabilities = std::unordered_map<std::string, double> {};
+
+    // applying noise involves generating the indices of pairs of states, and this is much more convenient
+    // when done with indices rather than strings; so the downsides of using twice the memory don't seem
+    // that bad
+    if (noise) {
+        const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+
+        for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
+            const auto bitstring = state_as_bitstring(i_state, n_qubits);
+            probabilities[bitstring] = probabilities_raw[i_state];
+        }
+    }
+    else {
+        for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
+            const auto prob = impl_mqis::norm_squared(state[i_state]);
+            const auto bitstring = state_as_bitstring(i_state, n_qubits);
+            probabilities[bitstring] = prob;
         }
     }
 

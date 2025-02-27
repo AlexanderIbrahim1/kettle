@@ -31,8 +31,8 @@ TEST_CASE("measurements")
 
         mqis::simulate(circuit, state);
 
-        const auto probabilities = mqis::calculate_probabilities(state);
-        const auto measurements = mqis::perform_measurements_as_memory(probabilities, n_shots);
+        const auto probabilities_raw = mqis::calculate_probabilities_raw(state);
+        const auto measurements = mqis::perform_measurements_as_memory(probabilities_raw, n_shots);
 
         REQUIRE(measurements.size() == n_shots);
 
@@ -60,8 +60,8 @@ TEST_CASE("measurements")
 
         mqis::simulate(circuit, state);
 
-        const auto probabilities = mqis::calculate_probabilities(state);
-        const auto measurements = mqis::perform_measurements_as_memory(probabilities, n_shots);
+        const auto probabilities_raw = mqis::calculate_probabilities_raw(state);
+        const auto measurements = mqis::perform_measurements_as_memory(probabilities_raw, n_shots);
 
         REQUIRE(measurements.size() == n_shots);
 

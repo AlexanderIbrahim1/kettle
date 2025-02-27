@@ -74,6 +74,36 @@ private:
 namespace mqis
 {
 
+inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
+    -> std::unordered_map<std::size_t, std::size_t>
+{
+    auto map = std::unordered_map<std::size_t, std::size_t> {};
+
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    for (auto i_state : measurements) {
+        ++map[i_state];
+    }
+
+    return map;
+}
+
+inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::unordered_map<std::size_t, double>
+{
+    auto map = std::unordered_map<std::size_t, double> {};
+
+    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    for (auto i_state : measurements) {
+        map[i_state] += 1.0;
+    }
+
+    const auto n_measurements = static_cast<double>(measurements.size());
+    for (auto& pair : map) {
+        map[pair.first] /= n_measurements;
+    }
+
+    return map;
+}
+
 /*
     Check that each qubit is measured once and only once during the circuit.
 */
@@ -112,12 +142,12 @@ inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
       - time complexity: O(k * 2^n)
 */
 inline auto perform_measurements_as_memory(
-    const std::vector<double>& probabilities,
+    const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
     std::optional<int> seed = std::nullopt
 ) -> std::vector<std::size_t>
 {
-    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
 
     auto measurements = std::vector<std::size_t> {};
     measurements.reserve(n_shots);
@@ -131,18 +161,18 @@ inline auto perform_measurements_as_memory(
 }
 
 inline auto perform_measurements_as_counts(
-    const std::vector<double>& probabilities,
+    const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::string, std::size_t>
 {
-    if (!impl_mqis::is_power_of_2(probabilities.size())) {
+    if (!impl_mqis::is_power_of_2(probabilities_raw.size())) {
         throw std::runtime_error {
             "The number of probabilities must be a power of 2 to correspond to valid qubit counts."};
     }
-    const auto n_qubits = impl_mqis::log_2_int(probabilities.size());
+    const auto n_qubits = impl_mqis::log_2_int(probabilities_raw.size());
 
-    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::unordered_map<std::string, std::size_t> {};
 
     // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
@@ -156,12 +186,12 @@ inline auto perform_measurements_as_counts(
 }
 
 inline auto perform_measurements_as_counts_raw(
-    const std::vector<double>& probabilities,
+    const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::size_t, std::size_t>
 {
-    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities, seed};
+    auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
 
     auto measurements = std::unordered_map<std::size_t, std::size_t> {};
 
@@ -172,36 +202,6 @@ inline auto perform_measurements_as_counts_raw(
     }
 
     return measurements;
-}
-
-inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
-    -> std::unordered_map<std::size_t, std::size_t>
-{
-    auto map = std::unordered_map<std::size_t, std::size_t> {};
-
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
-    for (auto i_state : measurements) {
-        ++map[i_state];
-    }
-
-    return map;
-}
-
-inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::unordered_map<std::size_t, double>
-{
-    auto map = std::unordered_map<std::size_t, double> {};
-
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
-    for (auto i_state : measurements) {
-        map[i_state] += 1.0;
-    }
-
-    const auto n_measurements = static_cast<double>(measurements.size());
-    for (auto& pair : map) {
-        map[pair.first] /= n_measurements;
-    }
-
-    return map;
 }
 
 }  // namespace mqis
