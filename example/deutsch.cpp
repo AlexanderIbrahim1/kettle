@@ -71,6 +71,11 @@ auto main() -> int
     // (state, count) = (01, 472)
     // ```
     // in other words, only states where the 0th bit is 0 were sampled
+    //
+    // if the counts were calculated marginally, the output will be:
+    // ```
+    // (state, count) = (0x, 1000)
+    // ```
 
     return 0;
 }
