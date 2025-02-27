@@ -160,6 +160,17 @@ inline auto perform_measurements_as_memory(
     return measurements;
 }
 
+inline auto perform_measurements_as_memory(
+    const QuantumState& state,
+    std::size_t n_shots,
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::vector<std::size_t>
+{
+    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+    return perform_measurements_as_memory(probabilities_raw, n_shots, seed);
+}
+
 inline auto perform_measurements_as_counts(
     const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
@@ -185,6 +196,17 @@ inline auto perform_measurements_as_counts(
     return measurements;
 }
 
+inline auto perform_measurements_as_counts(
+    const QuantumState& state,
+    std::size_t n_shots,
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::string, std::size_t>
+{
+    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+    return perform_measurements_as_counts(probabilities_raw, n_shots, seed);
+}
+
 inline auto perform_measurements_as_counts_raw(
     const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
@@ -202,6 +224,17 @@ inline auto perform_measurements_as_counts_raw(
     }
 
     return measurements;
+}
+
+inline auto perform_measurements_as_counts_raw(
+    const QuantumState& state,
+    std::size_t n_shots,
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::size_t, std::size_t>
+{
+    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+    return perform_measurements_as_counts_raw(probabilities_raw, n_shots, seed);
 }
 
 }  // namespace mqis
