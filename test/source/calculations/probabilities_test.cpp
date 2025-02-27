@@ -126,7 +126,10 @@ TEST_CASE("probabilities")
         mqis::simulate(circuit, state);
 
         const auto actual = mqis::calculate_probabilities(state);
-        const auto expected = std::unordered_map<std::string, double> {{"0", 0.5}, {"1", 0.5}};
+        const auto expected = std::unordered_map<std::string, double> {
+            {"0", 0.5},
+            {"1", 0.5}
+        };
 
         REQUIRE_THAT(actual.at("0"), Catch::Matchers::WithinAbs(expected.at("0"), RELATIVE_TOL));
         REQUIRE_THAT(actual.at("1"), Catch::Matchers::WithinAbs(expected.at("1"), RELATIVE_TOL));
@@ -147,7 +150,10 @@ TEST_CASE("probabilities")
             };
 
             const auto actual = mqis::calculate_probabilities(state);
-            const auto expected = std::unordered_map<std::string, double> {{"0", 1.0}, {"1", 0.0}};
+            const auto expected = std::unordered_map<std::string, double> {
+                {"0", 1.0},
+                {"1", 0.0}
+            };
 
             REQUIRE_THAT(actual.at("0"), Catch::Matchers::WithinAbs(expected.at("0"), RELATIVE_TOL));
             REQUIRE_THAT(actual.at("1"), Catch::Matchers::WithinAbs(expected.at("1"), RELATIVE_TOL));
