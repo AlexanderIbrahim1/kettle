@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "mini-qiskit/common/utils.hpp"
-#include "mini-qiskit/gate.hpp"
+#include "mini-qiskit/primitive_gate.hpp"
 
 namespace mqis
 {

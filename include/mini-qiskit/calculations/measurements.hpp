@@ -13,7 +13,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/utils.hpp"
-#include "mini-qiskit/gate.hpp"
+#include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/state.hpp"
 
 /*

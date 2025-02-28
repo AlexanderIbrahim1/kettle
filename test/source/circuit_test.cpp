@@ -5,7 +5,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/gate.hpp"
+#include "mini-qiskit/primitive_gate.hpp"
 
 static constexpr auto ABS_TOL = double {1.0e-6};
 
