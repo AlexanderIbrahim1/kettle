@@ -12,6 +12,7 @@
 #include "mini-qiskit/calculations/probabilities.hpp"
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gate.hpp"
 #include "mini-qiskit/state.hpp"
 
@@ -252,6 +253,11 @@ inline auto perform_measurements_as_counts_marginal(
 
     if (measure_bitmask.size() != n_qubits) {
         throw std::runtime_error {"The length of the marginal bitmask must match the number of qubits."};
+    }
+
+    const auto bit_is_set = [](std::uint8_t bit) { return bit == 1; };
+    if (!std::any_of(measure_bitmask.begin(), measure_bitmask.end(), bit_is_set)) {
+        throw std::runtime_error {"No measurement gates have been added."};
     }
 
     auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};

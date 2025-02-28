@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
@@ -70,4 +72,83 @@ TEST_CASE("measurements")
         REQUIRE_THAT(counts.at(0), Catch::Matchers::WithinAbs(0.5, FRACTION_TOLERANCE));
         REQUIRE_THAT(counts.at(1), Catch::Matchers::WithinAbs(0.5, FRACTION_TOLERANCE));
     }
+}
+
+TEST_CASE("measurement gate")
+{
+    using BitMask = std::vector<std::uint8_t>;
+
+    const auto calculate_n_measurements = [](const BitMask& bitmask)
+    { return std::count_if(bitmask.begin(), bitmask.end(), [](std::uint8_t bit) { return bit == 1; }); };
+
+    auto circuit = mqis::QuantumCircuit {2};
+
+    SECTION("no measurements")
+    {
+        REQUIRE(calculate_n_measurements(circuit.measure_bitmask()) == 0);
+    }
+
+    SECTION("qubit 0 set")
+    {
+        circuit.add_m_gate(0);
+        REQUIRE(circuit.measure_bitmask() == BitMask {1, 0});
+        REQUIRE(calculate_n_measurements(circuit.measure_bitmask()) == 1);
+    }
+
+    SECTION("qubit 1 set")
+    {
+        circuit.add_m_gate(1);
+        REQUIRE(circuit.measure_bitmask() == BitMask {0, 1});
+        REQUIRE(calculate_n_measurements(circuit.measure_bitmask()) == 1);
+    }
+
+    SECTION("qubits 0 and 1 set")
+    {
+        circuit.add_m_gate(0);
+        circuit.add_m_gate(1);
+        REQUIRE(circuit.measure_bitmask() == BitMask {1, 1});
+        REQUIRE(calculate_n_measurements(circuit.measure_bitmask()) == 2);
+    }
+}
+
+TEST_CASE("throws after multiple measurement gates")
+{
+    auto circuit = mqis::QuantumCircuit {2};
+
+    SECTION("add m gate to qubit 0 twice")
+    {
+        circuit.add_m_gate(0);
+        REQUIRE_THROWS_AS(circuit.add_m_gate(0), std::runtime_error);
+    }
+
+    SECTION("add m gate to qubit 1 twice")
+    {
+        circuit.add_m_gate(1);
+        REQUIRE_THROWS_AS(circuit.add_m_gate(1), std::runtime_error);
+    }
+
+    SECTION("add m gate to qubits 0 and 1, and then again to 0")
+    {
+        circuit.add_m_gate(0);
+        circuit.add_m_gate(1);
+        REQUIRE_THROWS_AS(circuit.add_m_gate(0), std::runtime_error);
+    }
+}
+
+TEST_CASE("throws after adding non-measurement gate after measurement gate")
+{
+    auto circuit = mqis::QuantumCircuit {2};
+    circuit.add_h_gate(0);
+    circuit.add_m_gate(0);
+
+    REQUIRE_THROWS_AS(circuit.add_h_gate(0), std::runtime_error);
+}
+
+TEST_CASE("throws when trying to get marginal counts with no measurement gates")
+{
+    auto circuit = mqis::QuantumCircuit {2};
+    auto state = mqis::QuantumState {"00"};
+    circuit.add_h_gate(0);
+
+    REQUIRE_THROWS_AS(mqis::perform_measurements_as_counts_marginal(circuit, state, 1024), std::runtime_error);
 }
