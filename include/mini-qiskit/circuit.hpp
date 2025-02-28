@@ -1,11 +1,13 @@
 #pragma once
 
 #include <cmath>
+#include <concepts>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
 
+#include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gate.hpp"
 
 namespace mqis
@@ -61,6 +63,14 @@ public:
         gates_.emplace_back(impl_mqis::create_x_gate(qubit_index));
     }
 
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_x_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_x_gate(index);
+        }
+    }
+
     void add_rx_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RX");
@@ -68,11 +78,28 @@ public:
         gates_.emplace_back(impl_mqis::create_rx_gate(theta, qubit_index));
     }
 
+    template <
+        impl_mqis::ContainerOfAnglesAndQubitIndices Container = std::initializer_list<std::pair<double, std::size_t>>>
+    void add_rx_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_rx_gate(pair.first, pair.second);
+        }
+    }
+
     void add_h_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "H");
         check_previous_gate_is_not_measure_(qubit_index, "H");
         gates_.emplace_back(impl_mqis::create_h_gate(qubit_index));
+    }
+
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_h_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_h_gate(index);
+        }
     }
 
     void add_cx_gate(std::size_t source_index, std::size_t target_index)
@@ -84,6 +111,16 @@ public:
         gates_.emplace_back(impl_mqis::create_cx_gate(source_index, target_index));
     }
 
+    template <
+        impl_mqis::ContainerOfControlAndTargetQubitIndices Container =
+            std::initializer_list<std::pair<std::size_t, std::size_t>>>
+    void add_cx_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_cx_gate(pair.first, pair.second);
+        }
+    }
+
     void add_crx_gate(double theta, std::size_t source_index, std::size_t target_index)
     {
         check_qubit_range_(source_index, "source qubit", "CRX");
@@ -91,6 +128,16 @@ public:
         check_previous_gate_is_not_measure_(source_index, "CRX");
         check_previous_gate_is_not_measure_(target_index, "CRX");
         gates_.emplace_back(impl_mqis::create_crx_gate(source_index, target_index, theta));
+    }
+
+    template <
+        impl_mqis::ContainerOfAnglesAndControlAndTargetQubitIndices Container =
+            std::initializer_list<std::tuple<double, std::size_t, std::size_t>>>
+    void add_crx_gate(const Container& tuples)
+    {
+        for (auto tuple : tuples) {
+            add_crx_gate(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple));
+        }
     }
 
     void add_rz_gate(double theta, std::size_t qubit_index)
@@ -102,6 +149,15 @@ public:
         gates_.emplace_back(impl_mqis::create_h_gate(qubit_index));
     }
 
+    template <
+        impl_mqis::ContainerOfAnglesAndQubitIndices Container = std::initializer_list<std::pair<double, std::size_t>>>
+    void add_rz_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_rz_gate(pair.first, pair.second);
+        }
+    }
+
     void add_ry_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RY");
@@ -111,11 +167,28 @@ public:
         gates_.emplace_back(impl_mqis::create_rx_gate(-M_PI_2, qubit_index));
     }
 
+    template <
+        impl_mqis::ContainerOfAnglesAndQubitIndices Container = std::initializer_list<std::pair<double, std::size_t>>>
+    void add_ry_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_ry_gate(pair.first, pair.second);
+        }
+    }
+
     void add_z_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "Z");
         check_previous_gate_is_not_measure_(qubit_index, "Z");
         add_rz_gate(M_PI, qubit_index);
+    }
+
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_z_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_z_gate(index);
+        }
     }
 
     void add_y_gate(std::size_t qubit_index)
@@ -124,6 +197,14 @@ public:
         check_previous_gate_is_not_measure_(qubit_index, "Y");
         add_z_gate(qubit_index);
         add_x_gate(qubit_index);
+    }
+
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_y_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_y_gate(index);
+        }
     }
 
     void add_m_gate(std::size_t qubit_index)
@@ -140,6 +221,14 @@ public:
 
         gates_.emplace_back(impl_mqis::create_m_gate(qubit_index, bit_index));
         measure_bitmask_[qubit_index] = MEASURED_FLAG;
+    }
+
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_m_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_m_gate(index);
+        }
     }
 
     constexpr auto measure_bitmask() const noexcept -> const std::vector<std::uint8_t>&
