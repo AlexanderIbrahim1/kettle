@@ -494,3 +494,86 @@ TEST_CASE("simulate H and CX")
         REQUIRE(mqis::almost_eq(state, expected_state));
     }
 }
+
+TEST_CASE("simulate CRX")
+{
+    SECTION("2 qubits, CRX(t, 0, 1) H(0)")
+    {
+        // expectation
+        // APPLY H(0)         : |00> -> (1/sqrt2) |00> + (1/sqrt2) |10>
+        // APPLY CRX(t, 0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) cos(t/2) |10> - (i/sqrt2) |11>
+        auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
+
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_h_gate(0);
+        circuit.add_crx_gate(angle, 0, 1);
+
+        auto state = mqis::QuantumState {"00"};
+        mqis::simulate(circuit, state);
+
+        const auto cost = std::cos(angle / 2.0);
+        const auto sint = std::sin(angle / 2.0);
+
+        const auto expected_state = mqis::QuantumState {
+            {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, 0.0}, {0.0, 0.0}, {0.0, -M_SQRT1_2 * sint}},
+            mqis::QuantumStateEndian::LITTLE
+        };
+
+        REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+}
+
+TEST_CASE("simulate CRZ")
+{
+    SECTION("2 qubits, CRZ(t, 0, 1) H(0)")
+    {
+        // expectation
+        // APPLY H(0)         : |00> -> (1/sqrt2) |00> + (1/sqrt2) |10>
+        // APPLY CRZ(t, 0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) exp(-i t/2) |10>
+        auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
+
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_h_gate(0);
+        circuit.add_crz_gate(angle, 0, 1);
+
+        auto state = mqis::QuantumState {"00"};
+        mqis::simulate(circuit, state);
+
+        const auto cost = std::cos(angle / 2.0);
+        const auto sint = std::sin(angle / 2.0);
+
+        const auto expected_state = mqis::QuantumState {
+            {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, -M_SQRT1_2 * sint}, {0.0, 0.0}, {0.0, 0.0}},
+            mqis::QuantumStateEndian::LITTLE
+        };
+
+        REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+
+    SECTION("2 qubits, evenly spaced")
+    {
+        // expectation
+        // APPLY H(0)         : |00> -> (1/sqrt2) |00> + (1/sqrt2) |10>
+        // APPLY H(1)         :      -> (1/2) [|00> + |10> + |01> + |11>]
+        // APPLY CRZ(t, 0, 1) :      -> (1/2) [|00> + exp(-i t/2) |10> + |10> + exp(i t/2) |11>]
+        auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
+
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_h_gate(0);
+        circuit.add_h_gate(1);
+        circuit.add_crz_gate(angle, 0, 1);
+
+        auto state = mqis::QuantumState {"00"};
+        mqis::simulate(circuit, state);
+
+        const auto cost = std::cos(angle / 2.0);
+        const auto sint = std::sin(angle / 2.0);
+
+        const auto expected_state = mqis::QuantumState {
+            {{0.5, 0.0}, {0.5 * cost, -0.5 * sint}, {0.5, 0.0}, {0.5 * cost, 0.5 * sint}},
+            mqis::QuantumStateEndian::LITTLE
+        };
+
+        REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+}
