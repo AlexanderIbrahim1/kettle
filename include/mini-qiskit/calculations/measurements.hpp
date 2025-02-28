@@ -270,13 +270,25 @@ inline auto perform_measurements_as_counts_marginal(
 inline auto perform_measurements_as_counts_marginal(
     const QuantumState& state,
     std::size_t n_shots,
-    const std::vector<std::uint8_t>& marginal_bitmask,
+    const std::vector<std::uint8_t>& measure_bitmask,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::string, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
-    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_bitmask, seed);
+    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, measure_bitmask, seed);
+}
+
+inline auto perform_measurements_as_counts_marginal(
+    const QuantumCircuit& circuit,
+    const QuantumState& state,
+    std::size_t n_shots,
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::string, std::size_t>
+{
+    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, circuit.measure_bitmask(), seed);
 }
 
 }  // namespace mqis
