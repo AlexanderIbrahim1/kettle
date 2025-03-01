@@ -65,6 +65,7 @@ add_test_target(TARGET simulate_test SOURCES "source/simulate_test.cpp")
 add_test_target(TARGET mathtools_test SOURCES "source/common/mathtools_test.cpp")
 add_test_target(TARGET probabilities_test SOURCES "source/calculations/probabilities_test.cpp")
 add_test_target(TARGET measurements_test SOURCES "source/calculations/measurements_test.cpp")
+add_test_target(TARGET fourier_test SOURCES "source/gates/fourier_test.cpp")
 
 # ---- End-of-file commands ----
 

@@ -38,6 +38,19 @@ concept ContainerOfAnglesAndControlAndTargetQubitIndices =
         requires std::is_same_v<typename Container::value_type, std::tuple<double, std::size_t, std::size_t>>;
     }) || std::is_same_v<Container, std::initializer_list<std::tuple<double, std::size_t, std::size_t>>>;
 
+template <ContainerOfQubitIndices Container>
+auto get_container_index(const Container& container, std::size_t index) -> std::size_t
+{
+    // std::initializer_list<T> doesn't support indexing, for some reason???
+    if constexpr (std::is_same_v<Container, std::initializer_list<std::size_t>>) {
+        return *(container.begin() + index);
+    } else {
+        return container[index];
+    }
+}
+
+
+
 static constexpr auto MARGINALIZED_QUBIT = char {'x'};
 
 }  // namespace impl_mqis

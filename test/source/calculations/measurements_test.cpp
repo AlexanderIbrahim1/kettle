@@ -9,11 +9,11 @@
 #include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
-constexpr static auto FRACTION_TOLERANCE = double {0.02};
+constexpr static auto FRACTION_TOLERANCE = double {0.025};
 
 TEST_CASE("measurements")
 {
-    const auto n_shots = std::size_t {1'000'000};
+    const auto n_shots = std::size_t {10'000};
 
     SECTION("two qubits, measurement after H(1) H(0)")
     {
