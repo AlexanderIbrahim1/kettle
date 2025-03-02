@@ -19,10 +19,12 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
         const auto i_target = impl_mqis::get_container_index(container, i_target_pre);
         circuit.add_h_gate(i_target);
 
+        auto i_angle_denom = std::size_t {2};
         for (std::size_t i_control_pre {i_target_pre + 1}; i_control_pre < size; ++i_control_pre) {
             const auto i_control = impl_mqis::get_container_index(container, i_control_pre);
-            const auto angle = 2.0 * M_PI / static_cast<double>(impl_mqis::pow_2_int(i_control_pre));
-            circuit.add_crz_gate(angle, i_control, i_target);
+            const auto angle = 2.0 * M_PI / static_cast<double>(impl_mqis::pow_2_int(i_angle_denom));
+            circuit.add_cp_gate(angle, i_control, i_target);
+            ++i_angle_denom;
         }
     }
     
