@@ -66,4 +66,17 @@ constexpr void phaseturn_states(mqis::QuantumState& state, std::size_t i0, std::
     state[i1] = mqis::Complex {real1, imag1};
 }
 
+constexpr void controlled_phaseturn_state(mqis::QuantumState& state, std::size_t i1, double theta)
+{
+    const auto& state1 = state[i1];
+
+    const auto cost = std::cos(theta);
+    const auto sint = std::sin(theta);
+
+    const auto real1 = state1.real * cost + state1.imag * sint;
+    const auto imag1 = state1.imag * cost + state1.real * sint;
+
+    state[i1] = mqis::Complex {real1, imag1};
+}
+
 }  // namespace impl_mqis

@@ -53,7 +53,7 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
     auto pair_iterator = DoubleQubitGatePairGenerator {source_index, target_index, n_qubits};
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
-        const auto [state0_index, state1_index] = pair_iterator.next();
+        [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
 
         if constexpr (GateType == Gate::CX) {
             swap_states(state, state0_index, state1_index);
@@ -61,6 +61,10 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crx_gate(info);
             turn_states(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CP) {
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cp_gate(info);
+            controlled_phaseturn_state(state, state1_index, theta);
         }
         else {
             static_assert(impl_mqis::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
@@ -100,8 +104,12 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
                 impl_mqis::simulate_double_qubit_gate<Gate::CX>(state, gate, circuit.n_qubits());
                 break;
             }
-            case Gate::CRX : {  // replace with default?
+            case Gate::CRX : {
                 impl_mqis::simulate_double_qubit_gate<Gate::CRX>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::CP : {  // replace with default?
+                impl_mqis::simulate_double_qubit_gate<Gate::CP>(state, gate, circuit.n_qubits());
                 break;
             }
         }

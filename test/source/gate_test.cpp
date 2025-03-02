@@ -58,6 +58,19 @@ TEST_CASE("Test create and unpack gate functions")
         REQUIRE_THAT(unpacked_theta, Catch::Matchers::WithinRel(theta));
     }
 
+    SECTION("CP gate")
+    {
+        const auto source_index = std::size_t {4};
+        const auto target_index = std::size_t {5};
+        const auto theta = 1.23;
+        const auto gate_info = impl_mqis::create_cp_gate(source_index, target_index, theta);
+        const auto [unpacked_source, unpacked_target, unpacked_theta] = impl_mqis::unpack_cp_gate(gate_info);
+
+        REQUIRE(unpacked_source == source_index);
+        REQUIRE(unpacked_target == target_index);
+        REQUIRE_THAT(unpacked_theta, Catch::Matchers::WithinRel(theta));
+    }
+
     SECTION("M gate")
     {
         const auto qubit_index = std::size_t {6};

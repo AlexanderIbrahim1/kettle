@@ -161,6 +161,25 @@ public:
         }
     }
 
+    void add_cp_gate(double theta, std::size_t source_index, std::size_t target_index)
+    {
+        check_qubit_range_(source_index, "source qubit", "CP");
+        check_qubit_range_(target_index, "target qubit", "CP");
+        check_previous_gate_is_not_measure_(source_index, "CP");
+        check_previous_gate_is_not_measure_(target_index, "CP");
+        gates_.emplace_back(impl_mqis::create_cp_gate(source_index, target_index, theta));
+    }
+
+    template <
+        impl_mqis::ContainerOfAnglesAndControlAndTargetQubitIndices Container =
+            std::initializer_list<std::tuple<double, std::size_t, std::size_t>>>
+    void add_cp_gate(const Container& tuples)
+    {
+        for (auto tuple : tuples) {
+            add_cp_gate(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple));
+        }
+    }
+
     void add_rz_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RZ");

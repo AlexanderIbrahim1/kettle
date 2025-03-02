@@ -13,6 +13,7 @@ enum class Gate
     H,
     CX,
     CRX,
+    CP,
     M
 };
 
@@ -105,6 +106,18 @@ constexpr auto create_crx_gate(std::size_t source_index, std::size_t target_inde
 
 /* Parse the relevant information for the CRX-gate */
 constexpr auto unpack_crx_gate(mqis::GateInfo info) -> std::tuple<std::size_t, std::size_t, double>
+{
+    return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
+}
+
+/* Apply the CP-gate with a rotation `theta` to qubits at the `source_index` and `target_index` */
+constexpr auto create_cp_gate(std::size_t source_index, std::size_t target_index, double theta) -> mqis::GateInfo
+{
+    return {mqis::Gate::CP, source_index, target_index, theta};
+}
+
+/* Parse the relevant information for the CP-gate */
+constexpr auto unpack_cp_gate(mqis::GateInfo info) -> std::tuple<std::size_t, std::size_t, double>
 {
     return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
 }

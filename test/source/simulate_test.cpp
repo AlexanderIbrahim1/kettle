@@ -451,7 +451,7 @@ TEST_CASE("simulate CX gate")
     }
 }
 
-TEST_CASE("simulate H and CX")
+TEST_CASE("simulate H and CX gates")
 {
     SECTION("2 qubits, CX(0, 1) H(0)")
     {
@@ -495,7 +495,7 @@ TEST_CASE("simulate H and CX")
     }
 }
 
-TEST_CASE("simulate CRX")
+TEST_CASE("simulate CRX gate")
 {
     SECTION("computational basis states, 2 qubits")
     {
@@ -554,7 +554,7 @@ TEST_CASE("simulate CRX")
     }
 }
 
-TEST_CASE("simulate CRZ")
+TEST_CASE("simulate CRZ gate")
 {
     SECTION("2 qubits, CRZ(t, 0, 1) H(0)")
     {
@@ -606,5 +606,39 @@ TEST_CASE("simulate CRZ")
         };
 
         REQUIRE(mqis::almost_eq(state, expected_state));
+    }
+}
+
+TEST_CASE("simulate CP gate")
+{
+    SECTION("computational basis")
+    {
+        struct TestPair
+        {
+            std::string input;
+            mqis::QuantumState expected;
+        };
+
+        // clang-format off
+        auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
+
+        const auto cost = std::cos(angle);
+        const auto sint = std::sin(angle);
+
+        auto pair = GENERATE_COPY(
+            TestPair {"00", mqis::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"10", mqis::QuantumState { {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"01", mqis::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"11", mqis::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {cost, sint}} }}
+        );
+        // clang-format on
+
+        auto circuit = mqis::QuantumCircuit {2};
+        circuit.add_cp_gate(angle, 0, 1);
+
+        auto state = mqis::QuantumState {pair.input};
+        mqis::simulate(circuit, state);
+
+        REQUIRE(mqis::almost_eq(state, pair.expected));
     }
 }
