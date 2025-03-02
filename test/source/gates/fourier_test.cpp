@@ -165,3 +165,62 @@ TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
 
     REQUIRE(mqis::almost_eq(state, expected));
 }
+
+TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
+{
+    struct TestPair
+    {
+        int i_bitstring;
+        std::string input;
+    };
+
+    // clang-format off
+    auto pair = GENERATE_COPY(
+        TestPair {0, "0000"},
+        TestPair {1, "0001"},
+        TestPair {2, "0010"},
+        TestPair {3, "0011"},
+        TestPair {4, "0100"},
+        TestPair {5, "0101"},
+        TestPair {6, "0110"},
+        TestPair {7, "0111"},
+        TestPair {8, "1000"},
+        TestPair {9, "1001"},
+        TestPair {10, "1010"},
+        TestPair {11, "1011"},
+        TestPair {12, "1100"},
+        TestPair {13, "1101"},
+        TestPair {14, "1110"},
+        TestPair {15, "1111"}
+    );
+    // clang-format on
+
+    const auto create_expected_state = [](const TestPair& test_pair)
+    {
+        const auto n_states = 16;
+        const auto norm = 1.0 / std::sqrt(static_cast<double>(n_states));
+
+        auto coefficients = std::vector<mqis::Complex> {};
+        coefficients.reserve(n_states);
+
+        for (int i {0}; i < n_states; ++i) {
+            const auto angle = (2.0 * M_PI / n_states) * static_cast<double>((i * test_pair.i_bitstring) % n_states);
+            const auto real = norm * std::cos(angle);
+            const auto imag = norm * std::sin(angle);
+
+            coefficients.push_back({real, imag});
+        }
+
+        return mqis::QuantumState {coefficients, mqis::QuantumStateEndian::BIG};
+    };
+
+    auto state = mqis::QuantumState {pair.input, mqis::QuantumStateEndian::LITTLE};
+    auto circuit = mqis::QuantumCircuit {4};
+
+    mqis::apply_forward_fourier_transform(circuit, {0, 1, 2, 3});
+    mqis::simulate(circuit, state);
+
+    const auto expected = create_expected_state(pair);
+
+    REQUIRE(mqis::almost_eq(state, expected));
+}
