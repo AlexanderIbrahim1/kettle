@@ -27,7 +27,7 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
             ++i_angle_denom;
         }
     }
-    
+
     // apply the swaps
     auto i_left_pre = std::size_t {0};
     auto i_right_pre = size - 1;

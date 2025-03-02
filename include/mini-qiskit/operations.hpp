@@ -73,7 +73,7 @@ constexpr void controlled_phaseturn_state(mqis::QuantumState& state, std::size_t
     const auto cost = std::cos(theta);
     const auto sint = std::sin(theta);
 
-    const auto real1 = state1.real * cost + state1.imag * sint;
+    const auto real1 = state1.real * cost - state1.imag * sint;
     const auto imag1 = state1.imag * cost + state1.real * sint;
 
     state[i1] = mqis::Complex {real1, imag1};

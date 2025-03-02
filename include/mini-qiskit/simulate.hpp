@@ -1,8 +1,5 @@
 #pragma once
 
-// TODO: remove
-// #include <iostream>
-
 #include <algorithm>
 #include <tuple>
 #include <unordered_map>
@@ -118,13 +115,6 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
                 break;
             }
         }
-
-//         std::cout << "gate: " << static_cast<int>(gate.gate) << '\n';
-//         std::cout << "--- STATE ---\n";
-//         for (std::size_t i {0}; i < 8; ++i) {
-//             const auto coeff = state[i];
-//             std::cout << "(real, imag) = (" << coeff.real << ", " << coeff.imag << ")\n";
-//         }
     }
 }
 

@@ -44,12 +44,11 @@ auto get_container_index(const Container& container, std::size_t index) -> std::
     // std::initializer_list<T> doesn't support indexing, for some reason???
     if constexpr (std::is_same_v<Container, std::initializer_list<std::size_t>>) {
         return *(container.begin() + index);
-    } else {
+    }
+    else {
         return container[index];
     }
 }
-
-
 
 static constexpr auto MARGINALIZED_QUBIT = char {'x'};
 
