@@ -63,6 +63,8 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             turn_states(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CP) {
+            // NOTE: the DoubleQubitGatePairGenerator needs to calculate the `state0_index` before
+            // it calculates the `state1_index`, so we're not losing too much in terms of performance
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cp_gate(info);
             controlled_phaseturn_state(state, state1_index, theta);
         }
