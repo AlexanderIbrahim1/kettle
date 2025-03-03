@@ -5,7 +5,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/common/complex.hpp"
+#include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/gates/fourier.hpp"
 #include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
@@ -141,7 +141,7 @@ TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
         const auto n_states = 8;
         const auto norm = 1.0 / std::sqrt(static_cast<double>(n_states));
 
-        auto coefficients = std::vector<mqis::Complex> {};
+        auto coefficients = std::vector<std::complex<double>> {};
         coefficients.reserve(n_states);
 
         for (int i {0}; i < n_states; ++i) {
@@ -200,7 +200,7 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
         const auto n_states = 16;
         const auto norm = 1.0 / std::sqrt(static_cast<double>(n_states));
 
-        auto coefficients = std::vector<mqis::Complex> {};
+        auto coefficients = std::vector<std::complex<double>> {};
         coefficients.reserve(n_states);
 
         for (int i {0}; i < n_states; ++i) {

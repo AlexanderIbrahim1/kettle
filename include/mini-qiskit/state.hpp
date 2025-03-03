@@ -4,6 +4,7 @@
 #include <bit>
 #include <bitset>
 #include <cmath>
+#include <complex>
 #include <iomanip>
 #include <numeric>
 #include <sstream>
@@ -12,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include "mini-qiskit/common/complex.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/utils.hpp"
 
@@ -113,7 +113,7 @@ public:
         coefficients_[0] = {1, 0};
     }
 
-    QuantumState(std::vector<Complex> coefficients, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
+    QuantumState(std::vector<std::complex<double>> coefficients, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
         : n_qubits_ {0}
         , n_states_ {coefficients.size()}
         , coefficients_ {std::move(coefficients)}
@@ -135,7 +135,7 @@ public:
     QuantumState(const std::string& computational_state, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
         : n_qubits_ {computational_state.size()}
         , n_states_ {impl_mqis::pow_2_int(computational_state.size())}
-        , coefficients_ {n_states_, {0.0, 0.0}}
+        , coefficients_ (n_states_, {0.0, 0.0})
     {
         const auto is_binary = [](char c) { return c == '0' || c == '1'; };
         if (!std::all_of(computational_state.begin(), computational_state.end(), is_binary)) {
@@ -153,23 +153,23 @@ public:
         }
     }
 
-    constexpr auto operator[](std::size_t index) const noexcept -> const Complex&
+    constexpr auto operator[](std::size_t index) const noexcept -> const std::complex<double>&
     {
         return coefficients_[index];
     }
 
-    constexpr auto operator[](std::size_t index) noexcept -> Complex&
+    constexpr auto operator[](std::size_t index) noexcept -> std::complex<double>&
     {
         return coefficients_[index];
     }
 
-    constexpr auto at(std::size_t index) const -> const Complex&
+    constexpr auto at(std::size_t index) const -> const std::complex<double>&
     {
         check_index_(index);
         return coefficients_[index];
     }
 
-    constexpr auto at(std::size_t index) -> Complex&
+    constexpr auto at(std::size_t index) -> std::complex<double>&
     {
         check_index_(index);
         return coefficients_[index];
@@ -188,7 +188,7 @@ public:
 private:
     std::size_t n_qubits_;
     std::size_t n_states_;
-    std::vector<Complex> coefficients_;
+    std::vector<std::complex<double>> coefficients_;
 
     void check_power_of_2_with_at_least_one_qubit_() const
     {
@@ -209,7 +209,7 @@ private:
     {
         auto sum_of_squared_norms = double {0.0};
         for (const auto& elem : coefficients_) {
-            sum_of_squared_norms += impl_mqis::norm_squared(elem.real, elem.imag);
+            sum_of_squared_norms += impl_mqis::norm_squared(elem);
         }
 
         const auto expected = 1.0;

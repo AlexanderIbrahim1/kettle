@@ -1,25 +1,26 @@
 #pragma once
 
 #include <bitset>
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
 #include <string>
 
-#include "mini-qiskit/common/complex.hpp"
-
 namespace impl_mqis
 {
+
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
+constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_EQ = double {1.0e-8};
 
 constexpr auto norm_squared(double real, double imag) noexcept -> double
 {
     return real * real + imag * imag;
 }
 
-constexpr auto norm_squared(const mqis::Complex& complex) noexcept -> double
+constexpr auto norm_squared(const std::complex<double>& complex) noexcept -> double
 {
-    return complex.real * complex.real + complex.imag * complex.imag;
+    return complex.real() * complex.real() + complex.imag() * complex.imag();
 }
 
 constexpr auto pow_2_int(std::size_t exponent) noexcept -> std::size_t
@@ -70,3 +71,21 @@ auto qubit_string_to_state_index(const std::string& computational_state) -> std:
 }
 
 }  // namespace impl_mqis
+
+namespace mqis
+{
+
+constexpr auto almost_eq(
+    const std::complex<double>& left,
+    const std::complex<double>& right,
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+) noexcept -> bool
+{
+    const auto diff_real = left.real() - right.real();
+    const auto diff_imag = left.imag() - right.imag();
+    const auto diff_sq = diff_real * diff_real + diff_imag * diff_imag;
+
+    return diff_sq < tolerance_sq;
+}
+
+}

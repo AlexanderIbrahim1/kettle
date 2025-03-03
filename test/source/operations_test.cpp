@@ -30,10 +30,10 @@ TEST_CASE("Swap states operation")
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
 
-    REQUIRE_THAT(coeff_0.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_0.imag, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.real, Catch::Matchers::WithinAbs(1.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.imag, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.imag(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.real(), Catch::Matchers::WithinAbs(1.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.imag(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
 }
 
 TEST_CASE("Superpose states operation")
@@ -48,10 +48,10 @@ TEST_CASE("Superpose states operation")
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
 
-    REQUIRE_THAT(coeff_0.real, Catch::Matchers::WithinAbs(1.0, ABS_TOL));
-    REQUIRE_THAT(coeff_0.imag, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.imag, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.real(), Catch::Matchers::WithinAbs(1.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.imag(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.imag(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
 }
 
 TEST_CASE("Turn states operation")
@@ -66,10 +66,10 @@ TEST_CASE("Turn states operation")
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
 
-    REQUIRE_THAT(coeff_0.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_0.imag, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.imag, Catch::Matchers::WithinAbs(-1.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.imag(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.imag(), Catch::Matchers::WithinAbs(-1.0, ABS_TOL));
 }
 
 TEST_CASE("Phase turn states operation")
@@ -84,8 +84,8 @@ TEST_CASE("Phase turn states operation")
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
 
-    REQUIRE_THAT(coeff_0.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_0.imag, Catch::Matchers::WithinAbs(-M_SQRT1_2, ABS_TOL));
-    REQUIRE_THAT(coeff_1.real, Catch::Matchers::WithinAbs(0.0, ABS_TOL));
-    REQUIRE_THAT(coeff_1.imag, Catch::Matchers::WithinAbs(M_SQRT1_2, ABS_TOL));
+    REQUIRE_THAT(coeff_0.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_0.imag(), Catch::Matchers::WithinAbs(-M_SQRT1_2, ABS_TOL));
+    REQUIRE_THAT(coeff_1.real(), Catch::Matchers::WithinAbs(0.0, ABS_TOL));
+    REQUIRE_THAT(coeff_1.imag(), Catch::Matchers::WithinAbs(M_SQRT1_2, ABS_TOL));
 }

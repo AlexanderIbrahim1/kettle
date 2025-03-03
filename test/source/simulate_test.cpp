@@ -6,7 +6,7 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "mini-qiskit/common/complex.hpp"
+#include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
