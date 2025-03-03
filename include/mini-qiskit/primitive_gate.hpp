@@ -14,6 +14,8 @@ enum class Gate
     CX,
     CRX,
     CP,
+    U,
+    CU,
     M
 };
 

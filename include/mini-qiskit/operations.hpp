@@ -4,6 +4,7 @@
 #include <complex>
 
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/state.hpp"
 
 /*
@@ -78,6 +79,18 @@ constexpr void controlled_phaseturn_state(mqis::QuantumState& state, std::size_t
     const auto imag1 = state1.imag() * cost + state1.real() * sint;
 
     state[i1] = std::complex<double> {real1, imag1};
+}
+
+constexpr void general_gate_transform(mqis::QuantumState& state, std::size_t i0, std::size_t i1, const mqis::Matrix2X2& mat)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto new_state0 = state0 * mat.elem00 + state1 * mat.elem01;
+    const auto new_state1 = state0 * mat.elem10 + state1 * mat.elem11;
+
+    state[i0] = new_state0;
+    state[i1] = new_state1;
 }
 
 }  // namespace impl_mqis

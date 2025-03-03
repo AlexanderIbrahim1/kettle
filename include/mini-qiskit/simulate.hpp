@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gate_pair_generator.hpp"
 #include "mini-qiskit/operations.hpp"
@@ -43,6 +44,17 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
     }
 }
 
+void simulate_single_qubit_gate_general(mqis::QuantumState& state, const mqis::GateInfo& info, std::size_t n_qubits, const mqis::Matrix2X2& mat)
+{
+    const auto qubit_index = unpack_single_qubit_gate_index(info);
+    auto pair_iterator = SingleQubitGatePairGenerator {qubit_index, n_qubits};
+
+    for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
+        const auto [state0_index, state1_index] = pair_iterator.next();
+        general_gate_transform(state, state0_index, state1_index, mat);
+    }
+}
+
 template <mqis::Gate GateType>
 void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo& info, std::size_t n_qubits)
 {
@@ -74,6 +86,17 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
     }
 }
 
+void simulate_double_qubit_gate_general(mqis::QuantumState& state, const mqis::GateInfo& info, std::size_t n_qubits, const mqis::Matrix2X2& mat)
+{
+    const auto [source_index, target_index] = unpack_double_qubit_gate_indices(info);
+    auto pair_iterator = DoubleQubitGatePairGenerator {source_index, target_index, n_qubits};
+
+    for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
+        const auto [state0_index, state1_index] = pair_iterator.next();
+        general_gate_transform(state, state0_index, state1_index, mat);
+    }
+}
+
 }  // namespace impl_mqis
 
 namespace mqis
@@ -102,6 +125,10 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
                 impl_mqis::simulate_single_qubit_gate<Gate::RX>(state, gate, circuit.n_qubits());
                 break;
             }
+//            case Gate::U : {
+//                impl_mqis::simulate_single_qubit_gate_general(state, gate, circuit.n_qubits());
+//                break;
+//            }
             case Gate::CX : {
                 impl_mqis::simulate_double_qubit_gate<Gate::CX>(state, gate, circuit.n_qubits());
                 break;
