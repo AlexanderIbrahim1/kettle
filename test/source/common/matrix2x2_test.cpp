@@ -3,7 +3,6 @@
 
 #include "mini-qiskit/common/matrix2x2.hpp"
 
-
 TEST_CASE("conjugate transpose")
 {
     SECTION("real matrix")

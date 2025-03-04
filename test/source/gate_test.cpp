@@ -81,4 +81,28 @@ TEST_CASE("Test create and unpack gate functions")
         REQUIRE(unpacked_qubit == qubit_index);
         REQUIRE(unpacked_bit == bit_index);
     }
+
+    SECTION("U gate")
+    {
+        const auto qubit_index = std::size_t {0};
+        const auto gate_index = std::size_t {3};
+        const auto gate_info = impl_mqis::create_u_gate(qubit_index, gate_index);
+        const auto [unpacked_qubit_index, unpacked_gate_index] = impl_mqis::unpack_u_gate(gate_info);
+
+        REQUIRE(unpacked_qubit_index == qubit_index);
+        REQUIRE(unpacked_gate_index == gate_index);
+    }
+
+    SECTION("CU gate")
+    {
+        const auto source_index = std::size_t {0};
+        const auto target_index = std::size_t {1};
+        const auto gate_index = std::size_t {3};
+        const auto gate_info = impl_mqis::create_cu_gate(source_index, target_index, gate_index);
+        const auto [u_source_index, u_target_index, u_gate_index] = impl_mqis::unpack_cu_gate(gate_info);
+
+        REQUIRE(u_source_index == source_index);
+        REQUIRE(u_target_index == target_index);
+        REQUIRE(u_gate_index == gate_index);
+    }
 }

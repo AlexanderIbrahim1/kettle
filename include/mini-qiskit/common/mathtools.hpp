@@ -88,4 +88,4 @@ constexpr auto almost_eq(
     return diff_sq < tolerance_sq;
 }
 
-}
+}  // namespace mqis

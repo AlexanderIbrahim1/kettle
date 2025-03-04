@@ -7,6 +7,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
@@ -640,5 +641,142 @@ TEST_CASE("simulate CP gate")
         mqis::simulate(circuit, state);
 
         REQUIRE(mqis::almost_eq(state, pair.expected));
+    }
+}
+
+TEST_CASE("simulate U gate")
+{
+    const auto simulate_single_qubit_with_ugate =
+        [](const std::string& initial_state, const mqis::Matrix2X2& matrix, std::size_t n_qubits)
+    {
+        auto state = mqis::QuantumState {initial_state};
+
+        auto circuit = mqis::QuantumCircuit {n_qubits};
+        circuit.add_u_gate(matrix, 0);
+
+        mqis::simulate(circuit, state);
+
+        return state;
+    };
+
+    const auto simulate_single_qubit_with_builtin =
+        [](const std::string& initial_state, std::string_view which_gate, double angle, std::size_t n_qubits)
+    {
+        auto state = mqis::QuantumState {initial_state};
+
+        auto circuit = mqis::QuantumCircuit {n_qubits};
+
+        if (which_gate == "H") {
+            circuit.add_h_gate(0);
+        }
+        else if (which_gate == "X") {
+            circuit.add_x_gate(0);
+        }
+        else if (which_gate == "RX") {
+            circuit.add_rx_gate(angle, 0);
+        }
+        else {
+            throw std::runtime_error {"invalid gate entered into unit test"};
+        }
+
+        mqis::simulate(circuit, state);
+
+        return state;
+    };
+
+    SECTION("H gate mimic")
+    {
+        const auto h_matrix = mqis::Matrix2X2 {
+            {M_SQRT1_2,  0.0},
+            {M_SQRT1_2,  0.0},
+            {M_SQRT1_2,  0.0},
+            {-M_SQRT1_2, 0.0}
+        };
+
+        SECTION("1-qubit circuits")
+        {
+            const auto initial_state = GENERATE("0", "1");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, h_matrix, 1);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "H", 0.0, 1);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("2-qubit circuits")
+        {
+            const auto initial_state = GENERATE("00", "10", "01", "11");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, h_matrix, 2);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "H", 0.0, 2);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+    }
+
+    SECTION("X gate mimic")
+    {
+        const auto x_matrix = mqis::Matrix2X2 {
+            {0.0, 0.0},
+            {1.0, 0.0},
+            {1.0, 0.0},
+            {0.0, 0.0}
+        };
+
+        SECTION("1-qubit circuits")
+        {
+            const auto initial_state = GENERATE("0", "1");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, x_matrix, 1);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "X", 0.0, 1);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("2-qubit circuits")
+        {
+            const auto initial_state = GENERATE("00", "10", "01", "11");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, x_matrix, 2);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "X", 0.0, 2);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+    }
+
+    SECTION("RX gate mimic")
+    {
+        const auto angle =
+            GENERATE(0.0, M_PI / 6.0, M_PI / 3.0, M_PI / 2.0, 0.75 * M_PI, M_PI, 1.25 * M_PI, 2.0 * M_PI);
+
+        const auto cost = std::cos(angle / 2.0);
+        const auto sint = std::sin(angle / 2.0);
+
+        const auto rx_matrix = mqis::Matrix2X2 {
+            {cost, 0.0  },
+            {0.0,  -sint},
+            {0.0,  -sint},
+            {cost, 0.0  }
+        };
+
+        SECTION("1-qubit circuits")
+        {
+            const auto initial_state = GENERATE("0", "1");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, rx_matrix, 1);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "RX", angle, 1);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("2-qubit circuits")
+        {
+            const auto initial_state = GENERATE("00", "10", "01", "11");
+
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, rx_matrix, 2);
+            const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, "RX", angle, 2);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
     }
 }

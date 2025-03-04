@@ -113,7 +113,10 @@ public:
         coefficients_[0] = {1, 0};
     }
 
-    QuantumState(std::vector<std::complex<double>> coefficients, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
+    QuantumState(
+        std::vector<std::complex<double>> coefficients,
+        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+    )
         : n_qubits_ {0}
         , n_states_ {coefficients.size()}
         , coefficients_ {std::move(coefficients)}
@@ -135,7 +138,7 @@ public:
     QuantumState(const std::string& computational_state, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
         : n_qubits_ {computational_state.size()}
         , n_states_ {impl_mqis::pow_2_int(computational_state.size())}
-        , coefficients_ (n_states_, {0.0, 0.0})
+        , coefficients_(n_states_, {0.0, 0.0})
     {
         const auto is_binary = [](char c) { return c == '0' || c == '1'; };
         if (!std::all_of(computational_state.begin(), computational_state.end(), is_binary)) {

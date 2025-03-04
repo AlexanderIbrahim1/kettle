@@ -81,7 +81,12 @@ constexpr void controlled_phaseturn_state(mqis::QuantumState& state, std::size_t
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void general_gate_transform(mqis::QuantumState& state, std::size_t i0, std::size_t i1, const mqis::Matrix2X2& mat)
+constexpr void general_gate_transform(
+    mqis::QuantumState& state,
+    std::size_t i0,
+    std::size_t i1,
+    const mqis::Matrix2X2& mat
+)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];

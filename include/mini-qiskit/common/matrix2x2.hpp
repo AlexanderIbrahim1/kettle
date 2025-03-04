@@ -1,7 +1,7 @@
 #pragma once
 
-#include <complex>
 #include <cmath>
+#include <complex>
 
 #include "mini-qiskit/common/mathtools.hpp"
 

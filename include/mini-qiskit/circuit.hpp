@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
 
@@ -247,6 +248,65 @@ public:
         }
     }
 
+    void add_u_gate(const Matrix2X2& gate, std::size_t qubit_index)
+    {
+        check_qubit_range_(qubit_index, "qubit", "U");
+        check_previous_gate_is_not_measure_(qubit_index, "U");
+
+        unitary_gates_.push_back(gate);
+        const auto gate_index = unitary_gates_.size() - 1;
+
+        gates_.emplace_back(impl_mqis::create_u_gate(qubit_index, gate_index));
+    }
+
+    template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+    void add_u_gate(const Matrix2X2& gate, const Container& indices)
+    {
+        unitary_gates_.push_back(gate);
+        const auto gate_index = unitary_gates_.size() - 1;
+
+        for (auto qubit_index : indices) {
+            check_qubit_range_(qubit_index, "qubit", "U");
+            check_previous_gate_is_not_measure_(qubit_index, "U");
+
+            gates_.emplace_back(impl_mqis::create_u_gate(qubit_index, gate_index));
+        }
+    }
+
+    void add_cu_gate(const Matrix2X2& gate, std::size_t source_index, std::size_t target_index)
+    {
+        check_qubit_range_(source_index, "source qubit", "CU");
+        check_qubit_range_(target_index, "target qubit", "CU");
+        check_previous_gate_is_not_measure_(source_index, "CU");
+        check_previous_gate_is_not_measure_(target_index, "CU");
+
+        unitary_gates_.push_back(gate);
+        const auto gate_index = unitary_gates_.size() - 1;
+
+        gates_.emplace_back(impl_mqis::create_cu_gate(source_index, target_index, gate_index));
+    }
+
+    template <
+        impl_mqis::ContainerOfControlAndTargetQubitIndices Container =
+            std::initializer_list<std::pair<std::size_t, std::size_t>>>
+    void add_cu_gate(const Matrix2X2& gate, const Container& tuples)
+    {
+        unitary_gates_.push_back(gate);
+        const auto gate_index = unitary_gates_.size() - 1;
+
+        for (auto tuple : tuples) {
+            const auto source_index = std::get<0>(tuple);
+            const auto target_index = std::get<1>(tuple);
+
+            check_qubit_range_(source_index, "source qubit", "CU");
+            check_qubit_range_(target_index, "target qubit", "CU");
+            check_previous_gate_is_not_measure_(source_index, "CU");
+            check_previous_gate_is_not_measure_(target_index, "CU");
+
+            gates_.emplace_back(impl_mqis::create_cu_gate(source_index, target_index, gate_index));
+        }
+    }
+
     void add_m_gate(std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "M");
@@ -276,11 +336,17 @@ public:
         return measure_bitmask_;
     }
 
+    constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
+    {
+        return unitary_gates_[matrix_index];
+    }
+
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
     std::vector<std::uint8_t> measure_bitmask_;
     std::vector<GateInfo> gates_ {};
+    std::vector<Matrix2X2> unitary_gates_ {};
 
     void check_qubit_range_(std::size_t qubit_index, std::string_view qubit_name, std::string_view gate_name)
     {
