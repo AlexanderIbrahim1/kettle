@@ -898,12 +898,73 @@ TEST_CASE("simulate CU gate")
 
             REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
         }
+
+        // clang-format off
+        SECTION("CX then CRX")
+        {
+            const auto first_control_qubit = control_qubit;
+            const auto first_target_qubit = target_qubit;
+            const auto [second_control_qubit, second_target_qubit] = GENERATE_COPY(
+                CTPair {control_qubit, target_qubit},
+                CTPair {target_qubit, control_qubit}
+            );
+
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(
+                initial_state,
+                {
+                    {x_matrix, first_control_qubit, first_target_qubit},
+                    {rx_matrix, second_control_qubit, second_target_qubit}
+                },
+                n_qubits
+            );
+
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(
+                initial_state,
+                {
+                    {"CX", 0.0, first_control_qubit, first_target_qubit},
+                    {"CRX", angle, second_control_qubit, second_target_qubit}
+                },
+                n_qubits
+            );
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+        // clang-format on
     }
-//     // clang-format off
-//     const std::string initial_state = GENERATE(
-//         "00", "10", "01", "11",
-//         "000", "100", "010", "110", "001", "101", "011", "111"
-//     );
-//     // clang-format on
+
+    SECTION("3-qubit circuits")
+    {
+        using CTPair = std::pair<std::size_t, std::size_t>;
+
+        const auto [control_qubit, target_qubit] = GENERATE(
+            CTPair {0, 1}, CTPair {1, 0}, CTPair {0, 2}, CTPair {2, 0}, CTPair {1, 2}, CTPair {2, 1}
+        );
+        const std::string initial_state = GENERATE("000", "100", "010", "110", "001", "101", "011", "111");
+        const auto n_qubits = initial_state.size();
+
+        SECTION("CX gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{x_matrix, control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CX", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CRX gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{rx_matrix, control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CRX", angle, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CP gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{p_matrix, control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CP", angle, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+    }
 }
 
