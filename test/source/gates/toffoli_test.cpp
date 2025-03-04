@@ -19,11 +19,9 @@ TEST_CASE("toffoli gate with 3 qubits")
         mqis::QuantumState expected;
     };
 
+    // clang-format off
     const auto info = GENERATE(
-        TestInfo {
-            "000", {0, 1},
-             2, mqis::QuantumState {"000"}
-    },
+        TestInfo {"000", {0, 1}, 2, mqis::QuantumState {"000"}},
         TestInfo {"100", {0, 1}, 2, mqis::QuantumState {"100"}},
         TestInfo {"010", {0, 1}, 2, mqis::QuantumState {"010"}},
         TestInfo {"110", {0, 1}, 2, mqis::QuantumState {"111"}},
@@ -48,6 +46,7 @@ TEST_CASE("toffoli gate with 3 qubits")
         TestInfo {"011", {1, 2}, 0, mqis::QuantumState {"111"}},
         TestInfo {"111", {1, 2}, 0, mqis::QuantumState {"011"}}
     );
+    // clang-format on
 
     auto state = mqis::QuantumState {info.initial_bitstring};
     auto circuit = mqis::QuantumCircuit {3};
@@ -68,11 +67,9 @@ TEST_CASE("toffoli gate with 4 qubits")
         mqis::QuantumState expected;
     };
 
+    // clang-format off
     const auto info = GENERATE(
-        TestInfo {
-            "0000", {0, 1},
-             2, mqis::QuantumState {"0000"}
-    },
+        TestInfo {"0000", {0, 1}, 2, mqis::QuantumState {"0000"}},
         TestInfo {"1000", {0, 1}, 2, mqis::QuantumState {"1000"}},
         TestInfo {"0100", {0, 1}, 2, mqis::QuantumState {"0100"}},
         TestInfo {"1100", {0, 1}, 2, mqis::QuantumState {"1110"}},
@@ -105,6 +102,7 @@ TEST_CASE("toffoli gate with 4 qubits")
         TestInfo {"0111", {0, 1}, 3, mqis::QuantumState {"0111"}},
         TestInfo {"1111", {0, 1}, 3, mqis::QuantumState {"1110"}}
     );
+    // clang-format on
 
     auto state = mqis::QuantumState {info.initial_bitstring};
     auto circuit = mqis::QuantumCircuit {4};
