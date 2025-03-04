@@ -5,9 +5,9 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/gates/toffoli.hpp"
 #include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
-#include "mini-qiskit/gates/toffoli.hpp"
 
 TEST_CASE("toffoli gate with 3 qubits")
 {
@@ -20,7 +20,10 @@ TEST_CASE("toffoli gate with 3 qubits")
     };
 
     const auto info = GENERATE(
-        TestInfo {"000", {0, 1}, 2, mqis::QuantumState {"000"}},
+        TestInfo {
+            "000", {0, 1},
+             2, mqis::QuantumState {"000"}
+    },
         TestInfo {"100", {0, 1}, 2, mqis::QuantumState {"100"}},
         TestInfo {"010", {0, 1}, 2, mqis::QuantumState {"010"}},
         TestInfo {"110", {0, 1}, 2, mqis::QuantumState {"111"}},
@@ -66,7 +69,10 @@ TEST_CASE("toffoli gate with 4 qubits")
     };
 
     const auto info = GENERATE(
-        TestInfo {"0000", {0, 1}, 2, mqis::QuantumState {"0000"}},
+        TestInfo {
+            "0000", {0, 1},
+             2, mqis::QuantumState {"0000"}
+    },
         TestInfo {"1000", {0, 1}, 2, mqis::QuantumState {"1000"}},
         TestInfo {"0100", {0, 1}, 2, mqis::QuantumState {"0100"}},
         TestInfo {"1100", {0, 1}, 2, mqis::QuantumState {"1110"}},
