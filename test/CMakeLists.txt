@@ -68,6 +68,7 @@ add_test_target(TARGET probabilities_test SOURCES "source/calculations/probabili
 add_test_target(TARGET measurements_test SOURCES "source/calculations/measurements_test.cpp")
 add_test_target(TARGET fourier_test SOURCES "source/gates/fourier_test.cpp")
 add_test_target(TARGET toffoli_test SOURCES "source/gates/toffoli_test.cpp")
+add_test_target(TARGET multiplicity_controlled_u_gate_test SOURCES "source/gates/multiplicity_controlled_u_gate_test.cpp")
 
 # ---- End-of-file commands ----
 
