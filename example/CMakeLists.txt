@@ -21,5 +21,6 @@ function(add_example NAME)
 endfunction()
 
 add_example(deutsch)
+add_example(inverse_fourier)
 
 add_folders(Example)
