@@ -967,3 +967,11 @@ TEST_CASE("simulate CU gate")
     }
     // clang-format off
 }
+
+TEST_CASE("Invalid simulation; circuit and state have different numbers of qubits")
+{
+    auto circuit = mqis::QuantumCircuit {4};
+    auto state = mqis::QuantumState {"000"};
+
+    REQUIRE_THROWS_AS(mqis::simulate(circuit, state), std::runtime_error);
+}

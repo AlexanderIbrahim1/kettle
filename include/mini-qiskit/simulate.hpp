@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <tuple>
 #include <unordered_map>
 
@@ -114,6 +115,10 @@ namespace mqis
 
 inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
 {
+    if (circuit.n_qubits() != state.n_qubits()) {
+        throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
+    }
+
     auto measured_clbit_to_qubit = std::unordered_map<std::size_t, std::size_t> {};
 
     for (const auto& gate : circuit) {
