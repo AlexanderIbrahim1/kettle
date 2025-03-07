@@ -1,4 +1,6 @@
 #include <cmath>
+#include <ranges>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -175,7 +177,7 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
     };
 
     // clang-format off
-    auto pair = GENERATE_COPY(
+    auto pair = GENERATE(
         TestPair {0, "0000"},
         TestPair {1, "0001"},
         TestPair {2, "0010"},
@@ -223,4 +225,32 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
     const auto expected = create_expected_state(pair);
 
     REQUIRE(mqis::almost_eq(state, expected));
+}
+
+TEST_CASE("inverse QFT after forward QFT")
+{
+    SECTION("2-qubit gates")
+    {
+        // clang-format off
+        const auto init_bitstring = std::string {GENERATE(
+            "00", "10", "01", "11",
+            "000", "100", "010", "110", "001", "101", "011", "111",
+            "0000", "1000", "0100", "1100", "0010", "1010", "0110", "1110",
+            "0001", "1001", "0101", "1101", "0011", "1011", "0111", "1111"
+        )};
+        // clang-format on
+
+        auto state = mqis::QuantumState {init_bitstring};
+        auto expected = mqis::QuantumState {init_bitstring};
+
+        const auto n_qubits = init_bitstring.size();
+        auto qubit_indices = std::vector<std::size_t> (n_qubits);
+        std::iota(qubit_indices.begin(), qubit_indices.end(), 0);
+
+        auto circuit = mqis::QuantumCircuit {init_bitstring.size()};
+        mqis::apply_forward_fourier_transform(circuit, qubit_indices);
+        mqis::apply_inverse_fourier_transform(circuit, qubit_indices);
+
+        REQUIRE(mqis::almost_eq(state, expected));
+    }
 }
