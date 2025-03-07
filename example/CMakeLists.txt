@@ -21,6 +21,8 @@ function(add_example NAME)
 endfunction()
 
 add_example(deutsch)
+add_example(deutsch_jozsa)
+add_example(deutsch_jozsa_balanced_ibm_example)
 add_example(inverse_fourier)
 
 add_folders(Example)
