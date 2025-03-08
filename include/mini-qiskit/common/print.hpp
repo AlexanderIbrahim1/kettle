@@ -236,6 +236,14 @@ auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_
     return err_msg.str();
 }
 
+void print_state_(const mqis::QuantumState& state)
+{
+    for (std::size_t i {0}; i < state.n_states(); ++i) {
+        const auto bitstring = mqis::state_as_bitstring(i, state.n_qubits());
+        std::cout << bitstring << " : (" << state[i].real() << ", " << state[i].imag() << ")\n";
+    }
+}
+
 auto ae_err_msg_diff_states_(
     const mqis::QuantumState& left,
     const mqis::QuantumState& right
@@ -246,14 +254,10 @@ auto ae_err_msg_diff_states_(
     err_msg << "REASON: different states\n";
 
     err_msg << "LEFT STATE:\n";
-    for (std::size_t i {0}; i < left.n_states(); ++i) {
-        err_msg << "(" << left[i].real() << ", " << left[i].imag() << ")\n";
-    }
+    print_state_(left);
 
     err_msg << "RIGHT STATE:\n";
-    for (std::size_t i {0}; i < right.n_states(); ++i) {
-        err_msg << "(" << right[i].real() << ", " << right[i].imag() << ")\n";
-    }
+    print_state_(right);
 
     return err_msg.str();
 }
@@ -277,6 +281,11 @@ void print_circuit(const QuantumCircuit& circuit)
             std::cout << impl_mqis::format_matrix_(matrix) << '\n';
         }
     }
+}
+
+void print_state(const QuantumState& state)
+{
+    impl_mqis::print_state_(state);
 }
 
 enum PrintAlmostEq
