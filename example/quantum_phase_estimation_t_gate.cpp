@@ -19,7 +19,10 @@ auto main() -> int
 {
     auto state = mqis::QuantumState {"0000"};
 
-    auto circuit = mqis::QuantumCircuit {4};
+    const auto n_counting_qubits = 3;
+    const auto n_ancilla_qubits = 1;
+
+    auto circuit = mqis::QuantumCircuit {n_counting_qubits + n_ancilla_qubits};
     circuit.add_h_gate({0, 1, 2});
     circuit.add_x_gate(3);
     apply_multiplicity_controlled_t_gate_manually(circuit);
@@ -32,6 +35,15 @@ auto main() -> int
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
+
+        const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
+        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto n_states = 1ul << n_counting_qubits;
+        const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
+
+        const auto estimated_phase = 2.0 * M_PI * binary_fraction;
+
+        std::cout << "estimated phase: " << estimated_phase << '\n';
     }
     // Expected output:
     // ```
