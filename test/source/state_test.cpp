@@ -468,3 +468,86 @@ TEST_CASE("state_as_bitstring")
         }
     }
 }
+
+TEST_CASE("are_all_marginal_bits_on_right_")
+{
+    struct TestInfo
+    {
+        std::string input;
+        bool expected;
+    };
+
+    const auto info = GENERATE(
+        TestInfo {"", true},
+        TestInfo {"0", true},
+        TestInfo {"1", true},
+        TestInfo {"01", true},
+        TestInfo {"10", true},
+        TestInfo {"00x", true},
+        TestInfo {"10x", true},
+        TestInfo {"01x", true},
+        TestInfo {"01xx", true},
+        TestInfo {"010010xx", true},
+        TestInfo {"xx", true},
+        TestInfo {"xxxx", true},
+        TestInfo {"xx0x", false},
+        TestInfo {"x00x", false},
+        TestInfo {"xx1x", false},
+        TestInfo {"xx1", false},
+        TestInfo {"00x1", false}
+    );
+
+    REQUIRE(impl_mqis::are_all_marginal_bits_on_right_(info.input) == info.expected);
+}
+
+TEST_CASE("rstrip_marginal_bits")
+{
+    struct TestInfo
+    {
+        std::string input;
+        std::string expected;
+    };
+
+    const auto info = GENERATE(
+        TestInfo {"", ""},
+        TestInfo {"0", "0"},
+        TestInfo {"1", "1"},
+        TestInfo {"01", "01"},
+        TestInfo {"10", "10"},
+        TestInfo {"00x", "00"},
+        TestInfo {"10x", "10"},
+        TestInfo {"01x", "01"},
+        TestInfo {"01xx", "01"},
+        TestInfo {"010010xx", "010010"},
+        TestInfo {"xx", ""},
+        TestInfo {"xxxx", ""}
+    );
+
+    REQUIRE(mqis::rstrip_marginal_bits(info.input) == info.expected);
+}
+
+TEST_CASE("bitstring_to_state_index_little_endian")
+{
+    struct TestInfo
+    {
+        std::string input;
+        std::size_t expected;
+    };
+
+    const auto info = GENERATE(
+        TestInfo {"00", 0},
+        TestInfo {"10", 1},
+        TestInfo {"01", 2},
+        TestInfo {"11", 3},
+        TestInfo {"000", 0},
+        TestInfo {"100", 1},
+        TestInfo {"010", 2},
+        TestInfo {"110", 3},
+        TestInfo {"001", 4},
+        TestInfo {"101", 5},
+        TestInfo {"011", 6},
+        TestInfo {"111", 7}
+    );
+
+    REQUIRE(mqis::bitstring_to_state_index(info.input) == info.expected);
+}

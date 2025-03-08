@@ -85,6 +85,30 @@ inline auto state_as_bitstring_little_endian_marginal_(
     return bitstring;
 }
 
+auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstring) -> bool
+{
+    if (marginal_bitstring.size() == 0) {
+        return true;
+    }
+
+    auto flag_marginal_already_found = false;
+
+    for (auto bitchar : marginal_bitstring) {
+        if (bitchar == MARGINALIZED_QUBIT) {
+            flag_marginal_already_found = true;
+            continue;
+        }
+
+        // at this point, a 0 or 1 has been found; if a marginal qubit was seen earlier, then we
+        // know the bitstring is invalid
+        if (flag_marginal_already_found) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 }  // namespace impl_mqis
 
 namespace mqis
@@ -286,6 +310,62 @@ inline auto state_as_bitstring_big_endian(std::size_t i_state, std::size_t n_qub
 inline auto state_as_bitstring(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     return state_as_bitstring_little_endian(i_state, n_qubits);
+}
+
+inline auto rstrip_marginal_bits(const std::string& marginal_bitstring) -> std::string
+{
+    if (!impl_mqis::are_all_marginal_bits_on_right_(marginal_bitstring)) {
+        auto err_msg = std::stringstream {};
+        err_msg << "The bitstring '" << marginal_bitstring << "' cannot be rstripped of its marginal bits\n";
+        throw std::runtime_error {err_msg.str()};
+    }
+
+    const auto it = std::find(marginal_bitstring.begin(), marginal_bitstring.end(), impl_mqis::MARGINALIZED_QUBIT);
+
+    return std::string {marginal_bitstring.begin(), it};
+}
+
+inline auto is_valid_bitstring(const std::string& bitstring) -> bool
+{
+    const auto is_bitstring_char = [](char bitchar) {
+        return bitchar == '0' || bitchar == '1' || bitchar == impl_mqis::MARGINALIZED_QUBIT;
+    };
+
+    return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);
+}
+
+inline auto is_nonmarginal_bitstring(const std::string& bitstring) -> bool
+{
+    const auto is_nonmarginal_bitstring_char = [](char bitchar) {
+        return bitchar == '0' || bitchar == '1';
+    };
+
+    return std::all_of(bitstring.begin(), bitstring.end(), is_nonmarginal_bitstring_char);
+}
+
+inline auto bitstring_to_state_index_little_endian(const std::string& bitstring)
+{
+    if (!is_nonmarginal_bitstring(bitstring)) {
+        auto err_msg = std::stringstream {};
+        err_msg << "Can only convert valid non-marginal bitstrings into state indices\n";
+        err_msg << "Received invalid input: '" << bitstring << "'\n";
+
+        throw std::runtime_error {err_msg.str()};
+    }
+
+    auto output = std::size_t {0};
+    for (std::size_t i {0}; i < bitstring.size(); ++i) {
+        if (bitstring[i] == '1') {
+            output += (1ul << i);
+        }
+    }
+
+    return output;
+}
+
+inline auto bitstring_to_state_index(const std::string& bitstring)
+{
+    return bitstring_to_state_index_little_endian(bitstring);
 }
 
 constexpr auto almost_eq(
