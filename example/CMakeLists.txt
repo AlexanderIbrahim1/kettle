@@ -25,5 +25,6 @@ add_example(deutsch_jozsa)
 add_example(deutsch_jozsa_balanced_ibm_example)
 add_example(inverse_fourier)
 add_example(simon_ibm_example)
+add_example(shor)
 
 add_folders(Example)
