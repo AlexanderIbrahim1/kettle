@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ranges>
 #include <stdexcept>
 #include <unordered_set>
 
@@ -53,9 +54,10 @@ void control_multiplication_mod15(
         }
 
         if (base == 7 || base == 11 || base == 13) {
-            for (auto iq : {i0, i1, i2, i3}) {
-                circuit.add_x_gate(iq);
-            }
+            circuit.add_cx_gate(control_qubit, i0);
+            circuit.add_cx_gate(control_qubit, i1);
+            circuit.add_cx_gate(control_qubit, i2);
+            circuit.add_cx_gate(control_qubit, i3);
         }
     }
 }
@@ -64,18 +66,17 @@ auto main() -> int
 {
     const auto base = int {7};
 
-    const auto n_counting_qubits = 8;
-    const auto n_ancilla_qubits = 4;
+    const auto n_counting_qubits = 8ul;
+    const auto n_ancilla_qubits = 4ul;
 
-    auto counting_qubits = std::vector<std::size_t> (n_counting_qubits);
-    std::iota(counting_qubits.begin(), counting_qubits.end(), 0);
+    const auto counting_qubits = std::vector<std::size_t> {0, 1, 2, 3, 4, 5, 6, 7};
 
     auto circuit = mqis::QuantumCircuit {n_counting_qubits + n_ancilla_qubits};
     circuit.add_h_gate(counting_qubits);
-    circuit.add_x_gate(8);
+    circuit.add_x_gate(n_counting_qubits);
 
-    for (std::size_t i {0}; i < n_counting_qubits; ++i) {
-        const auto n_iterations = std::size_t {1 << i};
+    for (auto i : std::views::iota(0ul, n_counting_qubits) | std::views::reverse) {
+        const auto n_iterations = 1ul << i;
         control_multiplication_mod15(circuit, base, i, n_counting_qubits, n_iterations);
     }
 
@@ -86,7 +87,9 @@ auto main() -> int
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1 << 12);
+    // mqis::print_state(state);
+
+    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1 << 10);
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
