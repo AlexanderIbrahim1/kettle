@@ -26,5 +26,6 @@ add_example(deutsch_jozsa_balanced_ibm_example)
 add_example(inverse_fourier)
 add_example(simon_ibm_example)
 add_example(quantum_phase_estimation_t_gate)
+add_example(shor)
 
 add_folders(Example)
