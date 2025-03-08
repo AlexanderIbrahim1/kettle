@@ -1,7 +1,7 @@
+#include <iostream>
+
 #include <mini-qiskit/mini-qiskit.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/common/gateprint.hpp>
-
 
 
 auto main() -> int
@@ -17,7 +17,6 @@ auto main() -> int
     for (std::size_t i {0}; i < 16; ++i) {
         std::cout << state[i].real() << ", " << state[i].imag() << '\n';
     }
-    // mqis::print_circuit(circuit);
 
     return 0;
 }

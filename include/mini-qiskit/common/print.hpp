@@ -12,6 +12,7 @@
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/state.hpp"
 
 
 namespace impl_mqis
@@ -223,6 +224,40 @@ auto format_matrix_(const mqis::Matrix2X2& matrix) -> std::string
     return output.str();
 }
 
+auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_right_qubits)
+-> std::string
+{
+    auto err_msg = std::stringstream {};
+    err_msg << "FALSE: ALMOST_EQ_WITH_PRINT()\n";
+    err_msg << "REASON: different number of qubits in the states\n";
+    err_msg << "left state: " << n_left_qubits << '\n';
+    err_msg << "right state: " << n_right_qubits << '\n';
+
+    return err_msg.str();
+}
+
+auto ae_err_msg_diff_states_(
+    const mqis::QuantumState& left,
+    const mqis::QuantumState& right
+) -> std::string
+{
+    auto err_msg = std::stringstream {};
+    err_msg << "FALSE: ALMOST_EQ_WITH_PRINT()\n";
+    err_msg << "REASON: different states\n";
+
+    err_msg << "LEFT STATE:\n";
+    for (std::size_t i {0}; i < left.n_states(); ++i) {
+        err_msg << "(" << left[i].real() << ", " << left[i].imag() << ")\n";
+    }
+
+    err_msg << "RIGHT STATE:\n";
+    for (std::size_t i {0}; i < right.n_states(); ++i) {
+        err_msg << "(" << right[i].real() << ", " << right[i].imag() << ")\n";
+    }
+
+    return err_msg.str();
+}
+
 }  // namespace impl_mqis
 
 
@@ -243,5 +278,40 @@ void print_circuit(const QuantumCircuit& circuit)
         }
     }
 }
+
+enum PrintAlmostEq
+{
+    PRINT,
+    NOPRINT
+};
+
+constexpr auto almost_eq_with_print(
+    const QuantumState& left,
+    const QuantumState& right,
+    PrintAlmostEq print_state = PrintAlmostEq::PRINT,
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+) noexcept -> bool
+{
+    using PAE = PrintAlmostEq;
+
+    if (left.n_qubits() != right.n_qubits()) {
+        if (print_state == PAE::PRINT) {
+            std::cout << impl_mqis::ae_err_msg_diff_number_of_qubits_(left.n_qubits(), right.n_qubits());
+        }
+        return false;
+    }
+
+    for (std::size_t i {0}; i < left.n_states(); ++i) {
+        if (!almost_eq(left[i], right[i], tolerance_sq)) {
+            if (print_state == PAE::PRINT) {
+                std::cout << impl_mqis::ae_err_msg_diff_states_(left, right);
+            }
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 }  // namespace mqis
