@@ -298,7 +298,7 @@ constexpr auto almost_eq_with_print(
     const QuantumState& left,
     const QuantumState& right,
     PrintAlmostEq print_state = PrintAlmostEq::PRINT,
-    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     using PAE = PrintAlmostEq;

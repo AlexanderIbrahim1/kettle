@@ -11,7 +11,8 @@ namespace impl_mqis
 {
 
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
-constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_EQ = double {1.0e-8};
+constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-8};
+constexpr static auto ANGLE_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-8};
 
 constexpr auto norm_squared(double real, double imag) noexcept -> double
 {
@@ -78,7 +79,7 @@ namespace mqis
 constexpr auto almost_eq(
     const std::complex<double>& left,
     const std::complex<double>& right,
-    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     const auto diff_real = left.real() - right.real();

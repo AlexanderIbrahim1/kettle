@@ -5,11 +5,94 @@
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
+
+namespace impl_mqis
+{
+
+struct MatrixIndexPair
+{
+    std::size_t i_left;
+    std::size_t i_right;
+
+    bool operator==(const MatrixIndexPair& other) const = default;
+};
+
+struct MatrixIndexPairKeyHash
+{
+    auto operator()(const MatrixIndexPair& pair) const
+    {
+        return std::hash<std::size_t>()(pair.i_left) ^ (std::hash<std::size_t>()(pair.i_right) << 1);
+    }
+};
+
+inline auto is_gate_info_almost_eq(const mqis::GateInfo& left, const mqis::GateInfo& right, double tolerance) -> bool
+{
+    using G = mqis::Gate;
+
+    if (left.gate != right.gate) {
+        return false;
+    }
+
+    switch (left.gate)
+    {
+        case G::X : {
+            return unpack_x_gate(left) == unpack_x_gate(right);
+        }
+        case G::RX : {
+            const auto [left_angle, left_qubit] = unpack_rx_gate(left);
+            const auto [right_angle, right_qubit] = unpack_rx_gate(right);
+            return left_qubit == right_qubit && std::fabs(left_angle - right_angle) < tolerance;
+        }
+        case G::H : {
+            return unpack_h_gate(left) == unpack_h_gate(right);
+        }
+        case G::CX : {
+            return unpack_cx_gate(left) == unpack_cx_gate(right);
+        }
+        case G::CRX : {
+            const auto [left_control_qubit, left_target_qubit, left_angle] = unpack_crx_gate(left);
+            const auto [right_control_qubit, right_target_qubit, right_angle] = unpack_crx_gate(right);
+            return left_control_qubit == right_control_qubit && \
+                left_target_qubit == right_target_qubit && \
+                std::fabs(left_angle - right_angle) < tolerance;
+        }
+        case G::CP : {
+            const auto [left_control_qubit, left_target_qubit, left_angle] = unpack_cp_gate(left);
+            const auto [right_control_qubit, right_target_qubit, right_angle] = unpack_cp_gate(right);
+            return left_control_qubit == right_control_qubit && \
+                left_target_qubit == right_target_qubit && \
+                std::fabs(left_angle - right_angle) < tolerance;
+        }
+        case G::U : {
+            [[maybe_ignore]]
+            const auto [left_qubit_index, left_ignore] = unpack_u_gate(left);
+            [[maybe_ignore]]
+            const auto [right_qubit_index, right_ignore] = unpack_u_gate(right);
+            return left_qubit_index == right_qubit_index;
+        }
+        case G::CU : {
+            [[maybe_ignore]]
+            const auto [left_control_qubit, left_target_qubit, left_ignore] = unpack_cu_gate(left);
+            [[maybe_ignore]]
+            const auto [right_control_qubit, right_target_qubit, right_ignore] = unpack_cu_gate(right);
+            return left_control_qubit == right_control_qubit && left_target_qubit == right_target_qubit;
+        }
+        case G::M : {
+            return unpack_m_gate(left) == unpack_m_gate(right);
+        }
+        default : {
+            throw std::runtime_error {"UNREACHABLE: invalid GateInfo instance given"};
+        }
+    }
+}
+
+}  // namespace impl_mqis
 
 namespace mqis
 {
@@ -20,13 +103,13 @@ public:
     static constexpr auto MEASURED_FLAG = std::uint8_t {1};
     static constexpr auto UNMEASURED_FLAG = std::uint8_t {0};
 
-    explicit QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
+    explicit constexpr QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_bits}
         , measure_bitmask_(n_qubits, UNMEASURED_FLAG)
     {}
 
-    explicit QuantumCircuit(std::size_t n_qubits)
+    explicit constexpr QuantumCircuit(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_qubits}
         , measure_bitmask_(n_qubits, UNMEASURED_FLAG)
@@ -362,6 +445,8 @@ public:
         return unitary_gates_[matrix_index];
     }
 
+    friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
+
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
@@ -425,5 +510,69 @@ private:
         }
     }
 };
+
+auto almost_eq(
+    const QuantumCircuit& left,
+    const QuantumCircuit& right,
+    double matrix_complex_tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ,
+    double angle_tolerance_sq = impl_mqis::ANGLE_ALMOST_EQ_TOLERANCE_SQ
+) -> bool
+{
+    // begin with the fastest checks first (qubits, bits, and bitmask values)
+    if (left.n_qubits() != right.n_qubits()) {
+        return false;
+    }
+
+    if (left.n_bits() != right.n_bits()) {
+        return false;
+    }
+
+    if (left.measure_bitmask() != right.measure_bitmask()) {
+        return false;
+    }
+
+    // don't bother checking the gates if there aren't the same number on both sides
+    const auto n_left_gates = std::distance(left.begin(), left.end());
+    const auto n_right_gates = std::distance(right.begin(), right.end());
+
+    if (n_left_gates != n_right_gates) {
+        return false;
+    }
+
+    // don't bother rechecking matrix index pairs already seen
+    auto checked_matrix_index_pairs = std::unordered_set<impl_mqis::MatrixIndexPair, impl_mqis::MatrixIndexPairKeyHash> {};
+
+    for (std::size_t i_gate {0}; i_gate < n_left_gates; ++i_gate) {
+        const auto& left_info = left[i_gate];
+        const auto& right_info = right[i_gate];
+
+        if (!impl_mqis::is_gate_info_almost_eq(left_info, right_info, angle_tolerance_sq)) {
+            return false;
+        }
+
+        // the previous function has already checked that left_info.gate == right_info.gate
+        // NOTE: we check the matrices independently of the index because two gates could refer to the
+        // same matrix, but that matrix could be located at a different index
+        if (left_info.gate == Gate::U || left_info.gate == Gate::CU) {
+            const auto i_left_matrix = impl_mqis::unpack_matrix_index(left_info);
+            const auto i_right_matrix = impl_mqis::unpack_matrix_index(right_info);
+
+            if (checked_matrix_index_pairs.contains({i_left_matrix, i_right_matrix})) {
+                continue;
+            }
+
+            const auto& lmatrix = left.unitary_gate(i_left_matrix);
+            const auto& rmatrix = right.unitary_gate(i_right_matrix);
+
+            if (!almost_eq(lmatrix, rmatrix, matrix_complex_tolerance_sq)) {
+                return false;
+            }
+
+            checked_matrix_index_pairs.insert({i_left_matrix, i_right_matrix});
+        }
+    }
+
+    return true;
+}
 
 }  // namespace mqis

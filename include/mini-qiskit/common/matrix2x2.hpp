@@ -89,7 +89,7 @@ constexpr auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
 constexpr auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,
-    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     // clang-format off

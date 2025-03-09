@@ -371,7 +371,7 @@ inline auto bitstring_to_state_index(const std::string& bitstring)
 constexpr auto almost_eq(
     const QuantumState& left,
     const QuantumState& right,
-    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_EQ
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     if (left.n_qubits() != right.n_qubits()) {

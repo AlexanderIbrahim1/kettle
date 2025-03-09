@@ -179,4 +179,20 @@ constexpr auto unpack_matrix_index(mqis::GateInfo info) -> std::size_t
     return info.arg3;
 }
 
+constexpr auto is_single_qubit_gate(mqis::GateInfo info) -> bool
+{
+    using G = mqis::Gate;
+    const auto gate = info.gate;
+
+    return gate == G::X || gate == G::RX || gate == G::H || gate == G::U || gate == G::M;
+}
+
+constexpr auto is_double_qubit_gate(mqis::GateInfo info) -> bool
+{
+    using G = mqis::Gate;
+    const auto gate = info.gate;
+
+    return gate == G::CX || gate == G::CRX || gate == G::CP || gate == G::CU;
+}
+
 }  // namespace impl_mqis
