@@ -122,6 +122,27 @@ public:
         }
     }
 
+    void add_cz_gate(std::size_t source_index, std::size_t target_index)
+    {
+        check_qubit_range_(source_index, "source qubit", "CZ");
+        check_qubit_range_(target_index, "target qubit", "CZ");
+        check_previous_gate_is_not_measure_(source_index, "CZ");
+        check_previous_gate_is_not_measure_(target_index, "CZ");
+        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
+        gates_.emplace_back(impl_mqis::create_cx_gate(source_index, target_index));
+        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
+    }
+
+    template <
+        impl_mqis::ContainerOfControlAndTargetQubitIndices Container =
+            std::initializer_list<std::pair<std::size_t, std::size_t>>>
+    void add_cz_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_cz_gate(pair.first, pair.second);
+        }
+    }
+
     void add_crx_gate(double theta, std::size_t source_index, std::size_t target_index)
     {
         check_qubit_range_(source_index, "source qubit", "CRX");
