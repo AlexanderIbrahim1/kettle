@@ -26,8 +26,6 @@ inline void check_matching_number_of_bits_(const mqis::QuantumCircuit& left, con
 
 inline auto is_operating_on_measured_qubit_(const mqis::GateInfo& info, const std::vector<std::uint8_t>& measure_bitmask) -> bool
 {
-    using G = mqis::Gate;
-
     if (is_single_qubit_gate(info)) {
         const auto target_index = unpack_single_qubit_gate_index(info);
         return measure_bitmask[target_index];
@@ -68,7 +66,6 @@ inline auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) ->
     impl_mqis::check_matching_number_of_qubits_(left, right);
     impl_mqis::check_matching_number_of_bits_(left, right);
 
-    const auto n_qubits = left.n_qubits();
     const auto n_left_matrices = left.unitary_gates_.size();
 
     auto new_gates = left.gates_;
