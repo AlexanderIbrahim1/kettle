@@ -70,16 +70,16 @@ inline auto is_gate_info_almost_eq(const mqis::GateInfo& left, const mqis::GateI
                 std::fabs(left_angle - right_angle) < tolerance;
         }
         case G::U : {
-            [[maybe_ignore]]
+            [[maybe_unused]]
             const auto [left_qubit_index, left_ignore] = unpack_u_gate(left);
-            [[maybe_ignore]]
+            [[maybe_unused]]
             const auto [right_qubit_index, right_ignore] = unpack_u_gate(right);
             return left_qubit_index == right_qubit_index;
         }
         case G::CU : {
-            [[maybe_ignore]]
+            [[maybe_unused]]
             const auto [left_control_qubit, left_target_qubit, left_ignore] = unpack_cu_gate(left);
-            [[maybe_ignore]]
+            [[maybe_unused]]
             const auto [right_control_qubit, right_target_qubit, right_ignore] = unpack_cu_gate(right);
             return left_control_qubit == right_control_qubit && left_target_qubit == right_target_qubit;
         }
@@ -515,7 +515,7 @@ auto almost_eq(
     const QuantumCircuit& left,
     const QuantumCircuit& right,
     double matrix_complex_tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ,
-    double angle_tolerance_sq = impl_mqis::ANGLE_ALMOST_EQ_TOLERANCE_SQ
+    double angle_tolerance_sq = impl_mqis::ANGLE_ALMOST_EQ_TOLERANCE
 ) -> bool
 {
     // begin with the fastest checks first (qubits, bits, and bitmask values)
@@ -532,8 +532,8 @@ auto almost_eq(
     }
 
     // don't bother checking the gates if there aren't the same number on both sides
-    const auto n_left_gates = std::distance(left.begin(), left.end());
-    const auto n_right_gates = std::distance(right.begin(), right.end());
+    const auto n_left_gates  = static_cast<std::size_t>(std::distance(left.begin(), left.end()));
+    const auto n_right_gates = static_cast<std::size_t>(std::distance(right.begin(), right.end()));
 
     if (n_left_gates != n_right_gates) {
         return false;

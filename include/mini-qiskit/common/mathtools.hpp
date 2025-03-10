@@ -12,7 +12,7 @@ namespace impl_mqis
 
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
 constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-8};
-constexpr static auto ANGLE_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-8};
+constexpr static auto ANGLE_ALMOST_EQ_TOLERANCE = double {1.0e-8};
 
 constexpr auto norm_squared(double real, double imag) noexcept -> double
 {
