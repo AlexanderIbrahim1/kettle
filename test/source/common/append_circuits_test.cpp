@@ -2,7 +2,7 @@
 
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/common/append_circuits.hpp"
+#include "mini-qiskit/circuit_operations/append_circuits.hpp"
 
 
 TEST_CASE("append_circuits working")
