@@ -40,7 +40,7 @@ TEST_CASE("multiplicity-controlled X gate test")
         };
 
         const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, i_target, {i_control});
+            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), i_target, {i_control});
         };
 
         const auto state_from_cx = create_state(modify_via_cx, init_bitstring, 2);
@@ -75,7 +75,7 @@ TEST_CASE("multiplicity-controlled X gate test")
         };
 
         const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, target, {control0, control1});
+            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), target, {control0, control1});
         };
 
         const auto state_from_cx = create_state(modify_via_toffoli, init_bitstring, 3);
@@ -147,7 +147,7 @@ TEST_CASE("multiplicity-controlled X gate test")
 
         const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
             mqis::apply_multiplicity_controlled_u_gate(
-                circuit, mqis::X_GATE, info.target_qubit, info.control_qubits);
+                circuit, mqis::x_gate(), info.target_qubit, info.control_qubits);
         };
 
         const auto state_from_mcu = create_state(modify_via_mcu, info.input_bitstring, 4);

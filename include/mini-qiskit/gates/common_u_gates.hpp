@@ -5,25 +5,49 @@
 namespace mqis
 {
 
-static constexpr auto X_GATE = Matrix2X2 {
-    {0.0, 0.0},
-    {1.0, 0.0},
-    {1.0, 0.0},
-    {0.0, 0.0}
-};
+constexpr auto x_gate() noexcept -> Matrix2X2
+{
+    return {
+        {0.0, 0.0},
+        {1.0, 0.0},
+        {1.0, 0.0},
+        {0.0, 0.0}
+    };
+}
 
-static constexpr auto Y_GATE = Matrix2X2 {
-    {0.0, 0.0},
-    {0.0, -1.0},
-    {0.0, 1.0},
-    {0.0, 0.0}
-};
+constexpr auto y_gate() noexcept -> Matrix2X2
+{
+    return {
+        {0.0, 0.0},
+        {0.0, -1.0},
+        {0.0, 1.0},
+        {0.0, 0.0}
+    };
+}
 
-static constexpr auto Z_GATE = Matrix2X2 {
-    {1.0, 0.0},
-    {0.0, 0.0},
-    {0.0, 0.0},
-    {-1.0, 0.0}
-};
+constexpr auto z_gate() noexcept -> Matrix2X2
+{
+    return {
+        {1.0, 0.0},
+        {0.0, 0.0},
+        {0.0, 0.0},
+        {-1.0, 0.0}
+    };
+}
+
+constexpr auto sqrt_x_gate() noexcept -> Matrix2X2
+{
+    return {
+        {0.5, 0.5 },
+        {0.5, -0.5},
+        {0.5, -0.5},
+        {0.5, 0.5 }
+    };
+}
+
+constexpr auto sqrt_x_gate_conj() noexcept -> Matrix2X2
+{
+    return mqis::conjugate_transpose(sqrt_x_gate());
+}
 
 }  // namespace mqis

@@ -38,7 +38,7 @@ TEST_CASE("append_circuits working")
         const auto add_right_gates = [&](mqis::QuantumCircuit& circuit) {
             circuit.add_h_gate({1, 2});
             circuit.add_z_gate(0);
-            circuit.add_u_gate(mqis::X_GATE, 2);
+            circuit.add_u_gate(mqis::x_gate(), 2);
         };
 
         add_left_gates(circuit0);

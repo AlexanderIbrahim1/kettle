@@ -14,19 +14,19 @@ void add_balanced_deutsch_jozsa_from_ibm_example(mqis::QuantumCircuit& circuit)
 {
     // this is a circuit with 3 data qubits and 1 ancilla qubit
     circuit.add_x_gate({2});
-    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, 3, {0, 1, 2});
+    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), 3, {0, 1, 2});
     circuit.add_x_gate({2});
 
     circuit.add_x_gate({0, 1, 2});
-    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, 3, {0, 1, 2});
+    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), 3, {0, 1, 2});
     circuit.add_x_gate({0, 1, 2});
 
     circuit.add_x_gate({0, 2});
-    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, 3, {0, 1, 2});
+    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), 3, {0, 1, 2});
     circuit.add_x_gate({0, 2});
 
     circuit.add_x_gate({1});
-    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, 3, {0, 1, 2});
+    mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), 3, {0, 1, 2});
     circuit.add_x_gate({1});
 }
 

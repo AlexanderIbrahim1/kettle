@@ -50,6 +50,12 @@ auto get_container_index(const Container& container, std::size_t index) -> std::
     }
 }
 
+template <typename Container>
+auto get_container_size(const Container& container) -> std::size_t
+{
+    return static_cast<std::size_t>(std::distance(container.begin(), container.end()));
+}
+
 static constexpr auto MARGINALIZED_QUBIT = char {'x'};
 
 }  // namespace impl_mqis

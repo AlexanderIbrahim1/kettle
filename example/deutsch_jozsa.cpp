@@ -76,7 +76,7 @@ void add_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
         const auto bitset = mqis::state_as_dynamic_bitset(i_state, data_qubits.size());
 
         add_x_gates_on_set_bits(circuit, bitset);
-        mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::X_GATE, i_ancilla, data_qubits);
+        mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), i_ancilla, data_qubits);
         add_x_gates_on_set_bits(circuit, bitset);
     }
 }
