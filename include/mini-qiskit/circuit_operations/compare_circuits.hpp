@@ -45,16 +45,17 @@ inline auto as_u_gate(const mqis::QuantumCircuit& circuit, const mqis::GateInfo&
     }
     else {
         const auto matrix = impl_mqis::non_u_gate_to_u_gate(info);
+        const auto dummy_gate_index = 0;
 
         if (impl_mqis::is_single_qubit_gate_and_not_u(info)) {
             const auto target = impl_mqis::unpack_single_qubit_gate_index(info);
-            const auto u_gate_info = impl_mqis::create_u_gate(target, 0);  // TODO: replace 0 with dummy
+            const auto u_gate_info = impl_mqis::create_u_gate(target, dummy_gate_index);
 
             return {u_gate_info, matrix};
         }
         else if (impl_mqis::is_double_qubit_gate_and_not_cu(info)) {
             const auto [control, target] = impl_mqis::unpack_double_qubit_gate_indices(info);
-            const auto u_gate_info = impl_mqis::create_cu_gate(control, target, 0);  // TODO: 0 replace with dummy
+            const auto u_gate_info = impl_mqis::create_cu_gate(control, target, dummy_gate_index);
 
             return {u_gate_info, matrix};
         }

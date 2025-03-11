@@ -90,8 +90,6 @@ The function should take as arguments:
 
 Later I should make a multiplicity-controlled version of this function
   - I would have to turn all the general gates into U-gates
-
-TODO: add a check to make sure the new qubit indices, and control qubit, will all fit onto the new circuit
 */
 template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
 inline auto make_controlled_circuit(
