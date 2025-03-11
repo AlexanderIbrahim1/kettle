@@ -86,9 +86,9 @@ void apply_multiplicity_controlled_u_gate(
 
         stack.emplace_back(sqrt_gate, top_control_indices, gate_target_qubit);
         stack.emplace_back(sqrt_gate, bottom_control_indices, gate_target_qubit);
-        stack.emplace_back(X_GATE, top_control_indices, mcx_target_qubit);
+        stack.emplace_back(x_gate(), top_control_indices, mcx_target_qubit);
         stack.emplace_back(sqrt_gate_conj, bottom_control_indices, gate_target_qubit);
-        stack.emplace_back(X_GATE, top_control_indices, mcx_target_qubit);
+        stack.emplace_back(x_gate(), top_control_indices, mcx_target_qubit);
     }
 }
 

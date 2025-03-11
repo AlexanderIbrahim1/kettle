@@ -7,6 +7,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
+#include "mini-qiskit/circuit_operations/compare_circuits.hpp"
 
 static constexpr auto ABS_TOL = double {1.0e-6};
 

@@ -174,6 +174,11 @@ constexpr auto unpack_double_qubit_gate_indices(mqis::GateInfo info) -> std::tup
     return {info.arg0, info.arg1};
 }
 
+constexpr auto unpack_gate_angle(mqis::GateInfo info) -> double
+{
+    return info.arg2;
+}
+
 constexpr auto unpack_matrix_index(mqis::GateInfo info) -> std::size_t
 {
     return info.arg3;
@@ -193,6 +198,22 @@ constexpr auto is_double_qubit_gate(mqis::GateInfo info) -> bool
     const auto gate = info.gate;
 
     return gate == G::CX || gate == G::CRX || gate == G::CP || gate == G::CU;
+}
+
+constexpr auto is_single_qubit_gate_and_not_u(mqis::GateInfo info) -> bool
+{
+    using G = mqis::Gate;
+    const auto gate = info.gate;
+
+    return gate == G::X || gate == G::RX || gate == G::H;
+}
+
+constexpr auto is_double_qubit_gate_and_not_cu(mqis::GateInfo info) -> bool
+{
+    using G = mqis::Gate;
+    const auto gate = info.gate;
+
+    return gate == G::CX || gate == G::CRX || gate == G::CP;
 }
 
 }  // namespace impl_mqis
