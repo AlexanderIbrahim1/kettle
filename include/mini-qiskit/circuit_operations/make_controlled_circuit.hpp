@@ -7,6 +7,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
+#include "mini-qiskit/gates/multiplicity_controlled_u_gate.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
 
 
@@ -96,14 +97,14 @@ template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<s
 inline auto make_controlled_circuit(
     const mqis::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
-    std::size_t control_qubit,
+    std::size_t control,
     const Container& container
 ) -> mqis::QuantumCircuit
 {
     impl_mqis::check_valid_number_of_mapped_indices_(container, subcircuit);
     impl_mqis::check_all_indices_are_unique_(container);
-    impl_mqis::check_control_qubit_is_not_a_mapped_qubit_(container, control_qubit);
-    impl_mqis::check_new_indices_fit_onto_new_circuit_(container, control_qubit, n_new_qubits);
+    impl_mqis::check_control_qubit_is_not_a_mapped_qubit_(container, control);
+    impl_mqis::check_new_indices_fit_onto_new_circuit_(container, control, n_new_qubits);
 
     auto new_circuit = mqis::QuantumCircuit {n_new_qubits};
 
@@ -111,16 +112,61 @@ inline auto make_controlled_circuit(
         switch (gate_info.gate)
         {
             case Gate::X : {
-                const auto original_target_qubit = impl_mqis::unpack_x_gate(gate_info);
-                const auto new_target_qubit = impl_mqis::get_container_index(container, original_target_qubit);
-                new_circuit.add_cu_gate(x_gate(), control_qubit, new_target_qubit);
+                const auto original_target = impl_mqis::unpack_x_gate(gate_info);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                new_circuit.add_cu_gate(x_gate(), control, new_target);
                 break;
             }
             case Gate::RX : {
-                const auto original_target_qubit = impl_mqis::unpack_x_gate(gate_info);
-                const auto new_target_qubit = impl_mqis::get_container_index(container, original_target_qubit);
-                new_circuit.add_cu_gate(x_gate(), control_qubit, new_target_qubit);
+                const auto [angle, original_target] = impl_mqis::unpack_rx_gate(gate_info);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                new_circuit.add_cu_gate(rx_gate(angle), control, new_target);
                 break;
+            }
+            case Gate::H : {
+                const auto original_target = impl_mqis::unpack_h_gate(gate_info);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                new_circuit.add_cu_gate(h_gate(), control, new_target);
+                break;
+            }
+            case Gate::CX : {
+                const auto [original_control, original_target] = impl_mqis::unpack_cx_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(container, original_control);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                apply_multiplicity_controlled_u_gate(new_circuit, x_gate(), new_target, {control, new_control});
+                break;
+            }
+            case Gate::CRX : {
+                const auto [original_control, original_target, angle] = impl_mqis::unpack_crx_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(container, original_control);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                apply_multiplicity_controlled_u_gate(new_circuit, rx_gate(angle), new_target, {control, new_control});
+                break;
+            }
+            case Gate::CP : {
+                const auto [original_control, original_target, angle] = impl_mqis::unpack_cp_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(container, original_control);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                apply_multiplicity_controlled_u_gate(new_circuit, p_gate(angle), new_target, {control, new_control});
+                break;
+            }
+            case Gate::U : {
+                const auto [original_target, original_gate_index] = impl_mqis::unpack_u_gate(gate_info);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                const auto& matrix = subcircuit.unitary_gate(original_gate_index);
+                new_circuit.add_cu_gate(matrix, control, new_target);
+                break;
+            }
+            case Gate::CU : {
+                const auto [original_control, original_target, original_gate_index] = impl_mqis::unpack_cu_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(container, original_control);
+                const auto new_target = impl_mqis::get_container_index(container, original_target);
+                const auto& matrix = subcircuit.unitary_gate(original_gate_index);
+                apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, {control, new_control});
+                break;
+            }
+            case Gate::M : {
+                throw std::runtime_error {"Cannot make a measurement gate controlled."};
             }
         }
     }
