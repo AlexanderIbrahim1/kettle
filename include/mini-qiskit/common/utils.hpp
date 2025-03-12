@@ -56,6 +56,26 @@ auto get_container_size(const Container& container) -> std::size_t
     return static_cast<std::size_t>(std::distance(container.begin(), container.end()));
 }
 
+template <typename Container0 = std::initializer_list<std::size_t>, typename Container1 = std::initializer_list<std::size_t>>
+requires ContainerOfQubitIndices<Container0> && ContainerOfQubitIndices<Container1>
+auto extend_container_to_vector(const Container0& container0, const Container1& container1) -> std::vector<std::size_t>
+{
+    const auto new_size = get_container_size(container0) + get_container_size(container1);
+
+    auto new_container = std::vector<std::size_t> {};
+    new_container.reserve(new_size);
+
+    for (auto elem : container0) {
+        new_container.push_back(elem);
+    }
+
+    for (auto elem : container1) {
+        new_container.push_back(elem);
+    }
+    
+    return new_container;
+}
+
 static constexpr auto MARGINALIZED_QUBIT = char {'x'};
 
 }  // namespace impl_mqis
