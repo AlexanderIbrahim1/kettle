@@ -130,11 +130,85 @@ TEST_CASE("make_controlled_circuit()")
         }
     }
 
+    SECTION("several gates")
+    {
+        const auto angle = double {1.2345};
+
+        const auto init_bitstring = std::string {
+            GENERATE(
+                "00000", "10000", "01000", "11000", "00100", "10100", "01100", "11100",
+                "00010", "10010", "01010", "11010", "00110", "10110", "01110", "11110",
+                "00001", "10001", "01001", "11001", "00101", "10101", "01101", "11101",
+                "00011", "10011", "01011", "11011", "00111", "10111", "01111", "11111"
+            )
+        };
+
+        auto subcircuit = mqis::QuantumCircuit {3};
+        subcircuit.add_x_gate(0);
+        subcircuit.add_x_gate(1);
+        subcircuit.add_h_gate(1);
+        subcircuit.add_h_gate(2);
+        subcircuit.add_rx_gate(angle, 2);
+        subcircuit.add_cx_gate(1, 2);
+
+        auto new_circuit = mqis::make_controlled_circuit(subcircuit, 5, 0, {2, 3, 4});
+
+        auto expected = mqis::QuantumCircuit {5};
+        expected.add_cu_gate(mqis::x_gate(), 0, 2);
+        expected.add_cu_gate(mqis::x_gate(), 0, 3);
+        expected.add_cu_gate(mqis::h_gate(), 0, 3);
+        expected.add_cu_gate(mqis::h_gate(), 0, 4);
+        expected.add_cu_gate(mqis::rx_gate(angle), 0, 4);
+        mqis::apply_multiplicity_controlled_u_gate(expected, mqis::x_gate(), 4, {0, 3});
+
+        auto state0 = mqis::QuantumState {init_bitstring};
+        auto state1 = mqis::QuantumState {init_bitstring};
+
+        mqis::simulate(new_circuit, state0);
+        mqis::simulate(expected, state1);
+
+        REQUIRE(mqis::almost_eq(state0, state1));
+    }
+
     SECTION("throws if measurement gate is found")
     {
         auto subcircuit = mqis::QuantumCircuit {1};
         subcircuit.add_m_gate(0);
 
         REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 2, 0, {1}), std::runtime_error);
+    }
+}
+
+TEST_CASE("throwing with make_controlled_circuit()")
+{
+    auto subcircuit = mqis::QuantumCircuit {2};
+    subcircuit.add_cx_gate({{0, 1}, {1, 0}});
+
+    SECTION("throws when all indices are not unique")
+    {
+        REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 3, 0, {1, 1}), std::runtime_error);
+    }
+
+    SECTION("throws when an invalid number of indices are given")
+    {
+        SECTION("too few")
+        {
+            REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 3, 0, {1}), std::runtime_error);
+        }
+
+        SECTION("too many")
+        {
+            REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 3, 0, {1, 2, 3}), std::runtime_error);
+        }
+    }
+
+    SECTION("throws when a mapped qubit is the control qubit")
+    {
+        REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 3, 0, {0, 1}), std::runtime_error);
+    }
+
+    SECTION("throws when not all indices fit onto the new circuit")
+    {
+        REQUIRE_THROWS_AS(mqis::make_controlled_circuit(subcircuit, 2, 0, {1, 2}), std::runtime_error);
     }
 }
