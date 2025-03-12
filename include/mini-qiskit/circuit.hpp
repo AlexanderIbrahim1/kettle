@@ -364,6 +364,7 @@ public:
     }
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
+    friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
 
 private:
     std::size_t n_qubits_;
