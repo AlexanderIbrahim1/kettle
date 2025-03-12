@@ -61,56 +61,6 @@ inline auto bitwise_or(const std::vector<std::uint8_t>& left, const std::vector<
 namespace mqis
 {
     
-inline auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit
-{
-    impl_mqis::check_matching_number_of_qubits_(left, right);
-    impl_mqis::check_matching_number_of_bits_(left, right);
-
-    const auto n_left_matrices = left.unitary_gates_.size();
-
-    auto new_gates = left.gates_;
-    new_gates.reserve(left.gates_.size() + right.gates_.size());
-
-    for (const auto& right_gate : right.gates_) {
-        if (impl_mqis::is_operating_on_measured_qubit_(right_gate, left.measure_bitmask_)) {
-            throw std::runtime_error {
-                "No gate on the right QuantumCircuit instance can act on a qubit that has already \n"
-                "been measured on the left QuantumCircuit instance.\n"
-            };
-        }
-
-        // the matrix-using gates refer to the index of the held matrix; so all the matrix-using gates
-        // need to have their indices updated to reflect the new indices
-        if (right_gate.gate == Gate::U) {
-            auto [target_index, matrix_index] = impl_mqis::unpack_u_gate(right_gate);
-            matrix_index += n_left_matrices;
-            new_gates.emplace_back(impl_mqis::create_u_gate(target_index, matrix_index));
-        }
-        else if (right_gate.gate == Gate::CU) {
-            auto [control_index, target_index, matrix_index] = impl_mqis::unpack_cu_gate(right_gate);
-            matrix_index += n_left_matrices;
-            new_gates.emplace_back(impl_mqis::create_cu_gate(control_index, target_index, matrix_index));
-        }
-        else {
-            new_gates.push_back(right_gate);
-        }
-    }
-
-    // the previous loop has already checked that there are no repeated measurements
-    auto new_measure_bitmask = impl_mqis::bitwise_or(left.measure_bitmask_, right.measure_bitmask_);
-
-    // GateInfo vector can be extended trivially; none of the GateInfo gates themselves reference the indices
-    auto new_unitary_gates = left.unitary_gates_;
-    new_unitary_gates.reserve(left.unitary_gates_.size() + right.unitary_gates_.size());
-    new_unitary_gates.insert(new_unitary_gates.end(), right.unitary_gates_.begin(), right.unitary_gates_.end());
-
-    left.measure_bitmask_ = std::move(new_measure_bitmask);
-    left.gates_ = std::move(new_gates);
-    left.unitary_gates_ = std::move(new_unitary_gates);
-
-    return left;
-}
-
 inline void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
 {
     impl_mqis::check_matching_number_of_qubits_(left, right);
@@ -154,5 +104,12 @@ inline void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
     left.unitary_gates_.reserve(n_new_matrices);
     left.unitary_gates_.insert(left.unitary_gates_.end(), right.unitary_gates_.begin(), right.unitary_gates_.end());
 }
+
+inline auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit
+{
+    extend_circuit(left, right);
+    return left;
+}
+
 
 }  // namespace mqis
