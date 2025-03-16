@@ -6,6 +6,9 @@
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
 #include <mini-qiskit/common/print.hpp>
+#include <mini-qiskit/circuit.hpp>
+#include <mini-qiskit/simulate.hpp>
+#include <mini-qiskit/state.hpp>
 
 auto main() -> int
 {
@@ -63,7 +66,12 @@ auto main() -> int
 
     const auto circuit = mqis::make_circuit_from_decomposed_gates(gates);
 
-    mqis::print_circuit(circuit);
+    // mqis::print_circuit(circuit);
+
+    auto statevector = mqis::QuantumState {"11"};
+    mqis::simulate(circuit, statevector);
+
+    mqis::print_state(statevector);
 
     return 0;
 }
