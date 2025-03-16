@@ -2,29 +2,15 @@
 
 #include <array>
 #include <complex>
+#include <filesystem>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>
 
 #include "mini-qiskit/common/matrix2x2.hpp"
-
-namespace mqis
-{
-
-enum class DecomposedGateState {
-    SINGLEGATE = 0,
-    ALLCONTROL = 1
-};
-
-struct DecomposedGateInfo
-{
-    DecomposedGateState state;
-    std::size_t qubit_index;
-    Matrix2X2 matrix;
-};
-
-}  // namespace mqis
+#include "mini-qiskit/decomposed/decomposed_gate.hpp"
 
 namespace impl_mqis
 {
@@ -100,7 +86,8 @@ auto read_unitary_matrix_(std::istream& stream) -> mqis::Matrix2X2
 namespace mqis
 {
 
-auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGateInfo> {
+auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGateInfo>
+{
     const auto n_gates = impl_mqis::read_number_of_gates_(stream);
 
     auto gates = std::vector<DecomposedGateInfo> {};
@@ -115,6 +102,20 @@ auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGa
     }
 
     return gates;
+}
+
+auto read_decomposed_gate_info(const std::filesystem::path& filepath) -> std::vector<DecomposedGateInfo>
+{
+    auto instream = std::ifstream {filepath};
+
+    if (!instream.is_open()) {
+        auto err_msg = std::stringstream {};
+        err_msg << "ERROR: unable to open decompose gate file:\n";
+        err_msg << filepath << '\n';
+        throw std::ios::failure {err_msg.str()};
+    }
+
+    return read_decomposed_gate_info(instream);
 }
 
 }  // namespace mqis
