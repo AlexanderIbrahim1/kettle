@@ -50,8 +50,6 @@ auto main() -> int
         "  0.0000000000000000e+00 -1.0000000000000000e+00\n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
     };
-    // const auto filename = std::string {"decomposition_example.txt"};
-    // const auto filepath = std::filesystem::path {"example"} / filename;
 
     const auto gates = mqis::read_decomposed_gate_info(stream);
 
@@ -65,8 +63,6 @@ auto main() -> int
     }
 
     const auto circuit = mqis::make_circuit_from_decomposed_gates(gates);
-
-    // mqis::print_circuit(circuit);
 
     auto statevector = mqis::QuantumState {"11"};
     mqis::simulate(circuit, statevector);

@@ -73,6 +73,7 @@ add_test_target(TARGET control_swap_test SOURCES "source/gates/control_swap_test
 add_test_target(TARGET append_circuits_test SOURCES "source/common/append_circuits_test.cpp")
 add_test_target(TARGET make_controlled_circuit_test SOURCES "source/circuit_operations/make_controlled_circuit_test.cpp")
 add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circuit_operations/make_binary_controlled_circuit_test.cpp")
+add_test_target(TARGET build_decomposed_circuit_test SOURCES "source/circuit_operations/build_decomposed_circuit_test.cpp")
 
 # ---- End-of-file commands ----
 
