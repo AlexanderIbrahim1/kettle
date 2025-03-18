@@ -387,4 +387,19 @@ constexpr auto almost_eq(
     return true;
 }
 
+inline auto tensor_product(const QuantumState& left, const QuantumState& right) -> QuantumState
+{
+    const auto n_states = left.n_states() * right.n_states();
+    auto new_coefficients = std::vector<std::complex<double>> {};
+    new_coefficients.reserve(n_states);
+
+    for (std::size_t i_right {0}; i_right < right.n_states(); ++i_right) {
+        for (std::size_t i_left {0}; i_left < left.n_states(); ++i_left) {
+            new_coefficients.push_back(left[i_left] * right[i_right]);
+        }
+    }
+
+    return QuantumState {std::move(new_coefficients)};
+}
+
 }  // namespace mqis

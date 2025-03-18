@@ -1,7 +1,13 @@
+#include <functional>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
+
+#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
 TEST_CASE("QuantumState endian representation")
@@ -550,4 +556,136 @@ TEST_CASE("bitstring_to_state_index_little_endian")
     );
 
     REQUIRE(mqis::bitstring_to_state_index(info.input) == info.expected);
+}
+
+TEST_CASE("tensor product")
+{
+    using Amplitudes = std::vector<std::complex<double>>;
+
+    SECTION("direct 1-qubit x 1-qubit")
+    {
+        const auto state0 = mqis::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto state1 = mqis::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto expected = mqis::QuantumState {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
+
+        const auto actual = mqis::tensor_product(state0, state1);
+
+        REQUIRE(mqis::almost_eq(actual, expected));
+    }
+
+    SECTION("unentangled 1-qubit x 1-qubit")
+    {
+        struct TestCase
+        {
+            std::function<void(void)> add_gates;
+            std::string message;
+        };
+
+        auto state0 = mqis::QuantumState {"0"};
+        auto state1 = mqis::QuantumState {"0"};
+        auto product_state = mqis::QuantumState {"00"};
+
+        auto circuit0 = mqis::QuantumCircuit {1};
+        auto circuit1 = mqis::QuantumCircuit {1};
+        auto product_circuit = mqis::QuantumCircuit {2};
+
+        auto testcase = GENERATE_REF(
+            TestCase {
+                [&]() {
+                    circuit0.add_h_gate(0);
+                    circuit1.add_h_gate(0);
+                    product_circuit.add_h_gate({0, 1});
+                },
+                "H on each circuit"
+            },
+            TestCase {
+                [&]() {
+                    circuit1.add_h_gate({0, 0});
+                    product_circuit.add_h_gate({1, 1});
+                },
+                "H twice on circuit1"
+            },
+            TestCase {
+                [&]() {
+                    circuit0.add_h_gate(0);
+                    circuit1.add_x_gate(0);
+                    product_circuit.add_h_gate(0);
+                    product_circuit.add_x_gate(1);
+                },
+                "H on circuit0, X on circuit1"
+            },
+            TestCase {
+                [&]() {
+                    circuit0.add_h_gate(0);
+                    circuit0.add_x_gate(0);
+                    circuit1.add_z_gate(0);
+                    product_circuit.add_h_gate(0);
+                    product_circuit.add_x_gate(0);
+                    product_circuit.add_z_gate(1);
+                },
+                "H and X on circuit0, Z on circuit1"
+            }
+        );
+
+        testcase.add_gates();
+
+        mqis::simulate(circuit0, state0);
+        mqis::simulate(circuit1, state1);
+        mqis::simulate(product_circuit, product_state);
+
+        const auto tensor_product_state = mqis::tensor_product(state0, state1);
+
+        REQUIRE_MSG(mqis::almost_eq(product_state, tensor_product_state), testcase.message);
+    }
+
+    SECTION("unentangled 2-qubit x 3-qubit")
+    {
+        struct TestCase
+        {
+            std::function<void(void)> add_gates;
+            std::string message;
+        };
+
+        auto state0 = mqis::QuantumState {"00"};
+        auto state1 = mqis::QuantumState {"000"};
+        auto product_state = mqis::QuantumState {"00000"};
+
+        auto circuit0 = mqis::QuantumCircuit {2};
+        auto circuit1 = mqis::QuantumCircuit {3};
+        auto product_circuit = mqis::QuantumCircuit {5};
+
+        auto testcase = GENERATE_REF(
+            TestCase {
+                [&]() {
+                    circuit0.add_h_gate({0, 1});
+                    circuit1.add_h_gate({0, 1, 2});
+                    product_circuit.add_h_gate({0, 1, 2, 3, 4});
+                },
+                "circuit0 : H(1)H(0), circuit1: H(2)H(1)H(0)"
+            },
+            TestCase {
+                [&]() {
+                    circuit0.add_h_gate({0, 1});
+                    circuit1.add_x_gate({1, 2});
+                    circuit1.add_h_gate(0);
+                    circuit1.add_cx_gate(0, 1);
+                    product_circuit.add_h_gate({0, 1});
+                    product_circuit.add_x_gate({3, 4});
+                    product_circuit.add_h_gate(2);
+                    product_circuit.add_cx_gate(2, 3);
+                },
+                "circuit0 : H(1)H(0), circuit1: CX(0,1)H(0)X(2)X(1)"
+            }
+        );
+
+        testcase.add_gates();
+
+        mqis::simulate(circuit0, state0);
+        mqis::simulate(circuit1, state1);
+        mqis::simulate(product_circuit, product_state);
+
+        const auto tensor_product_state = mqis::tensor_product(state0, state1);
+
+        REQUIRE_MSG(mqis::almost_eq(product_state, tensor_product_state), testcase.message);
+    }
 }
