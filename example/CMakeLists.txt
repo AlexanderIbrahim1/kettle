@@ -29,5 +29,6 @@ add_example(quantum_phase_estimation_t_gate)
 add_example(shor)
 add_example(simon_ibm_example)
 add_example(read_decomposition_file)
+add_example(quantum_phase_estimation_diagonal)
 
 add_folders(Example)
