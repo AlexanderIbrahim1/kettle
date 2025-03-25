@@ -72,8 +72,9 @@ add_test_target(TARGET multiplicity_controlled_u_gate_test SOURCES "source/gates
 add_test_target(TARGET control_swap_test SOURCES "source/gates/control_swap_test.cpp")
 add_test_target(TARGET append_circuits_test SOURCES "source/common/append_circuits_test.cpp")
 add_test_target(TARGET make_controlled_circuit_test SOURCES "source/circuit_operations/make_controlled_circuit_test.cpp")
-add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circuit_operations/make_binary_controlled_circuit_test.cpp")
+add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circuit_operations/make_binary_controlled_circuit_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
 add_test_target(TARGET build_decomposed_circuit_test SOURCES "source/circuit_operations/build_decomposed_circuit_test.cpp")
+add_test_target(TARGET multi_product_test SOURCES "source/multi_product_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
 
 # ---- End-of-file commands ----
 
