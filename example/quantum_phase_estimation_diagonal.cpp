@@ -10,7 +10,6 @@
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/common/print.hpp>
 #include <mini-qiskit/circuit.hpp>
 #include <mini-qiskit/simulate.hpp>
 #include <mini-qiskit/state.hpp>
@@ -139,7 +138,7 @@ auto main() -> int
     // estimated phase:  4.12334
     // ```
     //
-    // Expected output (for "01"):
+    // Expected output (for "11"):
     // ```
     // (state, count) = (101110xx, 1024)
     // binary expansion: 011101

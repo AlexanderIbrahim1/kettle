@@ -4,6 +4,7 @@
 #include <iterator>
 
 #include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
@@ -62,7 +63,8 @@ void apply_multiplicity_controlled_u_gate(
     QuantumCircuit& circuit,
     const Matrix2X2& gate,
     std::size_t target_index,
-    const Container& container
+    const Container& container,
+    double matrix_sqrt_tolerance = impl_mqis::MATRIX_2X2_SQRT_TOLERANCE
 )
 {
     auto stack = std::vector<impl_mqis::MCUGateStackFrame_> {};
@@ -79,7 +81,7 @@ void apply_multiplicity_controlled_u_gate(
 
         const auto [bottom_control_indices, top_control_indices] =
             impl_mqis::split_control_indices_(frame.control_indices);
-        const auto sqrt_gate = matrix_square_root(frame.gate);
+        const auto sqrt_gate = matrix_square_root(frame.gate, matrix_sqrt_tolerance);
         const auto sqrt_gate_conj = conjugate_transpose(sqrt_gate);
         const auto mcx_target_qubit = frame.control_indices[0];
         const auto gate_target_qubit = frame.target_index;

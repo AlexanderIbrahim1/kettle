@@ -5,6 +5,29 @@
 
 #include "mini-qiskit/common/mathtools.hpp"
 
+namespace impl_mqis
+{
+
+inline auto matrix_sqrt_parameters(
+    std::complex<double> trace,
+    std::complex<double> determinant,
+    double tolerance
+) -> std::tuple<std::complex<double>, std::complex<double>>
+{
+    const auto s = std::sqrt(determinant);
+    const auto t_arg = trace + 2.0 * s;
+
+    if (std::norm(t_arg) > tolerance) {
+        const auto t = std::sqrt(trace + 2.0 * s);
+        return {s, t};
+    } else {
+        const auto t = std::sqrt(trace - 2.0 * s);
+        return {-s, t};
+    }
+}
+
+}  // namespace impl_mqis
+
 namespace mqis
 {
 
@@ -58,15 +81,20 @@ constexpr auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix
     return lhs;
 }
 
-inline auto matrix_square_root(const Matrix2X2& mat) -> Matrix2X2
+inline auto matrix_square_root(
+    const Matrix2X2& mat,
+    double matrix_sqrt_tolerance = impl_mqis::MATRIX_2X2_SQRT_TOLERANCE
+) -> Matrix2X2
 {
     // uses the following: https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix#A_general_formula
     // we use the solution with the positive roots of s and t
-    const auto tau = mat.elem00 + mat.elem11;
-    const auto delta = mat.elem00 * mat.elem11 - mat.elem01 * mat.elem10;
+    const auto trace = mat.elem00 + mat.elem11;
+    const auto determinant = mat.elem00 * mat.elem11 - mat.elem01 * mat.elem10;
 
-    const auto s = std::sqrt(delta);
-    const auto t = std::sqrt(tau + 2.0 * s);
+    const auto [s, t] = impl_mqis::matrix_sqrt_parameters(trace, determinant, matrix_sqrt_tolerance);
+
+//     const auto s = std::sqrt(determinant);
+//     const auto t = std::sqrt(trace + 2.0 * s);
 
     const auto new00 = (mat.elem00 + s) / t;
     const auto new01 = mat.elem01 / t;

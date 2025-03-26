@@ -10,7 +10,6 @@
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/common/print.hpp>
 #include <mini-qiskit/circuit.hpp>
 #include <mini-qiskit/simulate.hpp>
 #include <mini-qiskit/state.hpp>
@@ -21,13 +20,11 @@
     each of which is a different power of 2 of the gate of interest.
 
     The expected outputs are the same.
-
-    NOTE: this is just a WIP; there might be a bug I haven't found yet
 */
 
-auto main() -> int
+auto get_gate_pow_1_stream() -> std::stringstream
 {
-    auto stream0 = std::stringstream {
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 5                          \n"
         "SINGLEGATE : 1                                  \n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
@@ -55,8 +52,11 @@ auto main() -> int
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
         " -7.0710678118654724e-01  7.0710678118654779e-01\n"
     };
+}
 
-    auto stream1 = std::stringstream {
+auto get_gate_pow_2_stream() -> std::stringstream
+{
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 5                          \n"
         "SINGLEGATE : 1                                  \n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
@@ -84,8 +84,11 @@ auto main() -> int
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
         " -9.9920072216264089e-16 -9.9999999999999989e-01\n"
     };
+}
 
-    auto stream2 = std::stringstream {
+auto get_gate_pow_4_stream() -> std::stringstream
+{
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 5                          \n"
         "SINGLEGATE : 1                                  \n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
@@ -113,8 +116,11 @@ auto main() -> int
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
         " -1.0000000000000000e+00  1.7208456881689926e-15\n"
     };
+}
 
-    auto stream3 = std::stringstream {
+auto get_gate_pow_8_stream() -> std::stringstream
+{
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 5                          \n"
         "SINGLEGATE : 1                                  \n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
@@ -142,8 +148,11 @@ auto main() -> int
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
         "  1.0000000000000000e+00 -3.3861802251067274e-15\n"
     };
+}
 
-    auto stream4 = std::stringstream {
+auto get_gate_pow_16_stream() -> std::stringstream
+{
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 5                          \n"
         "SINGLEGATE : 1                                  \n"
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
@@ -171,8 +180,11 @@ auto main() -> int
         "  0.0000000000000000e+00  0.0000000000000000e+00\n"
         "  1.0000000000000002e+00 -6.8278716014447143e-15\n"
     };
+}
 
-    auto stream5 = std::stringstream {
+auto get_gate_pow_32_stream() -> std::stringstream
+{
+    return std::stringstream {
         "NUMBER_OF_COMMANDS : 1                          \n"
         "ALLCONTROL : 1                                  \n"
         " -9.9999999999999867e-01  1.1768364061026640e-14\n"
@@ -180,14 +192,17 @@ auto main() -> int
         "  0.0000000000000000e+00 -0.0000000000000000e+00\n"
         " -1.0000000000000013e+00 -1.1768364061026672e-14\n"
     };
+}
 
+auto main() -> int
+{
     auto streams = std::vector<std::stringstream> {};
-    streams.emplace_back(std::move(stream0));
-    streams.emplace_back(std::move(stream1));
-    streams.emplace_back(std::move(stream2));
-    streams.emplace_back(std::move(stream3));
-    streams.emplace_back(std::move(stream4));
-    streams.emplace_back(std::move(stream5));
+    streams.emplace_back(get_gate_pow_1_stream());
+    streams.emplace_back(get_gate_pow_2_stream());
+    streams.emplace_back(get_gate_pow_4_stream());
+    streams.emplace_back(get_gate_pow_8_stream());
+    streams.emplace_back(get_gate_pow_16_stream());
+    streams.emplace_back(get_gate_pow_32_stream());
 
     // create the circuit representing the powers of the 4x4 unitary matrix
     auto unitary_op_circuits = [&]() {
@@ -207,8 +222,6 @@ auto main() -> int
     // - it will be controlled by 6 other qubits, in a binary controlled manner
     auto subcircuit = mqis::make_binary_controlled_circuit_from_binary_powers(unitary_op_circuits, 8, {0, 1, 2, 3, 4, 5}, {6, 7});
 
-    mqis::print_circuit(unitary_op_circuits[4]);
-
     // create the circuit needed to perform quantum phase estimation
     auto circuit = mqis::QuantumCircuit {8};
     circuit.add_h_gate({0, 1, 2, 3, 4, 5});
@@ -219,7 +232,7 @@ auto main() -> int
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates
     auto counting_statevector = mqis::QuantumState {"000000"};
-    auto unitary_eigenstatevector = mqis::QuantumState {"11"};
+    auto unitary_eigenstatevector = mqis::QuantumState {"00"};
     auto statevector = mqis::tensor_product(counting_statevector, unitary_eigenstatevector);
 
     // perform the simulation
@@ -268,7 +281,7 @@ auto main() -> int
     // estimated phase:  4.12334
     // ```
     //
-    // Expected output (for "01"):
+    // Expected output (for "11"):
     // ```
     // (state, count) = (101110xx, 1024)
     // binary expansion: 011101

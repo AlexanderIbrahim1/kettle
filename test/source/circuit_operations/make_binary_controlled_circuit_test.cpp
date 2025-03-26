@@ -10,9 +10,6 @@
 #include "mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp"
 #include "mini-qiskit/decomposed/read_decomposition_file.hpp"
 
-// TODO: remove
-#include "mini-qiskit/common/print.hpp"
-
 #include "../test_utils/powers_of_diagonal_unitary.hpp"
 
 TEST_CASE("make_binary_controlled_circuit()")
@@ -122,9 +119,9 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for double qubit 
         return {output_control_qubits, output_mapped_qubits};
     };
 
-    const auto n_control_qubits = 5ul; // GENERATE(Catch::Generators::range(1ul, 5ul));
+    const auto n_control_qubits = GENERATE(Catch::Generators::range(1ul, 6ul));
     const auto n_total_qubits = n_control_qubits + 2ul;
-    const auto i_state = 20ul; // GENERATE_COPY(Catch::Generators::range(0ul, 1ul << n_total_qubits));
+    const auto i_state = GENERATE_COPY(Catch::Generators::range(0ul, 1ul << n_total_qubits));
     const auto init_bitstring = mqis::state_as_bitstring_little_endian(i_state, n_total_qubits);
 
     const auto [control_qubits, mapped_qubits] = control_and_mapped_qubits(n_total_qubits);
@@ -139,16 +136,5 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for double qubit 
     mqis::simulate(binary_made_circuit_naive, state0);
     mqis::simulate(binary_made_circuit_power, state1);
 
-    // the bug occurs when including the pow_16 circuit, with 5 control qubits
-    // - for i_state = 20ul, both states have all their probability focused on a single state (0010100)
-    // - the binary controlled circuit made naively is normalized                : (0.707107, -0.707107)
-    // - the binary controlled circuit made from binary powers is NOT normalized : (5.31067, 3.83753)
-    
-    // IDEA: look at the 3 non-X gates in the pow_16 circuit, and look at what happens to them when
-    // you try to make each of them individually controlled; that should point out the bug
-    // - it probably has something to do with taking square roots of the 2x2 matrices
-    mqis::print_state(state0);
-    mqis::print_state(state1);
-
-    REQUIRE(mqis::almost_eq(state0, state1, 1.0e-4));
+    REQUIRE(mqis::almost_eq(state0, state1));
 }
