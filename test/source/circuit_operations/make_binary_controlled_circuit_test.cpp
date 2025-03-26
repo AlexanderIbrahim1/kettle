@@ -143,6 +143,10 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for double qubit 
     // - for i_state = 20ul, both states have all their probability focused on a single state (0010100)
     // - the binary controlled circuit made naively is normalized                : (0.707107, -0.707107)
     // - the binary controlled circuit made from binary powers is NOT normalized : (5.31067, 3.83753)
+    
+    // IDEA: look at the 3 non-X gates in the pow_16 circuit, and look at what happens to them when
+    // you try to make each of them individually controlled; that should point out the bug
+    // - it probably has something to do with taking square roots of the 2x2 matrices
     mqis::print_state(state0);
     mqis::print_state(state1);
 

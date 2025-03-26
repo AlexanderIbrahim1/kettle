@@ -203,14 +203,11 @@ auto main() -> int
         return output;
     }();
 
-    for (const auto& circuit : unitary_op_circuits) {
-        std::cout << std::distance(circuit.begin(), circuit.end());
-        mqis::print_circuit(circuit);
-    }
-
     // make the unitary operator circuit a controlled circuit
     // - it will be controlled by 6 other qubits, in a binary controlled manner
     auto subcircuit = mqis::make_binary_controlled_circuit_from_binary_powers(unitary_op_circuits, 8, {0, 1, 2, 3, 4, 5}, {6, 7});
+
+    mqis::print_circuit(unitary_op_circuits[4]);
 
     // create the circuit needed to perform quantum phase estimation
     auto circuit = mqis::QuantumCircuit {8};
