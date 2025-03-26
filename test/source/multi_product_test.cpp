@@ -121,6 +121,17 @@ TEST_CASE("powers of unitary operator")
         REQUIRE(mqis::almost_eq(state0, state1));
     }
 
+    SECTION("applying gate_pow_1 x16 VS applying gate_pow_16 x1")
+    {
+        const auto circuit0 = apply_n_times(gate_pow_1_stream, 16);
+        const auto circuit1 = apply_n_times(gate_pow_16_stream, 1);
+
+        mqis::simulate(circuit0, state0);
+        mqis::simulate(circuit1, state1);
+
+        REQUIRE(mqis::almost_eq(state0, state1));
+    }
+
     SECTION("applying gate_pow_1 x32 VS applying gate_pow_32 x1")
     {
         const auto circuit0 = apply_n_times(gate_pow_1_stream, 32);
