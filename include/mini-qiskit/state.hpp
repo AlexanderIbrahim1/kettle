@@ -5,6 +5,8 @@
 #include <bitset>
 #include <cmath>
 #include <complex>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <numeric>
 #include <sstream>
@@ -44,7 +46,7 @@ constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t 
     return dyn_bitset;
 }
 
-auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std::string
+inline auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std::string
 {
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
@@ -85,7 +87,7 @@ inline auto state_as_bitstring_little_endian_marginal_(
     return bitstring;
 }
 
-auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstring) -> bool
+inline auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstring) -> bool
 {
     if (marginal_bitstring.size() == 0) {
         return true;
@@ -107,6 +109,22 @@ auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstring) -> b
     }
 
     return true;
+}
+
+inline auto read_complex_numpy_format(std::istream& stream) -> std::complex<double>
+{
+    // reads in text that looks like (1.23456e005+5.43210e002j) into a std::complex<double> instance
+    double real;
+    double imag;
+    char ch;
+
+    stream >> ch; // '('
+    stream >> real;
+    stream >> imag;
+    stream >> ch; // 'j'
+    stream >> ch; // ')'
+
+    return {real, imag};
 }
 
 }  // namespace impl_mqis
@@ -400,6 +418,43 @@ inline auto tensor_product(const QuantumState& left, const QuantumState& right) 
     }
 
     return QuantumState {std::move(new_coefficients)};
+}
+
+inline auto read_statevector(std::istream& instream) -> QuantumState
+{
+    // the very first line contains the number of qubits
+    const auto n_qubits = [&]() {
+        std::size_t n_qubits_;
+        instream >> n_qubits_;
+
+        return n_qubits_;
+    }();
+
+    const auto n_states = 1ul << n_qubits;
+
+    auto amplitudes = std::vector<std::complex<double>> {};
+    amplitudes.reserve(n_states);
+
+    for (std::size_t i {0}; i < n_states; ++i) {
+        amplitudes.push_back(impl_mqis::read_complex_numpy_format(instream));
+    }
+
+    return QuantumState {std::move(amplitudes)};
+}
+
+inline auto read_statevector(const std::filesystem::path& filepath) -> QuantumState
+{
+    auto instream = std::ifstream {filepath};
+
+    if (!instream.is_open()) {
+        auto err_msg = std::stringstream {};
+        err_msg << "ERROR: unable to open file for statevector: \n";
+        err_msg << "'" << filepath << "'\n";
+
+        throw std::ios::failure {err_msg.str()};
+    }
+
+    return read_statevector(instream);
 }
 
 }  // namespace mqis
