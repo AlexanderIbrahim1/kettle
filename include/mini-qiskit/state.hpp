@@ -420,7 +420,10 @@ inline auto tensor_product(const QuantumState& left, const QuantumState& right) 
     return QuantumState {std::move(new_coefficients)};
 }
 
-inline auto read_statevector(std::istream& instream) -> QuantumState
+inline auto read_statevector(
+    std::istream& instream,
+    QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+) -> QuantumState
 {
     // the very first line contains the number of qubits
     const auto n_qubits = [&]() {
@@ -439,10 +442,13 @@ inline auto read_statevector(std::istream& instream) -> QuantumState
         amplitudes.push_back(impl_mqis::read_complex_numpy_format(instream));
     }
 
-    return QuantumState {std::move(amplitudes)};
+    return QuantumState {std::move(amplitudes), input_endian};
 }
 
-inline auto read_statevector(const std::filesystem::path& filepath) -> QuantumState
+inline auto read_statevector(
+    const std::filesystem::path& filepath,
+    QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+) -> QuantumState
 {
     auto instream = std::ifstream {filepath};
 
@@ -454,7 +460,7 @@ inline auto read_statevector(const std::filesystem::path& filepath) -> QuantumSt
         throw std::ios::failure {err_msg.str()};
     }
 
-    return read_statevector(instream);
+    return read_statevector(instream, input_endian);
 }
 
 }  // namespace mqis
