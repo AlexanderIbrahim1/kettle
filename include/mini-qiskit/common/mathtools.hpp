@@ -50,21 +50,20 @@ constexpr auto log_2_int(std::size_t power) noexcept -> std::size_t
     return log2 - 1;
 }
 
-auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
+constexpr auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
 {
-    constexpr auto n_bits = std::numeric_limits<std::size_t>::digits;
+    auto backward = std::size_t {0};
 
-    const auto forward = std::bitset<n_bits> {value};
-    auto backward = std::bitset<n_bits> {0};
-
-    for (std::size_t i_bit {0}; i_bit < n_relevant_bits; ++i_bit) {
-        backward[i_bit] = forward[n_relevant_bits - 1 - i_bit];
+    for (std::size_t i {0}; i < n_relevant_bits; ++i) {
+        backward <<= 1;
+        backward |= (value & 1);
+        value >>= 1;
     }
 
-    return static_cast<std::size_t>(backward.to_ullong());
+    return backward;
 }
 
-auto qubit_string_to_state_index(const std::string& computational_state) -> std::size_t
+inline auto qubit_string_to_state_index(const std::string& computational_state) -> std::size_t
 {
     constexpr auto n_bits = std::numeric_limits<std::size_t>::digits;
     const auto bits = std::bitset<n_bits> {computational_state};
