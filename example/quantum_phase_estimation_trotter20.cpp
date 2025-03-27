@@ -21,6 +21,8 @@
 
     The output from the program upon creating the quantum circuit is "Killed"
       - this indicates that the program is running out of memory even constructing the circuit
+      - even creating the first circuit results in ~26.8 million gates, just before the process is killed
+        - so my naive method of creating the gates is too inefficient
 */
 
 static const auto SHAEER_FILEPATH = []() {
