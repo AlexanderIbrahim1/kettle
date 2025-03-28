@@ -9,11 +9,11 @@ namespace mqis
 enum class Gate
 {
     X,
+    H,
     RX,
     RY,
     RZ,
     P,
-    H,
     CX,
     CRX,
     CP,
