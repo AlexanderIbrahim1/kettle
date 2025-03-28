@@ -207,9 +207,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "RZ");
         check_previous_gate_is_not_measure_(qubit_index, "RZ");
-        gates_.emplace_back(impl_mqis::create_h_gate(qubit_index));
-        gates_.emplace_back(impl_mqis::create_rx_gate(theta, qubit_index));
-        gates_.emplace_back(impl_mqis::create_h_gate(qubit_index));
+        gates_.emplace_back(impl_mqis::create_rz_gate(theta, qubit_index));
     }
 
     template <

@@ -10,6 +10,7 @@ enum class Gate
 {
     X,
     RX,
+    RZ,
     H,
     CX,
     CRX,
@@ -74,6 +75,18 @@ constexpr auto create_rx_gate(double theta, std::size_t qubit_index) -> mqis::Ga
 
 /* Parse the relevant information for the RX-gate */
 constexpr auto unpack_rx_gate(mqis::GateInfo info) -> std::tuple<double, std::size_t>
+{
+    return {info.arg2, info.arg0};  // theta, qubit index
+}
+
+/* Apply the RZ-gate with a rotation `theta` to the qubit at index `qubit_index` */
+constexpr auto create_rz_gate(double theta, std::size_t qubit_index) -> mqis::GateInfo
+{
+    return {mqis::Gate::RZ, qubit_index, DUMMY_ARG1, theta, DUMMY_ARG3};
+}
+
+/* Parse the relevant information for the RZ-gate */
+constexpr auto unpack_rz_gate(mqis::GateInfo info) -> std::tuple<double, std::size_t>
 {
     return {info.arg2, info.arg0};  // theta, qubit index
 }
@@ -189,7 +202,7 @@ constexpr auto is_single_qubit_gate(mqis::GateInfo info) -> bool
     using G = mqis::Gate;
     const auto gate = info.gate;
 
-    return gate == G::X || gate == G::RX || gate == G::H || gate == G::U || gate == G::M;
+    return gate == G::X || gate == G::RX || gate == G::RZ || gate == G::H || gate == G::U || gate == G::M;
 }
 
 constexpr auto is_double_qubit_gate(mqis::GateInfo info) -> bool
@@ -205,7 +218,7 @@ constexpr auto is_single_qubit_gate_and_not_u(mqis::GateInfo info) -> bool
     using G = mqis::Gate;
     const auto gate = info.gate;
 
-    return gate == G::X || gate == G::RX || gate == G::H;
+    return gate == G::X || gate == G::RX || gate == G::RZ || gate == G::H;
 }
 
 constexpr auto is_double_qubit_gate_and_not_cu(mqis::GateInfo info) -> bool
