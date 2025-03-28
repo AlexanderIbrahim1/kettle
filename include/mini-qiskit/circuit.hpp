@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <concepts>
+#include <cstdint>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>

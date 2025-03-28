@@ -45,7 +45,21 @@ inline auto format_complex(const std::complex<double>& value) -> std::string
 {
     auto output = std::stringstream {};
     output << std::fixed << std::setprecision(14);
-    output << value.real() << "   " << value.imag();
+
+    // use a space to pad the negative sign
+    if (value.real() >= 0.0) {
+        output << ' ';
+    }
+    output << value.real();
+
+    output << "   ";
+
+    // use a space to pad the negative sign
+    if (value.imag() >= 0.0) {
+        output << ' ';
+    }
+    output << value.imag();
+
 
     return output.str();
 }

@@ -27,6 +27,16 @@
         - so my naive method of creating the gates is too inefficient
 */
 
+/*
+    trotter20_init_circ.dat
+    trotter20_qft_circuit.dat
+    trotter20_0.dat
+    trotter20_1.dat
+    trotter20_2.dat
+    trotter20_3.dat
+    trotter20_iqft_circuit.dat
+*/
+
 static const auto SHAEER_FILEPATH = []() {
     const auto home = std::getenv("HOME");
 
