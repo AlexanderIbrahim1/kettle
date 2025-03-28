@@ -188,6 +188,10 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         std::string gate_name;
         gatestream >> gate_name;
 
+        if (gate_name == "") {
+            continue;
+        }
+
         if (gate_name == "H") {
             impl_mqis::parse_one_target_gate<Gate::H>(circuit, gatestream);
         }

@@ -51,12 +51,12 @@ auto main() -> int
 {
     auto circuit = mqis::QuantumCircuit {13};
     extend(circuit, SHAEER_FILEPATH / "trotter20_init_circ.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_qft_circuit.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_0.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_1.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_2.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_3.dat");
-    extend(circuit, SHAEER_FILEPATH / "trotter20_iqft_circuit.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_qft_circuit.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_0.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_1.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_2.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_3.dat");
+    // extend(circuit, SHAEER_FILEPATH / "trotter20_iqft_circuit.dat");
 
     std::cout << std::distance(circuit.begin(), circuit.end()) << '\n';
     return 0;
