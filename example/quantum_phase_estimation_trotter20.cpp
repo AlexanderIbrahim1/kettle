@@ -8,6 +8,7 @@
 #include <mini-qiskit/mini-qiskit.hpp>
 #include <mini-qiskit/decomposed/decomposed_gate.hpp>
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
+// #include <mini-qiskit/decomposed/read_tangelo_file.hpp>
 #include <mini-qiskit/circuit_operations/append_circuits.hpp>
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
@@ -38,7 +39,8 @@ auto main() -> int
 
         for (auto power : {1ul, 2ul, 4ul, 8ul}) {
             const auto filepath = SHAEER_FILEPATH / std::format("trotter_pow_{}.dat", power);
-            std::cout << "reading power = " << power << '\n';
+            std::cout << "reading circuit = " << power << '\n';
+            // auto unitary_op_circuit = mqis::read_tangelo_circuit();
             auto gates = mqis::read_decomposed_gate_info(filepath);
             std::cout << "creating unitary for power = " << power << '\n';
             auto unitary_op_circuit = mqis::make_circuit_from_decomposed_gates(std::move(gates));
