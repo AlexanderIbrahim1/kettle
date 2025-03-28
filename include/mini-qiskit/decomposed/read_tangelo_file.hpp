@@ -81,6 +81,9 @@ inline void parse_r_gate(mqis::QuantumCircuit& circuit, std::stringstream& strea
     if constexpr (GateType == mqis::Gate::RX) {
         circuit.add_rx_gate(angle, target_qubit);
     }
+    else if constexpr (GateType == mqis::Gate::RY) {
+        circuit.add_ry_gate(angle, target_qubit);
+    }
     else if constexpr (GateType == mqis::Gate::RZ) {
         circuit.add_rz_gate(angle, target_qubit);
     }

@@ -38,6 +38,19 @@ constexpr auto rx_gate(double angle) noexcept -> Matrix2X2
     };
 }
 
+constexpr auto ry_gate(double angle) noexcept -> Matrix2X2
+{
+    const auto cost = std::cos(angle / 2.0);
+    const auto sint = std::sin(angle / 2.0);
+
+    return {
+        {cost, 0.0},
+        {-sint, 0.0},
+        {sint, 0.0},
+        {cost, 0.0}
+    };
+}
+
 constexpr auto rz_gate(double angle) noexcept -> Matrix2X2
 {
     const auto cost = std::cos(angle / 2.0);

@@ -37,14 +37,16 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             [[maybe_unused]] const auto [theta, ignore] = unpack_rx_gate(info);
             turn_states(state, state0_index, state1_index, theta);
         }
+        else if constexpr (GateType == Gate::RY) {
+            [[maybe_unused]] const auto [theta, ignore] = unpack_ry_gate(info);
+            apply_ry_gate(state, state0_index, state1_index, theta);
+        }
         else if constexpr (GateType == Gate::RZ) {
             [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
             phaseturn_states(state, state0_index, state1_index, theta);
         }
         else {
-            static_assert(
-                impl_mqis::always_false<void>::value, "Invalid single qubit gate: must be one of {X, H, RX}."
-            );
+            static_assert(impl_mqis::always_false<void>::value, "Invalid single qubit gate");
         }
     }
 }
@@ -142,6 +144,10 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::RX : {
                 impl_mqis::simulate_single_qubit_gate<Gate::RX>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::RY : {
+                impl_mqis::simulate_single_qubit_gate<Gate::RY>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::RZ : {

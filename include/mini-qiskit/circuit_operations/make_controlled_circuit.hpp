@@ -140,6 +140,12 @@ inline auto make_multiplicity_controlled_circuit(
                 apply_multiplicity_controlled_u_gate(new_circuit, rx_gate(angle), new_target, control_qubits);
                 break;
             }
+            case Gate::RY : {
+                const auto [angle, original_target] = impl_mqis::unpack_ry_gate(gate_info);
+                const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
+                apply_multiplicity_controlled_u_gate(new_circuit, ry_gate(angle), new_target, control_qubits);
+                break;
+            }
             case Gate::RZ : {
                 const auto [angle, original_target] = impl_mqis::unpack_rz_gate(gate_info);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
