@@ -16,6 +16,7 @@
 #include <mini-qiskit/circuit.hpp>
 #include <mini-qiskit/simulate.hpp>
 #include <mini-qiskit/state.hpp>
+#include <mini-qiskit/io/numpy_statevector.hpp>
 
 /*
     An attempt at performing QPE for the 9-qubit gate for the rotor paper.
@@ -75,7 +76,7 @@ auto main() -> int
 
     auto unitary_eigenstatevector = []() {
         const auto filepath = SHAEER_FILEPATH / "trotter_ansatz.dat";
-        return mqis::read_statevector(filepath, mqis::QuantumStateEndian::BIG);
+        return mqis::read_numpy_statevector(filepath, mqis::QuantumStateEndian::BIG);
     }();
 
     std::cout << "D\n";

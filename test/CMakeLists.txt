@@ -76,6 +76,8 @@ add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circu
 add_test_target(TARGET build_decomposed_circuit_test SOURCES "source/circuit_operations/build_decomposed_circuit_test.cpp")
 add_test_target(TARGET multi_product_test SOURCES "source/multi_product_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
 add_test_target(TARGET read_tangelo_file_test SOURCES "source/decomposed/read_tangelo_file_test.cpp")
+add_test_target(TARGET io_numpy_statevector_test SOURCES "source/io/numpy_statevector_test.cpp")
+add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.cpp")
 
 # ---- End-of-file commands ----
 
