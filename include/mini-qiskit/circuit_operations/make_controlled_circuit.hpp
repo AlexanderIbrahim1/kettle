@@ -180,6 +180,22 @@ inline auto make_multiplicity_controlled_circuit(
                 apply_multiplicity_controlled_u_gate(new_circuit, rx_gate(angle), new_target, new_controls);
                 break;
             }
+            case Gate::CRY : {
+                const auto [original_control, original_target, angle] = impl_mqis::unpack_cry_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);
+                const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
+                const auto new_controls = impl_mqis::extend_container_to_vector(control_qubits, {new_control});
+                apply_multiplicity_controlled_u_gate(new_circuit, ry_gate(angle), new_target, new_controls);
+                break;
+            }
+            case Gate::CRZ : {
+                const auto [original_control, original_target, angle] = impl_mqis::unpack_crz_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);
+                const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
+                const auto new_controls = impl_mqis::extend_container_to_vector(control_qubits, {new_control});
+                apply_multiplicity_controlled_u_gate(new_circuit, rz_gate(angle), new_target, new_controls);
+                break;
+            }
             case Gate::CP : {
                 const auto [original_control, original_target, angle] = impl_mqis::unpack_cp_gate(gate_info);
                 const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);

@@ -45,10 +45,6 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
             apply_rz_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::RZ) {
-            [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
-            apply_rz_gate(state, state0_index, state1_index, theta);
-        }
         else if constexpr (GateType == Gate::P) {
             [[maybe_unused]] const auto [theta, ignore] = unpack_p_gate(info);
             apply_p_gate(state, state1_index, theta);
@@ -93,6 +89,14 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crx_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CRY) {
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cry_gate(info);
+            apply_ry_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CRZ) {
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crz_gate(info);
+            apply_rz_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CP) {
             // NOTE: the DoubleQubitGatePairGenerator needs to calculate the `state0_index` before
@@ -184,6 +188,14 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::CRX : {
                 impl_mqis::simulate_double_qubit_gate<Gate::CRX>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::CRY : {
+                impl_mqis::simulate_double_qubit_gate<Gate::CRY>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::CRZ : {
+                impl_mqis::simulate_double_qubit_gate<Gate::CRZ>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::CP : {  // replace with default?

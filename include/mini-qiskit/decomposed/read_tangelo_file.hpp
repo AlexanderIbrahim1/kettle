@@ -149,12 +149,20 @@ void parse_one_target_one_control_one_angle_gate(mqis::QuantumCircuit& circuit, 
     if constexpr (GateType == mqis::Gate::CP) {
         circuit.add_cp_gate(angle, control_qubit, target_qubit);
     }
+    else if constexpr (GateType == mqis::Gate::CRX) {
+        circuit.add_crx_gate(angle, control_qubit, target_qubit);
+    }
+    else if constexpr (GateType == mqis::Gate::CRY) {
+        circuit.add_cry_gate(angle, control_qubit, target_qubit);
+    }
+    else if constexpr (GateType == mqis::Gate::CRZ) {
+        circuit.add_crz_gate(angle, control_qubit, target_qubit);
+    }
     else {
         static_assert(
             impl_mqis::always_false<void>::value,
             "Invalid gate template provided to `parse_one_target_one_control_one_angle_gate()`"
         );
-        static_assert(impl_mqis::always_false<void>::value, "Invalid gate template provided to `parse_r_gate()`");
     }
 }
 
@@ -195,11 +203,20 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         else if (gate_name == "PHASE") {
             impl_mqis::parse_one_target_one_angle_gate<Gate::P>(circuit, gatestream);
         }
+        else if (gate_name == "CNOT") {
+            impl_mqis::parse_cx_gate(circuit, gatestream);
+        }
         else if (gate_name == "CPHASE") {
             impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CP>(circuit, gatestream);
         }
-        else if (gate_name == "CNOT") {
-            impl_mqis::parse_cx_gate(circuit, gatestream);
+        else if (gate_name == "CRX") {
+            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRX>(circuit, gatestream);
+        }
+        else if (gate_name == "CRY") {
+            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRY>(circuit, gatestream);
+        }
+        else if (gate_name == "CRZ") {
+            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRZ>(circuit, gatestream);
         }
         else if (gate_name == "SWAP") {
             impl_mqis::parse_swap_gate(circuit, gatestream);

@@ -61,6 +61,12 @@ auto gate_to_string_(mqis::Gate gate) -> std::string
         case G::CRX : {
             return "CRX";
         }
+        case G::CRY : {
+            return "CRY";
+        }
+        case G::CRZ : {
+            return "CRZ";
+        }
         case G::CP : {
             return "CP";
         }
@@ -182,6 +188,20 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
         }
         case G::CRX : {
             const auto [temp_control, temp_target, temp_angle] = unpack_crx_gate(info);
+            control = left_padded_integer_(temp_control);
+            target = left_padded_integer_(temp_target);
+            angle = left_padded_double_(temp_angle);
+            break;
+        }
+        case G::CRY : {
+            const auto [temp_control, temp_target, temp_angle] = unpack_cry_gate(info);
+            control = left_padded_integer_(temp_control);
+            target = left_padded_integer_(temp_target);
+            angle = left_padded_double_(temp_angle);
+            break;
+        }
+        case G::CRZ : {
+            const auto [temp_control, temp_target, temp_angle] = unpack_crz_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);

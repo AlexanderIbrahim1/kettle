@@ -16,6 +16,8 @@ enum class Gate
     P,
     CX,
     CRX,
+    CRY,
+    CRZ,
     CP,
     U,
     CU,
@@ -153,6 +155,30 @@ constexpr auto unpack_crx_gate(mqis::GateInfo info) -> std::tuple<std::size_t, s
     return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
 }
 
+/* Apply the CRY-gate with a rotation `theta` to qubits at the `source_index` and `target_index` */
+constexpr auto create_cry_gate(std::size_t source_index, std::size_t target_index, double theta) -> mqis::GateInfo
+{
+    return {mqis::Gate::CRY, source_index, target_index, theta, DUMMY_ARG3};
+}
+
+/* Parse the relevant information for the CRY-gate */
+constexpr auto unpack_cry_gate(mqis::GateInfo info) -> std::tuple<std::size_t, std::size_t, double>
+{
+    return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
+}
+
+/* Apply the CRZ-gate with a rotation `theta` to qubits at the `source_index` and `target_index` */
+constexpr auto create_crz_gate(std::size_t source_index, std::size_t target_index, double theta) -> mqis::GateInfo
+{
+    return {mqis::Gate::CRZ, source_index, target_index, theta, DUMMY_ARG3};
+}
+
+/* Parse the relevant information for the CRZ-gate */
+constexpr auto unpack_crz_gate(mqis::GateInfo info) -> std::tuple<std::size_t, std::size_t, double>
+{
+    return {info.arg0, info.arg1, info.arg2};  // source index, target index, theta
+}
+
 /* Apply the CP-gate with a rotation `theta` to qubits at the `source_index` and `target_index` */
 constexpr auto create_cp_gate(std::size_t source_index, std::size_t target_index, double theta) -> mqis::GateInfo
 {
@@ -236,7 +262,7 @@ constexpr auto is_double_qubit_gate(mqis::GateInfo info) -> bool
     using G = mqis::Gate;
     const auto gate = info.gate;
 
-    return gate == G::CX || gate == G::CRX || gate == G::CP || gate == G::CU;
+    return gate == G::CX || gate == G::CRX || gate == G::CRY || gate == G::CRZ || gate == G::CP || gate == G::CU;
 }
 
 constexpr auto is_single_qubit_gate_and_not_u(mqis::GateInfo info) -> bool
@@ -252,7 +278,7 @@ constexpr auto is_double_qubit_gate_and_not_cu(mqis::GateInfo info) -> bool
     using G = mqis::Gate;
     const auto gate = info.gate;
 
-    return gate == G::CX || gate == G::CRX || gate == G::CP;
+    return gate == G::CX || gate == G::CRX || gate == G::CRY || gate == G::CRZ || gate == G::CP;
 }
 
 }  // namespace impl_mqis

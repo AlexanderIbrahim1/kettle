@@ -164,15 +164,32 @@ public:
         }
     }
 
+    void add_cry_gate(double theta, std::size_t source_index, std::size_t target_index)
+    {
+        check_qubit_range_(source_index, "source qubit", "CRY");
+        check_qubit_range_(target_index, "target qubit", "CRY");
+        check_previous_gate_is_not_measure_(source_index, "CRY");
+        check_previous_gate_is_not_measure_(target_index, "CRY");
+        gates_.emplace_back(impl_mqis::create_cry_gate(source_index, target_index, theta));
+    }
+
+    template <
+        impl_mqis::ContainerOfAnglesAndControlAndTargetQubitIndices Container =
+            std::initializer_list<std::tuple<double, std::size_t, std::size_t>>>
+    void add_cry_gate(const Container& tuples)
+    {
+        for (auto tuple : tuples) {
+            add_cry_gate(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple));
+        }
+    }
+
     void add_crz_gate(double theta, std::size_t source_index, std::size_t target_index)
     {
         check_qubit_range_(source_index, "source qubit", "CRZ");
         check_qubit_range_(target_index, "target qubit", "CRZ");
         check_previous_gate_is_not_measure_(source_index, "CRZ");
         check_previous_gate_is_not_measure_(target_index, "CRZ");
-        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
-        gates_.emplace_back(impl_mqis::create_crx_gate(source_index, target_index, theta));
-        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
+        gates_.emplace_back(impl_mqis::create_crz_gate(source_index, target_index, theta));
     }
 
     template <

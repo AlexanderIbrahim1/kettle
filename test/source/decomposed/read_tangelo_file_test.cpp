@@ -1,6 +1,8 @@
+#include <functional>
 #include <sstream>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <mini-qiskit/primitive_gate.hpp>
@@ -110,18 +112,45 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-1.3474016644659843));
     }
 
-    SECTION("single CPHASE gate")
+    SECTION("parse_one_target_one_control_one_angle_gate()")
     {
-        auto stream = std::stringstream {
-            "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n"
+        struct TestCase
+        {
+            std::string stream_contents;
+            mqis::Gate gate;
+            std::function<std::tuple<std::size_t, std::size_t, double>(mqis::GateInfo)> unpack_func;
         };
 
+        auto testcase = GENERATE_REF(
+            TestCase {
+                "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
+                mqis::Gate::CP,
+                impl_mqis::unpack_cp_gate
+            },
+            TestCase {
+                "CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
+                mqis::Gate::CRX,
+                impl_mqis::unpack_crx_gate
+            },
+            TestCase {
+                "CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
+                mqis::Gate::CRY,
+                impl_mqis::unpack_cry_gate
+            },
+            TestCase {
+                "CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
+                mqis::Gate::CRZ,
+                impl_mqis::unpack_crz_gate
+            }
+        );
+
+        auto stream = std::stringstream {testcase.stream_contents};
         const auto actual = mqis::read_tangelo_circuit(13, stream, 0);
 
         REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == mqis::Gate::CP);
+        REQUIRE(actual[0].gate == testcase.gate);
 
-        const auto [control_qubit, target_qubit, angle] = impl_mqis::unpack_cp_gate(actual[0]);
+        const auto [control_qubit, target_qubit, angle] = testcase.unpack_func(actual[0]);
         REQUIRE(control_qubit == 12);
         REQUIRE(target_qubit == 9);
         REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-0.39269908169872414));
