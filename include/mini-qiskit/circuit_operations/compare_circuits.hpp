@@ -33,16 +33,12 @@ inline auto non_u_gate_to_u_gate(const mqis::GateInfo& info) -> mqis::Matrix2X2
         const auto angle = unpack_gate_angle(info);
         return mqis::rz_gate(angle);
     }
-    else if (info.gate == G::P) {
+    else if (info.gate == G::P || info.gate == G::CP) {
         const auto angle = unpack_gate_angle(info);
         return mqis::p_gate(angle);
     }
     else if (info.gate == G::H) {
         return mqis::h_gate();
-    }
-    else if (info.gate == G::CP) {
-        const auto angle = unpack_gate_angle(info);
-        return mqis::p_gate(angle);
     }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};

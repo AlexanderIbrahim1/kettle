@@ -27,7 +27,7 @@ namespace impl_mqis
 {
 
 template <mqis::Gate GateType>
-void parse_single_target_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -116,6 +116,44 @@ void parse_one_target_one_angle_gate(mqis::QuantumCircuit& circuit, std::strings
         circuit.add_p_gate(angle, target_qubit);
     }
     else {
+        static_assert(
+            impl_mqis::always_false<void>::value,
+            "Invalid gate template provided to `parse_one_target_one_angle_gate()`"
+        );
+    }
+}
+
+template <mqis::Gate GateType>
+void parse_one_target_one_control_one_angle_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t target_qubit;
+    std::size_t control_qubit;
+    double angle;
+
+    stream >> dummy_str;    // 'target'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> target_qubit; // target qubit
+    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;    // 'control'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> control_qubit; // control qubit
+    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;    // 'parameter'
+    stream >> dummy_str;    // ':'
+    stream >> angle;        // angle
+
+    if constexpr (GateType == mqis::Gate::CP) {
+        circuit.add_cp_gate(angle, control_qubit, target_qubit);
+    }
+    else {
+        static_assert(
+            impl_mqis::always_false<void>::value,
+            "Invalid gate template provided to `parse_one_target_one_control_one_angle_gate()`"
+        );
         static_assert(impl_mqis::always_false<void>::value, "Invalid gate template provided to `parse_r_gate()`");
     }
 }
@@ -143,7 +181,7 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         gatestream >> gate_name;
 
         if (gate_name == "H") {
-            impl_mqis::parse_single_target_gate<Gate::H>(circuit, gatestream);
+            impl_mqis::parse_one_target_gate<Gate::H>(circuit, gatestream);
         }
         else if (gate_name == "RX") {
             impl_mqis::parse_one_target_one_angle_gate<Gate::RX>(circuit, gatestream);
@@ -156,6 +194,9 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         }
         else if (gate_name == "PHASE") {
             impl_mqis::parse_one_target_one_angle_gate<Gate::P>(circuit, gatestream);
+        }
+        else if (gate_name == "CPHASE") {
+            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CP>(circuit, gatestream);
         }
         else if (gate_name == "CNOT") {
             impl_mqis::parse_cx_gate(circuit, gatestream);

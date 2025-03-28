@@ -109,4 +109,21 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(target_qubit == 11);
         REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-1.3474016644659843));
     }
+
+    SECTION("single CPHASE gate")
+    {
+        auto stream = std::stringstream {
+            "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n"
+        };
+
+        const auto actual = mqis::read_tangelo_circuit(13, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
+        REQUIRE(actual[0].gate == mqis::Gate::CP);
+
+        const auto [control_qubit, target_qubit, angle] = impl_mqis::unpack_cp_gate(actual[0]);
+        REQUIRE(control_qubit == 12);
+        REQUIRE(target_qubit == 9);
+        REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-0.39269908169872414));
+    }
 }
