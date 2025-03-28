@@ -93,4 +93,20 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(q_right_0 == q_left_1);
         REQUIRE(q_left_1 == q_right_2);
     }
+
+    SECTION("single PHASE gate")
+    {
+        auto stream = std::stringstream {
+            "PHASE     target : [11]   parameter : -1.3474016644659843\n"
+        };
+
+        const auto actual = mqis::read_tangelo_circuit(13, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
+        REQUIRE(actual[0].gate == mqis::Gate::P);
+
+        const auto [angle, target_qubit] = impl_mqis::unpack_p_gate(actual[0]);
+        REQUIRE(target_qubit == 11);
+        REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-1.3474016644659843));
+    }
 }

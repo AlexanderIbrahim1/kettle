@@ -20,7 +20,7 @@ constexpr void swap_states(mqis::QuantumState& state, std::size_t i0, std::size_
     std::swap(state[i0], state[i1]);
 }
 
-constexpr void superpose_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
+constexpr void apply_h_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -34,7 +34,7 @@ constexpr void superpose_states(mqis::QuantumState& state, std::size_t i0, std::
     state[i1] = std::complex<double> {real_sub, imag_sub};
 }
 
-constexpr void turn_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+constexpr void apply_rx_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -51,7 +51,7 @@ constexpr void turn_states(mqis::QuantumState& state, std::size_t i0, std::size_
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void phaseturn_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+constexpr void apply_rz_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -85,7 +85,7 @@ constexpr void apply_ry_gate(mqis::QuantumState& state, std::size_t i0, std::siz
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void controlled_phaseturn_state(mqis::QuantumState& state, std::size_t i1, double theta)
+constexpr void apply_p_gate(mqis::QuantumState& state, std::size_t i1, double theta)
 {
     const auto& state1 = state[i1];
 

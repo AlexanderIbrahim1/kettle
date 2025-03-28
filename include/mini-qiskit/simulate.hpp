@@ -31,11 +31,11 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             swap_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::H) {
-            superpose_states(state, state0_index, state1_index);
+            apply_h_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::RX) {
             [[maybe_unused]] const auto [theta, ignore] = unpack_rx_gate(info);
-            turn_states(state, state0_index, state1_index, theta);
+            apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::RY) {
             [[maybe_unused]] const auto [theta, ignore] = unpack_ry_gate(info);
@@ -43,7 +43,15 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         }
         else if constexpr (GateType == Gate::RZ) {
             [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
-            phaseturn_states(state, state0_index, state1_index, theta);
+            apply_rz_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::RZ) {
+            [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
+            apply_rz_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::P) {
+            [[maybe_unused]] const auto [theta, ignore] = unpack_p_gate(info);
+            apply_p_gate(state, state1_index, theta);
         }
         else {
             static_assert(impl_mqis::always_false<void>::value, "Invalid single qubit gate");
@@ -84,13 +92,13 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         }
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crx_gate(info);
-            turn_states(state, state0_index, state1_index, theta);
+            apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CP) {
             // NOTE: the DoubleQubitGatePairGenerator needs to calculate the `state0_index` before
             // it calculates the `state1_index`, so we're not losing too much in terms of performance
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cp_gate(info);
-            controlled_phaseturn_state(state, state1_index, theta);
+            apply_p_gate(state, state1_index, theta);
         }
         else {
             static_assert(impl_mqis::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
@@ -152,6 +160,10 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::RZ : {
                 impl_mqis::simulate_single_qubit_gate<Gate::RZ>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::P : {
+                impl_mqis::simulate_single_qubit_gate<Gate::P>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::U : {

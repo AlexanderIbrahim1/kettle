@@ -26,7 +26,8 @@ RZ        target : [5]   parameter : 12.533816585267923
 namespace impl_mqis
 {
 
-inline void parse_h_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+template <mqis::Gate GateType>
+void parse_single_target_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -38,7 +39,12 @@ inline void parse_h_gate(mqis::QuantumCircuit& circuit, std::stringstream& strea
     stream >> target_qubit; // target qubit
     stream >> dummy_ch;     // ']'
 
-    circuit.add_h_gate(target_qubit);
+    if constexpr (GateType == mqis::Gate::H) {
+        circuit.add_h_gate(target_qubit);
+    }
+    else {
+        static_assert(impl_mqis::always_false<void>::value, "Invalid gate template provided to `parse_r_gate()`");
+    }
 }
 
 inline void parse_swap_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
@@ -81,7 +87,7 @@ inline void parse_cx_gate(mqis::QuantumCircuit& circuit, std::stringstream& stre
 }
 
 template <mqis::Gate GateType>
-inline void parse_r_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_one_angle_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -105,6 +111,9 @@ inline void parse_r_gate(mqis::QuantumCircuit& circuit, std::stringstream& strea
     }
     else if constexpr (GateType == mqis::Gate::RZ) {
         circuit.add_rz_gate(angle, target_qubit);
+    }
+    else if constexpr (GateType == mqis::Gate::P) {
+        circuit.add_p_gate(angle, target_qubit);
     }
     else {
         static_assert(impl_mqis::always_false<void>::value, "Invalid gate template provided to `parse_r_gate()`");
@@ -134,16 +143,19 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         gatestream >> gate_name;
 
         if (gate_name == "H") {
-            impl_mqis::parse_h_gate(circuit, gatestream);
+            impl_mqis::parse_single_target_gate<Gate::H>(circuit, gatestream);
         }
         else if (gate_name == "RX") {
-            impl_mqis::parse_r_gate<Gate::RX>(circuit, gatestream);
+            impl_mqis::parse_one_target_one_angle_gate<Gate::RX>(circuit, gatestream);
         }
         else if (gate_name == "RY") {
-            impl_mqis::parse_r_gate<Gate::RY>(circuit, gatestream);
+            impl_mqis::parse_one_target_one_angle_gate<Gate::RY>(circuit, gatestream);
         }
         else if (gate_name == "RZ") {
-            impl_mqis::parse_r_gate<Gate::RZ>(circuit, gatestream);
+            impl_mqis::parse_one_target_one_angle_gate<Gate::RZ>(circuit, gatestream);
+        }
+        else if (gate_name == "PHASE") {
+            impl_mqis::parse_one_target_one_angle_gate<Gate::P>(circuit, gatestream);
         }
         else if (gate_name == "CNOT") {
             impl_mqis::parse_cx_gate(circuit, gatestream);

@@ -220,6 +220,22 @@ public:
         }
     }
 
+    void add_p_gate(double theta, std::size_t qubit_index)
+    {
+        check_qubit_range_(qubit_index, "qubit", "P");
+        check_previous_gate_is_not_measure_(qubit_index, "P");
+        gates_.emplace_back(impl_mqis::create_p_gate(theta, qubit_index));
+    }
+
+    template <
+        impl_mqis::ContainerOfAnglesAndQubitIndices Container = std::initializer_list<std::pair<double, std::size_t>>>
+    void add_p_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_p_gate(pair.first, pair.second);
+        }
+    }
+
     void add_ry_gate(double theta, std::size_t qubit_index)
     {
         check_qubit_range_(qubit_index, "qubit", "RY");

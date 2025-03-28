@@ -33,6 +33,10 @@ inline auto non_u_gate_to_u_gate(const mqis::GateInfo& info) -> mqis::Matrix2X2
         const auto angle = unpack_gate_angle(info);
         return mqis::rz_gate(angle);
     }
+    else if (info.gate == G::P) {
+        const auto angle = unpack_gate_angle(info);
+        return mqis::p_gate(angle);
+    }
     else if (info.gate == G::H) {
         return mqis::h_gate();
     }
