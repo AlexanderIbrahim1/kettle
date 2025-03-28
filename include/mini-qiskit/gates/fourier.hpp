@@ -6,6 +6,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/utils.hpp"
+#include "mini-qiskit/gates/swap.hpp"
 
 namespace impl_mqis
 {
@@ -22,9 +23,7 @@ void apply_fourier_transform_swaps_(mqis::QuantumCircuit& circuit, const Contain
     while (i_right_pre > i_left_pre) {
         const auto i_left = impl_mqis::get_container_index(container, i_left_pre);
         const auto i_right = impl_mqis::get_container_index(container, i_right_pre);
-        circuit.add_cx_gate(i_left, i_right);
-        circuit.add_cx_gate(i_right, i_left);
-        circuit.add_cx_gate(i_left, i_right);
+        mqis::apply_swap(circuit, i_left, i_right);
 
         ++i_left_pre;
         --i_right_pre;

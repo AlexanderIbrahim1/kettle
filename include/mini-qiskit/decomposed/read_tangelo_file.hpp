@@ -9,6 +9,7 @@
 #include <mini-qiskit/primitive_gate.hpp>
 #include <mini-qiskit/circuit.hpp>
 #include <mini-qiskit/common/utils.hpp>
+#include <mini-qiskit/gates/swap.hpp>
 
 /*
 This script parses the file of gates produced by the tangelo code.
@@ -38,6 +39,24 @@ inline void parse_h_gate(mqis::QuantumCircuit& circuit, std::stringstream& strea
     stream >> dummy_ch;     // ']'
 
     circuit.add_h_gate(target_qubit);
+}
+
+inline void parse_swap_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t target_qubit0;
+    std::size_t target_qubit1;
+
+    stream >> dummy_str;    // 'target'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> target_qubit0; // target qubit 0
+    stream >> dummy_ch;     // ','
+    stream >> target_qubit1; // target qubit 1
+    stream >> dummy_ch;     // ']'
+
+    mqis::apply_swap(circuit, target_qubit0, target_qubit1);
 }
 
 inline void parse_cx_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
@@ -120,14 +139,22 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         else if (gate_name == "RX") {
             impl_mqis::parse_r_gate<Gate::RX>(circuit, gatestream);
         }
+        else if (gate_name == "RY") {
+            impl_mqis::parse_r_gate<Gate::RY>(circuit, gatestream);
+        }
         else if (gate_name == "RZ") {
             impl_mqis::parse_r_gate<Gate::RZ>(circuit, gatestream);
         }
         else if (gate_name == "CNOT") {
             impl_mqis::parse_cx_gate(circuit, gatestream);
         }
+        else if (gate_name == "SWAP") {
+            impl_mqis::parse_swap_gate(circuit, gatestream);
+        }
         else {
-            throw std::runtime_error {"`read_tangelo_file()` can only handle the following gates: 'H', 'RX', 'RZ', 'CNOT'"};
+            auto err_msg = std::stringstream {};
+            err_msg << "Unknown gate found in `read_tangelo_file()` : " << gate_name << '\n';
+            throw std::runtime_error {err_msg.str()};
         }
     }
 

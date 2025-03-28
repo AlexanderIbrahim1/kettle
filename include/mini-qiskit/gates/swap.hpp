@@ -9,6 +9,17 @@
 namespace mqis
 {
 
+void apply_swap(QuantumCircuit& circuit, std::size_t target_qubit0, std::size_t target_qubit1)
+{
+    if (target_qubit0 == target_qubit1) {
+        throw std::runtime_error {"Cannot swap a qubit with itself"};
+    }
+
+    circuit.add_cx_gate(target_qubit0, target_qubit1);
+    circuit.add_cx_gate(target_qubit1, target_qubit0);
+    circuit.add_cx_gate(target_qubit0, target_qubit1);
+}
+
 void apply_control_swap(QuantumCircuit& circuit, std::size_t control_qubit, std::size_t swap_qubit0, std::size_t swap_qubit1)
 {
     // solution taken from: https://quantumcomputing.stackexchange.com/a/9343

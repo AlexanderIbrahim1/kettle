@@ -70,4 +70,27 @@ TEST_CASE("read_tangelo_file()")
             REQUIRE_THAT(angle, Catch::Matchers::WithinRel(12.533816585267923));
         }
     }
+
+    SECTION("single SWAP gate")
+    {
+        auto stream = std::stringstream {
+            "SWAP      target : [12, 9]\n"
+        };
+
+        const auto actual = mqis::read_tangelo_circuit(13, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 3);
+        REQUIRE(actual[0].gate == mqis::Gate::CX);
+        REQUIRE(actual[1].gate == mqis::Gate::CX);
+        REQUIRE(actual[2].gate == mqis::Gate::CX);
+
+        const auto [q_left_0, q_right_0] = impl_mqis::unpack_cx_gate(actual[0]);
+        const auto [q_left_1, q_right_1] = impl_mqis::unpack_cx_gate(actual[1]);
+        const auto [q_left_2, q_right_2] = impl_mqis::unpack_cx_gate(actual[2]);
+
+        REQUIRE(q_left_0 == q_right_1);
+        REQUIRE(q_right_1 == q_left_2);
+        REQUIRE(q_right_0 == q_left_1);
+        REQUIRE(q_left_1 == q_right_2);
+    }
 }

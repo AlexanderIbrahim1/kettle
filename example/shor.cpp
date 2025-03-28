@@ -4,7 +4,7 @@
 #include <unordered_set>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/control_swap.hpp>
+#include <mini-qiskit/gates/swap.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
 
 /*
