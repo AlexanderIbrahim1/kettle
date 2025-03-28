@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <filesystem>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -127,6 +129,20 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
     }
 
     return circuit;
+}
+
+inline auto read_tangelo_circuit(std::size_t n_qubits, const std::filesystem::path& filepath, std::size_t n_skip_lines) -> QuantumCircuit
+{
+    auto instream = std::ifstream {filepath};
+
+    if (!instream.is_open()) {
+        auto err_msg = std::stringstream {};
+        err_msg << "ERROR: unable to read tangelo circuit from : '" << filepath << "'\n";
+
+        throw std::ios::failure {err_msg.str()};
+    }
+
+    return read_tangelo_circuit(n_qubits, instream, n_skip_lines);
 }
 
 }  // namespace mqis
