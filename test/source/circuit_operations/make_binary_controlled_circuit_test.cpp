@@ -26,9 +26,9 @@ TEST_CASE("make_binary_controlled_circuit()")
 
     // create the circuit manually, by repeating the gates
     auto manual_circuit = mqis::QuantumCircuit {4};
-    manual_circuit.add_cp_gate({{angle, 0, 3}});
-    manual_circuit.add_cp_gate({{angle, 1, 3}, {angle, 1, 3}});
-    manual_circuit.add_cp_gate({{angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}});
+    manual_circuit.add_cp_gate({{0, 3, angle}});
+    manual_circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
+    manual_circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
 
     // create the circuit using the `make_binary_controlled_circuit()` function
     auto subcircuit = mqis::QuantumCircuit {1};
@@ -57,9 +57,9 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for single qubit 
 
     // create the circuit manually, by repeating the gates
     auto manual_circuit = mqis::QuantumCircuit {4};
-    manual_circuit.add_cp_gate({{angle, 0, 3}});
-    manual_circuit.add_cp_gate({{angle, 1, 3}, {angle, 1, 3}});
-    manual_circuit.add_cp_gate({{angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}});
+    manual_circuit.add_cp_gate({{0, 3, angle}});
+    manual_circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
+    manual_circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
 
     // create the circuit using the `make_binary_controlled_circuit()` function
     auto subcircuits = std::vector<mqis::QuantumCircuit> {};

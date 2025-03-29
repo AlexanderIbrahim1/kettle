@@ -30,7 +30,7 @@ TEST_CASE("make_controlled_circuit()")
         SECTION("single rx-gate")
         {
             const auto angle = 1.2345;
-            subcircuit.add_rx_gate(angle, 0);
+            subcircuit.add_rx_gate(0, angle);
             auto new_circuit = mqis::make_controlled_circuit(subcircuit, 2, 0, {1});
 
             expected.add_cu_gate(mqis::rx_gate(angle), 0, 1);
@@ -91,7 +91,7 @@ TEST_CASE("make_controlled_circuit()")
         SECTION("single crx-gate")
         {
             const auto angle = double {1.2345};
-            subcircuit.add_crx_gate(angle, 0, 1);
+            subcircuit.add_crx_gate(0, 1, angle);
             auto new_circuit = mqis::make_controlled_circuit(subcircuit, 3, 0, {1, 2});
 
             mqis::apply_multiplicity_controlled_u_gate(expected, mqis::rx_gate(angle), 2, {0, 1});
@@ -105,7 +105,7 @@ TEST_CASE("make_controlled_circuit()")
         SECTION("single cp-gate")
         {
             const auto angle = double {1.2345};
-            subcircuit.add_cp_gate(angle, 0, 1);
+            subcircuit.add_cp_gate(0, 1, angle);
             auto new_circuit = mqis::make_controlled_circuit(subcircuit, 3, 0, {1, 2});
 
             mqis::apply_multiplicity_controlled_u_gate(expected, mqis::p_gate(angle), 2, {0, 1});
@@ -148,7 +148,7 @@ TEST_CASE("make_controlled_circuit()")
         subcircuit.add_x_gate(1);
         subcircuit.add_h_gate(1);
         subcircuit.add_h_gate(2);
-        subcircuit.add_rx_gate(angle, 2);
+        subcircuit.add_rx_gate(2, angle);
         subcircuit.add_cx_gate(1, 2);
 
         auto new_circuit = mqis::make_controlled_circuit(subcircuit, 5, 0, {2, 3, 4});
@@ -243,7 +243,7 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         SECTION("single rx-gate")
         {
             const auto angle = 1.2345;
-            subcircuit.add_rx_gate(angle, 0);
+            subcircuit.add_rx_gate(0, angle);
             auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 3, {0, 1}, {2});
 
             mqis::apply_multiplicity_controlled_u_gate(expected, mqis::rx_gate(angle), 2, {0, 1});
@@ -315,7 +315,7 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         SECTION("single crx-gate")
         {
             const auto angle = double {1.2345};
-            subcircuit.add_crx_gate(angle, 0, 1);
+            subcircuit.add_crx_gate(0, 1, angle);
             auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 4, {0, 1}, {2, 3});
 
             mqis::apply_multiplicity_controlled_u_gate(expected, mqis::rx_gate(angle), 3, {0, 1, 2});
@@ -329,7 +329,7 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         SECTION("single cp-gate")
         {
             const auto angle = double {1.2345};
-            subcircuit.add_cp_gate(angle, 0, 1);
+            subcircuit.add_cp_gate(0, 1, angle);
             auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 4, {0, 1}, {2, 3});
 
             mqis::apply_multiplicity_controlled_u_gate(expected, mqis::p_gate(angle), 3, {0, 1, 2});
@@ -372,7 +372,7 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         subcircuit.add_x_gate(1);
         subcircuit.add_h_gate(1);
         subcircuit.add_h_gate(2);
-        subcircuit.add_rx_gate(angle, 2);
+        subcircuit.add_rx_gate(2, angle);
         subcircuit.add_cx_gate(1, 2);
 
         auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 5, {0, 1}, {2, 3, 4});

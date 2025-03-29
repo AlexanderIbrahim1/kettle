@@ -14,7 +14,7 @@
 namespace impl_mqis
 {
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_all_indices_are_unique_(const Container& container)
 {
     auto seen = std::unordered_set<std::size_t> {};
@@ -27,7 +27,7 @@ void check_all_indices_are_unique_(const Container& container)
     }
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_valid_number_of_mapped_indices_(const Container& container, const mqis::QuantumCircuit& circuit)
 {
     const auto size = impl_mqis::get_container_size(container);
@@ -39,7 +39,7 @@ void check_valid_number_of_mapped_indices_(const Container& container, const mqi
     }
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std::size_t control_qubit)
 {
     const auto is_control_qubit = [&](std::size_t i) { return i == control_qubit; };
@@ -50,7 +50,7 @@ void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std:
     }
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_no_overlap_between_control_qubits_and_mapped_qubits_(const Container& mapped_qubits, const Container& control_qubits)
 {
     auto control_qubit_set = std::unordered_set<std::size_t> {control_qubits.begin(), control_qubits.end()};
@@ -62,7 +62,7 @@ void check_no_overlap_between_control_qubits_and_mapped_qubits_(const Container&
     }
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_new_indices_fit_onto_new_circuit_(const Container& container, std::size_t control_qubit, std::size_t n_qubits_on_new_circuit)
 {
     // the additional '1' comes from the control qubit
@@ -82,7 +82,7 @@ void check_new_indices_fit_onto_new_circuit_(const Container& container, std::si
     }
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, const Container& control_qubits, std::size_t n_qubits_on_new_circuit)
 {
     const auto n_mapped_indices = impl_mqis::get_container_size(mapped_qubits);
@@ -109,7 +109,7 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
 namespace mqis
 {
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 inline auto make_multiplicity_controlled_circuit(
     const mqis::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
@@ -182,7 +182,7 @@ inline auto make_multiplicity_controlled_circuit(
     return new_circuit;
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 inline auto make_controlled_circuit(
     const mqis::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,

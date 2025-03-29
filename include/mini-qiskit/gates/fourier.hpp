@@ -11,7 +11,7 @@
 namespace impl_mqis
 {
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void apply_fourier_transform_swaps_(mqis::QuantumCircuit& circuit, const Container& container)
 {
     const auto size = static_cast<std::size_t>(std::distance(container.begin(), container.end()));
@@ -36,7 +36,7 @@ void apply_fourier_transform_swaps_(mqis::QuantumCircuit& circuit, const Contain
 namespace mqis
 {
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& container)
 {
     const auto size = static_cast<std::size_t>(std::distance(container.begin(), container.end()));
@@ -50,7 +50,7 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
         for (std::size_t i_control_pre {i_target_pre + 1}; i_control_pre < size; ++i_control_pre) {
             const auto i_control = impl_mqis::get_container_index(container, i_control_pre);
             const auto angle = 2.0 * M_PI / static_cast<double>(impl_mqis::pow_2_int(i_angle_denom));
-            circuit.add_cp_gate(angle, i_control, i_target);
+            circuit.add_cp_gate(i_control, i_target, angle);
             ++i_angle_denom;
         }
     }
@@ -59,7 +59,7 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
     impl_mqis::apply_fourier_transform_swaps_(circuit, container);
 }
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void apply_inverse_fourier_transform(QuantumCircuit& circuit, const Container& container)
 {
     namespace sv = std::views;
@@ -76,7 +76,7 @@ void apply_inverse_fourier_transform(QuantumCircuit& circuit, const Container& c
         for (std::size_t i_control_pre : sv::iota(i_target_pre + 1, size) | sv::reverse) {
             const auto i_control = impl_mqis::get_container_index(container, i_control_pre);
             const auto angle = 2.0 * M_PI / static_cast<double>(impl_mqis::pow_2_int(i_angle_denom));
-            circuit.add_cp_gate(-angle, i_control, i_target);
+            circuit.add_cp_gate(i_control, i_target, -angle);
             --i_angle_denom;
         }
 

@@ -9,9 +9,9 @@
 void apply_multiplicity_controlled_t_gate_manually(mqis::QuantumCircuit& circuit)
 {
     const auto angle = M_PI_4;
-    circuit.add_cp_gate({{angle, 0, 3}});
-    circuit.add_cp_gate({{angle, 1, 3}, {angle, 1, 3}});
-    circuit.add_cp_gate({{angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}, {angle, 2, 3}});
+    circuit.add_cp_gate({{0, 3, angle}});
+    circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
+    circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
 }
 
 

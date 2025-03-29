@@ -87,9 +87,9 @@ TEST_CASE("add multiple RX gates")
     SECTION("add 0, 1, 2 via initializer list")
     {
         circuit.add_rx_gate({
-            {0.25, 0},
-            {0.5,  1},
-            {0.75, 2}
+            {0, 0.25},
+            {1, 0.5},
+            {2, 0.75}
         });
 
         REQUIRE(number_of_gates(circuit) == 3);
@@ -155,9 +155,9 @@ TEST_CASE("add multiple CRX gates")
     SECTION("add 0, 1, 2 via initializer list")
     {
         circuit.add_crx_gate({
-            {0.25, 0, 1},
-            {0.5,  1, 2},
-            {0.75, 2, 0}
+            {0, 1, 0.25},
+            {1, 2, 0.5},
+            {2, 0, 0.75}
         });
 
         REQUIRE(number_of_gates(circuit) == 3);
@@ -262,16 +262,16 @@ TEST_CASE("QuantumCircuit: almost_eq()")
             {
                 SECTION("different angle")
                 {
-                    circuit0.add_rx_gate(M_PI, 0);
-                    circuit1.add_rx_gate(M_PI_2, 0);
+                    circuit0.add_rx_gate(0, M_PI);
+                    circuit1.add_rx_gate(0, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
 
                 SECTION("different qubit")
                 {
-                    circuit0.add_rx_gate(M_PI_2, 0);
-                    circuit1.add_rx_gate(M_PI_2, 1);
+                    circuit0.add_rx_gate(0, M_PI_2);
+                    circuit1.add_rx_gate(1, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
@@ -297,16 +297,16 @@ TEST_CASE("QuantumCircuit: almost_eq()")
             {
                 SECTION("different angle")
                 {
-                    circuit0.add_crx_gate(M_PI_4, 0, 1);
-                    circuit1.add_crx_gate(M_PI_2, 0, 1);
+                    circuit0.add_crx_gate(0, 1, M_PI_4);
+                    circuit1.add_crx_gate(0, 1, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
 
                 SECTION("different qubit")
                 {
-                    circuit0.add_crx_gate(M_PI_2, 1, 0);
-                    circuit1.add_crx_gate(M_PI_2, 0, 1);
+                    circuit0.add_crx_gate(1, 0, M_PI_2);
+                    circuit1.add_crx_gate(0, 1, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
@@ -316,16 +316,16 @@ TEST_CASE("QuantumCircuit: almost_eq()")
             {
                 SECTION("different angle")
                 {
-                    circuit0.add_cp_gate(M_PI_4, 0, 1);
-                    circuit1.add_cp_gate(M_PI_2, 0, 1);
+                    circuit0.add_cp_gate(0, 1, M_PI_4);
+                    circuit1.add_cp_gate(0, 1, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
 
                 SECTION("different qubit")
                 {
-                    circuit0.add_cp_gate(M_PI_2, 1, 0);
-                    circuit1.add_cp_gate(M_PI_2, 0, 1);
+                    circuit0.add_cp_gate(1, 0, M_PI_2);
+                    circuit1.add_cp_gate(0, 1, M_PI_2);
 
                     REQUIRE(!mqis::almost_eq(circuit0, circuit1));
                 }
@@ -398,8 +398,8 @@ TEST_CASE("QuantumCircuit: almost_eq()")
 
         SECTION("add_rx_gate()")
         {
-            circuit0.add_rx_gate(M_PI, 1);
-            circuit1.add_rx_gate(M_PI, 1);
+            circuit0.add_rx_gate(1, M_PI);
+            circuit1.add_rx_gate(1, M_PI);
             REQUIRE(mqis::almost_eq(circuit0, circuit1));
         }
 
@@ -420,16 +420,16 @@ TEST_CASE("QuantumCircuit: almost_eq()")
 
         SECTION("add_crx_gate()")
         {
-            circuit0.add_crx_gate(M_PI_4, 0, 1);
-            circuit1.add_crx_gate(M_PI_4, 0, 1);
+            circuit0.add_crx_gate(0, 1, M_PI_4);
+            circuit1.add_crx_gate(0, 1, M_PI_4);
 
             REQUIRE(mqis::almost_eq(circuit0, circuit1));
         }
 
         SECTION("add_cp_gate()")
         {
-            circuit0.add_cp_gate(M_PI_4, 1, 0);
-            circuit1.add_cp_gate(M_PI_4, 1, 0);
+            circuit0.add_cp_gate(1, 0, M_PI_4);
+            circuit1.add_cp_gate(1, 0, M_PI_4);
 
             REQUIRE(mqis::almost_eq(circuit0, circuit1));
         }

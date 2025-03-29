@@ -77,7 +77,7 @@ auto simulate_single_qubit_with_builtin(
             circuit.add_z_gate(target_index);
         }
         else if (gate_id == "RX") {
-            circuit.add_rx_gate(angle, target_index);
+            circuit.add_rx_gate(target_index, angle);
         }
         else {
             throw std::runtime_error {"invalid gate entered into unit test"};
@@ -129,10 +129,10 @@ auto simulate_double_qubit_with_builtin(
             circuit.add_cz_gate(control_index, target_index);
         }
         else if (gate_id == "CRX") {
-            circuit.add_crx_gate(angle, control_index, target_index);
+            circuit.add_crx_gate(control_index, target_index, angle);
         }
         else if (gate_id == "CP") {
-            circuit.add_cp_gate(angle, control_index, target_index);
+            circuit.add_cp_gate(control_index, target_index, angle);
         }
         else {
             throw std::runtime_error {"invalid gate entered into unit test"};
@@ -296,7 +296,7 @@ TEST_CASE("simulate RX gate")
         const auto n_qubits = 1;
 
         auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_rx_gate(M_PI / 4.0, 0);
+        circuit.add_rx_gate(0, M_PI / 4.0);
 
         auto state = mqis::QuantumState {n_qubits};
         mqis::simulate(circuit, state);
@@ -315,7 +315,7 @@ TEST_CASE("simulate RX gate")
         const auto n_qubits = 2;
 
         auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_rx_gate(M_PI / 4.0, 0);
+        circuit.add_rx_gate(0, M_PI / 4.0);
 
         auto state = mqis::QuantumState {n_qubits};
         mqis::simulate(circuit, state);
@@ -341,8 +341,8 @@ TEST_CASE("simulate RX gate")
         const auto n_qubits = 2;
 
         auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_rx_gate(M_PI / 4.0, 0);
-        circuit.add_rx_gate(M_PI / 8.0, 1);
+        circuit.add_rx_gate(0, M_PI / 4.0);
+        circuit.add_rx_gate(1, M_PI / 8.0);
 
         auto state = mqis::QuantumState {n_qubits};
         mqis::simulate(circuit, state);
@@ -367,7 +367,7 @@ TEST_CASE("simulate RY gate")
         const auto n_qubits = 1;
 
         auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_ry_gate(M_PI / 4.0, 0);
+        circuit.add_ry_gate(0, M_PI / 4.0);
 
         auto state = mqis::QuantumState {n_qubits};
         mqis::simulate(circuit, state);
@@ -388,7 +388,7 @@ TEST_CASE("simulate RY gate")
             auto circuit = mqis::QuantumCircuit {n_qubits};
 
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
-            circuit.add_ry_gate(angle, 0);
+            circuit.add_ry_gate(0, angle);
 
             auto state = mqis::QuantumState {n_qubits};
             mqis::simulate(circuit, state);
@@ -411,7 +411,7 @@ TEST_CASE("simulate RZ gate")
         const auto n_qubits = 1;
 
         auto circuit = mqis::QuantumCircuit {n_qubits};
-        circuit.add_rz_gate(M_PI / 4.0, 0);
+        circuit.add_rz_gate(0, M_PI / 4.0);
 
         auto state = mqis::QuantumState {n_qubits};
         mqis::simulate(circuit, state);
@@ -432,7 +432,7 @@ TEST_CASE("simulate RZ gate")
             auto circuit = mqis::QuantumCircuit {n_qubits};
 
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
-            circuit.add_rz_gate(angle, 0);
+            circuit.add_rz_gate(0, angle);
 
             auto state = mqis::QuantumState {n_qubits};
             mqis::simulate(circuit, state);
@@ -456,13 +456,13 @@ TEST_CASE("simulate RZ gate")
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
 
             auto circuit0 = mqis::QuantumCircuit {n_qubits};
-            circuit0.add_rz_gate(angle, 0);
+            circuit0.add_rz_gate(0, angle);
 
             auto state0 = mqis::QuantumState {n_qubits};
             mqis::simulate(circuit0, state0);
 
             auto circuit1 = mqis::QuantumCircuit {n_qubits};
-            circuit1.add_rz_gate(angle, 1);
+            circuit1.add_rz_gate(1, angle);
 
             auto state1 = mqis::QuantumState {n_qubits};
             mqis::simulate(circuit1, state1);
@@ -722,7 +722,7 @@ TEST_CASE("simulate CRX gate")
         // clang-format on
 
         auto circuit = mqis::QuantumCircuit {2};
-        circuit.add_crx_gate(angle, 0, 1);
+        circuit.add_crx_gate(0, 1, angle);
 
         auto state = mqis::QuantumState {pair.input, mqis::QuantumStateEndian::LITTLE};
         mqis::simulate(circuit, state);
@@ -739,7 +739,7 @@ TEST_CASE("simulate CRX gate")
 
         auto circuit = mqis::QuantumCircuit {2};
         circuit.add_h_gate(0);
-        circuit.add_crx_gate(angle, 0, 1);
+        circuit.add_crx_gate(0, 1, angle);
 
         auto state = mqis::QuantumState {"00"};
         mqis::simulate(circuit, state);
@@ -767,7 +767,7 @@ TEST_CASE("simulate CRZ gate")
 
         auto circuit = mqis::QuantumCircuit {2};
         circuit.add_h_gate(0);
-        circuit.add_crz_gate(angle, 0, 1);
+        circuit.add_crz_gate(0, 1, angle);
 
         auto state = mqis::QuantumState {"00"};
         mqis::simulate(circuit, state);
@@ -794,7 +794,7 @@ TEST_CASE("simulate CRZ gate")
         auto circuit = mqis::QuantumCircuit {2};
         circuit.add_h_gate(0);
         circuit.add_h_gate(1);
-        circuit.add_crz_gate(angle, 0, 1);
+        circuit.add_crz_gate(0, 1, angle);
 
         auto state = mqis::QuantumState {"00"};
         mqis::simulate(circuit, state);
@@ -836,7 +836,7 @@ TEST_CASE("simulate CP gate")
         // clang-format on
 
         auto circuit = mqis::QuantumCircuit {2};
-        circuit.add_cp_gate(angle, 0, 1);
+        circuit.add_cp_gate(0, 1, angle);
 
         auto state = mqis::QuantumState {pair.input};
         mqis::simulate(circuit, state);

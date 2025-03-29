@@ -58,7 +58,7 @@ auto split_control_indices_(const std::vector<std::size_t>& control_indices)
 namespace mqis
 {
 
-template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
 void apply_multiplicity_controlled_u_gate(
     QuantumCircuit& circuit,
     const Matrix2X2& gate,

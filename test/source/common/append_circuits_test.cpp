@@ -33,7 +33,7 @@ TEST_CASE("append_circuits working")
             circuit.add_x_gate(0);
             circuit.add_h_gate(1);
             circuit.add_y_gate({0, 1, 2});
-            circuit.add_rx_gate({{M_PI_4, 0}, {M_1_PI, 2}});
+            circuit.add_rx_gate({{0, M_PI_4}, {2, M_1_PI}});
         };
 
         const auto add_right_gates = [&](mqis::QuantumCircuit& circuit) {
@@ -128,7 +128,7 @@ TEST_CASE("extend_circuit working")
             circuit.add_x_gate(0);
             circuit.add_h_gate(1);
             circuit.add_y_gate({0, 1, 2});
-            circuit.add_rx_gate({{M_PI_4, 0}, {M_1_PI, 2}});
+            circuit.add_rx_gate({{0, M_PI_4}, {2, M_1_PI}});
         };
 
         const auto add_right_gates = [&](mqis::QuantumCircuit& circuit) {

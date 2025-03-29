@@ -104,16 +104,16 @@ void parse_one_target_one_angle_gate(mqis::QuantumCircuit& circuit, std::strings
     stream >> angle;        // angle
 
     if constexpr (GateType == mqis::Gate::RX) {
-        circuit.add_rx_gate(angle, target_qubit);
+        circuit.add_rx_gate(target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::RY) {
-        circuit.add_ry_gate(angle, target_qubit);
+        circuit.add_ry_gate(target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::RZ) {
-        circuit.add_rz_gate(angle, target_qubit);
+        circuit.add_rz_gate(target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::P) {
-        circuit.add_p_gate(angle, target_qubit);
+        circuit.add_p_gate(target_qubit, angle);
     }
     else {
         static_assert(
@@ -147,16 +147,16 @@ void parse_one_target_one_control_one_angle_gate(mqis::QuantumCircuit& circuit, 
     stream >> angle;        // angle
 
     if constexpr (GateType == mqis::Gate::CP) {
-        circuit.add_cp_gate(angle, control_qubit, target_qubit);
+        circuit.add_cp_gate(control_qubit, target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::CRX) {
-        circuit.add_crx_gate(angle, control_qubit, target_qubit);
+        circuit.add_crx_gate(control_qubit, target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::CRY) {
-        circuit.add_cry_gate(angle, control_qubit, target_qubit);
+        circuit.add_cry_gate(control_qubit, target_qubit, angle);
     }
     else if constexpr (GateType == mqis::Gate::CRZ) {
-        circuit.add_crz_gate(angle, control_qubit, target_qubit);
+        circuit.add_crz_gate(control_qubit, target_qubit, angle);
     }
     else {
         static_assert(
