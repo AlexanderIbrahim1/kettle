@@ -40,6 +40,12 @@ auto gate_to_string_(mqis::Gate gate) -> std::string
         case G::X : {
             return "X";
         }
+        case G::Y : {
+            return "Y";
+        }
+        case G::Z : {
+            return "Z";
+        }
         case G::RX : {
             return "RX";
         }
@@ -147,6 +153,16 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
     switch (info.gate)
     {
         case G::X : {
+            const auto temp_target = unpack_one_target_gate(info);
+            target = left_padded_integer_(temp_target);
+            break;
+        }
+        case G::Y : {
+            const auto temp_target = unpack_one_target_gate(info);
+            target = left_padded_integer_(temp_target);
+            break;
+        }
+        case G::Z : {
             const auto temp_target = unpack_one_target_gate(info);
             target = left_padded_integer_(temp_target);
             break;

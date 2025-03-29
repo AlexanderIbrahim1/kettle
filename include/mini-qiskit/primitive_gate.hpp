@@ -11,6 +11,8 @@ enum class Gate
 {
     H,
     X,
+    Y,
+    Z,
     RX,
     RY,
     RZ,
@@ -55,7 +57,7 @@ namespace impl_mqis::gate_id
 constexpr auto is_one_target_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
-    return gate == G::X || gate == G::H;
+    return gate == G::X || gate == G::Y || gate == G::Z || gate == G::H;
 }
 
 constexpr auto is_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool

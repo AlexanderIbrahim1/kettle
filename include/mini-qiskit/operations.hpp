@@ -20,6 +20,25 @@ constexpr void apply_x_gate(mqis::QuantumState& state, std::size_t i0, std::size
     std::swap(state[i0], state[i1]);
 }
 
+constexpr void apply_y_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto real0 = state1.imag();
+    const auto imag0 = -state1.real();
+    const auto real1 = -state0.imag();
+    const auto imag1 = state0.real();
+
+    state[i0] = std::complex<double> {real0, imag0};
+    state[i1] = std::complex<double> {real1, imag1};
+}
+
+constexpr void apply_z_gate(mqis::QuantumState& state, std::size_t i1)
+{
+    state[i1] *= -1.0;
+}
+
 constexpr void apply_h_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];

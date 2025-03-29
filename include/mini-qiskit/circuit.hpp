@@ -273,7 +273,7 @@ public:
     {
         check_qubit_range_(target_index, "qubit", "Z");
         check_previous_gate_is_not_measure_(target_index, "Z");
-        add_rz_gate(M_PI, target_index);
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Z>(target_index));
     }
 
     template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
@@ -288,8 +288,7 @@ public:
     {
         check_qubit_range_(target_index, "qubit", "Y");
         check_previous_gate_is_not_measure_(target_index, "Y");
-        add_z_gate(target_index);
-        add_x_gate(target_index);
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Y>(target_index));
     }
 
     template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
