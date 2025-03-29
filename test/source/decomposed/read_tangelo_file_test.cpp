@@ -22,7 +22,7 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
         REQUIRE(actual[0].gate == mqis::Gate::H);
 
-        const auto target_qubit = impl_mqis::unpack_h_gate(actual[0]);
+        const auto target_qubit = impl_mqis::unpack_one_target_gate(actual[0]);
         REQUIRE(target_qubit == 4);
     }
 
@@ -44,14 +44,14 @@ TEST_CASE("read_tangelo_file()")
         SECTION("H gate")
         {
             REQUIRE(actual[0].gate == mqis::Gate::H);
-            const auto target_qubit = impl_mqis::unpack_h_gate(actual[0]);
+            const auto target_qubit = impl_mqis::unpack_one_target_gate(actual[0]);
             REQUIRE(target_qubit == 4);
         }
 
         SECTION("RX gate")
         {
             REQUIRE(actual[1].gate == mqis::Gate::RX);
-            const auto [angle, target_qubit] = impl_mqis::unpack_rx_gate(actual[1]);
+            const auto [angle, target_qubit] = impl_mqis::unpack_one_target_one_angle_gate(actual[1]);
             REQUIRE(target_qubit == 5);
             REQUIRE_THAT(angle, Catch::Matchers::WithinRel(1.5707963267948966));
         }
@@ -67,7 +67,7 @@ TEST_CASE("read_tangelo_file()")
         SECTION("RZ gate")
         {
             REQUIRE(actual[3].gate == mqis::Gate::RZ);
-            const auto [angle, target_qubit] = impl_mqis::unpack_rx_gate(actual[3]);
+            const auto [angle, target_qubit] = impl_mqis::unpack_one_target_one_angle_gate(actual[3]);
             REQUIRE(target_qubit == 5);
             REQUIRE_THAT(angle, Catch::Matchers::WithinRel(12.533816585267923));
         }
@@ -107,7 +107,7 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
         REQUIRE(actual[0].gate == mqis::Gate::P);
 
-        const auto [angle, target_qubit] = impl_mqis::unpack_p_gate(actual[0]);
+        const auto [angle, target_qubit] = impl_mqis::unpack_one_target_one_angle_gate(actual[0]);
         REQUIRE(target_qubit == 11);
         REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-1.3474016644659843));
     }
@@ -125,22 +125,22 @@ TEST_CASE("read_tangelo_file()")
             TestCase {
                 "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 mqis::Gate::CP,
-                impl_mqis::unpack_cp_gate
+                impl_mqis::unpack_one_control_one_target_one_angle_gate
             },
             TestCase {
                 "CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 mqis::Gate::CRX,
-                impl_mqis::unpack_crx_gate
+                impl_mqis::unpack_one_control_one_target_one_angle_gate
             },
             TestCase {
                 "CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 mqis::Gate::CRY,
-                impl_mqis::unpack_cry_gate
+                impl_mqis::unpack_one_control_one_target_one_angle_gate
             },
             TestCase {
                 "CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 mqis::Gate::CRZ,
-                impl_mqis::unpack_crz_gate
+                impl_mqis::unpack_one_control_one_target_one_angle_gate
             }
         );
 

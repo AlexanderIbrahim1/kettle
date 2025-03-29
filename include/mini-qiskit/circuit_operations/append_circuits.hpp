@@ -26,11 +26,11 @@ inline void check_matching_number_of_bits_(const mqis::QuantumCircuit& left, con
 
 inline auto is_operating_on_measured_qubit_(const mqis::GateInfo& info, const std::vector<std::uint8_t>& measure_bitmask) -> bool
 {
-    if (is_single_qubit_gate(info)) {
+    if (gate_id::is_single_qubit_transform_gate(info.gate) || info.gate == mqis::Gate::M) {
         const auto target_index = unpack_single_qubit_gate_index(info);
         return measure_bitmask[target_index];
     }
-    else if (is_double_qubit_gate(info)) {
+    else if (gate_id::is_double_qubit_transform_gate(info.gate)) {
         const auto [control_index, target_index] = unpack_double_qubit_gate_indices(info);
         return measure_bitmask[control_index] || measure_bitmask[target_index];
     }

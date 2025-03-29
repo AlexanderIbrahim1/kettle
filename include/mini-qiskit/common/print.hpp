@@ -147,36 +147,36 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
     switch (info.gate)
     {
         case G::X : {
-            const auto temp_target = unpack_x_gate(info);
+            const auto temp_target = unpack_one_target_gate(info);
             target = left_padded_integer_(temp_target);
             break;
         }
         case G::RX : {
-            const auto [temp_angle, temp_target] = unpack_rx_gate(info);
+            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::RY : {
-            const auto [temp_angle, temp_target] = unpack_ry_gate(info);
+            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::RZ : {
-            const auto [temp_angle, temp_target] = unpack_rz_gate(info);
+            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::P : {
-            const auto [temp_angle, temp_target] = unpack_p_gate(info);
+            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::H : {
-            const auto temp_target = unpack_h_gate(info);
+            const auto temp_target = unpack_one_target_gate(info);
             target = left_padded_integer_(temp_target);
             break;
         }
@@ -187,28 +187,28 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
             break;
         }
         case G::CRX : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_crx_gate(info);
+            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::CRY : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_cry_gate(info);
+            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::CRZ : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_crz_gate(info);
+            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::CP : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_cp_gate(info);
+            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);

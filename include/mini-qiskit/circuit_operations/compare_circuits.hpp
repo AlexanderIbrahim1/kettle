@@ -47,21 +47,23 @@ inline auto non_u_gate_to_u_gate(const mqis::GateInfo& info) -> mqis::Matrix2X2
 
 inline auto as_u_gate(const mqis::QuantumCircuit& circuit, const mqis::GateInfo& info) -> std::tuple<mqis::GateInfo, mqis::Matrix2X2>
 {
-    if (info.gate == mqis::Gate::U || info.gate == mqis::Gate::CU) {
-        const auto i_matrix = impl_mqis::unpack_matrix_index(info);
+    using G = mqis::Gate;
+
+    if (info.gate == G::U || info.gate == G::CU) {
+        const auto i_matrix = impl_mqis::unpack_gate_matrix_index(info);
         return {info, circuit.unitary_gate(i_matrix)};
     }
     else {
-        const auto matrix = impl_mqis::non_u_gate_to_u_gate(info);
+        const auto matrix = non_u_gate_to_u_gate(info);
         const auto dummy_gate_index = 0;
 
-        if (impl_mqis::is_single_qubit_gate_and_not_u(info)) {
+        if (gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
             const auto target = impl_mqis::unpack_single_qubit_gate_index(info);
             const auto u_gate_info = impl_mqis::create_u_gate(target, dummy_gate_index);
 
             return {u_gate_info, matrix};
         }
-        else if (impl_mqis::is_double_qubit_gate_and_not_cu(info)) {
+        else if (gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
             const auto [control, target] = impl_mqis::unpack_double_qubit_gate_indices(info);
             const auto u_gate_info = impl_mqis::create_cu_gate(control, target, dummy_gate_index);
 

@@ -34,19 +34,19 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             apply_h_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::RX) {
-            [[maybe_unused]] const auto [theta, ignore] = unpack_rx_gate(info);
+            [[maybe_unused]] const auto [theta, ignore] = unpack_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::RY) {
-            [[maybe_unused]] const auto [theta, ignore] = unpack_ry_gate(info);
+            [[maybe_unused]] const auto [theta, ignore] = unpack_one_target_one_angle_gate(info);
             apply_ry_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::RZ) {
-            [[maybe_unused]] const auto [theta, ignore] = unpack_rz_gate(info);
+            [[maybe_unused]] const auto [theta, ignore] = unpack_one_target_one_angle_gate(info);
             apply_rz_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::P) {
-            [[maybe_unused]] const auto [theta, ignore] = unpack_p_gate(info);
+            [[maybe_unused]] const auto [theta, ignore] = unpack_one_target_one_angle_gate(info);
             apply_p_gate(state, state1_index, theta);
         }
         else {
@@ -87,21 +87,21 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
             swap_states(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CRX) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crx_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CRY) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cry_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
             apply_ry_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CRZ) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_crz_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
             apply_rz_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CP) {
             // NOTE: the DoubleQubitGatePairGenerator needs to calculate the `state0_index` before
             // it calculates the `state1_index`, so we're not losing too much in terms of performance
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_cp_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
             apply_p_gate(state, state1_index, theta);
         }
         else {
@@ -171,13 +171,13 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
                 break;
             }
             case Gate::U : {
-                const auto matrix_index = impl_mqis::unpack_matrix_index(gate);
+                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
                 const auto& matrix = circuit.unitary_gate(matrix_index);
                 impl_mqis::simulate_single_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
                 break;
             }
             case Gate::CU : {
-                const auto matrix_index = impl_mqis::unpack_matrix_index(gate);
+                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
                 const auto& matrix = circuit.unitary_gate(matrix_index);
                 impl_mqis::simulate_double_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
                 break;

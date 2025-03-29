@@ -63,7 +63,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "X");
         check_previous_gate_is_not_measure_(qubit_index, "X");
-        gates_.emplace_back(impl_mqis::create_x_gate(qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::X>(qubit_index));
     }
 
     template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
@@ -78,7 +78,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "RX");
         check_previous_gate_is_not_measure_(qubit_index, "RX");
-        gates_.emplace_back(impl_mqis::create_rx_gate(theta, qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RX>(theta, qubit_index));
     }
 
     template <
@@ -94,7 +94,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "H");
         check_previous_gate_is_not_measure_(qubit_index, "H");
-        gates_.emplace_back(impl_mqis::create_h_gate(qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(qubit_index));
     }
 
     template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
@@ -130,9 +130,9 @@ public:
         check_qubit_range_(target_index, "target qubit", "CZ");
         check_previous_gate_is_not_measure_(source_index, "CZ");
         check_previous_gate_is_not_measure_(target_index, "CZ");
-        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
         gates_.emplace_back(impl_mqis::create_cx_gate(source_index, target_index));
-        gates_.emplace_back(impl_mqis::create_h_gate(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
     }
 
     template <
@@ -151,7 +151,7 @@ public:
         check_qubit_range_(target_index, "target qubit", "CRX");
         check_previous_gate_is_not_measure_(source_index, "CRX");
         check_previous_gate_is_not_measure_(target_index, "CRX");
-        gates_.emplace_back(impl_mqis::create_crx_gate(source_index, target_index, theta));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRX>(source_index, target_index, theta));
     }
 
     template <
@@ -170,7 +170,7 @@ public:
         check_qubit_range_(target_index, "target qubit", "CRY");
         check_previous_gate_is_not_measure_(source_index, "CRY");
         check_previous_gate_is_not_measure_(target_index, "CRY");
-        gates_.emplace_back(impl_mqis::create_cry_gate(source_index, target_index, theta));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRY>(source_index, target_index, theta));
     }
 
     template <
@@ -189,7 +189,7 @@ public:
         check_qubit_range_(target_index, "target qubit", "CRZ");
         check_previous_gate_is_not_measure_(source_index, "CRZ");
         check_previous_gate_is_not_measure_(target_index, "CRZ");
-        gates_.emplace_back(impl_mqis::create_crz_gate(source_index, target_index, theta));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRZ>(source_index, target_index, theta));
     }
 
     template <
@@ -208,7 +208,7 @@ public:
         check_qubit_range_(target_index, "target qubit", "CP");
         check_previous_gate_is_not_measure_(source_index, "CP");
         check_previous_gate_is_not_measure_(target_index, "CP");
-        gates_.emplace_back(impl_mqis::create_cp_gate(source_index, target_index, theta));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CP>(source_index, target_index, theta));
     }
 
     template <
@@ -225,7 +225,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "RZ");
         check_previous_gate_is_not_measure_(qubit_index, "RZ");
-        gates_.emplace_back(impl_mqis::create_rz_gate(theta, qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RZ>(theta, qubit_index));
     }
 
     template <
@@ -241,7 +241,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "P");
         check_previous_gate_is_not_measure_(qubit_index, "P");
-        gates_.emplace_back(impl_mqis::create_p_gate(theta, qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::P>(theta, qubit_index));
     }
 
     template <
@@ -257,7 +257,7 @@ public:
     {
         check_qubit_range_(qubit_index, "qubit", "RY");
         check_previous_gate_is_not_measure_(qubit_index, "RY");
-        gates_.emplace_back(impl_mqis::create_ry_gate(theta, qubit_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RY>(theta, qubit_index));
     }
 
     template <
