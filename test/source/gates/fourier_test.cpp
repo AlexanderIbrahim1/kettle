@@ -9,7 +9,7 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/gates/fourier.hpp"
-#include "mini-qiskit/simulate.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
 TEST_CASE("Forward QFT on |0> state")

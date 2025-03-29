@@ -12,7 +12,7 @@
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulate.hpp>
+#include <mini-qiskit/simulation/simulate.hpp>
 #include <mini-qiskit/state.hpp>
 
 

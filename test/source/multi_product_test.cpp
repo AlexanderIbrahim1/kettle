@@ -5,7 +5,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulate.hpp>
+#include <mini-qiskit/simulation/simulate.hpp>
 #include <mini-qiskit/state.hpp>
 #include <mini-qiskit/circuit_operations/append_circuits.hpp>
 #include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>

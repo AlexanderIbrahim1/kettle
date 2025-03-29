@@ -11,7 +11,7 @@
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
 #include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulate.hpp>
+#include <mini-qiskit/simulation/simulate.hpp>
 #include <mini-qiskit/state.hpp>
 
 /*

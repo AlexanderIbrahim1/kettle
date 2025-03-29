@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "mini-qiskit/common/mathtools.hpp"
-#include "mini-qiskit/gate_pair_generator.hpp"
+#include "mini-qiskit/simulation/gate_pair_generator.hpp"
 #include "mini-qiskit/state.hpp"
 
 /*

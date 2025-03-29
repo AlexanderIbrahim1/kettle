@@ -5,7 +5,7 @@
 
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/state.hpp"
-#include "mini-qiskit/simulate.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/gates/swap.hpp"
 
 TEST_CASE("control swap gate on 3-qubit circuit")

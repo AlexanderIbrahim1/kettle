@@ -11,7 +11,7 @@
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/simulate.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 
 /*

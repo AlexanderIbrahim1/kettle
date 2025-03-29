@@ -8,8 +8,8 @@
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
-#include "mini-qiskit/gate_pair_generator.hpp"
-#include "mini-qiskit/operations.hpp"
+#include "mini-qiskit/simulation/gate_pair_generator.hpp"
+#include "mini-qiskit/simulation/operations.hpp"
 #include "mini-qiskit/state.hpp"
 
 namespace impl_mqis

@@ -3,7 +3,7 @@
 
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/state.hpp"
-#include "mini-qiskit/simulate.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/gates/multiplicity_controlled_u_gate.hpp"
 #include "mini-qiskit/gates/toffoli.hpp"
