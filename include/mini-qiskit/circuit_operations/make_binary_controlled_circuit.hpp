@@ -13,7 +13,7 @@
 namespace impl_mqis
 {
 
-template <QubitIndices Container = std::initializer_list<std::size_t>>
+template <QubitIndices Container = impl_mqis::QubitIndicesIList>
 inline void check_subcircuit_powers_(
     const std::vector<mqis::QuantumCircuit>& subcircuit_powers,
     const Container& control_qubits
@@ -34,7 +34,7 @@ namespace mqis
     the required number of times. This is slower than finding a way to combine the
     circuits and creating a new gate with each iteration.
 */
-template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
 inline auto make_binary_controlled_circuit_naive(
     const QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
@@ -66,7 +66,7 @@ inline auto make_binary_controlled_circuit_naive(
     It assumes that the circuits are the correct binary powers. This results in
     fewer gates than the naive approach.
 */
-template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
 inline auto make_binary_controlled_circuit_from_binary_powers(
     const std::vector<QuantumCircuit>& subcircuit_powers,
     std::size_t n_new_qubits,

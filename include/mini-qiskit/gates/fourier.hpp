@@ -11,7 +11,7 @@
 namespace impl_mqis
 {
 
-template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
 void apply_fourier_transform_swaps_(mqis::QuantumCircuit& circuit, const Container& container)
 {
     const auto size = static_cast<std::size_t>(std::distance(container.begin(), container.end()));
@@ -36,7 +36,7 @@ void apply_fourier_transform_swaps_(mqis::QuantumCircuit& circuit, const Contain
 namespace mqis
 {
 
-template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
 void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& container)
 {
     const auto size = static_cast<std::size_t>(std::distance(container.begin(), container.end()));
@@ -59,7 +59,7 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
     impl_mqis::apply_fourier_transform_swaps_(circuit, container);
 }
 
-template <impl_mqis::QubitIndices Container = std::initializer_list<std::size_t>>
+template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
 void apply_inverse_fourier_transform(QuantumCircuit& circuit, const Container& container)
 {
     namespace sv = std::views;
