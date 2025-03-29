@@ -61,8 +61,8 @@ private:
 
 /*
     The DoubleQubitGatePairIterator loops over all pairs of computational states where
-      - in the first state, the qubits at (source_index, target_index) are (1, 0)
-      - in the second state, the qubits at (source_index, target_index) are (1, 1)
+      - in the first state, the qubits at (control_index, target_index) are (1, 0)
+      - in the second state, the qubits at (control_index, target_index) are (1, 1)
     and yields them using the `next()` member function.
 
     The number of yielded pairs is always 2^(n_qubits - 2).
@@ -75,12 +75,12 @@ private:
 class DoubleQubitGatePairGenerator
 {
 public:
-    DoubleQubitGatePairGenerator(std::size_t source_index, std::size_t target_index, std::size_t n_qubits)
-        : lower_index_ {std::min({source_index, target_index})}
-        , upper_index_ {std::max({source_index, target_index})}
+    DoubleQubitGatePairGenerator(std::size_t control_index, std::size_t target_index, std::size_t n_qubits)
+        : lower_index_ {std::min({control_index, target_index})}
+        , upper_index_ {std::max({control_index, target_index})}
         , lower_shift_ {impl_mqis::pow_2_int(lower_index_ + 1)}
         , upper_shift_ {impl_mqis::pow_2_int(upper_index_ + 1)}
-        , source_shift_ {impl_mqis::pow_2_int(source_index)}
+        , control_shift_ {impl_mqis::pow_2_int(control_index)}
         , target_shift_ {impl_mqis::pow_2_int(target_index)}
         , i0_max_ {impl_mqis::pow_2_int(lower_index_)}
         , i1_max_ {impl_mqis::pow_2_int(upper_index_ - lower_index_ - 1)}
@@ -109,7 +109,7 @@ public:
             }
         }
 
-        const auto state0_index = current_i0 + current_i1 * lower_shift_ + current_i2 * upper_shift_ + source_shift_;
+        const auto state0_index = current_i0 + current_i1 * lower_shift_ + current_i2 * upper_shift_ + control_shift_;
         const auto state1_index = state0_index + target_shift_;
 
         return {state0_index, state1_index};
@@ -120,7 +120,7 @@ private:
     std::size_t upper_index_;
     std::size_t lower_shift_;
     std::size_t upper_shift_;
-    std::size_t source_shift_;
+    std::size_t control_shift_;
     std::size_t target_shift_;
     std::size_t i0_max_;
     std::size_t i1_max_;

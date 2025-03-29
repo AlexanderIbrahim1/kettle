@@ -155,16 +155,16 @@ constexpr auto unpack_u_gate(const mqis::GateInfo& info) -> std::tuple<std::size
 }
 
 /* Apply CU-gate, with the 2x2 matrix identified by `matrix_index` to qubits at the `control_index` and `target_index` */
-constexpr auto create_cu_gate(std::size_t source_index, std::size_t target_index, std::size_t matrix_index)
+constexpr auto create_cu_gate(std::size_t control_index, std::size_t target_index, std::size_t matrix_index)
     -> mqis::GateInfo
 {
-    return {mqis::Gate::CU, source_index, target_index, DUMMY_ARG2, matrix_index};
+    return {mqis::Gate::CU, control_index, target_index, DUMMY_ARG2, matrix_index};
 }
 
 /* Parse the relevant information for the CU-gate */
 constexpr auto unpack_cu_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t, std::size_t>
 {
-    return {info.arg0, info.arg1, info.arg3};  // source index, target index, matrix index
+    return {info.arg0, info.arg1, info.arg3};  // control index, target index, matrix index
 }
 
 /* Apply a measurement gate to a given qubit and bit */

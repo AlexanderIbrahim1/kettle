@@ -477,7 +477,7 @@ TEST_CASE("simulate CX gate")
     {
         auto circuit = mqis::QuantumCircuit {2};
 
-        SECTION("CX(source=0, target=1)")
+        SECTION("CX(control=0, target=1)")
         {
             circuit.add_cx_gate(0, 1);
 
@@ -492,7 +492,7 @@ TEST_CASE("simulate CX gate")
             REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
 
-        SECTION("CX(source=1, target=0)")
+        SECTION("CX(control=1, target=0)")
         {
             circuit.add_cx_gate(1, 0);
 
@@ -512,7 +512,7 @@ TEST_CASE("simulate CX gate")
     {
         auto circuit = mqis::QuantumCircuit {3};
 
-        SECTION("CX(source=0, target=1)")
+        SECTION("CX(control=0, target=1)")
         {
             circuit.add_cx_gate(0, 1);
 
@@ -531,7 +531,7 @@ TEST_CASE("simulate CX gate")
             REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
 
-        SECTION("CX(source=0, target=2)")
+        SECTION("CX(control=0, target=2)")
         {
             circuit.add_cx_gate(0, 2);
 
@@ -600,7 +600,7 @@ TEST_CASE("simulate CZ gate")
     {
         auto circuit = mqis::QuantumCircuit {3};
 
-        SECTION("CZ(source=0, target=1)")
+        SECTION("CZ(control=0, target=1)")
         {
             circuit.add_cz_gate(0, 1);
 
@@ -619,7 +619,7 @@ TEST_CASE("simulate CZ gate")
             REQUIRE(mqis::almost_eq(pair.expected, pair.state));
         }
 
-        SECTION("CZ(source=0, target=2)")
+        SECTION("CZ(control=0, target=2)")
         {
             circuit.add_cz_gate(0, 2);
 
