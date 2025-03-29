@@ -5,6 +5,16 @@
 namespace mqis
 {
 
+constexpr auto h_gate() noexcept -> Matrix2X2
+{
+    return {
+        {M_SQRT1_2, 0.0},
+        {M_SQRT1_2, 0.0},
+        {M_SQRT1_2, 0.0},
+        {-M_SQRT1_2, 0.0}
+    };
+}
+
 constexpr auto x_gate() noexcept -> Matrix2X2
 {
     return {
@@ -15,13 +25,23 @@ constexpr auto x_gate() noexcept -> Matrix2X2
     };
 }
 
-constexpr auto h_gate() noexcept -> Matrix2X2
+constexpr auto y_gate() noexcept -> Matrix2X2
 {
     return {
-        {M_SQRT1_2, 0.0},
-        {M_SQRT1_2, 0.0},
-        {M_SQRT1_2, 0.0},
-        {M_SQRT1_2, 0.0}
+        {0.0, 0.0},
+        {0.0, -1.0},
+        {0.0, 1.0},
+        {0.0, 0.0}
+    };
+}
+
+constexpr auto z_gate() noexcept -> Matrix2X2
+{
+    return {
+        {1.0, 0.0},
+        {0.0, 0.0},
+        {0.0, 0.0},
+        {-1.0, 0.0}
     };
 }
 
@@ -74,26 +94,6 @@ constexpr auto p_gate(double angle) noexcept -> Matrix2X2
         {0.0, 0.0},
         {0.0, 0.0},
         {cost, sint}
-    };
-}
-
-constexpr auto y_gate() noexcept -> Matrix2X2
-{
-    return {
-        {0.0, 0.0},
-        {0.0, -1.0},
-        {0.0, 1.0},
-        {0.0, 0.0}
-    };
-}
-
-constexpr auto z_gate() noexcept -> Matrix2X2
-{
-    return {
-        {1.0, 0.0},
-        {0.0, 0.0},
-        {0.0, 0.0},
-        {-1.0, 0.0}
     };
 }
 
