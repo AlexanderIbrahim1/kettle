@@ -142,16 +142,16 @@ constexpr auto unpack_cx_gate(const mqis::GateInfo& info) -> std::tuple<std::siz
     return {info.arg0, info.arg1};  // control_index, target_index
 }
 
-/* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `qubit_index` */
-constexpr auto create_u_gate(std::size_t qubit_index, std::size_t matrix_index) -> mqis::GateInfo
+/* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `target_index` */
+constexpr auto create_u_gate(std::size_t target_index, std::size_t matrix_index) -> mqis::GateInfo
 {
-    return {mqis::Gate::U, qubit_index, DUMMY_ARG1, DUMMY_ARG2, matrix_index};
+    return {mqis::Gate::U, target_index, DUMMY_ARG1, DUMMY_ARG2, matrix_index};
 }
 
 /* Parse the relevant information for the U-gate */
 constexpr auto unpack_u_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
-    return {info.arg0, info.arg3};  // qubit index, matrix_index
+    return {info.arg0, info.arg3};  // target_index, matrix_index
 }
 
 /* Apply CU-gate, with the 2x2 matrix identified by `matrix_index` to qubits at the `control_index` and `target_index` */

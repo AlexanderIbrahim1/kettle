@@ -20,9 +20,9 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
 {
     using Gate = mqis::Gate;
 
-    const auto qubit_index = unpack_single_qubit_gate_index(info);
+    const auto target_index = unpack_single_qubit_gate_index(info);
 
-    auto pair_iterator = SingleQubitGatePairGenerator {qubit_index, n_qubits};
+    auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
@@ -62,8 +62,8 @@ void simulate_single_qubit_gate_general(
     const mqis::Matrix2X2& mat
 )
 {
-    const auto qubit_index = unpack_single_qubit_gate_index(info);
-    auto pair_iterator = SingleQubitGatePairGenerator {qubit_index, n_qubits};
+    const auto target_index = unpack_single_qubit_gate_index(info);
+    auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();

@@ -42,7 +42,7 @@ auto get_generated_index_pairs(Generator& generator) -> std::vector<IndexPair>
 constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::size_t
 {
     // The number of yielded pairs is always 2^(n_qubits - 1):
-    // - the qubit at `qubit_index` is fixed for the pair (one must be set to 0, the other to 1)
+    // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 1` of them, with 2 possible states per qubit
     return impl_mqis::pow_2_int(n_qubits - 1);

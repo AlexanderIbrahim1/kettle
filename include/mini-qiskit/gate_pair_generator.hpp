@@ -11,7 +11,7 @@ namespace impl_mqis
 
 /*
     The SingleQubitGatePairGenerator loops over all pairs of computational states which
-    differ on bit `qubit_index`, and yields them using the `next()` member function.
+    differ on bit `target_index`, and yields them using the `next()` member function.
 
     The number of yielded pairs is always 2^(n_qubits - 1).
 
@@ -23,9 +23,9 @@ namespace impl_mqis
 class SingleQubitGatePairGenerator
 {
 public:
-    constexpr SingleQubitGatePairGenerator(std::size_t qubit_index, std::size_t n_qubits)
-        : i0_max_ {impl_mqis::pow_2_int(qubit_index)}
-        , i1_max_ {impl_mqis::pow_2_int(n_qubits - qubit_index - 1)}
+    constexpr SingleQubitGatePairGenerator(std::size_t target_index, std::size_t n_qubits)
+        : i0_max_ {impl_mqis::pow_2_int(target_index)}
+        , i1_max_ {impl_mqis::pow_2_int(n_qubits - target_index - 1)}
     {}
 
     constexpr auto size() const noexcept -> std::size_t
