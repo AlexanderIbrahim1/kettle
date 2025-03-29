@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
@@ -31,72 +32,26 @@ static constexpr auto DEFAULT_ANGLE = std::string   (DEFAULT_ANGLE_WIDTH  , ' ')
 
 }
 
-// TODO: replace this with a map; performance doesn't matter here that much
-auto gate_to_string_(mqis::Gate gate) -> std::string
-{
-    using G = mqis::Gate;
-    // returns the gate as a string, since we still don't have reflection
-    switch (gate)
-    {
-        case G::X : {
-            return "X";
-        }
-        case G::Y : {
-            return "Y";
-        }
-        case G::Z : {
-            return "Z";
-        }
-        case G::RX : {
-            return "RX";
-        }
-        case G::RY : {
-            return "RY";
-        }
-        case G::RZ : {
-            return "RZ";
-        }
-        case G::P : {
-            return "P";
-        }
-        case G::H : {
-            return "H";
-        }
-        case G::CX : {
-            return "CX";
-        }
-        case G::CY : {
-            return "CY";
-        }
-        case G::CZ : {
-            return "CZ";
-        }
-        case G::CRX : {
-            return "CRX";
-        }
-        case G::CRY : {
-            return "CRY";
-        }
-        case G::CRZ : {
-            return "CRZ";
-        }
-        case G::CP : {
-            return "CP";
-        }
-        case G::U : {
-            return "U";
-        }
-        case G::CU : {
-            return "CU";
-        }
-        case G::M : {
-            return "M";
-        }
-        default : {
-            throw std::runtime_error {"UNREACHABLE: invalid Gate enum class passed to function."};
-        }
-    }
-}
+static const auto GATE_TO_STRING = std::unordered_map<mqis::Gate, std::string> {
+    {mqis::Gate::H, "H"},
+    {mqis::Gate::X, "X"},
+    {mqis::Gate::Y, "Y"},
+    {mqis::Gate::Z, "Z"},
+    {mqis::Gate::RX, "RX"},
+    {mqis::Gate::RY, "RY"},
+    {mqis::Gate::RZ, "RZ"},
+    {mqis::Gate::P, "P"},
+    {mqis::Gate::CX, "CX"},
+    {mqis::Gate::CY, "CY"},
+    {mqis::Gate::CZ, "CZ"},
+    {mqis::Gate::CRX, "CRX"},
+    {mqis::Gate::CRY, "CRY"},
+    {mqis::Gate::CRZ, "CRZ"},
+    {mqis::Gate::CP, "CP"},
+    {mqis::Gate::U, "U"},
+    {mqis::Gate::CU, "CU"},
+    {mqis::Gate::M, "M"}
+};
 
 auto left_padded_integer_(std::size_t x, std::size_t minimum_width = formatting::DEFAULT_INTEGER_WIDTH) -> std::string
 {
@@ -143,14 +98,14 @@ auto left_padded_double_(double x, std::size_t precision = formatting::DEFAULT_A
     return std::string (padding, ' ') + number_as_string;
 }
 
-// TODO: replace A LOT of duplicated code once the primitive gates have all been chosen
 auto format_gate_control_target_angle_(const mqis::GateInfo& info)
     -> std::tuple<std::string, std::optional<std::size_t>>
 {
+    namespace gid = impl_mqis::gate_id;
     using G = mqis::Gate;
 
     auto output = std::stringstream {};
-    output << gate_to_string_(info.gate) << '\n';
+    output << GATE_TO_STRING.at(info.gate) << '\n';
     output << "(control, target, angle) = (";
 
     auto control = formatting::DEFAULT_CONTROL;
@@ -158,120 +113,45 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
     auto angle = formatting::DEFAULT_ANGLE;
     auto i_matrix = std::optional<std::size_t> {std::nullopt};
 
-    switch (info.gate)
+    if (gid::is_one_target_transform_gate(info.gate)) {
+        const auto temp_target = unpack_one_target_gate(info);
+        target = left_padded_integer_(temp_target);
+    }
+    else if (gid::is_one_target_one_angle_transform_gate(info.gate))
     {
-        case G::X : {
-            const auto temp_target = unpack_one_target_gate(info);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::Y : {
-            const auto temp_target = unpack_one_target_gate(info);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::Z : {
-            const auto temp_target = unpack_one_target_gate(info);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::RX : {
-            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::RY : {
-            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::RZ : {
-            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::P : {
-            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::H : {
-            const auto temp_target = unpack_one_target_gate(info);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::CX : {
-            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::CY : {
-            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::CZ : {
-            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        case G::CRX : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::CRY : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::CRZ : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::CP : {
-            const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            angle = left_padded_double_(temp_angle);
-            break;
-        }
-        case G::U : {
-            const auto [temp_target, temp_matrix] = unpack_u_gate(info);
-            target = left_padded_integer_(temp_target);
-            i_matrix = temp_matrix;
-            break;
-        }
-        case G::CU : {
-            const auto [temp_control, temp_target, temp_matrix] = unpack_cu_gate(info);
-            control = left_padded_integer_(temp_control);
-            target = left_padded_integer_(temp_target);
-            i_matrix = temp_matrix;
-            break;
-        }
-        case G::M : {
-            [[maybe_unused]]
-            const auto [temp_target, ignore] = unpack_m_gate(info);
-            target = left_padded_integer_(temp_target);
-            break;
-        }
-        default : {
-            throw std::runtime_error {"UNREACHABLE: invalid Gate enum class passed to function."};
-        }
+        const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
+        target = left_padded_integer_(temp_target);
+        angle = left_padded_double_(temp_angle);
+    }
+    else if (gid::is_one_control_one_target_transform_gate(info.gate)) {
+        const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
+        control = left_padded_integer_(temp_control);
+        target = left_padded_integer_(temp_target);
+    }
+    else if (gid::is_one_control_one_target_one_angle_transform_gate(info.gate)) {
+        const auto [temp_control, temp_target, temp_angle] = unpack_one_control_one_target_one_angle_gate(info);
+        control = left_padded_integer_(temp_control);
+        target = left_padded_integer_(temp_target);
+        angle = left_padded_double_(temp_angle);
+    }
+    else if (info.gate == G::U) {
+        const auto [temp_target, temp_matrix] = unpack_u_gate(info);
+        target = left_padded_integer_(temp_target);
+        i_matrix = temp_matrix;
+    }
+    else if (info.gate == G::CU) {
+        const auto [temp_control, temp_target, temp_matrix] = unpack_cu_gate(info);
+        control = left_padded_integer_(temp_control);
+        target = left_padded_integer_(temp_target);
+        i_matrix = temp_matrix;
+    }
+    else if (info.gate == G::M) {
+        [[maybe_unused]]
+        const auto [temp_target, ignore] = unpack_m_gate(info);
+        target = left_padded_integer_(temp_target);
+    }
+    else {
+        throw std::runtime_error {"UNREACHABLE: dev error, invalid gate found when formatting gate print output.\n"};
     }
 
     output << control << ", ";

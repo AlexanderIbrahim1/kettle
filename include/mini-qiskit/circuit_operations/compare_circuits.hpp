@@ -16,35 +16,12 @@ namespace impl_mqis
 
 inline auto non_u_gate_to_u_gate(const mqis::GateInfo& info) -> mqis::Matrix2X2
 {
-    using G = mqis::Gate;
-
-    if (info.gate == G::X || info.gate == G::CX) {
-        return mqis::x_gate();
+    if (impl_mqis::gate_id::is_non_angle_transform_gate(info.gate)) {
+        return mqis::non_angle_gate(info.gate);
     }
-    else if (info.gate == G::Y || info.gate == G::CY) {
-        return mqis::y_gate();
-    }
-    else if (info.gate == G::Z || info.gate == G::CZ) {
-        return mqis::z_gate();
-    }
-    else if (info.gate == G::RX || info.gate == G::CRX) {
-        const auto angle = unpack_gate_angle(info);
-        return mqis::rx_gate(angle);
-    }
-    else if (info.gate == G::RY || info.gate == G::CRY) {
-        const auto angle = unpack_gate_angle(info);
-        return mqis::ry_gate(angle);
-    }
-    else if (info.gate == G::RZ || info.gate == G::CRZ) {
-        const auto angle = unpack_gate_angle(info);
-        return mqis::rz_gate(angle);
-    }
-    else if (info.gate == G::P || info.gate == G::CP) {
-        const auto angle = unpack_gate_angle(info);
-        return mqis::p_gate(angle);
-    }
-    else if (info.gate == G::H) {
-        return mqis::h_gate();
+    else if (impl_mqis::gate_id::is_angle_transform_gate(info.gate)) {
+        const auto angle = impl_mqis::unpack_gate_angle(info);
+        return mqis::angle_gate(info.gate, angle);
     }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};

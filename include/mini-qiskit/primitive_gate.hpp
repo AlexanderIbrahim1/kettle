@@ -94,6 +94,16 @@ constexpr auto is_double_qubit_transform_gate(mqis::Gate gate) -> bool
         || gate == G::CU;
 }
 
+constexpr auto is_non_angle_transform_gate(mqis::Gate gate) -> bool
+{
+    return is_one_target_transform_gate(gate) || is_one_control_one_target_transform_gate(gate);
+}
+
+constexpr auto is_angle_transform_gate(mqis::Gate gate) -> bool
+{
+    return is_one_target_one_angle_transform_gate(gate) || is_one_control_one_target_one_angle_transform_gate(gate);
+}
+
 }  // namespace impl_mqis::gate_id
 
 
