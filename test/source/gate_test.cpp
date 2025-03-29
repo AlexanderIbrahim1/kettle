@@ -19,7 +19,7 @@ TEST_CASE("Test create and unpack gate functions")
         const auto theta = 1.57;
         const auto target_index = std::size_t {3};
         const auto gate_info = impl_mqis::create_one_target_one_angle_gate<mqis::Gate::RX>(theta, target_index);
-        const auto [unpacked_theta, unpacked_index] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
+        const auto [unpacked_index, unpacked_theta] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
 
         REQUIRE(unpacked_index == target_index);
         REQUIRE_THAT(unpacked_theta, Catch::Matchers::WithinRel(theta));

@@ -127,9 +127,9 @@ constexpr auto create_one_target_one_angle_gate(double theta, std::size_t target
     return {GateKind, target_index, DUMMY_ARG1, theta, DUMMY_ARG3};
 }
 
-constexpr auto unpack_one_target_one_angle_gate(const mqis::GateInfo& info) -> std::tuple<double, std::size_t>
+constexpr auto unpack_one_target_one_angle_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, double>
 {
-    return {info.arg2, info.arg0};  // theta, target_index
+    return {info.arg0, info.arg2};  // target_index, angle
 }
 
 template <mqis::Gate GateKind>

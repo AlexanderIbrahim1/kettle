@@ -95,18 +95,18 @@ TEST_CASE("add multiple RX gates")
         REQUIRE(number_of_gates(circuit) == 3);
 
         const auto rx_gate0 = impl_mqis::unpack_one_target_one_angle_gate(circuit[0]);
-        REQUIRE_THAT(std::get<0>(rx_gate0), Catch::Matchers::WithinAbs(0.25, ABS_TOL));
-        REQUIRE(std::get<1>(rx_gate0) == 0);
+        REQUIRE(std::get<0>(rx_gate0) == 0);
+        REQUIRE_THAT(std::get<1>(rx_gate0), Catch::Matchers::WithinAbs(0.25, ABS_TOL));
         REQUIRE(circuit[0].gate == mqis::Gate::RX);
 
         const auto rx_gate1 = impl_mqis::unpack_one_target_one_angle_gate(circuit[1]);
-        REQUIRE_THAT(std::get<0>(rx_gate1), Catch::Matchers::WithinAbs(0.5, ABS_TOL));
-        REQUIRE(std::get<1>(rx_gate1) == 1);
+        REQUIRE(std::get<0>(rx_gate1) == 1);
+        REQUIRE_THAT(std::get<1>(rx_gate1), Catch::Matchers::WithinAbs(0.5, ABS_TOL));
         REQUIRE(circuit[1].gate == mqis::Gate::RX);
 
         const auto rx_gate2 = impl_mqis::unpack_one_target_one_angle_gate(circuit[2]);
-        REQUIRE_THAT(std::get<0>(rx_gate2), Catch::Matchers::WithinAbs(0.75, ABS_TOL));
-        REQUIRE(std::get<1>(rx_gate2) == 2);
+        REQUIRE(std::get<0>(rx_gate2) == 2);
+        REQUIRE_THAT(std::get<1>(rx_gate2), Catch::Matchers::WithinAbs(0.75, ABS_TOL));
         REQUIRE(circuit[2].gate == mqis::Gate::RX);
     }
 }

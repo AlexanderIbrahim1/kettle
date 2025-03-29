@@ -148,25 +148,25 @@ inline auto make_multiplicity_controlled_circuit(
                 break;
             }
             case Gate::RX : {
-                const auto [angle, original_target] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
+                const auto [original_target, angle] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
                 apply_multiplicity_controlled_u_gate(new_circuit, rx_gate(angle), new_target, control_qubits);
                 break;
             }
             case Gate::RY : {
-                const auto [angle, original_target] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
+                const auto [original_target, angle] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
                 apply_multiplicity_controlled_u_gate(new_circuit, ry_gate(angle), new_target, control_qubits);
                 break;
             }
             case Gate::RZ : {
-                const auto [angle, original_target] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
+                const auto [original_target, angle] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
                 apply_multiplicity_controlled_u_gate(new_circuit, rz_gate(angle), new_target, control_qubits);
                 break;
             }
             case Gate::P : {
-                const auto [angle, original_target] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
+                const auto [original_target, angle] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
                 apply_multiplicity_controlled_u_gate(new_circuit, p_gate(angle), new_target, control_qubits);
                 break;

@@ -176,25 +176,25 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
             break;
         }
         case G::RX : {
-            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
+            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::RY : {
-            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
+            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::RZ : {
-            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
+            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
         }
         case G::P : {
-            const auto [temp_angle, temp_target] = unpack_one_target_one_angle_gate(info);
+            const auto [temp_target, temp_angle] = unpack_one_target_one_angle_gate(info);
             target = left_padded_integer_(temp_target);
             angle = left_padded_double_(temp_angle);
             break;
