@@ -15,7 +15,7 @@
 namespace impl_mqis
 {
 
-constexpr void swap_states(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
+constexpr void apply_x_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     std::swap(state[i0], state[i1]);
 }
@@ -51,23 +51,6 @@ constexpr void apply_rx_gate(mqis::QuantumState& state, std::size_t i0, std::siz
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_rz_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
-{
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
-
-    const auto cost = std::cos(theta / 2.0);
-    const auto sint = std::sin(theta / 2.0);
-
-    const auto real0 = state0.real() * cost + state0.imag() * sint;
-    const auto imag0 = state0.imag() * cost - state0.real() * sint;
-    const auto real1 = state1.real() * cost - state1.imag() * sint;
-    const auto imag1 = state1.imag() * cost + state1.real() * sint;
-
-    state[i0] = std::complex<double> {real0, imag0};
-    state[i1] = std::complex<double> {real1, imag1};
-}
-
 constexpr void apply_ry_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
@@ -80,6 +63,23 @@ constexpr void apply_ry_gate(mqis::QuantumState& state, std::size_t i0, std::siz
     const auto imag0 = state0.imag() * cost - state1.imag() * sint;
     const auto real1 = state1.real() * cost + state0.real() * sint;
     const auto imag1 = state1.imag() * cost + state0.imag() * sint;
+
+    state[i0] = std::complex<double> {real0, imag0};
+    state[i1] = std::complex<double> {real1, imag1};
+}
+
+constexpr void apply_rz_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto cost = std::cos(theta / 2.0);
+    const auto sint = std::sin(theta / 2.0);
+
+    const auto real0 = state0.real() * cost + state0.imag() * sint;
+    const auto imag0 = state0.imag() * cost - state0.real() * sint;
+    const auto real1 = state1.real() * cost - state1.imag() * sint;
+    const auto imag1 = state1.imag() * cost + state1.real() * sint;
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};
@@ -98,7 +98,7 @@ constexpr void apply_p_gate(mqis::QuantumState& state, std::size_t i1, double th
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void general_gate_transform(
+constexpr void apply_u_gate(
     mqis::QuantumState& state,
     std::size_t i0,
     std::size_t i1,

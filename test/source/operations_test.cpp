@@ -25,7 +25,7 @@ TEST_CASE("Swap states operation")
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    impl_mqis::swap_states(quantum_state, 0, 1);
+    impl_mqis::apply_x_gate(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];

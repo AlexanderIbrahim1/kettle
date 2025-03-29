@@ -28,7 +28,7 @@ void simulate_single_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         const auto [state0_index, state1_index] = pair_iterator.next();
 
         if constexpr (GateType == Gate::X) {
-            swap_states(state, state0_index, state1_index);
+            apply_x_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::H) {
             apply_h_gate(state, state0_index, state1_index);
@@ -67,7 +67,7 @@ void simulate_single_qubit_gate_general(
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
-        general_gate_transform(state, state0_index, state1_index, mat);
+        apply_u_gate(state, state0_index, state1_index, mat);
     }
 }
 
@@ -84,7 +84,7 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
 
         if constexpr (GateType == Gate::CX) {
-            swap_states(state, state0_index, state1_index);
+            apply_x_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
@@ -122,7 +122,7 @@ void simulate_double_qubit_gate_general(
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
-        general_gate_transform(state, state0_index, state1_index, mat);
+        apply_u_gate(state, state0_index, state1_index, mat);
     }
 }
 
