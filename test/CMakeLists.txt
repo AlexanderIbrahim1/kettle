@@ -78,6 +78,7 @@ add_test_target(TARGET multi_product_test SOURCES "source/multi_product_test.cpp
 add_test_target(TARGET read_tangelo_file_test SOURCES "source/decomposed/read_tangelo_file_test.cpp")
 add_test_target(TARGET io_numpy_statevector_test SOURCES "source/io/numpy_statevector_test.cpp")
 add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.cpp")
+add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
 
 # ---- End-of-file commands ----
 
