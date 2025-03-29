@@ -21,10 +21,10 @@ inline auto non_u_gate_to_u_gate(const mqis::GateInfo& info) -> mqis::Matrix2X2
     if (info.gate == G::X || info.gate == G::CX) {
         return mqis::x_gate();
     }
-    else if (info.gate == G::Y) {
+    else if (info.gate == G::Y || info.gate == G::CY) {
         return mqis::y_gate();
     }
-    else if (info.gate == G::Z) {
+    else if (info.gate == G::Z || info.gate == G::CZ) {
         return mqis::z_gate();
     }
     else if (info.gate == G::RX || info.gate == G::CRX) {

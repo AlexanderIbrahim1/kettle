@@ -18,6 +18,8 @@ enum class Gate
     RZ,
     P,
     CX,
+    CY,
+    CZ,
     CRX,
     CRY,
     CRZ,
@@ -66,6 +68,12 @@ constexpr auto is_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
     return gate == G::RX || gate == G::RY || gate == G::RZ || gate == G::P;
 }
 
+constexpr auto is_one_control_one_target_transform_gate(mqis::Gate gate) -> bool
+{
+    using G = mqis::Gate;
+    return gate == G::CX || gate == G::CY || gate == G::CZ;
+}
+
 constexpr auto is_one_control_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
@@ -81,7 +89,9 @@ constexpr auto is_single_qubit_transform_gate(mqis::Gate gate) -> bool
 constexpr auto is_double_qubit_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
-    return is_one_control_one_target_one_angle_transform_gate(gate) || gate == G::CX || gate == G::CU;
+    return is_one_control_one_target_one_angle_transform_gate(gate) \
+        || is_one_control_one_target_transform_gate(gate) \
+        || gate == G::CU;
 }
 
 }  // namespace impl_mqis::gate_id
@@ -134,12 +144,14 @@ constexpr auto unpack_one_control_one_target_one_angle_gate(const mqis::GateInfo
     return {info.arg0, info.arg1, info.arg2};  // control_index, target_index, angle
 }
 
-constexpr auto create_cx_gate(std::size_t control_index, std::size_t target_index) -> mqis::GateInfo
+template <mqis::Gate GateKind>
+constexpr auto create_one_control_one_target_gate(std::size_t control_index, std::size_t target_index) -> mqis::GateInfo
 {
-    return {mqis::Gate::CX, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
+    static_assert(gate_id::is_one_control_one_target_transform_gate(GateKind));
+    return {GateKind, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
 }
 
-constexpr auto unpack_cx_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
+constexpr auto unpack_one_control_one_target_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};  // control_index, target_index
 }

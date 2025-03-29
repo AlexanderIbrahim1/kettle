@@ -59,7 +59,7 @@ TEST_CASE("read_tangelo_file()")
         SECTION("CX gate")
         {
             REQUIRE(actual[2].gate == mqis::Gate::CX);
-            const auto [control_qubit, target_qubit] = impl_mqis::unpack_cx_gate(actual[2]);
+            const auto [control_qubit, target_qubit] = impl_mqis::unpack_one_control_one_target_gate(actual[2]);
             REQUIRE(target_qubit == 4);
             REQUIRE(control_qubit == 2);
         }
@@ -86,9 +86,9 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(actual[1].gate == mqis::Gate::CX);
         REQUIRE(actual[2].gate == mqis::Gate::CX);
 
-        const auto [q_left_0, q_right_0] = impl_mqis::unpack_cx_gate(actual[0]);
-        const auto [q_left_1, q_right_1] = impl_mqis::unpack_cx_gate(actual[1]);
-        const auto [q_left_2, q_right_2] = impl_mqis::unpack_cx_gate(actual[2]);
+        const auto [q_left_0, q_right_0] = impl_mqis::unpack_one_control_one_target_gate(actual[0]);
+        const auto [q_left_1, q_right_1] = impl_mqis::unpack_one_control_one_target_gate(actual[1]);
+        const auto [q_left_2, q_right_2] = impl_mqis::unpack_one_control_one_target_gate(actual[2]);
 
         REQUIRE(q_left_0 == q_right_1);
         REQUIRE(q_right_1 == q_left_2);

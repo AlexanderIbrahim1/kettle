@@ -92,6 +92,12 @@ void simulate_double_qubit_gate(mqis::QuantumState& state, const mqis::GateInfo&
         if constexpr (GateType == Gate::CX) {
             apply_x_gate(state, state0_index, state1_index);
         }
+        else if constexpr (GateType == Gate::CY) {
+            apply_y_gate(state, state0_index, state1_index);
+        }
+        else if constexpr (GateType == Gate::CZ) {
+            apply_z_gate(state, state1_index);
+        }
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
@@ -198,6 +204,14 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::CX : {
                 impl_mqis::simulate_double_qubit_gate<Gate::CX>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::CY : {
+                impl_mqis::simulate_double_qubit_gate<Gate::CY>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::CZ : {
+                impl_mqis::simulate_double_qubit_gate<Gate::CZ>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::CRX : {

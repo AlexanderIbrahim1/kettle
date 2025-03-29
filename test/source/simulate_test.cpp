@@ -122,6 +122,12 @@ auto simulate_double_qubit_with_builtin(
         if (gate_id == "CX") {
             circuit.add_cx_gate(control_index, target_index);
         }
+        else if (gate_id == "CY") {
+            circuit.add_cy_gate(control_index, target_index);
+        }
+        else if (gate_id == "CZ") {
+            circuit.add_cz_gate(control_index, target_index);
+        }
         else if (gate_id == "CRX") {
             circuit.add_crx_gate(angle, control_index, target_index);
         }
@@ -945,6 +951,22 @@ TEST_CASE("simulate CU gate")
         {
             const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::x_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CX", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CY gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::y_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CY", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CZ gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::z_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CZ", 0.0, control_qubit, target_qubit}}, n_qubits);
 
             REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
         }

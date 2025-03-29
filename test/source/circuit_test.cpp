@@ -128,17 +128,17 @@ TEST_CASE("add multiple CX gates")
 
         REQUIRE(number_of_gates(circuit) == 3);
 
-        const auto cx_gate0 = impl_mqis::unpack_cx_gate(circuit[0]);
+        const auto cx_gate0 = impl_mqis::unpack_one_control_one_target_gate(circuit[0]);
         REQUIRE(std::get<0>(cx_gate0) == 0);
         REQUIRE(std::get<1>(cx_gate0) == 1);
         REQUIRE(circuit[0].gate == mqis::Gate::CX);
 
-        const auto cx_gate1 = impl_mqis::unpack_cx_gate(circuit[1]);
+        const auto cx_gate1 = impl_mqis::unpack_one_control_one_target_gate(circuit[1]);
         REQUIRE(std::get<0>(cx_gate1) == 1);
         REQUIRE(std::get<1>(cx_gate1) == 2);
         REQUIRE(circuit[1].gate == mqis::Gate::CX);
 
-        const auto cx_gate2 = impl_mqis::unpack_cx_gate(circuit[2]);
+        const auto cx_gate2 = impl_mqis::unpack_one_control_one_target_gate(circuit[2]);
         REQUIRE(std::get<0>(cx_gate2) == 2);
         REQUIRE(std::get<1>(cx_gate2) == 0);
         REQUIRE(circuit[2].gate == mqis::Gate::CX);

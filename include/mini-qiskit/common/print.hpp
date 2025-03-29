@@ -31,6 +31,7 @@ static constexpr auto DEFAULT_ANGLE = std::string   (DEFAULT_ANGLE_WIDTH  , ' ')
 
 }
 
+// TODO: replace this with a map; performance doesn't matter here that much
 auto gate_to_string_(mqis::Gate gate) -> std::string
 {
     using G = mqis::Gate;
@@ -63,6 +64,12 @@ auto gate_to_string_(mqis::Gate gate) -> std::string
         }
         case G::CX : {
             return "CX";
+        }
+        case G::CY : {
+            return "CY";
+        }
+        case G::CZ : {
+            return "CZ";
         }
         case G::CRX : {
             return "CRX";
@@ -136,6 +143,7 @@ auto left_padded_double_(double x, std::size_t precision = formatting::DEFAULT_A
     return std::string (padding, ' ') + number_as_string;
 }
 
+// TODO: replace A LOT of duplicated code once the primitive gates have all been chosen
 auto format_gate_control_target_angle_(const mqis::GateInfo& info)
     -> std::tuple<std::string, std::optional<std::size_t>>
 {
@@ -197,7 +205,19 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
             break;
         }
         case G::CX : {
-            const auto [temp_control, temp_target] = unpack_cx_gate(info);
+            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
+            control = left_padded_integer_(temp_control);
+            target = left_padded_integer_(temp_target);
+            break;
+        }
+        case G::CY : {
+            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
+            control = left_padded_integer_(temp_control);
+            target = left_padded_integer_(temp_target);
+            break;
+        }
+        case G::CZ : {
+            const auto [temp_control, temp_target] = unpack_one_control_one_target_gate(info);
             control = left_padded_integer_(temp_control);
             target = left_padded_integer_(temp_target);
             break;

@@ -109,6 +109,7 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
 namespace mqis
 {
 
+// TODO: replace A LOT of duplicated code once the primitive gates have all been implemented!
 template <impl_mqis::ContainerOfQubitIndices Container = std::initializer_list<std::size_t>>
 inline auto make_multiplicity_controlled_circuit(
     const mqis::QuantumCircuit& subcircuit,
@@ -177,11 +178,27 @@ inline auto make_multiplicity_controlled_circuit(
                 break;
             }
             case Gate::CX : {
-                const auto [original_control, original_target] = impl_mqis::unpack_cx_gate(gate_info);
+                const auto [original_control, original_target] = impl_mqis::unpack_one_control_one_target_gate(gate_info);
                 const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);
                 const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
                 const auto new_controls = impl_mqis::extend_container_to_vector(control_qubits, {new_control});
                 apply_multiplicity_controlled_u_gate(new_circuit, x_gate(), new_target, new_controls);
+                break;
+            }
+            case Gate::CY : {
+                const auto [original_control, original_target] = impl_mqis::unpack_one_control_one_target_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);
+                const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
+                const auto new_controls = impl_mqis::extend_container_to_vector(control_qubits, {new_control});
+                apply_multiplicity_controlled_u_gate(new_circuit, y_gate(), new_target, new_controls);
+                break;
+            }
+            case Gate::CZ : {
+                const auto [original_control, original_target] = impl_mqis::unpack_one_control_one_target_gate(gate_info);
+                const auto new_control = impl_mqis::get_container_index(mapped_qubits, original_control);
+                const auto new_target = impl_mqis::get_container_index(mapped_qubits, original_target);
+                const auto new_controls = impl_mqis::extend_container_to_vector(control_qubits, {new_control});
+                apply_multiplicity_controlled_u_gate(new_circuit, z_gate(), new_target, new_controls);
                 break;
             }
             case Gate::CRX : {

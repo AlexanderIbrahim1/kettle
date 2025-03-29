@@ -38,8 +38,8 @@ TEST_CASE("Test create and unpack gate functions")
     {
         const auto control_index = std::size_t {2};
         const auto target_index = std::size_t {3};
-        const auto gate_info = impl_mqis::create_cx_gate(control_index, target_index);
-        const auto [unpacked_control, unpacked_target] = impl_mqis::unpack_cx_gate(gate_info);
+        const auto gate_info = impl_mqis::create_one_control_one_target_gate<mqis::Gate::CX>(control_index, target_index);
+        const auto [unpacked_control, unpacked_target] = impl_mqis::unpack_one_control_one_target_gate(gate_info);
 
         REQUIRE(unpacked_control == control_index);
         REQUIRE(unpacked_target == target_index);

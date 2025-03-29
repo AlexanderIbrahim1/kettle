@@ -16,6 +16,7 @@
 namespace mqis
 {
 
+// TODO: use templates to replace a lot of duplicated code with these gate-creating member functions
 class QuantumCircuit
 {
 public:
@@ -111,7 +112,7 @@ public:
         check_qubit_range_(target_index, "target qubit", "CX");
         check_previous_gate_is_not_measure_(control_index, "CX");
         check_previous_gate_is_not_measure_(target_index, "CX");
-        gates_.emplace_back(impl_mqis::create_cx_gate(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CX>(control_index, target_index));
     }
 
     template <
@@ -124,15 +125,32 @@ public:
         }
     }
 
+    void add_cy_gate(std::size_t control_index, std::size_t target_index)
+    {
+        check_qubit_range_(control_index, "control qubit", "CY");
+        check_qubit_range_(target_index, "target qubit", "CY");
+        check_previous_gate_is_not_measure_(control_index, "CY");
+        check_previous_gate_is_not_measure_(target_index, "CY");
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CY>(control_index, target_index));
+    }
+
+    template <
+        impl_mqis::ContainerOfControlAndTargetQubitIndices Container =
+            std::initializer_list<std::pair<std::size_t, std::size_t>>>
+    void add_cy_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_cy_gate(pair.first, pair.second);
+        }
+    }
+
     void add_cz_gate(std::size_t control_index, std::size_t target_index)
     {
         check_qubit_range_(control_index, "control qubit", "CZ");
         check_qubit_range_(target_index, "target qubit", "CZ");
         check_previous_gate_is_not_measure_(control_index, "CZ");
         check_previous_gate_is_not_measure_(target_index, "CZ");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
-        gates_.emplace_back(impl_mqis::create_cx_gate(control_index, target_index));
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CZ>(control_index, target_index));
     }
 
     template <
