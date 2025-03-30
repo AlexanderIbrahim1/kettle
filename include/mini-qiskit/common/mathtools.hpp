@@ -76,7 +76,7 @@ inline auto qubit_string_to_state_index(const std::string& computational_state) 
     
         i_flat = i1 + i0 * size1
 */
-inline auto flat_index_to_grid_indices_2d(
+constexpr auto flat_index_to_grid_indices_2d(
     std::size_t i_flat,
     std::size_t size1
 ) -> std::tuple<std::size_t, std::size_t>
@@ -94,7 +94,7 @@ inline auto flat_index_to_grid_indices_2d(
     
         i_flat = i2 + i1 * size2 + i0 * size1 * size2
 */
-inline auto flat_index_to_grid_indices_3d(
+constexpr auto flat_index_to_grid_indices_3d(
     std::size_t i_flat,
     std::size_t size1,
     std::size_t size2

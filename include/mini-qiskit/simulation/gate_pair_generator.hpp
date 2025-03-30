@@ -19,6 +19,8 @@ namespace impl_mqis
     correct pairs of indices are being chosen.
 
     C++20 doesn't support generators :(
+
+    I don't need the full iterator protocol for these objects, so I don't bother with it.
 */
 class SingleQubitGatePairGenerator
 {
@@ -28,6 +30,11 @@ public:
         , i1_max_ {impl_mqis::pow_2_int(n_qubits - target_index - 1)}
     {}
 
+    constexpr void set_state(std::size_t i_state) noexcept
+    {
+        std::tie(i0_, i1_) = flat_index_to_grid_indices_2d(i_state, i1_max_);
+    }
+
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_;
@@ -35,19 +42,16 @@ public:
 
     constexpr auto next() noexcept -> std::tuple<std::size_t, std::size_t>
     {
-        const auto current_i0 = i0_;
-        const auto current_i1 = i1_;
+        // indices corresponding to the computational basis states where the [i1]^th digit
+        // are 0 and 1, respectively
+        const auto state0_index = i0_ + 2 * i1_ * i0_max_;
+        const auto state1_index = state0_index + i0_max_;
 
         ++i1_;
         if (i1_ == i1_max_) {
             ++i0_;
             i1_ = 0;
         }
-
-        // indices corresponding to the computational basis states where the [i1]^th digit
-        // are 0 and 1, respectively
-        const auto state0_index = current_i0 + 2 * current_i1 * i0_max_;
-        const auto state1_index = state0_index + i0_max_;
 
         return {state0_index, state1_index};
     }
@@ -87,6 +91,11 @@ public:
         , i2_max_ {impl_mqis::pow_2_int(n_qubits - upper_index_ - 1)}
     {}
 
+    constexpr void set_state(std::size_t i_state) noexcept
+    {
+        std::tie(i0_, i1_, i2_) = flat_index_to_grid_indices_3d(i_state, i1_max_, i2_max_);
+    }
+
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_ * i2_max_;
@@ -94,9 +103,8 @@ public:
 
     constexpr auto next() noexcept -> std::tuple<std::size_t, std::size_t>
     {
-        const auto current_i0 = i0_;
-        const auto current_i1 = i1_;
-        const auto current_i2 = i2_;
+        const auto state0_index = i0_ + i1_ * lower_shift_ + i2_ * upper_shift_ + control_shift_;
+        const auto state1_index = state0_index + target_shift_;
 
         ++i2_;
         if (i2_ == i2_max_) {
@@ -108,9 +116,6 @@ public:
                 i1_ = 0;
             }
         }
-
-        const auto state0_index = current_i0 + current_i1 * lower_shift_ + current_i2 * upper_shift_ + control_shift_;
-        const auto state1_index = state0_index + target_shift_;
 
         return {state0_index, state1_index};
     }
