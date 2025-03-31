@@ -269,9 +269,15 @@ inline void simulate_multithreaded_loop_(
     const FlatIndexPair& double_gate_pair
 )
 {
+    int count = 0;
     for (const auto& gate : circuit) {
+        ++count;
         simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
         sync_point.arrive_and_wait();
+
+        if (count == 500000) {
+            break;
+        }
     }
 }
 
@@ -300,6 +306,8 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
 /*
     WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
     I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
+
+    A quick benchmark shows that the threads spend a large amount of time waiting.
 */
 inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& state, std::size_t n_threads)
 {
