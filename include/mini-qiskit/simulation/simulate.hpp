@@ -1,7 +1,9 @@
 #pragma once
 
 // TODO: remove
+#include <format>
 #include <iostream>
+#include <mutex>
 
 #include <algorithm>
 #include <barrier>
@@ -78,6 +80,8 @@ void simulate_single_qubit_gate(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
+        std::cout << std::format("(state0_index, state1_index) = ({}, {})\n", state0_index, state1_index);
+
         if constexpr (GateType == Gate::H) {
             apply_h_gate(state, state0_index, state1_index);
         }
@@ -112,7 +116,7 @@ void simulate_single_qubit_gate(
     }
 }
 
-void simulate_single_qubit_gate_general(
+inline void simulate_single_qubit_gate_general(
     mqis::QuantumState& state,
     const mqis::GateInfo& info,
     std::size_t n_qubits,
@@ -181,7 +185,7 @@ void simulate_double_qubit_gate(
     }
 }
 
-void simulate_double_qubit_gate_general(
+inline void simulate_double_qubit_gate_general(
     mqis::QuantumState& state,
     const mqis::GateInfo& info,
     std::size_t n_qubits,
@@ -299,6 +303,40 @@ inline void check_valid_number_of_qubits_(const mqis::QuantumCircuit& circuit, c
     }
 }
 
+// I get a segault after the `arrive_and_wait()` call
+//   - commenting out the `simulate_loop_body_()` call still results in the segfault, so it
+//     is unrelated to the actual simulation
+template <typename Barrier>
+void simulate_loop_(
+    Barrier& sync_point,
+    const mqis::QuantumCircuit& circuit,
+    mqis::QuantumState& state,
+    const FlatIndexPair& single_gate_pair,
+    const FlatIndexPair& double_gate_pair,
+    std::mutex& cout_mutex,
+    int thread_id
+)
+{
+    {
+        const auto lock = std::lock_guard {cout_mutex};
+
+        std::cout << "single_gate_pair for thread " << thread_id << '\n';
+        std::cout << '(' << single_gate_pair.i_lower << ", " << single_gate_pair.i_upper << ")\n";
+        std::cout << "double_gate_pair for thread " << thread_id << '\n';
+        std::cout << '(' << double_gate_pair.i_lower << ", " << double_gate_pair.i_upper << ")\n";
+    }
+
+    int count = 0;
+    for (const auto& gate : circuit) {
+        std::cout << thread_id << " entering loop body: " << count << '\n';
+        simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+        std::cout << thread_id << " leaving loop body : " << count << '\n';
+        ++count;
+        sync_point.arrive_and_wait();
+        std::cout << thread_id << " after sync point  : " << count << '\n';
+    }
+}
+
 }  // namespace impl_mqis
 
 namespace mqis
@@ -340,27 +378,38 @@ inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& 
     const auto double_gate_splits = im::load_balanced_division(n_double_gates, n_threads);
     const auto double_flat_indices = im::partial_sums_from_zero(double_gate_splits);
 
+    for (std::size_t i {0}; i < n_threads + 1; ++i) {
+        std::cout << "single_flat_indices[" << i << "] = " << single_flat_indices[i] << '\n';
+    }
+
+    for (std::size_t i {0}; i < n_threads + 1; ++i) {
+        std::cout << "double_flat_indices[" << i << "] = " << double_flat_indices[i] << '\n';
+    }
+
     auto threads = std::vector<std::jthread> {};
     threads.reserve(n_threads);
 
     auto barrier = std::barrier {static_cast<std::ptrdiff_t>(n_threads)};
-
-    // there is a deadlock? I'm not sure why yet
-    const auto job = [&barrier, &circuit, &state](const FIP& single_gate_pair, const FIP& double_gate_pair) {
-//        int count = 0;
-        for (const auto& gate : circuit) {
-            simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
-//             std::cout << "count = " << count << '\n';
-//             ++count;
-            barrier.arrive_and_wait();
-        }
-    };
+    auto cout_mutex = std::mutex {};
 
     for (std::size_t i {0}; i < n_threads; ++i) {
-        const auto single_gate_pair = FIP {single_flat_indices[i], single_flat_indices[i + 1]};
-        const auto double_gate_pair = FIP {double_flat_indices[i], double_flat_indices[i + 1]};
+        const auto single_pair = FIP {single_flat_indices[i], single_flat_indices[i + 1]};
+        const auto double_pair = FIP {double_flat_indices[i], double_flat_indices[i + 1]};
 
-        threads.emplace_back(job, single_gate_pair, double_gate_pair);
+        threads.emplace_back(
+            im::simulate_loop_<decltype(barrier)>,
+            std::ref(barrier),
+            std::ref(circuit),
+            std::ref(state),
+            single_pair,
+            double_pair,
+            std::ref(cout_mutex),
+            i
+        );
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
     }
 }
 
