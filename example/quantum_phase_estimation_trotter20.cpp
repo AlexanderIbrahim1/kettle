@@ -72,7 +72,7 @@ auto main() -> int
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates
-    // auto statevector = mqis::QuantumState {13};
+    auto statevector = mqis::QuantumState {13};
 
     // auto unitary_eigenstatevector = []() {
     //     const auto filepath = SHAEER_FILEPATH / "trotter_ansatz.dat";
@@ -82,10 +82,10 @@ auto main() -> int
     // auto statevector = mqis::tensor_product(counting_statevector, unitary_eigenstatevector);
 
     // perform the simulation
-    // mqis::simulate(circuit, statevector);
+    mqis::simulate_multithreaded(circuit, statevector, 4);
 
     // mqis::save_statevector("trotter20_example_statevector.dat", statevector);
-    auto statevector = mqis::load_statevector("trotter20_example_statevector.dat");
+    // auto statevector = mqis::load_statevector("trotter20_example_statevector.dat");
 
     // std::cout << "F\n";
 

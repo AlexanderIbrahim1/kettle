@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: remove
+#include <iostream>
+
 #include <algorithm>
 #include <barrier>
 #include <stdexcept>
@@ -342,9 +345,13 @@ inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& 
 
     auto barrier = std::barrier {static_cast<std::ptrdiff_t>(n_threads)};
 
-    const auto job = [&](const FIP& single_gate_pair, const FIP& double_gate_pair) {
+    // there is a deadlock? I'm not sure why yet
+    const auto job = [&barrier, &circuit, &state](const FIP& single_gate_pair, const FIP& double_gate_pair) {
+//        int count = 0;
         for (const auto& gate : circuit) {
             simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+//             std::cout << "count = " << count << '\n';
+//             ++count;
             barrier.arrive_and_wait();
         }
     };
