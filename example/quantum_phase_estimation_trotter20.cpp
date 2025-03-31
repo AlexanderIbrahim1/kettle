@@ -82,7 +82,7 @@ auto main() -> int
     // auto statevector = mqis::tensor_product(counting_statevector, unitary_eigenstatevector);
 
     // perform the simulation
-    mqis::simulate_multithreaded(circuit, statevector, 4);
+    mqis::simulate(circuit, statevector);
 
     // mqis::save_statevector("trotter20_example_statevector.dat", statevector);
     // auto statevector = mqis::load_statevector("trotter20_example_statevector.dat");

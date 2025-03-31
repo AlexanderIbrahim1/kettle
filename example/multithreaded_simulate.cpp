@@ -4,6 +4,9 @@
 
 /*
     This file shows an example of performing a multithreaded simulation.
+
+    WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
+    I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
 */
 
 auto main() -> int
