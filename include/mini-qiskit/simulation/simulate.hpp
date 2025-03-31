@@ -149,13 +149,10 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
         throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
     }
 
-    auto measured_clbit_to_qubit = std::unordered_map<std::size_t, std::size_t> {};
-
     for (const auto& gate : circuit) {
         switch (gate.gate) {
-            case Gate::M : {
-                const auto [qubit_index, bit_index] = impl_mqis::unpack_m_gate(gate);
-                measured_clbit_to_qubit[bit_index] = qubit_index;
+            case Gate::H : {
+                impl_mqis::simulate_single_qubit_gate<Gate::H>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::X : {
@@ -168,10 +165,6 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::Z : {
                 impl_mqis::simulate_single_qubit_gate<Gate::Z>(state, gate, circuit.n_qubits());
-                break;
-            }
-            case Gate::H : {
-                impl_mqis::simulate_single_qubit_gate<Gate::H>(state, gate, circuit.n_qubits());
                 break;
             }
             case Gate::RX : {
@@ -188,18 +181,6 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
             }
             case Gate::P : {
                 impl_mqis::simulate_single_qubit_gate<Gate::P>(state, gate, circuit.n_qubits());
-                break;
-            }
-            case Gate::U : {
-                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
-                const auto& matrix = circuit.unitary_gate(matrix_index);
-                impl_mqis::simulate_single_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
-                break;
-            }
-            case Gate::CU : {
-                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
-                const auto& matrix = circuit.unitary_gate(matrix_index);
-                impl_mqis::simulate_double_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
                 break;
             }
             case Gate::CX : {
@@ -226,8 +207,23 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
                 impl_mqis::simulate_double_qubit_gate<Gate::CRZ>(state, gate, circuit.n_qubits());
                 break;
             }
-            case Gate::CP : {  // replace with default?
+            case Gate::CP : {
                 impl_mqis::simulate_double_qubit_gate<Gate::CP>(state, gate, circuit.n_qubits());
+                break;
+            }
+            case Gate::U : {
+                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
+                const auto& matrix = circuit.unitary_gate(matrix_index);
+                impl_mqis::simulate_single_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
+                break;
+            }
+            case Gate::CU : {
+                const auto matrix_index = impl_mqis::unpack_gate_matrix_index(gate);
+                const auto& matrix = circuit.unitary_gate(matrix_index);
+                impl_mqis::simulate_double_qubit_gate_general(state, gate, circuit.n_qubits(), matrix);
+                break;
+            }
+            case Gate::M : {
                 break;
             }
         }
