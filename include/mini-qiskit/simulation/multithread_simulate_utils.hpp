@@ -27,4 +27,17 @@ inline auto load_balanced_division(std::size_t numerator, std::size_t denominato
     return output;
 }
 
+inline auto partial_sums_from_zero(const std::vector<std::size_t>& values) -> std::vector<std::size_t>
+{
+    auto output = std::vector<std::size_t> {};
+    output.reserve(values.size() + 1);
+
+    output.push_back(0);
+    for (std::size_t i {0}; i < values.size(); ++i) {
+        output.push_back(output[i] + values[i]);
+    }
+
+    return output;
+}
+
 }  // namespace impl_mqis

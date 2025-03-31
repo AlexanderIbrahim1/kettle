@@ -36,3 +36,24 @@ TEST_CASE("load_balanced_division()")
         REQUIRE_THROWS_AS(impl_mqis::load_balanced_division(10, 0), std::runtime_error);
     }
 }
+
+TEST_CASE("partial_sums_from_zero()")
+{
+    using Indices = std::vector<std::size_t>;
+
+    struct TestCase
+    {
+        Indices values;
+        Indices expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase { {}, {0} },
+        TestCase { {1, 2, 3}, {0, 1, 3, 6} },
+        TestCase { {2, 2, 2, 2}, {0, 2, 4, 6, 8} }
+    );
+
+    const auto actual = impl_mqis::partial_sums_from_zero(testcase.values);
+
+    REQUIRE_THAT(actual, Catch::Matchers::Equals(testcase.expected));
+}
