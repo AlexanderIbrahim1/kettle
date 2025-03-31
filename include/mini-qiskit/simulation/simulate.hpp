@@ -1,14 +1,17 @@
 #pragma once
 
 #include <algorithm>
+#include <barrier>
 #include <stdexcept>
+#include <thread>
 #include <tuple>
-#include <unordered_map>
+#include <vector>
 
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
+#include "mini-qiskit/simulation/multithread_simulate_utils.hpp"
 #include "mini-qiskit/simulation/operations.hpp"
 #include "mini-qiskit/state.hpp"
 
@@ -282,15 +285,14 @@ inline void simulate_loop_body_(
     }
 }
 
-inline void simulate_between_(
-    const mqis::QuantumCircuit& circuit,
-    mqis::QuantumState& state,
-    const FlatIndexPair& single_gate_pair,
-    const FlatIndexPair& double_gate_pair
-)
+inline void check_valid_number_of_qubits_(const mqis::QuantumCircuit& circuit, const mqis::QuantumState& state)
 {
-    for (const auto& gate : circuit) {
-        simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+    if (circuit.n_qubits() != state.n_qubits()) {
+        throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
+    }
+
+    if (circuit.n_qubits() == 0) {
+        throw std::runtime_error {"Cannot simulate a circuit or state with zero qubits."};
     }
 }
 
@@ -301,21 +303,58 @@ namespace mqis
 
 inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
 {
-    if (circuit.n_qubits() != state.n_qubits()) {
-        throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
+    namespace im = impl_mqis;
+
+    im::check_valid_number_of_qubits_(circuit, state);
+
+    const auto n_single_gates = im::number_of_single_qubit_gate_pairs(circuit.n_qubits());
+    const auto n_double_gates = im::number_of_double_qubit_gate_pairs(circuit.n_qubits());
+
+    const auto single_gate_pair = im::FlatIndexPair {0, n_single_gates};
+    const auto double_gate_pair = im::FlatIndexPair {0, n_double_gates};
+
+    for (const auto& gate : circuit) {
+        simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+    }
+}
+
+inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& state, std::size_t n_threads)
+{
+    namespace im = impl_mqis;
+    using FIP = im::FlatIndexPair;
+
+    if (n_threads == 0) {
+        throw std::runtime_error {"Cannot perform simulation with 0 threads.\n"};
     }
 
-    if (circuit.n_qubits() == 0) {
-        throw std::runtime_error {"Cannot simulate a circuit or state with zero qubits."};
+    im::check_valid_number_of_qubits_(circuit, state);
+
+    const auto n_single_gates = im::number_of_single_qubit_gate_pairs(circuit.n_qubits());
+    const auto single_gate_splits = im::load_balanced_division(n_single_gates, n_threads);
+    const auto single_flat_indices = im::partial_sums_from_zero(single_gate_splits);
+
+    const auto n_double_gates = im::number_of_double_qubit_gate_pairs(circuit.n_qubits());
+    const auto double_gate_splits = im::load_balanced_division(n_double_gates, n_threads);
+    const auto double_flat_indices = im::partial_sums_from_zero(double_gate_splits);
+
+    auto threads = std::vector<std::jthread> {};
+    threads.reserve(n_threads);
+
+    auto barrier = std::barrier {static_cast<std::ptrdiff_t>(n_threads)};
+
+    const auto job = [&](const FIP& single_gate_pair, const FIP& double_gate_pair) {
+        for (const auto& gate : circuit) {
+            simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+            barrier.arrive_and_wait();
+        }
+    };
+
+    for (std::size_t i {0}; i < n_threads; ++i) {
+        const auto single_gate_pair = FIP {single_flat_indices[i], single_flat_indices[i + 1]};
+        const auto double_gate_pair = FIP {double_flat_indices[i], double_flat_indices[i + 1]};
+
+        threads.emplace_back(job, single_gate_pair, double_gate_pair);
     }
-
-    const auto n_single_gates = impl_mqis::number_of_single_qubit_gate_pairs(circuit.n_qubits());
-    const auto n_double_gates = impl_mqis::number_of_double_qubit_gate_pairs(circuit.n_qubits());
-
-    const auto single_gate_pair = impl_mqis::FlatIndexPair {0, n_single_gates};
-    const auto double_gate_pair = impl_mqis::FlatIndexPair {0, n_double_gates};
-
-    impl_mqis::simulate_between_(circuit, state, single_gate_pair, double_gate_pair);
 }
 
 }  // namespace mqis
