@@ -297,6 +297,10 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
     }
 }
 
+/*
+    WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
+    I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
+*/
 inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& state, std::size_t n_threads)
 {
     namespace im = impl_mqis;
