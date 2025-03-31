@@ -33,7 +33,6 @@ add_example(read_decomposition_file)
 add_example(quantum_phase_estimation_diagonal)
 add_example(quantum_phase_estimation_diagonal_binary)
 add_example(quantum_phase_estimation_trotter20)
-add_example(barrier-loop-example)
 add_example(multithreaded_simulate)
 
 add_folders(Example)

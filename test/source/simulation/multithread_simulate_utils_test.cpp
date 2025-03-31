@@ -26,14 +26,14 @@ TEST_CASE("load_balanced_division()")
             TestCase {32, 8, {4, 4, 4, 4, 4, 4, 4, 4}}
         );
 
-        const auto actual = impl_mqis::load_balanced_division(testcase.numerator, testcase.denominator);
+        const auto actual = impl_mqis::load_balanced_division_(testcase.numerator, testcase.denominator);
 
         REQUIRE_THAT(actual, Catch::Matchers::UnorderedEquals(actual));
     }
 
     SECTION("throws when denominator is 0")
     {
-        REQUIRE_THROWS_AS(impl_mqis::load_balanced_division(10, 0), std::runtime_error);
+        REQUIRE_THROWS_AS(impl_mqis::load_balanced_division_(10, 0), std::runtime_error);
     }
 }
 
@@ -53,7 +53,29 @@ TEST_CASE("partial_sums_from_zero()")
         TestCase { {2, 2, 2, 2}, {0, 2, 4, 6, 8} }
     );
 
-    const auto actual = impl_mqis::partial_sums_from_zero(testcase.values);
+    const auto actual = impl_mqis::partial_sums_from_zero_(testcase.values);
+
+    REQUIRE_THAT(actual, Catch::Matchers::Equals(testcase.expected));
+}
+
+TEST_CASE("partial_sum_pairs_()")
+{
+    struct TestCase
+    {
+        std::size_t n_gate_pairs;
+        std::size_t n_threads;
+        std::vector<impl_mqis::FlatIndexPair> expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase { 8, 1, {{0, 8}} },
+        TestCase { 8, 2, {{0, 4}, {4, 8}} },
+        TestCase { 16, 1, {{0, 16}} },
+        TestCase { 16, 2, {{0, 8}, {8, 16}} },
+        TestCase { 16, 4, {{0, 4}, {4, 8}, {8, 12}, {12, 16}} }
+    );
+
+    const auto actual = impl_mqis::partial_sum_pairs_(testcase.n_gate_pairs, testcase.n_threads);
 
     REQUIRE_THAT(actual, Catch::Matchers::Equals(testcase.expected));
 }
