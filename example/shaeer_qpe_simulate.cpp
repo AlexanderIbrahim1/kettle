@@ -65,7 +65,7 @@ auto main(int argc, char** argv) -> int
     }();
 
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
-    const auto circuit = mqis::read_tangelo_circuit(n_total_qubits, arguments.abs_gate_filepath, 2);
+    const auto circuit = mqis::read_tangelo_circuit(n_total_qubits, arguments.abs_gate_filepath, 0);
 
     auto statevector = mqis::QuantumState {n_total_qubits};
     mqis::simulate(circuit, statevector);
