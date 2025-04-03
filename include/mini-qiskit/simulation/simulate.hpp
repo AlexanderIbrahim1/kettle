@@ -1,8 +1,5 @@
 #pragma once
 
-// TODO: remove
-#include <iostream>
-
 #include <algorithm>
 #include <barrier>
 #include <stdexcept>
@@ -274,10 +271,6 @@ inline void simulate_multithreaded_loop_(
         ++count;
         simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
         sync_point.arrive_and_wait();
-
-        if (count == 500000) {
-            break;
-        }
     }
 }
 
