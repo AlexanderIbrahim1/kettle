@@ -36,5 +36,6 @@ add_example(quantum_phase_estimation_trotter20)
 add_example(multithreaded_simulate)
 add_example(shaeer_qpe_measure)
 add_example(shaeer_qpe_simulate)
+add_example(shaeer_qpe_simulate_minimal)
 
 add_folders(Example)
