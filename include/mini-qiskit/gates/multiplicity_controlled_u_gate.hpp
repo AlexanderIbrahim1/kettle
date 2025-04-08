@@ -9,31 +9,6 @@
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 
-/*
-PLAN
-- accept a 2x2 matrix, a target qubit, and a non-zero number of control qubits
-- can solve via recursion or iteration
-  - iteration is probably easier to reason through
-
-- cover base cases:
-  - if one control qubit is given, forward to add_cu_gate()
-
-- create stack frames
-  - holds the gate, the target index, and the control indices
-
-- push the input into a stack frame, and then put it on top of the stack
-
-- while the stack is not empty:
-  - pop a stack frame off the top of the stack
-  - check the number of control qubits
-    - if it is one:
-      - call `add_cu_gate()`
-    - else:
-      - create the five decomposed stack frames
-      - push them into the stack (in reverse order)
-  - go back to the top
-*/
-
 namespace impl_mqis
 {
 
