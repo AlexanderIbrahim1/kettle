@@ -8,7 +8,7 @@
 #include <mini-qiskit/mini-qiskit.hpp>
 #include <mini-qiskit/decomposed/read_tangelo_file.hpp>
 #include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/circuit_operations/build_decomposed_circuit.hpp>
+#include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
 #include <mini-qiskit/circuit.hpp>

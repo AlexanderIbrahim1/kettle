@@ -6,7 +6,7 @@
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/circuit_operations/build_decomposed_circuit.hpp"
+#include "mini-qiskit/decomposed/build_decomposed_circuit.hpp"
 #include "mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp"
 #include "mini-qiskit/decomposed/read_decomposition_file.hpp"
 
