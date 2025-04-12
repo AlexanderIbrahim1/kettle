@@ -12,6 +12,7 @@
 #include "mini-qiskit/calculations/probabilities.hpp"
 #include "mini-qiskit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/prng.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/state.hpp"
@@ -22,18 +23,6 @@
 
 namespace impl_mqis
 {
-
-inline auto get_prng_(std::optional<int> seed) -> std::mt19937
-{
-    if (seed) {
-        const auto seed_val = static_cast<std::mt19937::result_type>(seed.value());
-        return std::mt19937 {seed_val};
-    }
-    else {
-        auto device = std::random_device {};
-        return std::mt19937 {device()};
-    }
-}
 
 class ProbabilitySampler_
 {
