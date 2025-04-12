@@ -6,6 +6,8 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
+#include <mini-qiskit/circuit.hpp>
+#include <mini-qiskit/state.hpp>
 #include <mini-qiskit/simulation/measure.hpp>
 
 
