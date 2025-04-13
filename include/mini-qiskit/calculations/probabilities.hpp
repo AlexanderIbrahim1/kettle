@@ -144,7 +144,7 @@ constexpr auto calculate_probabilities_raw(const QuantumState& state, const Quan
     probabilities.reserve(n_states);
 
     for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-        const auto prob = impl_mqis::norm_squared(state[i_state]);
+        const auto prob = std::norm(state[i_state]);
         probabilities.push_back(prob);
     }
 
@@ -178,7 +178,7 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
     }
     else {
         for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-            const auto prob = impl_mqis::norm_squared(state[i_state]);
+            const auto prob = std::norm(state[i_state]);
             const auto bitstring = state_as_bitstring(i_state, n_qubits);
             probabilities[bitstring] = prob;
         }

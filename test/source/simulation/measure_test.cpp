@@ -43,7 +43,7 @@ void normalize(std::vector<std::complex<double>>& values)
 {
     auto norm_sq = double {0.0};
     for (auto value : values) {
-        norm_sq += impl_mqis::norm_squared(value);
+        norm_sq += std::norm(value);
     }
 
     const auto inv_norm = std::sqrt(1.0 / norm_sq);

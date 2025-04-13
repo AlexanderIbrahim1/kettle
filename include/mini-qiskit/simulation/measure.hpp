@@ -32,8 +32,8 @@ inline auto probabilities_of_collapsed_states_(
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
-        prob_of_0_states += norm_squared(state[state0_index]);
-        prob_of_1_states += norm_squared(state[state1_index]);
+        prob_of_0_states += std::norm(state[state0_index]);
+        prob_of_1_states += std::norm(state[state1_index]);
     }
 
     return {prob_of_0_states, prob_of_1_states};

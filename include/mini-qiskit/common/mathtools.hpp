@@ -15,16 +15,6 @@ constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-8};
 constexpr static auto ANGLE_ALMOST_EQ_TOLERANCE = double {1.0e-8};
 constexpr static auto MATRIX_2X2_SQRT_TOLERANCE = double {1.0e-6};
 
-constexpr auto norm_squared(double real, double imag) noexcept -> double
-{
-    return real * real + imag * imag;
-}
-
-constexpr auto norm_squared(const std::complex<double>& complex) noexcept -> double
-{
-    return complex.real() * complex.real() + complex.imag() * complex.imag();
-}
-
 constexpr auto pow_2_int(std::size_t exponent) noexcept -> std::size_t
 {
     return 1 << exponent;

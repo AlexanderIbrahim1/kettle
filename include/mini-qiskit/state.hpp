@@ -239,7 +239,7 @@ private:
     {
         auto sum_of_squared_norms = double {0.0};
         for (const auto& elem : coefficients_) {
-            sum_of_squared_norms += impl_mqis::norm_squared(elem);
+            sum_of_squared_norms += std::norm(elem);
         }
 
         const auto expected = 1.0;
