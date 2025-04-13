@@ -95,23 +95,25 @@ inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) ->
 }
 
 /*
+    TODO: remove this once I get simulations with mid-circuit measurements to work
+
     Check that each qubit is measured once and only once during the circuit.
 */
-inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
-{
-    auto measurement_flags = std::vector<std::uint64_t>(circuit.n_qubits(), 0);
-
-    for (const auto& gate : circuit) {
-        if (gate.gate == Gate::M) {
-            [[maybe_unused]] const auto [qubit_index, ignore] = impl_mqis::unpack_m_gate(gate);
-            measurement_flags[qubit_index] += 1;
-        }
-    }
-
-    const auto equals_one = [](std::uint64_t x) { return x == 1; };
-
-    return std::all_of(measurement_flags.begin(), measurement_flags.end(), equals_one);
-}
+// inline auto is_circuit_measurable(const QuantumCircuit& circuit) -> bool
+// {
+//     auto measurement_flags = std::vector<std::uint64_t>(circuit.n_qubits(), 0);
+// 
+//     for (const auto& gate : circuit) {
+//         if (gate.gate == Gate::M) {
+//             [[maybe_unused]] const auto [qubit_index, ignore] = impl_mqis::unpack_m_gate(gate);
+//             measurement_flags[qubit_index] += 1;
+//         }
+//     }
+// 
+//     const auto equals_one = [](std::uint64_t x) { return x == 1; };
+// 
+//     return std::all_of(measurement_flags.begin(), measurement_flags.end(), equals_one);
+// }
 
 /*
     Performs measurements of the QuantumState using its probabilities. The measurements
@@ -230,7 +232,7 @@ inline auto perform_measurements_as_counts_raw(
 inline auto perform_measurements_as_counts_marginal(
     const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
-    const std::vector<std::uint8_t>& measure_bitmask,
+    const std::vector<std::uint8_t>& marginal_bitmask,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::string, std::size_t>
 {
@@ -240,14 +242,16 @@ inline auto perform_measurements_as_counts_marginal(
     }
     const auto n_qubits = impl_mqis::log_2_int(probabilities_raw.size());
 
-    if (measure_bitmask.size() != n_qubits) {
+    if (marginal_bitmask.size() != n_qubits) {
         throw std::runtime_error {"The length of the marginal bitmask must match the number of qubits."};
     }
 
-    const auto bit_is_set = [](std::uint8_t bit) { return bit == 1; };
-    if (!std::any_of(measure_bitmask.begin(), measure_bitmask.end(), bit_is_set)) {
-        throw std::runtime_error {"No measurement gates have been added."};
-    }
+    // TODO: remove
+    // REASON: allow measurements with no marginals
+    // const auto bit_is_set = [](std::uint8_t bit) { return bit == 1; };
+    // if (!std::any_of(marginal_bitmask.begin(), marginal_bitmask.end(), bit_is_set)) {
+    //     throw std::runtime_error {"No measurement gates have been added."};
+    // }
 
     auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::unordered_map<std::string, std::size_t> {};
@@ -255,35 +259,60 @@ inline auto perform_measurements_as_counts_marginal(
     // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
         const auto state = sampler();
-        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(state, measure_bitmask);
+        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(state, marginal_bitmask);
         ++measurements[bitstring];
     }
 
     return measurements;
 }
 
-inline auto perform_measurements_as_counts_marginal(
-    const QuantumState& state,
-    std::size_t n_shots,
-    const std::vector<std::uint8_t>& measure_bitmask,
-    const QuantumNoise* noise = nullptr,
-    std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::string, std::size_t>
-{
-    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
-    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, measure_bitmask, seed);
-}
+// inline auto perform_measurements_as_counts_marginal(
+//     const QuantumState& state,
+//     std::size_t n_shots,
+//     const std::vector<std::uint8_t>& marginal_bitmask,
+//     const QuantumNoise* noise = nullptr,
+//     std::optional<int> seed = std::nullopt
+// ) -> std::unordered_map<std::string, std::size_t>
+// {
+//     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+//     return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_bitmask, seed);
+// }
 
 inline auto perform_measurements_as_counts_marginal(
-    const QuantumCircuit& circuit,
     const QuantumState& state,
     std::size_t n_shots,
+    const std::vector<std::size_t>& marginal_qubits = {},
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
 ) -> std::unordered_map<std::string, std::size_t>
 {
+    if (std::any_of(marginal_qubits.begin(), marginal_qubits.end(), [&](auto i) { return i >= state.n_qubits(); }))
+    {
+        throw std::runtime_error {"ERROR: marginal qubit index out of range."};
+    }
+
+    // TODO: go into the code where the marginalization is done, and change what the bits do
+    // it doesn't make sense that '1' means "don't do something", and '0' means "do something"
+    auto marginal_bitmask = std::vector<std::uint8_t>(state.n_qubits(), 1);
+    for (auto index : marginal_qubits) {
+        marginal_bitmask[index] = 0;
+    }
+
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
-    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, circuit.measure_bitmask(), seed);
+    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_bitmask, seed);
 }
+
+// TODO: remove
+// inline auto perform_measurements_as_counts_marginal(
+//     const QuantumCircuit& circuit,
+//     const QuantumState& state,
+//     std::size_t n_shots,
+//     const QuantumNoise* noise = nullptr,
+//     std::optional<int> seed = std::nullopt
+// ) -> std::unordered_map<std::string, std::size_t>
+// {
+//     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+//     return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, circuit.measure_bitmask(), seed);
+// }
 
 }  // namespace mqis

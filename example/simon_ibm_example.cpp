@@ -79,11 +79,11 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2});
     apply_simon_function(circuit, hidden_bitset);
     circuit.add_h_gate({0, 1, 2});
-    circuit.add_m_gate({0, 1, 2});
+    // circuit.add_m_gate({0, 1, 2});
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1024, {3, 4, 5});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

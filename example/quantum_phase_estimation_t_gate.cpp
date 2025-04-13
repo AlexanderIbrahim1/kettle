@@ -27,11 +27,11 @@ auto main() -> int
     circuit.add_x_gate(3);
     apply_multiplicity_controlled_t_gate_manually(circuit);
     mqis::apply_inverse_fourier_transform(circuit, {2, 1, 0});
-    circuit.add_m_gate({0, 1, 2});
+    // circuit.add_m_gate({0, 1, 2});
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1024, {3});
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

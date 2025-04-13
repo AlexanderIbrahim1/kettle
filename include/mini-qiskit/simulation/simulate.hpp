@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <barrier>
+#include <optional>
 #include <stdexcept>
 #include <thread>
 #include <tuple>
@@ -11,13 +12,16 @@
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
-#include "mini-qiskit/simulation/simulate_utils.hpp"
+#include "mini-qiskit/simulation/measure.hpp"
 #include "mini-qiskit/simulation/multithread_simulate_utils.hpp"
 #include "mini-qiskit/simulation/operations.hpp"
+#include "mini-qiskit/simulation/simulate_utils.hpp"
 #include "mini-qiskit/state.hpp"
 
 namespace impl_mqis
 {
+
+constexpr static auto MEASURING_THREAD_ID = int {0};
 
 template <mqis::Gate GateType>
 void simulate_single_qubit_gate_(
@@ -163,7 +167,9 @@ inline void simulate_loop_body_(
     mqis::QuantumState& state,
     const FlatIndexPair& single_gate_pair,
     const FlatIndexPair& double_gate_pair,
-    const mqis::GateInfo& gate
+    const mqis::GateInfo& gate,
+    int thread_id,
+    std::optional<int> prng_seed
 )
 {
     using G = mqis::Gate;
@@ -242,6 +248,12 @@ inline void simulate_loop_body_(
             break;
         }
         case G::M : {
+            // this operation is more complicated to make multithreaded because the threads have already been
+            // spawned before entering the simulation loop; thus, it is easier to just make the measurement
+            // a single-threaded operation
+            if (thread_id == MEASURING_THREAD_ID) {
+                simulate_measurement_(state, gate, circuit.n_qubits(), prng_seed);
+            }
             break;
         }
     }
@@ -263,13 +275,15 @@ inline void simulate_multithreaded_loop_(
     const mqis::QuantumCircuit& circuit,
     mqis::QuantumState& state,
     const FlatIndexPair& single_gate_pair,
-    const FlatIndexPair& double_gate_pair
+    const FlatIndexPair& double_gate_pair,
+    int thread_id,
+    std::optional<int> prng_seed
 )
 {
     int count = 0;
     for (const auto& gate : circuit) {
         ++count;
-        simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate);
+        simulate_loop_body_(circuit, state, single_gate_pair, double_gate_pair, gate, thread_id, prng_seed);
         sync_point.arrive_and_wait();
     }
 }
@@ -279,20 +293,24 @@ inline void simulate_multithreaded_loop_(
 namespace mqis
 {
 
-inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
+inline void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<int> prng_seed = std::nullopt)
 {
     namespace im = impl_mqis;
 
     im::check_valid_number_of_qubits_(circuit, state);
 
     const auto n_single_gate_pairs = im::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
-    const auto single_flat_index_pair = im::FlatIndexPair {0, n_single_gate_pairs};
+    const auto single_pair = im::FlatIndexPair {0, n_single_gate_pairs};
 
     const auto n_double_gate_pairs = im::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
-    const auto double_flat_index_pair = im::FlatIndexPair {0, n_double_gate_pairs};
+    const auto double_pair = im::FlatIndexPair {0, n_double_gate_pairs};
+
+    // the `simulate_loop_body_()` function is used by both the single-threaded and multi-threaded
+    // code, and certain operations are only done on the thread with thread id 0
+    const auto thread_id = impl_mqis::MEASURING_THREAD_ID;
 
     for (const auto& gate : circuit) {
-        simulate_loop_body_(circuit, state, single_flat_index_pair, double_flat_index_pair, gate);
+        simulate_loop_body_(circuit, state, single_pair, double_pair, gate, thread_id, prng_seed);
     }
 }
 
@@ -302,7 +320,12 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state)
 
     A quick benchmark shows that the threads spend a large amount of time waiting.
 */
-inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& state, std::size_t n_threads)
+inline void simulate_multithreaded(
+    const QuantumCircuit& circuit,
+    QuantumState& state,
+    std::size_t n_threads,
+    std::optional<int> prng_seed = std::nullopt
+)
 {
     namespace im = impl_mqis;
 
@@ -330,7 +353,9 @@ inline void simulate_multithreaded(const QuantumCircuit& circuit, QuantumState& 
             std::ref(circuit),
             std::ref(state),
             single_flat_index_pairs[i],
-            double_flat_index_pairs[i]
+            double_flat_index_pairs[i],
+            i,
+            prng_seed
         );
     }
 

@@ -57,7 +57,7 @@ auto main() -> int
     extend(circuit, SHAEER_FILEPATH / "trotter20_2.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_3.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_iqft_circuit.dat");
-    circuit.add_m_gate({9, 10, 11, 12});
+    // circuit.add_m_gate({9, 10, 11, 12});
 
     // // make the unitary operator circuit a controlled circuit
     // // - it will be controlled by 4 other qubits, in a binary controlled manner
@@ -90,7 +90,7 @@ auto main() -> int
     // std::cout << "F\n";
 
     // perform the measurements
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1ul << 12);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1ul << 12, {0, 1, 2, 3, 4, 5, 6, 7, 8});
 
     // output the results
     for (const auto& [bitstring, count]: counts) {

@@ -227,7 +227,7 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3, 4, 5});
     mqis::extend_circuit(circuit, subcircuit);
     mqis::apply_inverse_fourier_transform(circuit, {5, 4, 3, 2, 1, 0});
-    circuit.add_m_gate({0, 1, 2, 3, 4, 5});
+    // circuit.add_m_gate({0, 1, 2, 3, 4, 5});
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates
@@ -239,7 +239,7 @@ auto main() -> int
     mqis::simulate(circuit, statevector);
 
     // perform the measurements
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1024, {6, 7});
 
     // output the results
     for (const auto& [bitstring, count]: counts) {

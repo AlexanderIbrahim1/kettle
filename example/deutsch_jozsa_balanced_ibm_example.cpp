@@ -38,11 +38,11 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3});
     add_balanced_deutsch_jozsa_from_ibm_example(circuit);
     circuit.add_h_gate({0, 1, 2});
-    circuit.add_m_gate({0, 1, 2});
+    // circuit.add_m_gate({0, 1, 2});   // TODO: remove
 
     mqis::simulate(circuit, statevector);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1000);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {3});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

@@ -55,13 +55,13 @@ auto main() -> int
     circuit.add_h_gate(0);
     apply_query(circuit, query);
     circuit.add_h_gate(0);
-    circuit.add_m_gate(0);
+    // TODO: remove circuit.add_m_gate(0);
 
     // propagate the state through the circuit
     mqis::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts (probabilities are calculated within the function)
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1000);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {1});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

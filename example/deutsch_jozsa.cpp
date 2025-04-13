@@ -83,7 +83,7 @@ void add_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
 
 auto main() -> int
 {
-    const auto query = QueryCase::CONSTANT_1;
+    const auto query = QueryCase::BALANCED;
 
     auto statevector = mqis::QuantumState {"00001"};
 
@@ -91,11 +91,11 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3, 4});
     add_deutsch_jozsa_function(circuit, query);
     circuit.add_h_gate({0, 1, 2, 3});
-    circuit.add_m_gate({0, 1, 2, 3});
+    // circuit.add_m_gate({0, 1, 2, 3});   // TODO: remove
 
     mqis::simulate(circuit, statevector);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 10000);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 10000, {4});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

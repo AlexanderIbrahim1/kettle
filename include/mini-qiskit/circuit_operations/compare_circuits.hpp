@@ -98,9 +98,10 @@ auto almost_eq(
         return false;
     }
 
-    if (left.measure_bitmask() != right.measure_bitmask()) {
-        return false;
-    }
+    // TODO: remove
+//     if (left.measure_bitmask() != right.measure_bitmask()) {
+//         return false;
+//     }
 
     // don't bother checking the gates if there aren't the same number on both sides
     const auto n_left_gates  = static_cast<std::size_t>(std::distance(left.begin(), left.end()));
