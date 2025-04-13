@@ -57,7 +57,6 @@ auto main() -> int
     extend(circuit, SHAEER_FILEPATH / "trotter20_2.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_3.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_iqft_circuit.dat");
-    // circuit.add_m_gate({9, 10, 11, 12});
 
     // // make the unitary operator circuit a controlled circuit
     // // - it will be controlled by 4 other qubits, in a binary controlled manner
@@ -68,7 +67,6 @@ auto main() -> int
     // circuit.add_h_gate({0, 1, 2, 3});
     // mqis::extend_circuit(circuit, subcircuit);
     // mqis::apply_inverse_fourier_transform(circuit, {3, 2, 1, 0});
-    // circuit.add_m_gate({0, 1, 2, 3});
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates

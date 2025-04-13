@@ -78,7 +78,6 @@ auto main() -> int
     }
 
     mqis::apply_inverse_fourier_transform(circuit, {7, 6, 5, 4, 3, 2, 1, 0});
-    // circuit.add_m_gate({0, 1, 2, 3, 4, 5, 6, 7});
 
     auto state = mqis::QuantumState {n_counting_qubits + n_ancilla_qubits};
 

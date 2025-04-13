@@ -76,7 +76,6 @@ auto main(int argc, char** argv) -> int
     }();
 
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
-    // const auto measurement_qubits = get_measurement_qubits(arguments.n_ancilla_qubits, arguments.n_unitary_qubits);
 
     auto marginal_qubits = std::vector<std::size_t> {};
     for (std::size_t i {0}; i < arguments.n_ancilla_qubits; ++i) {
@@ -85,7 +84,6 @@ auto main(int argc, char** argv) -> int
 
     auto statevector = mqis::load_statevector(arguments.abs_statevector_filepath);
     auto circuit = mqis::QuantumCircuit {n_total_qubits};
-    // TODO: remove circuit.add_m_gate(measurement_qubits);
 
     mqis::simulate(circuit, statevector);
 

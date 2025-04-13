@@ -24,22 +24,6 @@ inline void check_matching_number_of_bits_(const mqis::QuantumCircuit& left, con
     }
 }
 
-// TODO: remove once I get mid-circuit measurements to work
-// inline auto is_operating_on_measured_qubit_(const mqis::GateInfo& info, const std::vector<std::uint8_t>& measure_bitmask) -> bool
-// {
-//     if (gate_id::is_single_qubit_transform_gate(info.gate) || info.gate == mqis::Gate::M) {
-//         const auto target_index = unpack_single_qubit_gate_index(info);
-//         return measure_bitmask[target_index];
-//     }
-//     else if (gate_id::is_double_qubit_transform_gate(info.gate)) {
-//         const auto [control_index, target_index] = unpack_double_qubit_gate_indices(info);
-//         return measure_bitmask[control_index] || measure_bitmask[target_index];
-//     }
-//     else {
-//         throw std::runtime_error {"UNREACHABLE: development error; invalid qubit gate found"};
-//     }
-// }
-
 inline auto bitwise_or(const std::vector<std::uint8_t>& left, const std::vector<std::uint8_t>& right) -> std::vector<std::uint8_t>
 {
     if (left.size() != right.size()) {
@@ -73,14 +57,6 @@ inline void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
     left.gates_.reserve(n_new_gates);
 
     for (const auto& right_gate : right.gates_) {
-        // TODO: remove once I get mid-circuit measurements to work
-        // if (impl_mqis::is_operating_on_measured_qubit_(right_gate, left.measure_bitmask_)) {
-        //     throw std::runtime_error {
-        //         "No gate on the right QuantumCircuit instance can act on a qubit that has already \n"
-        //         "been measured on the left QuantumCircuit instance.\n"
-        //     };
-        // }
-
         // the matrix-using gates refer to the index of the held matrix; so all the matrix-using gates
         // need to have their indices updated to reflect the new indices
         if (right_gate.gate == Gate::U) {
@@ -97,10 +73,6 @@ inline void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
             left.gates_.push_back(right_gate);
         }
     }
-
-    // TODO: remove
-    // the previous loop has already checked that there are no repeated measurements
-    // left.measure_bitmask_ = impl_mqis::bitwise_or(left.measure_bitmask_, right.measure_bitmask_);
 
     // GateInfo vector can be extended trivially; none of the GateInfo gates themselves reference the indices
     const auto n_new_matrices = left.unitary_gates_.size() + right.unitary_gates_.size();

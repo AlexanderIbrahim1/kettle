@@ -84,7 +84,6 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3, 4, 5});
     mqis::extend_circuit(circuit, subcircuit);
     mqis::apply_inverse_fourier_transform(circuit, {5, 4, 3, 2, 1, 0});
-    // circuit.add_m_gate({0, 1, 2, 3, 4, 5});
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates

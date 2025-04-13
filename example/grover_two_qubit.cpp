@@ -30,9 +30,6 @@ auto main() -> int
     circuit.add_cz_gate(0, 1);
     circuit.add_h_gate({0, 1});
 
-    // add the measurements
-    // TODO: remove circuit.add_m_gate({0, 1});
-
     auto state = mqis::QuantumState {"00"};
     mqis::simulate(circuit, state);
 

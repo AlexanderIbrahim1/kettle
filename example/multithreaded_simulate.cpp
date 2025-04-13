@@ -15,7 +15,6 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3});
     circuit.add_cx_gate({{0, 1}, {0, 2}});
     circuit.add_x_gate({0, 1, 2, 3});
-    // circuit.add_m_gate({0, 1, 2, 3});
 
     auto statevector = mqis::QuantumState {"0000"};
 
