@@ -70,11 +70,9 @@ inline auto build_marginal_bitmask_(
         throw std::runtime_error {"ERROR: marginal qubit index out of range."};
     }
 
-    // TODO: go into the code where the marginalization is done, and change what the bits do
-    // it doesn't make sense that '1' means "don't do something", and '0' means "do something"
-    auto marginal_bitmask = std::vector<std::uint8_t>(n_qubits, 1);
+    auto marginal_bitmask = std::vector<std::uint8_t>(n_qubits, 0);
     for (auto index : marginal_qubits) {
-        marginal_bitmask[index] = 0;
+        marginal_bitmask[index] = 1;
     }
 
     return marginal_bitmask;

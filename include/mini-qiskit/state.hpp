@@ -73,7 +73,7 @@ inline auto state_as_bitstring_little_endian_marginal_(
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
     for (std::size_t i_bit {0}; i_bit < bits.size(); ++i_bit) {
-        if (!marginal_bitmask[i_bit]) {
+        if (marginal_bitmask[i_bit]) {
             bitstring.push_back(MARGINALIZED_QUBIT);
         }
         else if (bits[i_bit] == 0) {
