@@ -40,7 +40,7 @@ inline auto probabilities_of_collapsed_states_(
 }
 
 template <int StateToCollapse>
-inline void collapse_and_renormalize_(
+void collapse_and_renormalize_(
     mqis::QuantumState& state,
     const mqis::GateInfo& info,
     std::size_t n_qubits,
@@ -55,11 +55,11 @@ inline void collapse_and_renormalize_(
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if (StateToCollapse == 0) {
+        if constexpr (StateToCollapse == 0) {
             state[state0_index] = {0.0, 0.0};
             state[state1_index] *= norm_of_surviving_state;
         }
-        else if (StateToCollapse == 1) {
+        else if constexpr (StateToCollapse == 1) {
             state[state0_index] *= norm_of_surviving_state;
             state[state1_index] = {0.0, 0.0};
         }
@@ -76,7 +76,8 @@ inline void collapse_and_renormalize_(
     threads for the multithreaded implementation are spawned before entering the simulation
     loop.
 */
-inline void simulate_measurement_(
+template <DiscreteDistribution Distribution = std::discrete_distribution<int>>
+void simulate_measurement_(
     mqis::QuantumState& state,
     const mqis::GateInfo& info,
     std::size_t n_qubits,
@@ -86,13 +87,15 @@ inline void simulate_measurement_(
     const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info, n_qubits);
 
     auto prng = get_prng_(seed);
-    auto coin_flipper = std::discrete_distribution<int> {{prob_of_0_states, prob_of_1_states}};
+    auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
 
     if (coin_flipper(prng) == 0) {
-        collapse_and_renormalize_<1>(state, info, n_qubits, prob_of_0_states);
+        const auto norm = std::sqrt(1.0 / prob_of_0_states);
+        collapse_and_renormalize_<1>(state, info, n_qubits, norm);
     }
     else {
-        collapse_and_renormalize_<0>(state, info, n_qubits, prob_of_1_states);
+        const auto norm = std::sqrt(1.0 / prob_of_1_states);
+        collapse_and_renormalize_<0>(state, info, n_qubits, norm);
     }
 }
 
