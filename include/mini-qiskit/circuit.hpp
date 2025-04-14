@@ -383,6 +383,10 @@ private:
     std::size_t n_bits_;
     std::vector<GateInfo> gates_ {};
     std::vector<Matrix2X2> unitary_gates_ {};
+
+    // IDEA: instead of splitting all of this up, create a single ControlFlowObject that holds
+    // a single quantum circuit, a std::optional<> of another quantum circuit, and the control
+    // flow predicate; it will save a lot of bookkeeping;
     std::vector<std::unique_ptr<QuantumCircuit>> control_flow_circuits_ {};
     std::vector<std::function<int(const ClassicalRegister&)>> control_flow_predicates_ {};
 
