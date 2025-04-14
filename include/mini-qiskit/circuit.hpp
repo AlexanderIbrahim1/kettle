@@ -3,7 +3,9 @@
 #include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <iterator>
+#include <memory>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -13,6 +15,7 @@
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/classical_register.hpp"
 
 namespace mqis
 {
@@ -362,6 +365,16 @@ public:
         return unitary_gates_[matrix_index];
     }
 
+    auto control_flow_circuit(std::size_t index) const noexcept -> const std::unique_ptr<QuantumCircuit>&
+    {
+        return control_flow_circuits_[index];
+    }
+
+    auto control_flow_predicate(std::size_t index) const noexcept -> const std::function<int(const ClassicalRegister&)>
+    {
+        return control_flow_predicates_[index];
+    }
+
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
     friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
 
@@ -370,6 +383,8 @@ private:
     std::size_t n_bits_;
     std::vector<GateInfo> gates_ {};
     std::vector<Matrix2X2> unitary_gates_ {};
+    std::vector<std::unique_ptr<QuantumCircuit>> control_flow_circuits_ {};
+    std::vector<std::function<int(const ClassicalRegister&)>> control_flow_predicates_ {};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
     {
