@@ -77,19 +77,21 @@ void collapse_and_renormalize_(
     loop.
 */
 template <DiscreteDistribution Distribution = std::discrete_distribution<int>>
-void simulate_measurement_(
+auto simulate_measurement_(
     mqis::QuantumState& state,
     const mqis::GateInfo& info,
     std::size_t n_qubits,
     std::optional<int> seed = std::nullopt
-)
+) -> Distribution::result_type
 {
     const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info, n_qubits);
 
     auto prng = get_prng_(seed);
     auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
 
-    if (coin_flipper(prng) == 0) {
+    const auto collapsed_state = coin_flipper(prng);
+
+    if (collapsed_state == 0) {
         const auto norm = std::sqrt(1.0 / prob_of_0_states);
         collapse_and_renormalize_<1>(state, info, n_qubits, norm);
     }
@@ -97,6 +99,8 @@ void simulate_measurement_(
         const auto norm = std::sqrt(1.0 / prob_of_1_states);
         collapse_and_renormalize_<0>(state, info, n_qubits, norm);
     }
+
+    return collapsed_state;
 }
 
 }  // namespace impl_mqis

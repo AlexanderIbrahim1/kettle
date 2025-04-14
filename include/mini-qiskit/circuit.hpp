@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstdint>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -322,11 +323,15 @@ public:
         }
     }
 
+    /*
+        If no bit is provided to `add_m_gate()`, then the measured bit is assigned to the same
+        index as the qubit's index.
+    */
     void add_m_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "M");
-        // TODO: change the bit index later when it actually matters
-        gates_.emplace_back(impl_mqis::create_m_gate(target_index, 0));
+        check_bit_range_(target_index);
+        gates_.emplace_back(impl_mqis::create_m_gate(target_index, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -334,6 +339,21 @@ public:
     {
         for (auto index : indices) {
             add_m_gate(index);
+        }
+    }
+
+    void add_m_gate(std::size_t target_index, std::size_t bit_index)
+    {
+        check_qubit_range_(target_index, "qubit", "M");
+        check_bit_range_(bit_index);
+        gates_.emplace_back(impl_mqis::create_m_gate(target_index, bit_index));
+    }
+
+    template <impl_mqis::QubitAndBitIndices Container = impl_mqis::QubitAndBitIndicesIList>
+    void add_m_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_m_gate(pair.first, pair.second);
         }
     }
 

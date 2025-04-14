@@ -19,6 +19,8 @@ template <int Output>
 struct RiggedDiscreteDistribution
 {
 public:
+    using result_type = int;
+
     RiggedDiscreteDistribution([[maybe_unused]] std::initializer_list<double> ignore)
     {}
 
