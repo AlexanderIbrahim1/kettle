@@ -242,7 +242,7 @@ constexpr auto unpack_control_flow_kind(const mqis::GateInfo& info) -> std::size
 
 constexpr auto unpack_control_flow_index(const mqis::GateInfo& info) -> std::size_t
 {
-    return info.arg1;
+    return info.arg0;
 }
 
 constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> mqis::GateInfo
