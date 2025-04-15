@@ -1,8 +1,4 @@
-#include <complex>
-#include <cstddef>
 #include <functional>
-#include <random>
-#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_vector.hpp>
@@ -17,22 +13,38 @@
 
 TEST_CASE("add_if_statement()")
 {
-    // the 0th qubit is now guarenteed to be in state '1'
+    struct TestCase
+    {
+        std::function<void(mqis::QuantumCircuit&)> circuit_changer;
+        mqis::QuantumState expected;
+    };
+
+    auto testcase = GENERATE(
+        TestCase {
+            [](mqis::QuantumCircuit& circuit) {
+                circuit.add_x_gate(0);
+            },
+            mqis::QuantumState {"11"}
+        },
+        TestCase {
+            []([[maybe_unused]] mqis::QuantumCircuit& circuit) {},
+            mqis::QuantumState {"00"}
+        }
+    );
+
     auto circuit = mqis::QuantumCircuit {2};
-    circuit.add_x_gate(0);
+    testcase.circuit_changer(circuit);
     circuit.add_m_gate(0);
 
     // this statement might flip the 1st qubit from '0' to '1'
-    auto subcircuit = mqis::QuantumCircuit {2};
-    subcircuit.add_x_gate(1);
-
-    circuit.add_if_statement(0, subcircuit);
+    circuit.add_if_statement(0, [] {
+        auto subcircuit = mqis::QuantumCircuit {2};
+        subcircuit.add_x_gate(1);
+        return subcircuit;
+    }());
 
     auto statevector = mqis::QuantumState {"00"};
-
     mqis::simulate(circuit, statevector);
 
-    auto expected = mqis::QuantumState {"11"};
-
-    REQUIRE(mqis::almost_eq_with_print(statevector, expected));
+    REQUIRE(mqis::almost_eq_with_print(statevector, testcase.expected));
 }

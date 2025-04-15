@@ -15,7 +15,11 @@
 #include "mini-qiskit/common/prng.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state.hpp"
+
+// TODO: remove
+#include "mini-qiskit/common/print.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -227,6 +231,35 @@ inline auto perform_measurements_as_counts_marginal(
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_qubits, seed);
+}
+
+inline auto perform_measurements_as_counts_marginal(
+    const QuantumCircuit& circuit,
+    const QuantumState& original_state,
+    std::size_t n_shots,
+    const std::vector<std::size_t>& marginal_qubits = {},
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::string, std::size_t>
+{
+    const auto n_qubits = circuit.n_qubits();
+    const auto marginal_bitmask = impl_mqis::build_marginal_bitmask_(marginal_qubits, n_qubits);
+
+    auto measurements = std::unordered_map<std::string, std::size_t> {};
+
+    for (std::size_t i {0}; i < n_shots; ++i) {
+        auto state = original_state;
+        mqis::simulate(circuit, state);
+
+        const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+        auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
+
+        const auto i_state = sampler();
+        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(i_state, marginal_bitmask);
+        ++measurements[bitstring];
+    }
+
+    return measurements;
 }
 
 }  // namespace mqis

@@ -366,20 +366,12 @@ public:
 
         check_bit_range_(bit_index);
 
-        auto function = [bit_index](const ClassicalRegister& c_register) -> int {
-            if (!c_register.is_measured(bit_index)) {
-                auto err_msg = std::stringstream {};
-                err_msg << "There is no measured bit at classical register " << bit_index << '\n';
-                throw std::runtime_error {err_msg.str()};
-            }
-
-            return c_register.get(bit_index);
+        auto cfi = impl_mqis::ControlFlowInstruction {
+            impl_mqis::SingleBitControlFlowFunction {bit_index, impl_mqis::ControlBooleanKind::IF},
+            std::make_unique<QuantumCircuit>(std::move(circuit))
         };
 
-        control_flow_instructions_.emplace_back(
-            std::move(function),
-            std::make_unique<mqis::QuantumCircuit>(std::move(circuit))
-        );
+        control_flow_instructions_.push_back(std::move(cfi));
 
         const auto cfi_index = control_flow_instructions_.size() - 1;
 
@@ -404,7 +396,7 @@ private:
     std::size_t n_bits_;
     std::vector<GateInfo> gates_ {};
     std::vector<Matrix2X2> unitary_gates_ {};
-    std::vector<impl_mqis::ControlFlowInstruction> control_flow_instructions_;
+    std::vector<impl_mqis::ControlFlowInstruction> control_flow_instructions_ {};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
     {

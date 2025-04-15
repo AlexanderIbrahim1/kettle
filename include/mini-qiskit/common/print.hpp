@@ -50,7 +50,8 @@ static const auto GATE_TO_STRING = std::unordered_map<mqis::Gate, std::string> {
     {mqis::Gate::CP, "CP"},
     {mqis::Gate::U, "U"},
     {mqis::Gate::CU, "CU"},
-    {mqis::Gate::M, "M"}
+    {mqis::Gate::M, "M"},
+    {mqis::Gate::CONTROL, "CONTROL"}
 };
 
 auto left_padded_integer_(std::size_t x, std::size_t minimum_width = formatting::DEFAULT_INTEGER_WIDTH) -> std::string
@@ -149,6 +150,13 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
         [[maybe_unused]]
         const auto [temp_target, ignore] = unpack_m_gate(info);
         target = left_padded_integer_(temp_target);
+    }
+    // TODO: make this print statement more meaningful; it doesn't make sense right now
+    else if (info.gate == G::CONTROL) {
+        const auto cfi_index = control::unpack_control_flow_index(info);
+        const auto cfi_kind = control::unpack_control_flow_kind(info);
+        target = left_padded_integer_(cfi_index);
+        control= left_padded_integer_(cfi_kind);
     }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, invalid gate found when formatting gate print output.\n"};

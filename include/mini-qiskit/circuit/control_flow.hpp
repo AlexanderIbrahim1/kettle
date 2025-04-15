@@ -4,13 +4,11 @@
 #include <memory>
 
 #include "mini-qiskit/circuit/classical_register.hpp"
+#include "mini-qiskit/circuit/control_flow_function.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
-
 
 namespace mqis
 {
-
-using ControlFlowFunction = std::function<int(const ClassicalRegister&)>;
 
 class QuantumCircuit;
 
@@ -55,8 +53,11 @@ public:
     ControlFlowInstruction(const ControlFlowInstruction& other)
         : control_flow_function_ {other.control_flow_function_}
         , primary_circuit_ {std::make_unique<mqis::QuantumCircuit>(*other.primary_circuit_)}
-        , secondary_circuit_ {std::make_unique<mqis::QuantumCircuit>(*other.secondary_circuit_)}
-    {}
+    {
+        if (other.secondary_circuit_) {
+            secondary_circuit_ = std::make_unique<mqis::QuantumCircuit>(*other.secondary_circuit_);
+        }
+    }
 
     auto operator=(const ControlFlowInstruction& other) -> ControlFlowInstruction&
     {
@@ -64,7 +65,27 @@ public:
         {
             control_flow_function_ = other.control_flow_function_;
             primary_circuit_ = std::make_unique<mqis::QuantumCircuit>(*other.primary_circuit_);
-            secondary_circuit_ = std::make_unique<mqis::QuantumCircuit>(*other.secondary_circuit_);
+            if (other.secondary_circuit_) {
+                secondary_circuit_ = std::make_unique<mqis::QuantumCircuit>(*other.secondary_circuit_);
+            }
+        }
+
+        return *this;
+    }
+
+    ControlFlowInstruction(ControlFlowInstruction&& other)
+        : control_flow_function_ {std::move(other.control_flow_function_)}
+        , primary_circuit_ {std::move(other.primary_circuit_)}
+        , secondary_circuit_ {std::move(other.secondary_circuit_)}
+    {}
+
+    auto operator=(ControlFlowInstruction&& other) -> ControlFlowInstruction&
+    {
+        if (this != &other)
+        {
+            control_flow_function_ = std::move(other.control_flow_function_);
+            primary_circuit_ = std::move(other.primary_circuit_);
+            secondary_circuit_ = std::move(other.secondary_circuit_);
         }
 
         return *this;
@@ -72,8 +93,8 @@ public:
 
 private:
     mqis::ControlFlowFunction control_flow_function_;
-    std::unique_ptr<mqis::QuantumCircuit> primary_circuit_;
-    std::unique_ptr<mqis::QuantumCircuit> secondary_circuit_;
+    std::unique_ptr<mqis::QuantumCircuit> primary_circuit_ = nullptr;
+    std::unique_ptr<mqis::QuantumCircuit> secondary_circuit_ = nullptr;
 };
 
-}
+}  // namespace impl_mqis
