@@ -12,7 +12,7 @@
 
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/state.hpp"
 
 

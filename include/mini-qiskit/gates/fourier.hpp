@@ -3,7 +3,7 @@
 #include <iterator>
 #include <ranges>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/swap.hpp"

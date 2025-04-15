@@ -3,7 +3,7 @@
 #include <initializer_list>
 #include <iterator>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"

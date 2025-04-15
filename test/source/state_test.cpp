@@ -9,7 +9,7 @@
 
 #define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state.hpp"
 

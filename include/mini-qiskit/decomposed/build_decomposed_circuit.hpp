@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/circuit_operations/append_circuits.hpp"
 #include "mini-qiskit/circuit_operations/make_controlled_circuit.hpp"
 #include "mini-qiskit/decomposed/decomposed_gate.hpp"

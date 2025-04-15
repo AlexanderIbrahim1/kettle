@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "mini-qiskit/calculations/probabilities.hpp"
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/prng.hpp"
 #include "mini-qiskit/common/utils.hpp"
