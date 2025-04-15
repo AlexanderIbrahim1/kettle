@@ -15,7 +15,7 @@
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
-#include "mini-qiskit/circuit/classical_register.hpp"
+#include "mini-qiskit/circuit/control_flow.hpp"
 
 namespace mqis
 {
@@ -360,20 +360,41 @@ public:
         }
     }
 
+    void add_if_statement(std::size_t bit_index, QuantumCircuit circuit)
+    {
+        namespace ctrl = impl_mqis::control;
+
+        check_bit_range_(bit_index);
+
+        auto function = [&](const ClassicalRegister& c_register) -> int {
+            if (!c_register.is_measured(bit_index)) {
+                auto err_msg = std::stringstream {};
+                err_msg << "There is no measured bit at classical register " << bit_index << '\n';
+                throw std::runtime_error {err_msg.str()};
+            }
+
+            return c_register.get(bit_index);
+        };
+
+        control_flow_instructions_.emplace_back(
+            std::move(function),
+            std::make_unique<mqis::QuantumCircuit>(std::move(circuit))
+        );
+
+        const auto cfi_index = control_flow_instructions_.size() - 1;
+
+        gates_.emplace_back(ctrl::create_control_flow_gate(cfi_index, ctrl::IF_STMT));
+    }
+
     constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
     {
         return unitary_gates_[matrix_index];
     }
 
-    // auto control_flow_circuit(std::size_t index) const noexcept -> const std::unique_ptr<QuantumCircuit>&
-    // {
-    //     return control_flow_circuits_[index];
-    // }
-
-    // auto control_flow_predicate(std::size_t index) const noexcept -> const std::function<int(const ClassicalRegister&)>
-    // {
-    //     return control_flow_predicates_[index];
-    // }
+    auto control_flow_instruction(std::size_t index) const noexcept -> const impl_mqis::ControlFlowInstruction&
+    {
+        return control_flow_instructions_[index];
+    }
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
     friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
@@ -383,12 +404,7 @@ private:
     std::size_t n_bits_;
     std::vector<GateInfo> gates_ {};
     std::vector<Matrix2X2> unitary_gates_ {};
-
-    // IDEA: instead of splitting all of this up, create a single ControlFlowObject that holds
-    // a single quantum circuit, a std::optional<> of another quantum circuit, and the control
-    // flow predicate; it will save a lot of bookkeeping;
-    // std::vector<std::unique_ptr<QuantumCircuit>> control_flow_circuits_ {};
-    // std::vector<std::function<int(const ClassicalRegister&)>> control_flow_predicates_ {};
+    std::vector<impl_mqis::ControlFlowInstruction> control_flow_instructions_;
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
     {
