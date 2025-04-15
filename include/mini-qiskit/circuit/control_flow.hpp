@@ -77,20 +77,3 @@ private:
 };
 
 }
-
-// const auto control_kind = control::unpack_control_flow_kind(gate);
-
-// if (control_kind == control::IF_STMT) {
-//     const auto if_circ_index = control::unpack_if_gate(gate);
-//     const auto& if_circ = circuit.control_flow_circuit(if_circ_index);
-//     const auto& predicate = circuit.control_flow_predicate(if_circ_index);
-// }
-// else if (control_kind == control::IF_ELSE_STMT) {
-//     const auto [if_circ_index, else_circ_index] = control::unpack_if_else_gate(gate);
-// }
-// else if (control_kind == control::FOR_LOOP_STMT) {
-//     const auto circ_index = control::unpack_for_loop_gate(gate);
-// }
-// else if (control_kind == control::WHILE_LOOP_STMT) {
-//     const auto circ_index = control::unpack_while_loop_gate(gate);
-// }

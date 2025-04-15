@@ -28,9 +28,9 @@ public:
         return measured_bits_[qubit_index].value();
     }
 
-    constexpr void set(std::size_t qubit_index)
+    constexpr void set(std::size_t qubit_index, int value)
     {
-        measured_bits_[qubit_index] = qubit_index;
+        measured_bits_[qubit_index] = value;
     }
 
 private:

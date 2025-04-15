@@ -366,7 +366,7 @@ public:
 
         check_bit_range_(bit_index);
 
-        auto function = [&](const ClassicalRegister& c_register) -> int {
+        auto function = [bit_index](const ClassicalRegister& c_register) -> int {
             if (!c_register.is_measured(bit_index)) {
                 auto err_msg = std::stringstream {};
                 err_msg << "There is no measured bit at classical register " << bit_index << '\n';
