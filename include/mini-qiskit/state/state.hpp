@@ -24,7 +24,7 @@ namespace impl_mqis
 {
 
 template <mqis::QuantumStateEndian Endian>
-constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+constexpr auto state_index_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     const auto n_states = impl_mqis::pow_2_int(n_qubits);
     if (i_state >= n_states) {
@@ -71,7 +71,7 @@ inline auto state_as_bitstring_little_endian_marginal_(
 ) -> std::string
 {
     const auto n_qubits = marginal_bitmask.size();
-    const auto bits = state_as_dynamic_bitset_helper_<mqis::QuantumStateEndian::LITTLE>(i_state, n_qubits);
+    const auto bits = state_index_as_dynamic_bitset_helper_<mqis::QuantumStateEndian::LITTLE>(i_state, n_qubits);
 
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
@@ -277,13 +277,13 @@ private:
 constexpr auto state_as_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits)
     -> std::vector<std::uint8_t>
 {
-    return impl_mqis::state_as_dynamic_bitset_helper_<QuantumStateEndian::LITTLE>(i_state, n_qubits);
+    return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::LITTLE>(i_state, n_qubits);
 }
 
 constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits)
     -> std::vector<std::uint8_t>
 {
-    return impl_mqis::state_as_dynamic_bitset_helper_<QuantumStateEndian::BIG>(i_state, n_qubits);
+    return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::BIG>(i_state, n_qubits);
 }
 
 // the internal mapping in the quantum state is little endian, so this should be the default function
