@@ -81,6 +81,7 @@ add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.c
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
 add_test_target(TARGET measure_test SOURCES "source/simulation/measure_test.cpp")
 add_test_target(TARGET control_flow_test SOURCES "source/simulation/control_flow_test.cpp")
+add_test_target(TARGET arange_test SOURCES "source/common/arange_test.cpp")
 
 # ---- End-of-file commands ----
 
