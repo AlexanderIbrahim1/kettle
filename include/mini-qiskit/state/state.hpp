@@ -174,15 +174,8 @@ public:
             throw std::runtime_error {"Can only build QuantumState from string with all '0's and/or '1's"};
         }
 
-        const auto index = impl_mqis::qubit_string_to_state_index(computational_state);
-
-        if (input_endian == QuantumStateEndian::BIG) {
-            coefficients_[index] = {1.0, 0.0};
-        }
-        else {
-            const auto little_endian_index = impl_mqis::endian_flip(index, n_qubits_);
-            coefficients_[little_endian_index] = {1.0, 0.0};
-        }
+        const auto index = impl_mqis::qubit_string_to_state_index(computational_state, input_endian);
+        coefficients_[index] = {1.0, 0.0};
     }
 
     constexpr auto operator[](std::size_t index) const noexcept -> const std::complex<double>&
