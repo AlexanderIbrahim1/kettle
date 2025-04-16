@@ -97,6 +97,26 @@ public:
         return coefficients_[index];
     }
 
+    constexpr auto at(
+        const std::string& bitstring,
+        QuantumStateEndian endian = QuantumStateEndian::LITTLE
+    ) const -> const std::complex<double>&
+    {
+        const auto state_index = bitstring_to_state_index(bitstring, endian);
+        check_index_(state_index);
+        return coefficients_[state_index];
+    }
+
+    constexpr auto at(
+        const std::string& bitstring,
+        QuantumStateEndian endian = QuantumStateEndian::LITTLE
+    ) -> std::complex<double>&
+    {
+        const auto state_index = bitstring_to_state_index(bitstring, endian);
+        check_index_(state_index);
+        return coefficients_[state_index];
+    }
+
     constexpr auto n_states() const noexcept -> std::size_t
     {
         return n_states_;

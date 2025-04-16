@@ -9,6 +9,7 @@
 
 #define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
 
+#include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state/state.hpp"
@@ -750,3 +751,23 @@ TEST_CASE("tensor product")
     }
 }
 
+TEST_CASE("access amplitudes via bitstring")
+{
+    auto circuit = mqis::QuantumCircuit {3};
+
+    circuit.add_h_gate(0);  // |000> -> (1/sqrt(2)) [|000> + |100>]
+    circuit.add_x_gate(2);  //       -> (1/sqrt(2)) [|001> + |101>]
+    circuit.add_h_gate(1);  //       -> (1/2)       [|001> + |011> + |101> + |111>]
+
+    auto state = mqis::QuantumState {"000"};
+    mqis::simulate(circuit, state);
+
+    REQUIRE(mqis::almost_eq(state.at("000"), {0.0, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("100"), {0.0, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("010"), {0.0, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("110"), {0.0, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("001"), {0.5, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("101"), {0.5, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("011"), {0.5, 0.0}));
+    REQUIRE(mqis::almost_eq(state.at("111"), {0.5, 0.0}));
+}
