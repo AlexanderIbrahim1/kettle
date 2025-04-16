@@ -11,6 +11,7 @@
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
 #include "mini-qiskit/state/state.hpp"
+#include "mini-qiskit/state/qubit_state_conversion.hpp"
 
 /*
     This file contains code components to calculate the probabilities of each of
@@ -172,7 +173,7 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
         const auto probabilities_raw = calculate_probabilities_raw(state, noise);
 
         for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-            const auto bitstring = state_as_bitstring(i_state, n_qubits);
+            const auto bitstring = state_index_to_bitstring(i_state, n_qubits);
             probabilities[bitstring] = probabilities_raw[i_state];
         }
     }

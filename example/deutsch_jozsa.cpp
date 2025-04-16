@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <mini-qiskit/mini-qiskit.hpp>
+#include <mini-qiskit/state/qubit_state_conversion.hpp>
 #include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
 
 
@@ -73,7 +74,7 @@ void add_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
     const auto sampled_states = sampled_indices_of_half_of_all_states(data_qubits.size());
 
     for (auto i_state : sampled_states) {
-        const auto bitset = mqis::state_as_dynamic_bitset(i_state, data_qubits.size());
+        const auto bitset = mqis::state_index_to_dynamic_bitset(i_state, data_qubits.size(), mqis::QuantumStateEndian::LITTLE);
 
         add_x_gates_on_set_bits(circuit, bitset);
         mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), i_ancilla, data_qubits);

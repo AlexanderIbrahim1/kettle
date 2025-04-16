@@ -1,17 +1,20 @@
 #pragma once
 
+#include <algorithm>
 #include <bitset>
 #include <cstddef>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
+#include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/state/endian.hpp"
 
 namespace impl_mqis
 {
 
-constexpr auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
+constexpr auto endian_flip_(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
 {
     auto backward = std::size_t {0};
 
@@ -24,29 +27,45 @@ constexpr auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> st
     return backward;
 }
 
-inline auto bitstring_to_state_index(
-    const std::string& computational_state,
-    mqis::QuantumStateEndian input_endian
-) -> std::size_t
+inline auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
 {
-    constexpr auto n_bits = std::numeric_limits<std::size_t>::digits;
-    const auto bits = std::bitset<n_bits> {computational_state};
+    const auto is_bitstring_char = [](char bitchar) {
+        return bitchar == '0' || bitchar == '1' || bitchar == impl_mqis::MARGINALIZED_QUBIT;
+    };
 
-    const auto big_endian_index = static_cast<std::size_t>(bits.to_ullong());
+    return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);
+}
 
-    switch (input_endian)
-    {
-        case mqis::QuantumStateEndian::BIG : {
-            return big_endian_index;
-        }
-        case mqis::QuantumStateEndian::LITTLE : {
-            const auto n_qubits = computational_state.size();
-            const auto little_endian_index = endian_flip(big_endian_index, n_qubits);
-            return little_endian_index;
-        }
-        default : {
-            throw std::runtime_error {"UNREACHABLE: invalid QuantumStateEndian provided\n"};
-        }
+inline auto is_valid_nonmarginal_bitstring_(const std::string& bitstring) -> bool
+{
+    const auto is_nonmarginal_bitstring_char = [](char bitchar) {
+        return bitchar == '0' || bitchar == '1';
+    };
+
+    return std::all_of(bitstring.begin(), bitstring.end(), is_nonmarginal_bitstring_char);
+}
+
+inline void check_bitstring_is_valid_nonmarginal_(const std::string& bitstring)
+{
+    if (!is_valid_nonmarginal_bitstring_(bitstring)) {
+        auto err_msg = std::stringstream {};
+        err_msg << "Received a bitstring with inputs that aren't ";
+        err_msg << "'0' or '1': ";
+        err_msg << bitstring << '\n';
+
+        throw std::runtime_error {err_msg.str()};
+    }
+}
+
+inline void check_bitstring_is_valid_marginal_(const std::string& bitstring)
+{
+    if (!is_valid_marginal_bitstring_(bitstring)) {
+        auto err_msg = std::stringstream {};
+        err_msg << "Received a bitstring with inputs that aren't ";
+        err_msg << "'0', '1' or '" << impl_mqis::MARGINALIZED_QUBIT << "' : ";
+        err_msg << bitstring << '\n';
+
+        throw std::runtime_error {err_msg.str()};
     }
 }
 

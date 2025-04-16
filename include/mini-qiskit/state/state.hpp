@@ -19,51 +19,10 @@
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/state/bitstring_utils.hpp"
 #include "mini-qiskit/state/endian.hpp"
+#include "mini-qiskit/state/qubit_state_conversion.hpp"
 
 namespace impl_mqis
 {
-
-template <mqis::QuantumStateEndian Endian>
-constexpr auto state_index_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
-{
-    const auto n_states = impl_mqis::pow_2_int(n_qubits);
-    if (i_state >= n_states) {
-        throw std::runtime_error {"The index for the requested state exceeds the number of possible states."};
-    }
-
-    auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
-    for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
-        const auto bit_position = impl_mqis::pow_2_int(i_qubit);
-
-        if constexpr (Endian == mqis::QuantumStateEndian::LITTLE) {
-            dyn_bitset[i_qubit] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
-        }
-        else if constexpr (Endian == mqis::QuantumStateEndian::BIG) {
-            dyn_bitset[n_qubits - i_qubit - 1] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
-        }
-        else {
-            static_assert(always_false<void>::value, "UNREACHABLE: Invalid QuantumStateEndian provided\n");
-        }
-    }
-
-    return dyn_bitset;
-}
-
-inline auto dynamic_bitset_to_bitstring_(const std::vector<std::uint8_t>& bits) -> std::string
-{
-    auto bitstring = std::string {};
-    bitstring.reserve(bits.size());
-    for (auto bit : bits) {
-        if (bit == 0) {
-            bitstring.push_back('0');
-        }
-        else {
-            bitstring.push_back('1');
-        }
-    }
-
-    return bitstring;
-}
 
 inline auto state_as_bitstring_little_endian_marginal_(
     std::size_t i_state,
@@ -112,6 +71,19 @@ inline auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstrin
     }
 
     return true;
+}
+
+inline auto rstrip_marginal_bits(const std::string& marginal_bitstring) -> std::string
+{
+    if (!impl_mqis::are_all_marginal_bits_on_right_(marginal_bitstring)) {
+        auto err_msg = std::stringstream {};
+        err_msg << "The bitstring '" << marginal_bitstring << "' cannot be rstripped of its marginal bits\n";
+        throw std::runtime_error {err_msg.str()};
+    }
+
+    const auto it = std::find(marginal_bitstring.begin(), marginal_bitstring.end(), impl_mqis::MARGINALIZED_QUBIT);
+
+    return std::string {marginal_bitstring.begin(), it};
 }
 
 }  // namespace impl_mqis
@@ -169,12 +141,9 @@ public:
         , n_states_ {impl_mqis::pow_2_int(computational_state.size())}
         , coefficients_(n_states_, {0.0, 0.0})
     {
-        const auto is_binary = [](char c) { return c == '0' || c == '1'; };
-        if (!std::all_of(computational_state.begin(), computational_state.end(), is_binary)) {
-            throw std::runtime_error {"Can only build QuantumState from string with all '0's and/or '1's"};
-        }
+        impl_mqis::check_bitstring_is_all_binary_(computational_state);
 
-        const auto index = impl_mqis::bitstring_to_state_index(computational_state, input_endian);
+        const auto index = bitstring_to_state_index(computational_state, input_endian);
         coefficients_[index] = {1.0, 0.0};
     }
 
@@ -266,105 +235,13 @@ private:
     constexpr void perform_endian_flip_on_coefficients_() noexcept
     {
         for (std::size_t i {0}; i < n_states_; ++i) {
-            const auto i_flip = impl_mqis::endian_flip(i, n_qubits_);
+            const auto i_flip = impl_mqis::endian_flip_(i, n_qubits_);
             if (i < i_flip) {
                 std::swap(coefficients_[i], coefficients_[i_flip]);
             }
         }
     }
 };
-
-constexpr auto state_as_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits)
-    -> std::vector<std::uint8_t>
-{
-    return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::LITTLE>(i_state, n_qubits);
-}
-
-constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits)
-    -> std::vector<std::uint8_t>
-{
-    return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::BIG>(i_state, n_qubits);
-}
-
-// the internal mapping in the quantum state is little endian, so this should be the default function
-constexpr auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
-{
-    return state_as_dynamic_bitset_little_endian(i_state, n_qubits);
-}
-
-inline auto state_as_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
-{
-    const auto bits = state_as_dynamic_bitset_little_endian(i_state, n_qubits);
-    return impl_mqis::dynamic_bitset_to_bitstring_(bits);
-}
-
-inline auto state_as_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
-{
-    const auto bits = state_as_dynamic_bitset_big_endian(i_state, n_qubits);
-    return impl_mqis::dynamic_bitset_to_bitstring_(bits);
-}
-
-// the internal mapping in the quantum state is little endian, so this should be the default function
-inline auto state_as_bitstring(std::size_t i_state, std::size_t n_qubits) -> std::string
-{
-    return state_as_bitstring_little_endian(i_state, n_qubits);
-}
-
-inline auto rstrip_marginal_bits(const std::string& marginal_bitstring) -> std::string
-{
-    if (!impl_mqis::are_all_marginal_bits_on_right_(marginal_bitstring)) {
-        auto err_msg = std::stringstream {};
-        err_msg << "The bitstring '" << marginal_bitstring << "' cannot be rstripped of its marginal bits\n";
-        throw std::runtime_error {err_msg.str()};
-    }
-
-    const auto it = std::find(marginal_bitstring.begin(), marginal_bitstring.end(), impl_mqis::MARGINALIZED_QUBIT);
-
-    return std::string {marginal_bitstring.begin(), it};
-}
-
-inline auto is_valid_bitstring(const std::string& bitstring) -> bool
-{
-    const auto is_bitstring_char = [](char bitchar) {
-        return bitchar == '0' || bitchar == '1' || bitchar == impl_mqis::MARGINALIZED_QUBIT;
-    };
-
-    return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);
-}
-
-inline auto is_nonmarginal_bitstring(const std::string& bitstring) -> bool
-{
-    const auto is_nonmarginal_bitstring_char = [](char bitchar) {
-        return bitchar == '0' || bitchar == '1';
-    };
-
-    return std::all_of(bitstring.begin(), bitstring.end(), is_nonmarginal_bitstring_char);
-}
-
-inline auto bitstring_to_state_index_little_endian(const std::string& bitstring)
-{
-    if (!is_nonmarginal_bitstring(bitstring)) {
-        auto err_msg = std::stringstream {};
-        err_msg << "Can only convert valid non-marginal bitstrings into state indices\n";
-        err_msg << "Received invalid input: '" << bitstring << "'\n";
-
-        throw std::runtime_error {err_msg.str()};
-    }
-
-    auto output = std::size_t {0};
-    for (std::size_t i {0}; i < bitstring.size(); ++i) {
-        if (bitstring[i] == '1') {
-            output += (1ul << i);
-        }
-    }
-
-    return output;
-}
-
-inline auto bitstring_to_state_index(const std::string& bitstring)
-{
-    return bitstring_to_state_index_little_endian(bitstring);
-}
 
 constexpr auto almost_eq(
     const QuantumState& left,
@@ -399,5 +276,60 @@ inline auto tensor_product(const QuantumState& left, const QuantumState& right) 
 
     return QuantumState {std::move(new_coefficients)};
 }
+
+// constexpr auto state_as_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits)
+//     -> std::vector<std::uint8_t>
+// {
+//     return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::LITTLE>(i_state, n_qubits);
+// }
+// 
+// constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits)
+//     -> std::vector<std::uint8_t>
+// {
+//     return impl_mqis::state_index_as_dynamic_bitset_helper_<QuantumStateEndian::BIG>(i_state, n_qubits);
+// }
+// 
+// // the internal mapping in the quantum state is little endian, so this should be the default function
+// constexpr auto state_as_dynamic_bitset(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+// {
+//     return state_as_dynamic_bitset_little_endian(i_state, n_qubits);
+// }
+// 
+// inline auto state_as_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
+// {
+//     const auto bits = state_as_dynamic_bitset_little_endian(i_state, n_qubits);
+//     return impl_mqis::dynamic_bitset_to_bitstring_(bits);
+// }
+// 
+// inline auto state_as_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
+// {
+//     const auto bits = state_as_dynamic_bitset_big_endian(i_state, n_qubits);
+//     return impl_mqis::dynamic_bitset_to_bitstring_(bits);
+// }
+// 
+// // the internal mapping in the quantum state is little endian, so this should be the default function
+// inline auto state_as_bitstring(std::size_t i_state, std::size_t n_qubits) -> std::string
+// {
+//     return state_as_bitstring_little_endian(i_state, n_qubits);
+// }
+// 
+// inline auto bitstring_to_state_index_little_endian(const std::string& bitstring)
+// {
+//     impl_mqis::check_bitstring_is_all_binary_(bitstring);
+// 
+//     auto output = std::size_t {0};
+//     for (std::size_t i {0}; i < bitstring.size(); ++i) {
+//         if (bitstring[i] == '1') {
+//             output += (1ul << i);
+//         }
+//     }
+// 
+//     return output;
+// }
+// 
+// inline auto bitstring_to_state_index(const std::string& bitstring)
+// {
+//     return bitstring_to_state_index_little_endian(bitstring);
+// }
 
 }  // namespace mqis
