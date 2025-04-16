@@ -24,7 +24,7 @@ constexpr auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> st
     return backward;
 }
 
-inline auto qubit_string_to_state_index(
+inline auto bitstring_to_state_index(
     const std::string& computational_state,
     mqis::QuantumStateEndian input_endian
 ) -> std::size_t

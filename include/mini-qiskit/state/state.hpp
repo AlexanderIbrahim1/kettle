@@ -174,7 +174,7 @@ public:
             throw std::runtime_error {"Can only build QuantumState from string with all '0's and/or '1's"};
         }
 
-        const auto index = impl_mqis::qubit_string_to_state_index(computational_state, input_endian);
+        const auto index = impl_mqis::bitstring_to_state_index(computational_state, input_endian);
         coefficients_[index] = {1.0, 0.0};
     }
 
