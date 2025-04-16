@@ -29,4 +29,4 @@ inline auto qubit_string_to_state_index(const std::string& computational_state) 
     return static_cast<std::size_t>(bits.to_ullong());
 }
 
-}  // namespace mqis
+}  // namespace impl_mqis

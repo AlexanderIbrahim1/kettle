@@ -16,31 +16,33 @@
 #include <vector>
 
 #include "mini-qiskit/common/mathtools.hpp"
-#include "mini-qiskit/state/bitstring_utils.hpp"
 #include "mini-qiskit/common/utils.hpp"
+#include "mini-qiskit/state/bitstring_utils.hpp"
+#include "mini-qiskit/state/endian.hpp"
 
 namespace impl_mqis
 {
 
-template <bool LittleEndian>
+template <mqis::QuantumStateEndian Endian>
 constexpr auto state_as_dynamic_bitset_helper_(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     const auto n_states = impl_mqis::pow_2_int(n_qubits);
     if (i_state >= n_states) {
-        throw std::runtime_error {"The index for the requested state is greater than the number of possible states."};
+        throw std::runtime_error {"The index for the requested state exceeds the number of possible states."};
     }
 
     auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
     for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
         const auto bit_position = impl_mqis::pow_2_int(i_qubit);
 
-        // internally, the computational states are ordered in a little-endian manner
-        // - most people expect a big-endian representation
-        if constexpr (LittleEndian) {
+        if constexpr (Endian == mqis::QuantumStateEndian::LITTLE) {
             dyn_bitset[i_qubit] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
         }
-        else {
+        else if constexpr (Endian == mqis::QuantumStateEndian::BIG) {
             dyn_bitset[n_qubits - i_qubit - 1] = static_cast<std::uint8_t>((bit_position & i_state) != 0);
+        }
+        else {
+            static_assert(always_false<void>::value, "UNREACHABLE: Invalid QuantumStateEndian provided\n");
         }
     }
 
@@ -69,7 +71,7 @@ inline auto state_as_bitstring_little_endian_marginal_(
 ) -> std::string
 {
     const auto n_qubits = marginal_bitmask.size();
-    const auto bits = state_as_dynamic_bitset_helper_<true>(i_state, n_qubits);
+    const auto bits = state_as_dynamic_bitset_helper_<mqis::QuantumStateEndian::LITTLE>(i_state, n_qubits);
 
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
@@ -118,25 +120,21 @@ inline auto are_all_marginal_bits_on_right_(const std::string& marginal_bitstrin
 namespace mqis
 {
 
-enum class QuantumStateEndian
-{
-    LITTLE,
-    BIG
-};
-
 class QuantumState
 {
 public:
     /*
         The default constructor sets the initial state to the |0000...0> state; this means the entire
-        weight is on the 0th element.
+        weight is on the 0th element. The global phase factor is ignored.
+
+        The 0 state is the same in both the little and big endian representations, so it isn't needed
+        in this constructor.
     */
     explicit QuantumState(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , n_states_ {impl_mqis::pow_2_int(n_qubits)}
         , coefficients_(n_states_, {0.0, 0.0})
     {
-        // we can ignore the global phase factor, so the entire weight is on the real component
         check_at_least_one_qubit_();
         coefficients_[0] = {1, 0};
     }
@@ -145,7 +143,7 @@ public:
         std::vector<std::complex<double>> coefficients,
         QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
     )
-        : n_qubits_ {0}
+        : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
         , n_states_ {coefficients.size()}
         , coefficients_ {std::move(coefficients)}
     {
@@ -163,7 +161,10 @@ public:
         }
     }
 
-    QuantumState(const std::string& computational_state, QuantumStateEndian input_endian = QuantumStateEndian::LITTLE)
+    QuantumState(
+        const std::string& computational_state,
+        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+    )
         : n_qubits_ {computational_state.size()}
         , n_states_ {impl_mqis::pow_2_int(computational_state.size())}
         , coefficients_(n_states_, {0.0, 0.0})
@@ -283,13 +284,13 @@ private:
 constexpr auto state_as_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits)
     -> std::vector<std::uint8_t>
 {
-    return impl_mqis::state_as_dynamic_bitset_helper_<true>(i_state, n_qubits);
+    return impl_mqis::state_as_dynamic_bitset_helper_<QuantumStateEndian::LITTLE>(i_state, n_qubits);
 }
 
 constexpr auto state_as_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits)
     -> std::vector<std::uint8_t>
 {
-    return impl_mqis::state_as_dynamic_bitset_helper_<false>(i_state, n_qubits);
+    return impl_mqis::state_as_dynamic_bitset_helper_<QuantumStateEndian::BIG>(i_state, n_qubits);
 }
 
 // the internal mapping in the quantum state is little endian, so this should be the default function
