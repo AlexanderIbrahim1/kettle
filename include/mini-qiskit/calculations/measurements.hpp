@@ -17,9 +17,7 @@
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state/state.hpp"
-
-// TODO: remove
-#include "mini-qiskit/common/print.hpp"
+#include "mini-qiskit/state/marginal.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -211,10 +209,13 @@ inline auto perform_measurements_as_counts_marginal(
     auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::unordered_map<std::string, std::size_t> {};
 
+    // the internal layout of the quantum state is little endian, so the probabilities are as well
+    const auto endian = mqis::QuantumStateEndian::LITTLE;
+
     // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
-        const auto state = sampler();
-        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(state, marginal_bitmask);
+        const auto i_state = sampler();
+        const auto bitstring = impl_mqis::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
         ++measurements[bitstring];
     }
 
@@ -245,6 +246,9 @@ inline auto perform_measurements_as_counts_marginal(
     const auto n_qubits = circuit.n_qubits();
     const auto marginal_bitmask = impl_mqis::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
+    // the internal layout of the quantum state is little endian, so the probabilities are as well
+    const auto endian = mqis::QuantumStateEndian::LITTLE;
+
     auto measurements = std::unordered_map<std::string, std::size_t> {};
 
     for (std::size_t i {0}; i < n_shots; ++i) {
@@ -255,7 +259,7 @@ inline auto perform_measurements_as_counts_marginal(
         auto sampler = impl_mqis::ProbabilitySampler_ {probabilities_raw, seed};
 
         const auto i_state = sampler();
-        const auto bitstring = impl_mqis::state_as_bitstring_little_endian_marginal_(i_state, marginal_bitmask);
+        const auto bitstring = impl_mqis::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
         ++measurements[bitstring];
     }
 

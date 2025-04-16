@@ -209,8 +209,11 @@ auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_
 
 void print_state_(const mqis::QuantumState& state)
 {
+    // for the time being, fix this as being little-endian
+    const auto endian = mqis::QuantumStateEndian::LITTLE;
+
     for (std::size_t i {0}; i < state.n_states(); ++i) {
-        const auto bitstring = mqis::state_as_bitstring(i, state.n_qubits());
+        const auto bitstring = mqis::state_index_to_bitstring(i, state.n_qubits(), endian);
         std::cout << bitstring << " : (" << state[i].real() << ", " << state[i].imag() << ")\n";
     }
 }

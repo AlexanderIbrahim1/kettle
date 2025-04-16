@@ -13,6 +13,7 @@
 #include <mini-qiskit/circuit/circuit.hpp>
 #include <mini-qiskit/simulation/simulate.hpp>
 #include <mini-qiskit/state/state.hpp>
+#include <mini-qiskit/state/marginal.hpp>
 
 /*
     This example creates the same circuit as displayed in `quantum_phase_estimation_diagonal.cpp`,
@@ -245,7 +246,7 @@ auto main() -> int
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
-        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto state_index = mqis::bitstring_to_state_index_little_endian(rstripped_bitstring);
         const auto n_states = 1ul << 6;
         const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
 

@@ -6,6 +6,7 @@
 #include <mini-qiskit/mini-qiskit.hpp>
 #include <mini-qiskit/gates/swap.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
+#include <mini-qiskit/state/marginal.hpp>
 
 /*
 A basic implementation of Shor's algorithm, inspired by the code from:
@@ -89,7 +90,7 @@ auto main() -> int
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
-        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto state_index = mqis::bitstring_to_state_index_little_endian(rstripped_bitstring);
         const auto n_states = 1ul << n_counting_qubits;
         const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
 

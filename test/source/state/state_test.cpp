@@ -12,6 +12,7 @@
 #include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state/state.hpp"
+#include "mini-qiskit/state/marginal.hpp"
 
 TEST_CASE("QuantumState endian representation")
 {
@@ -313,21 +314,21 @@ TEST_CASE("state_as_dynamic_bitset")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
 
-            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("2 qubit")
         {
+            // clang-format off
             auto pair = GENERATE(
-                InputAndOutput {
-                    0, 2, {0, 0}
-            },
+                InputAndOutput {0, 2, {0, 0}},
                 InputAndOutput {1, 2, {1, 0}},
                 InputAndOutput {2, 2, {0, 1}},
                 InputAndOutput {3, 2, {1, 1}}
             );
+            // clang-format on
 
-            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("3 qubit")
@@ -345,7 +346,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {7, 3, {1, 1, 1}}
             );
 
-            REQUIRE(mqis::state_as_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
     }
 
@@ -355,7 +356,7 @@ TEST_CASE("state_as_dynamic_bitset")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
 
-            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("2 qubit")
@@ -369,7 +370,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {3, 2, {1, 1}}
             );
 
-            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("3 qubit")
@@ -387,7 +388,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {7, 3, {1, 1, 1}}
             );
 
-            REQUIRE(mqis::state_as_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
     }
 }
@@ -407,7 +408,7 @@ TEST_CASE("state_as_bitstring")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
 
-            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("2 qubit")
@@ -419,7 +420,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {3, 2, "11"}
             );
 
-            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("3 qubit")
@@ -435,7 +436,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {7, 3, "111"}
             );
 
-            REQUIRE(mqis::state_as_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
     }
 
@@ -445,7 +446,7 @@ TEST_CASE("state_as_bitstring")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
 
-            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("2 qubit")
@@ -457,7 +458,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {3, 2, "11"}
             );
 
-            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("3 qubit")
@@ -473,40 +474,70 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {7, 3, "111"}
             );
 
-            REQUIRE(mqis::state_as_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
     }
 }
 
-TEST_CASE("are_all_marginal_bits_on_right_")
+TEST_CASE("are_all_marginal_bits_on_side_")
 {
+    using MBS = impl_mqis::MarginalBitsSide;
+
     struct TestInfo
     {
         std::string input;
         bool expected;
     };
 
-    const auto info = GENERATE(
-        TestInfo {"", true},
-        TestInfo {"0", true},
-        TestInfo {"1", true},
-        TestInfo {"01", true},
-        TestInfo {"10", true},
-        TestInfo {"00x", true},
-        TestInfo {"10x", true},
-        TestInfo {"01x", true},
-        TestInfo {"01xx", true},
-        TestInfo {"010010xx", true},
-        TestInfo {"xx", true},
-        TestInfo {"xxxx", true},
-        TestInfo {"xx0x", false},
-        TestInfo {"x00x", false},
-        TestInfo {"xx1x", false},
-        TestInfo {"xx1", false},
-        TestInfo {"00x1", false}
-    );
+    SECTION("left side")
+    {
+        const auto info = GENERATE(
+            TestInfo {"", true},
+            TestInfo {"0", true},
+            TestInfo {"1", true},
+            TestInfo {"01", true},
+            TestInfo {"10", true},
+            TestInfo {"x00", true},
+            TestInfo {"x10", true},
+            TestInfo {"x01", true},
+            TestInfo {"xx01", true},
+            TestInfo {"xx010010", true},
+            TestInfo {"xx", true},
+            TestInfo {"xxxx", true},
+            TestInfo {"xx0x", false},
+            TestInfo {"x00x", false},
+            TestInfo {"xx1x", false},
+            TestInfo {"1xx", false},
+            TestInfo {"00x1", false}
+        );
 
-    REQUIRE(impl_mqis::are_all_marginal_bits_on_right_(info.input) == info.expected);
+        REQUIRE(impl_mqis::are_all_marginal_bits_on_side_<MBS::LEFT>(info.input) == info.expected);
+    }
+
+    SECTION("right side")
+    {
+        const auto info = GENERATE(
+            TestInfo {"", true},
+            TestInfo {"0", true},
+            TestInfo {"1", true},
+            TestInfo {"01", true},
+            TestInfo {"10", true},
+            TestInfo {"00x", true},
+            TestInfo {"10x", true},
+            TestInfo {"01x", true},
+            TestInfo {"01xx", true},
+            TestInfo {"010010xx", true},
+            TestInfo {"xx", true},
+            TestInfo {"xxxx", true},
+            TestInfo {"xx0x", false},
+            TestInfo {"x00x", false},
+            TestInfo {"xx1x", false},
+            TestInfo {"xx1", false},
+            TestInfo {"00x1", false}
+        );
+
+        REQUIRE(impl_mqis::are_all_marginal_bits_on_side_<MBS::RIGHT>(info.input) == info.expected);
+    }
 }
 
 TEST_CASE("rstrip_marginal_bits")
@@ -535,6 +566,32 @@ TEST_CASE("rstrip_marginal_bits")
     REQUIRE(mqis::rstrip_marginal_bits(info.input) == info.expected);
 }
 
+TEST_CASE("lstrip_marginal_bits")
+{
+    struct TestInfo
+    {
+        std::string input;
+        std::string expected;
+    };
+
+    const auto info = GENERATE(
+        TestInfo {"", ""},
+        TestInfo {"0", "0"},
+        TestInfo {"1", "1"},
+        TestInfo {"01", "01"},
+        TestInfo {"10", "10"},
+        TestInfo {"x00", "00"},
+        TestInfo {"x10", "10"},
+        TestInfo {"x01", "01"},
+        TestInfo {"xx01", "01"},
+        TestInfo {"xx010010", "010010"},
+        TestInfo {"xx", ""},
+        TestInfo {"xxxx", ""}
+    );
+
+    REQUIRE(mqis::lstrip_marginal_bits(info.input) == info.expected);
+}
+
 TEST_CASE("bitstring_to_state_index_little_endian")
 {
     struct TestInfo
@@ -558,7 +615,7 @@ TEST_CASE("bitstring_to_state_index_little_endian")
         TestInfo {"111", 7}
     );
 
-    REQUIRE(mqis::bitstring_to_state_index(info.input) == info.expected);
+    REQUIRE(mqis::bitstring_to_state_index_little_endian(info.input) == info.expected);
 }
 
 TEST_CASE("tensor product")
