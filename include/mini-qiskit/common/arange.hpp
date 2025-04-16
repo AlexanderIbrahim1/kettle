@@ -3,6 +3,7 @@
 #include <cmath>
 #include <concepts>
 #include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
 
@@ -21,18 +22,21 @@ enum class RightCompare
 };
 
 template <std::integral Integer, RightCompare Compare>
-auto arange_helper_(Integer left, Integer right, Integer step, Integer capacity) -> std::vector<Integer>
+auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capacity) -> std::vector<Integer>
 {
     auto output = std::vector<Integer> {};
     output.reserve(static_cast<std::size_t>(capacity));
 
+    const auto left_ = static_cast<std::int64_t>(left);
+    const auto right_ = static_cast<std::int64_t>(right);
+
     if constexpr (Compare == RightCompare::LESS_THAN) {
-        for (Integer i {left}; i < right; i += step) {
-            output.push_back(i);
+        for (std::int64_t i {left_}; i < right_; i += step) {
+            output.push_back(static_cast<Integer>(i));
         }
     } else {
-        for (Integer i {left}; i > right; i += step) {
-            output.push_back(i);
+        for (std::int64_t i {left_}; i > right_; i += step) {
+            output.push_back(static_cast<Integer>(i));
         }
     }
 
@@ -59,33 +63,8 @@ auto arange(Integer value) -> std::vector<Integer>
         return {};
     }
 
-    return impl_mqis::arange_helper_<Integer, RC::LESS_THAN>(Integer {0}, value, Integer {1}, value);
+    return impl_mqis::arange_helper_<Integer, RC::LESS_THAN>(Integer {0}, value, 1, value);
 }
-
-/*
-    Create a `std::vector` instance that holds integers {left, left + 1, ..., right - 2, right - 1}.
-
-    If `left >= right`, an empty vector is returned, like Python's `range` and numpy's `arange`.
-*/
-template <std::integral Integer = std::size_t>
-auto arange(Integer left, Integer right) -> std::vector<Integer>
-{
-    using RC = impl_mqis::RightCompare;
-
-    if (left >= right) {
-        return {};
-    }
-
-    return impl_mqis::arange_helper_<Integer, RC::LESS_THAN>(left, right, Integer {1}, right - left);
-}
-//     auto output = std::vector<Integer> {};
-//     output.reserve(right - left);
-// 
-//     for (Integer i {left}; i < right; ++i) {
-//         output.push_back(i);
-//     }
-// 
-//     return output;
 
 /*
     If `step >= 1`;
@@ -102,40 +81,56 @@ auto arange(Integer left, Integer right) -> std::vector<Integer>
     If `right >= left` and `step <= -1`, the empty vector is returned.
 */
 template <std::integral Integer = std::size_t>
-auto arange(Integer left, Integer right, Integer step) -> std::vector<Integer>
+auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<Integer>
 {
     using RC = impl_mqis::RightCompare;
 
-    if constexpr (std::is_signed_v<Integer>) {
-        if (step <= Integer{-1}) {
-            if (right >= left) {
-                return {};
-            } else {
-                const auto n_terms = Integer{1} + (left - right) / std::abs(step);
-                return impl_mqis::arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
-            }
-        }
+    if (step == 0) {
+        throw std::runtime_error {"The `step` value cannot be 0 in `arange()`"};
     }
 
-    if (step >= Integer{1}) {
+    const auto abs_step = static_cast<Integer>(std::abs(step));
+
+    if (step >= 1) {
         if (left >= right) {
             return {};
         } else {
-            const auto n_terms = Integer{1} + (left - right) / step;
+            const auto n_terms = Integer{1} + (right - left) / abs_step;
             return impl_mqis::arange_helper_<Integer, RC::LESS_THAN>(left, right, step, n_terms);
         }
-    } else {
-        throw std::runtime_error {"The `step` value cannot be 0 in `arange()`"};
+    }
+    else {
+        if (right >= left) {
+            return {};
+        } else {
+            const auto n_terms = Integer{1} + (left - right) / abs_step;
+            return impl_mqis::arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
+        }
     }
 }
 
-}  // namespace mqis
+/*
+    Create a `std::vector` instance that holds the reverse of `arange(value)`.
+*/
+template <std::integral Integer = std::size_t>
+auto revarange(Integer value) -> std::vector<Integer>
+{
+    auto output = arange(value);
+    std::reverse(output.begin(), output.end());
 
-// 
-//                 auto output = std::vector<Integer> {};
-//                 output.reserve(n_terms);
-//                 for (Integer i {left}; i > right; i += step) {
-//                     output.push_back(i);
-//                 }
-//                 
-//                 return output;
+    return output;
+}
+
+/*
+    Create a `std::vector` instance that holds the reverse of `arange(left, right, step)`.
+*/
+template <std::integral Integer = std::size_t>
+auto revarange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<Integer>
+{
+    auto output = arange(left, right, step);
+    std::reverse(output.begin(), output.end());
+
+    return output;
+}
+
+}  // namespace mqis
