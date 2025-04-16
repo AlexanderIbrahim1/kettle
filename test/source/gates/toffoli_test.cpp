@@ -7,7 +7,7 @@
 #include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/gates/toffoli.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 TEST_CASE("toffoli gate with 3 qubits")
 {

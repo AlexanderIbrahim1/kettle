@@ -12,7 +12,7 @@
 #include <mini-qiskit/gates/fourier.hpp>
 #include <mini-qiskit/circuit/circuit.hpp>
 #include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
+#include <mini-qiskit/state/state.hpp>
 
 /*
     This example creates the same circuit as displayed in `quantum_phase_estimation_diagonal.cpp`,

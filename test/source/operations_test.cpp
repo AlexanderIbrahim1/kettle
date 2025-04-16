@@ -4,7 +4,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/simulation/operations.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 constexpr static auto ABS_TOL = double {1.0e-6};
 

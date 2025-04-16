@@ -9,7 +9,7 @@
 #include "mini-qiskit/gates/multiplicity_controlled_u_gate.hpp"
 #include "mini-qiskit/gates/toffoli.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 template <typename CircuitFunction>
 auto create_state(CircuitFunction func, const std::string& init_bitstring, std::size_t n_qubits)

@@ -5,7 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <mini-qiskit/state.hpp>
+#include <mini-qiskit/state/state.hpp>
 #include <mini-qiskit/io/numpy_statevector.hpp>
 
 

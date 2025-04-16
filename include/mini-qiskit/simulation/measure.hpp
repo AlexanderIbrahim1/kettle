@@ -8,7 +8,7 @@
 #include "mini-qiskit/common/prng.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
 #include "mini-qiskit/simulation/simulate_utils.hpp"
 

@@ -12,7 +12,7 @@
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 /*
     Here are some commonly encountered trig function evaluations in the latter unit tests

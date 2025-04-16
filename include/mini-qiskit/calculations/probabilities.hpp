@@ -10,7 +10,7 @@
 
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 /*
     This file contains code components to calculate the probabilities of each of

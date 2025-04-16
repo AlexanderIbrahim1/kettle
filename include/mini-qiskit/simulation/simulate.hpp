@@ -17,7 +17,7 @@
 #include "mini-qiskit/simulation/multithread_simulate_utils.hpp"
 #include "mini-qiskit/simulation/operations.hpp"
 #include "mini-qiskit/simulation/simulate_utils.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 namespace impl_mqis
 {

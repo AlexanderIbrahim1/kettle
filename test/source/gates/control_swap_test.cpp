@@ -4,7 +4,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/gates/swap.hpp"
 

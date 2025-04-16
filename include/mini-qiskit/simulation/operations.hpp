@@ -5,7 +5,7 @@
 
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 /*
     This header file contains the common operations performed on two states in the

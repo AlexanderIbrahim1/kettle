@@ -16,7 +16,7 @@
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/primitive_gate.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 // TODO: remove
 #include "mini-qiskit/common/print.hpp"
