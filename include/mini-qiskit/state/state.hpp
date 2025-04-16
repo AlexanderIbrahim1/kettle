@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/state/bitstring_utils.hpp"
 #include "mini-qiskit/common/utils.hpp"
 
 namespace impl_mqis
