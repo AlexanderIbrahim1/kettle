@@ -15,13 +15,13 @@
 namespace impl_mqis
 {
 
-enum class RightCompare
+enum class RightCompare_
 {
     LESS_THAN,
     GREATER_THAN
 };
 
-template <std::integral Integer, RightCompare Compare>
+template <std::integral Integer, RightCompare_ Compare>
 auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capacity) -> std::vector<Integer>
 {
     auto output = std::vector<Integer> {};
@@ -30,7 +30,7 @@ auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capa
     const auto left_ = static_cast<std::int64_t>(left);
     const auto right_ = static_cast<std::int64_t>(right);
 
-    if constexpr (Compare == RightCompare::LESS_THAN) {
+    if constexpr (Compare == RightCompare_::LESS_THAN) {
         for (std::int64_t i {left_}; i < right_; i += step) {
             output.push_back(static_cast<Integer>(i));
         }
@@ -57,7 +57,7 @@ namespace mqis
 template <std::integral Integer = std::size_t>
 auto arange(Integer value) -> std::vector<Integer>
 {
-    using RC = impl_mqis::RightCompare;
+    using RC = impl_mqis::RightCompare_;
 
     if (value <= 0) {
         return {};
@@ -83,7 +83,7 @@ auto arange(Integer value) -> std::vector<Integer>
 template <std::integral Integer = std::size_t>
 auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<Integer>
 {
-    using RC = impl_mqis::RightCompare;
+    using RC = impl_mqis::RightCompare_;
 
     if (step == 0) {
         throw std::runtime_error {"The `step` value cannot be 0 in `arange()`"};
