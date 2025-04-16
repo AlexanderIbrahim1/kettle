@@ -27,7 +27,7 @@ constexpr auto endian_flip_(std::size_t value, std::size_t n_relevant_bits) -> s
     return backward;
 }
 
-inline auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
+constexpr auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
 {
     const auto is_bitstring_char = [](char bitchar) {
         return bitchar == '0' || bitchar == '1' || bitchar == impl_mqis::MARGINALIZED_QUBIT;
@@ -36,7 +36,7 @@ inline auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
     return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);
 }
 
-inline auto is_valid_nonmarginal_bitstring_(const std::string& bitstring) -> bool
+constexpr auto is_valid_nonmarginal_bitstring_(const std::string& bitstring) -> bool
 {
     const auto is_nonmarginal_bitstring_char = [](char bitchar) {
         return bitchar == '0' || bitchar == '1';
@@ -45,27 +45,17 @@ inline auto is_valid_nonmarginal_bitstring_(const std::string& bitstring) -> boo
     return std::all_of(bitstring.begin(), bitstring.end(), is_nonmarginal_bitstring_char);
 }
 
-inline void check_bitstring_is_valid_nonmarginal_(const std::string& bitstring)
+constexpr void check_bitstring_is_valid_nonmarginal_(const std::string& bitstring)
 {
     if (!is_valid_nonmarginal_bitstring_(bitstring)) {
-        auto err_msg = std::stringstream {};
-        err_msg << "Received a bitstring with inputs that aren't ";
-        err_msg << "'0' or '1': ";
-        err_msg << bitstring << '\n';
-
-        throw std::runtime_error {err_msg.str()};
+        throw std::runtime_error {"Received bitstring with inputs that aren't '0' or '1'\n"};
     }
 }
 
-inline void check_bitstring_is_valid_marginal_(const std::string& bitstring)
+constexpr void check_bitstring_is_valid_marginal_(const std::string& bitstring)
 {
     if (!is_valid_marginal_bitstring_(bitstring)) {
-        auto err_msg = std::stringstream {};
-        err_msg << "Received a bitstring with inputs that aren't ";
-        err_msg << "'0', '1' or '" << impl_mqis::MARGINALIZED_QUBIT << "' : ";
-        err_msg << bitstring << '\n';
-
-        throw std::runtime_error {err_msg.str()};
+        throw std::runtime_error {"Received bitstring with inputs that aren't '0', '1', or the marginal symbol.\n"};
     }
 }
 
