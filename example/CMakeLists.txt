@@ -35,5 +35,6 @@ add_example(quantum_phase_estimation_diagonal)
 add_example(quantum_phase_estimation_diagonal_binary)
 add_example(quantum_phase_estimation_trotter20)
 add_example(multithreaded_simulate)
+add_example(random_state)
 
 add_folders(Example)

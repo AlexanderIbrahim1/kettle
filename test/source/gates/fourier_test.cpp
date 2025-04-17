@@ -251,6 +251,8 @@ TEST_CASE("inverse QFT after forward QFT")
         mqis::apply_forward_fourier_transform(circuit, qubit_indices);
         mqis::apply_inverse_fourier_transform(circuit, qubit_indices);
 
+        mqis::simulate(circuit, state);
+
         REQUIRE(mqis::almost_eq(state, expected));
     }
 }

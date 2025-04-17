@@ -9,32 +9,10 @@
     prototypical example of quantum teleportation of a one-qubit state from Alice to Bob.
 */
 
-/*
-    Create an (almost completely random) one-qubit statevector.
-*/
-auto create_random_one_qubit_state() -> mqis::QuantumState
-{
-    auto device = std::random_device {};
-    auto prng = std::mt19937 {device()};
-    auto uniform = std::uniform_real_distribution<double> {-1.0, 1.0};
-
-    // this fixed '0.5' prevents the (admittedly incredibly rare) edge case where all
-    // the generated amplitudes evaluate to near 0.0, and we get an un-normalizable state
-    auto amplitude0 = std::complex<double> {0.5, uniform(prng)};
-    auto amplitude1 = std::complex<double> {uniform(prng), uniform(prng)};
-
-    const auto total_norm = std::sqrt(std::norm(amplitude0) + std::norm(amplitude1));
-
-    amplitude0 /= total_norm;
-    amplitude1 /= total_norm;
-
-    return mqis::QuantumState {{amplitude0, amplitude1}};
-}
-
 auto main() -> int
 {
     // Alice initally holds the state
-    const auto alice_qubit = create_random_one_qubit_state();
+    const auto alice_qubit = mqis::generate_random_state(1);
 
     // now we create the two resource qubits
     const auto resource_qubits = mqis::QuantumState {"00"};

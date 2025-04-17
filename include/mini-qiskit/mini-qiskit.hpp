@@ -29,4 +29,5 @@
 #include <mini-qiskit/state/endian.hpp>
 #include <mini-qiskit/state/marginal.hpp>
 #include <mini-qiskit/state/qubit_state_conversion.hpp>
+#include <mini-qiskit/state/random.hpp>
 #include <mini-qiskit/state/state.hpp>
