@@ -60,8 +60,7 @@ auto main() -> int
     // propagate the state through the circuit
     mqis::simulate(circuit, statevector);
 
-    // get a map of the bitstrings to the counts (probabilities are calculated within the function)
-    // the qubit at index `1` (right qubit) is being marginalized
+    // get a map of the bitstrings to the counts; the ancilla qubit (at index `1`) is being marginalized
     const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {1});
 
     for (const auto& [bitstring, count] : counts) {
