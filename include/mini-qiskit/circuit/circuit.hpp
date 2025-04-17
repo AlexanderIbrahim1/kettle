@@ -3,7 +3,10 @@
 #include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <iterator>
+#include <memory>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -11,7 +14,8 @@
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
+#include "mini-qiskit/circuit/control_flow.hpp"
 
 namespace mqis
 {
@@ -20,19 +24,14 @@ namespace mqis
 class QuantumCircuit
 {
 public:
-    static constexpr auto MEASURED_FLAG = std::uint8_t {1};
-    static constexpr auto UNMEASURED_FLAG = std::uint8_t {0};
-
     explicit constexpr QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_bits}
-        , measure_bitmask_(n_qubits, UNMEASURED_FLAG)
     {}
 
     explicit constexpr QuantumCircuit(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_qubits}
-        , measure_bitmask_(n_qubits, UNMEASURED_FLAG)
     {}
 
     constexpr auto n_qubits() const noexcept -> std::size_t
@@ -63,7 +62,6 @@ public:
     void add_h_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "H");
-        check_previous_gate_is_not_measure_(target_index, "H");
         gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
     }
 
@@ -78,7 +76,6 @@ public:
     void add_x_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "X");
-        check_previous_gate_is_not_measure_(target_index, "X");
         gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::X>(target_index));
     }
 
@@ -93,7 +90,6 @@ public:
     void add_z_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Z");
-        check_previous_gate_is_not_measure_(target_index, "Z");
         gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Z>(target_index));
     }
 
@@ -108,7 +104,6 @@ public:
     void add_y_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Y");
-        check_previous_gate_is_not_measure_(target_index, "Y");
         gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Y>(target_index));
     }
 
@@ -123,7 +118,6 @@ public:
     void add_rx_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RX");
-        check_previous_gate_is_not_measure_(target_index, "RX");
         gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RX>(angle, target_index));
     }
 
@@ -138,7 +132,6 @@ public:
     void add_ry_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RY");
-        check_previous_gate_is_not_measure_(target_index, "RY");
         gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RY>(angle, target_index));
     }
 
@@ -153,7 +146,6 @@ public:
     void add_rz_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RZ");
-        check_previous_gate_is_not_measure_(target_index, "RZ");
         gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RZ>(angle, target_index));
     }
 
@@ -168,7 +160,6 @@ public:
     void add_p_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "P");
-        check_previous_gate_is_not_measure_(target_index, "P");
         gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::P>(angle, target_index));
     }
 
@@ -184,8 +175,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CX");
         check_qubit_range_(target_index, "target qubit", "CX");
-        check_previous_gate_is_not_measure_(control_index, "CX");
-        check_previous_gate_is_not_measure_(target_index, "CX");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CX>(control_index, target_index));
     }
 
@@ -201,8 +190,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CY");
         check_qubit_range_(target_index, "target qubit", "CY");
-        check_previous_gate_is_not_measure_(control_index, "CY");
-        check_previous_gate_is_not_measure_(target_index, "CY");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CY>(control_index, target_index));
     }
 
@@ -218,8 +205,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CZ");
         check_qubit_range_(target_index, "target qubit", "CZ");
-        check_previous_gate_is_not_measure_(control_index, "CZ");
-        check_previous_gate_is_not_measure_(target_index, "CZ");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CZ>(control_index, target_index));
     }
 
@@ -235,8 +220,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRX");
         check_qubit_range_(target_index, "target qubit", "CRX");
-        check_previous_gate_is_not_measure_(control_index, "CRX");
-        check_previous_gate_is_not_measure_(target_index, "CRX");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRX>(control_index, target_index, angle));
     }
 
@@ -252,8 +235,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRY");
         check_qubit_range_(target_index, "target qubit", "CRY");
-        check_previous_gate_is_not_measure_(control_index, "CRY");
-        check_previous_gate_is_not_measure_(target_index, "CRY");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRY>(control_index, target_index, angle));
     }
 
@@ -269,8 +250,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRZ");
         check_qubit_range_(target_index, "target qubit", "CRZ");
-        check_previous_gate_is_not_measure_(control_index, "CRZ");
-        check_previous_gate_is_not_measure_(target_index, "CRZ");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRZ>(control_index, target_index, angle));
     }
 
@@ -286,8 +265,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CP");
         check_qubit_range_(target_index, "target qubit", "CP");
-        check_previous_gate_is_not_measure_(control_index, "CP");
-        check_previous_gate_is_not_measure_(target_index, "CP");
         gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CP>(control_index, target_index, angle));
     }
 
@@ -302,7 +279,6 @@ public:
     void add_u_gate(const Matrix2X2& gate, std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "U");
-        check_previous_gate_is_not_measure_(target_index, "U");
 
         unitary_gates_.push_back(gate);
         const auto gate_index = unitary_gates_.size() - 1;
@@ -318,8 +294,6 @@ public:
 
         for (auto target_index : indices) {
             check_qubit_range_(target_index, "qubit", "U");
-            check_previous_gate_is_not_measure_(target_index, "U");
-
             gates_.emplace_back(impl_mqis::create_u_gate(target_index, gate_index));
         }
     }
@@ -328,8 +302,6 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CU");
         check_qubit_range_(target_index, "target qubit", "CU");
-        check_previous_gate_is_not_measure_(control_index, "CU");
-        check_previous_gate_is_not_measure_(target_index, "CU");
 
         unitary_gates_.push_back(gate);
         const auto gate_index = unitary_gates_.size() - 1;
@@ -349,27 +321,20 @@ public:
 
             check_qubit_range_(control_index, "control qubit", "CU");
             check_qubit_range_(target_index, "target qubit", "CU");
-            check_previous_gate_is_not_measure_(control_index, "CU");
-            check_previous_gate_is_not_measure_(target_index, "CU");
 
             gates_.emplace_back(impl_mqis::create_cu_gate(control_index, target_index, gate_index));
         }
     }
 
+    /*
+        If no bit is provided to `add_m_gate()`, then the measured bit is assigned to the same
+        index as the qubit's index.
+    */
     void add_m_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "M");
-
-        if (measure_bitmask_[target_index] == MEASURED_FLAG) {
-            throw std::runtime_error {""};
-        }
-
-        // MicroQiskit only allows measurements where the bit index and qubit index are
-        // the same, and I'll be following the same convention
-        const auto bit_index = target_index;
-
-        gates_.emplace_back(impl_mqis::create_m_gate(target_index, bit_index));
-        measure_bitmask_[target_index] = MEASURED_FLAG;
+        check_bit_range_(target_index);
+        gates_.emplace_back(impl_mqis::create_m_gate(target_index, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -380,14 +345,47 @@ public:
         }
     }
 
-    constexpr auto measure_bitmask() const noexcept -> const std::vector<std::uint8_t>&
+    void add_m_gate(std::size_t target_index, std::size_t bit_index)
     {
-        return measure_bitmask_;
+        check_qubit_range_(target_index, "qubit", "M");
+        check_bit_range_(bit_index);
+        gates_.emplace_back(impl_mqis::create_m_gate(target_index, bit_index));
+    }
+
+    template <impl_mqis::QubitAndBitIndices Container = impl_mqis::QubitAndBitIndicesIList>
+    void add_m_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_m_gate(pair.first, pair.second);
+        }
+    }
+
+    void add_if_statement(std::size_t bit_index, QuantumCircuit circuit)
+    {
+        namespace ctrl = impl_mqis::control;
+
+        check_bit_range_(bit_index);
+
+        auto cfi = impl_mqis::ControlFlowInstruction {
+            impl_mqis::SingleBitControlFlowFunction {bit_index, impl_mqis::ControlBooleanKind::IF},
+            std::make_unique<QuantumCircuit>(std::move(circuit))
+        };
+
+        control_flow_instructions_.push_back(std::move(cfi));
+
+        const auto cfi_index = control_flow_instructions_.size() - 1;
+
+        gates_.emplace_back(ctrl::create_control_flow_gate(cfi_index, ctrl::IF_STMT));
     }
 
     constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
     {
         return unitary_gates_[matrix_index];
+    }
+
+    auto control_flow_instruction(std::size_t index) const noexcept -> const impl_mqis::ControlFlowInstruction&
+    {
+        return control_flow_instructions_[index];
     }
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
@@ -396,9 +394,9 @@ public:
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
-    std::vector<std::uint8_t> measure_bitmask_;
     std::vector<GateInfo> gates_ {};
     std::vector<Matrix2X2> unitary_gates_ {};
+    std::vector<impl_mqis::ControlFlowInstruction> control_flow_instructions_ {};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
     {
@@ -422,35 +420,6 @@ private:
             err_msg << "The bit index at which the 'M' gate is applied, is out of bounds.\n";
             err_msg << "n_bits             = " << n_bits_ << '\n';
             err_msg << "provided bit index = " << bit_index << '\n';
-
-            throw std::runtime_error {err_msg.str()};
-        }
-    }
-
-    void check_previous_gate_is_not_measure_(std::size_t target_index, std::string_view gate_name)
-    {
-        if (gates_.size() == 0) {
-            return;
-        }
-
-        if (gates_.back().gate == Gate::M) {
-            auto err_msg = std::stringstream {};
-
-            err_msg << "The current implementation only allows measurement gates at the very\n";
-            err_msg << "end of the circuit. A non-measurement gate cannot be added after a\n";
-            err_msg << "measurement gate.\n";
-            err_msg << "Cannot add '" << gate_name << "' gate at qubit " << target_index << '\n';
-
-            throw std::runtime_error {err_msg.str()};
-        }
-    }
-
-    void check_gate_is_not_already_measure_(std::size_t target_index)
-    {
-        if (measure_bitmask_[target_index] == MEASURED_FLAG) {
-            auto err_msg = std::stringstream {};
-
-            err_msg << "Cannot measure qubit " << target_index << " twice.\n";
 
             throw std::runtime_error {err_msg.str()};
         }

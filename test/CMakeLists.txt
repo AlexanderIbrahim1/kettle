@@ -58,14 +58,14 @@ endfunction()
 
 add_test_target(TARGET circuit_test SOURCES "source/circuit_test.cpp")
 add_test_target(TARGET gate_test SOURCES "source/gate_test.cpp")
-add_test_target(TARGET state_test SOURCES "source/state_test.cpp")
+add_test_target(TARGET state_test SOURCES "source/state/state_test.cpp")
+add_test_target(TARGET bitstring_utils_test SOURCES "source/state/bitstring_utils_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/operations_test.cpp")
 add_test_target(TARGET gate_pair_generator_test SOURCES "source/gate_pair_generator_test.cpp")
 add_test_target(TARGET simulate_test SOURCES "source/simulate_test.cpp")
 add_test_target(TARGET mathtools_test SOURCES "source/common/mathtools_test.cpp")
 add_test_target(TARGET matrix2x2_test SOURCES "source/common/matrix2x2_test.cpp")
 add_test_target(TARGET probabilities_test SOURCES "source/calculations/probabilities_test.cpp")
-add_test_target(TARGET measurements_test SOURCES "source/calculations/measurements_test.cpp")
 add_test_target(TARGET fourier_test SOURCES "source/gates/fourier_test.cpp")
 add_test_target(TARGET toffoli_test SOURCES "source/gates/toffoli_test.cpp")
 add_test_target(TARGET multiplicity_controlled_u_gate_test SOURCES "source/gates/multiplicity_controlled_u_gate_test.cpp")
@@ -79,6 +79,9 @@ add_test_target(TARGET read_tangelo_file_test SOURCES "source/decomposed/read_ta
 add_test_target(TARGET io_numpy_statevector_test SOURCES "source/io/numpy_statevector_test.cpp")
 add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.cpp")
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
+add_test_target(TARGET measure_test SOURCES "source/simulation/measure_test.cpp")
+add_test_target(TARGET control_flow_test SOURCES "source/simulation/control_flow_test.cpp")
+add_test_target(TARGET arange_test SOURCES "source/common/arange_test.cpp")
 
 # ---- End-of-file commands ----
 

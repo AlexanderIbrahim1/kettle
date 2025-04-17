@@ -1,6 +1,3 @@
-// TODO: remove
-#include <iostream>
-
 #include <algorithm>
 #include <compare>
 #include <optional>

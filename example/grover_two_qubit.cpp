@@ -30,13 +30,10 @@ auto main() -> int
     circuit.add_cz_gate(0, 1);
     circuit.add_h_gate({0, 1});
 
-    // add the measurements
-    circuit.add_m_gate({0, 1});
-
     auto state = mqis::QuantumState {"00"};
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1024);
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(bitstring, count) = (" << bitstring << ", " << count << ")\n";

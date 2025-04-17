@@ -6,8 +6,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 
@@ -95,10 +95,6 @@ auto almost_eq(
     }
 
     if (left.n_bits() != right.n_bits()) {
-        return false;
-    }
-
-    if (left.measure_bitmask() != right.measure_bitmask()) {
         return false;
     }
 

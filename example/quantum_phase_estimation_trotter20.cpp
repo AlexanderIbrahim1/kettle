@@ -6,15 +6,6 @@
 #include <sstream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
-#include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
-#include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
-#include <mini-qiskit/io/statevector.hpp>
 
 /*
     An attempt at performing QPE for the 9-qubit gate for the rotor paper.
@@ -57,7 +48,6 @@ auto main() -> int
     extend(circuit, SHAEER_FILEPATH / "trotter20_2.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_3.dat");
     extend(circuit, SHAEER_FILEPATH / "trotter20_iqft_circuit.dat");
-    circuit.add_m_gate({9, 10, 11, 12});
 
     // // make the unitary operator circuit a controlled circuit
     // // - it will be controlled by 4 other qubits, in a binary controlled manner
@@ -68,7 +58,6 @@ auto main() -> int
     // circuit.add_h_gate({0, 1, 2, 3});
     // mqis::extend_circuit(circuit, subcircuit);
     // mqis::apply_inverse_fourier_transform(circuit, {3, 2, 1, 0});
-    // circuit.add_m_gate({0, 1, 2, 3});
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates
@@ -90,7 +79,7 @@ auto main() -> int
     // std::cout << "F\n";
 
     // perform the measurements
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1ul << 12);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1ul << 12, {0, 1, 2, 3, 4, 5, 6, 7, 8});
 
     // output the results
     for (const auto& [bitstring, count]: counts) {

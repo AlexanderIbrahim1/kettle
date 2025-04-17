@@ -46,6 +46,16 @@ concept ControlAndTargetIndices = requires(Container container)
     container.end();
 };
 
+// identical to the `ControlAndTargetIndices`, but I figured a distinct name would be helpful for users
+template <typename Container>
+concept QubitAndBitIndices = requires(Container container)
+{
+    typename Container::value_type;
+    requires std::is_same_v<typename Container::value_type, std::pair<std::size_t, std::size_t>>;
+    container.begin();
+    container.end();
+};
+
 template <typename Container>
 concept ControlAndTargetIndicesAndAngles = requires(Container container)
 {
@@ -58,6 +68,7 @@ concept ControlAndTargetIndicesAndAngles = requires(Container container)
 using QubitIndicesIList = std::initializer_list<std::size_t>;
 using QubitIndicesAndAnglesIList = std::initializer_list<std::pair<std::size_t, double>>;
 using ControlAndTargetIndicesIList = std::initializer_list<std::pair<std::size_t, std::size_t>>;
+using QubitAndBitIndicesIList = std::initializer_list<std::pair<std::size_t, std::size_t>>;
 using ControlAndTargetIndicesAndAnglesIList = std::initializer_list<std::tuple<std::size_t, std::size_t, double>>;
 
 template <Iterable Container>

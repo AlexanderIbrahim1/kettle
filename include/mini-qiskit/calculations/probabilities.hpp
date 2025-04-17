@@ -10,7 +10,8 @@
 
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/simulation/gate_pair_generator.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/state.hpp"
+#include "mini-qiskit/state/qubit_state_conversion.hpp"
 
 /*
     This file contains code components to calculate the probabilities of each of
@@ -144,7 +145,7 @@ constexpr auto calculate_probabilities_raw(const QuantumState& state, const Quan
     probabilities.reserve(n_states);
 
     for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-        const auto prob = impl_mqis::norm_squared(state[i_state]);
+        const auto prob = std::norm(state[i_state]);
         probabilities.push_back(prob);
     }
 
@@ -165,6 +166,9 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
     const auto n_qubits = state.n_qubits();
     auto probabilities = std::unordered_map<std::string, double> {};
 
+    // the internal layout of the quantum state is little endian, so the probabilities are as well
+    const auto endian = mqis::QuantumStateEndian::LITTLE;
+
     // applying noise involves generating the indices of pairs of states, and this is much more convenient
     // when done with indices rather than strings; so the downsides of using twice the memory don't seem
     // that bad
@@ -172,14 +176,14 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
         const auto probabilities_raw = calculate_probabilities_raw(state, noise);
 
         for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-            const auto bitstring = state_as_bitstring(i_state, n_qubits);
+            const auto bitstring = state_index_to_bitstring(i_state, n_qubits, endian);
             probabilities[bitstring] = probabilities_raw[i_state];
         }
     }
     else {
         for (std::size_t i_state {0}; i_state < n_states; ++i_state) {
-            const auto prob = impl_mqis::norm_squared(state[i_state]);
-            const auto bitstring = state_as_bitstring(i_state, n_qubits);
+            const auto prob = std::norm(state[i_state]);
+            const auto bitstring = state_index_to_bitstring(i_state, n_qubits, endian);
             probabilities[bitstring] = prob;
         }
     }

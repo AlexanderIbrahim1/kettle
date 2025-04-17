@@ -2,9 +2,10 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/state/qubit_state_conversion.hpp"
+#include "mini-qiskit/state/state.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/decomposed/build_decomposed_circuit.hpp"
 #include "mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp"
@@ -122,7 +123,7 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for double qubit 
     const auto n_control_qubits = GENERATE(Catch::Generators::range(1ul, 6ul));
     const auto n_total_qubits = n_control_qubits + 2ul;
     const auto i_state = GENERATE_COPY(Catch::Generators::range(0ul, 1ul << n_total_qubits));
-    const auto init_bitstring = mqis::state_as_bitstring_little_endian(i_state, n_total_qubits);
+    const auto init_bitstring = mqis::state_index_to_bitstring(i_state, n_total_qubits, mqis::QuantumStateEndian::LITTLE);
 
     const auto [control_qubits, mapped_qubits] = control_and_mapped_qubits(n_total_qubits);
 

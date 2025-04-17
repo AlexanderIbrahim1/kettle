@@ -2,19 +2,23 @@
 
 #include <mini-qiskit/mini-qiskit.hpp>
 
+/*
+    This file contains a demonstration of how to use the library to simulate
+    the Deutsch algorithm. To pick which case the query function satisfies,
+    select the appropriate QueryCase instance in the first non-comment line
+    of the main() function below.
+*/
+
 enum class QueryCase
 {
-    CONSTANT_0 = 0,
-    CONSTANT_1 = 1,
-    BALANCED_SAME = 2,
-    BALANCED_SWAP = 3
+    CONSTANT_0,     // both bits map to 0
+    CONSTANT_1,     // both bits map to 1
+    BALANCED_SAME,  // both bits map to themselves
+    BALANCED_SWAP   // 0 maps to 1, and 1 maps to 0
 };
 
 void apply_query(mqis::QuantumCircuit& circuit, QueryCase parity)
 {
-    // NOTE: I could simplify this into two separate if-statements, but:
-    // - leaving it like this makes the intent easier to see
-    // - there aren't that many cases, so the downside of repetition isn't that bad
     using QC = QueryCase;
 
     switch (parity) {
@@ -47,21 +51,17 @@ auto main() -> int
     // construct the initial state, in this case using a bitstring
     auto statevector = mqis::QuantumState {"01"};
 
-    // include the gates needed for the Deutsch algorithm
-    // NOTE: in the current version of mini-qiskit, it is assumed that a measurement gate is
-    // applied to every qubit at the very end of the circuit
+    // create the circuit with the gates needed for the Deutsch algorithm
     auto circuit = mqis::QuantumCircuit {2};
-    circuit.add_h_gate(1);
-    circuit.add_h_gate(0);
+    circuit.add_h_gate({0, 1});
     apply_query(circuit, query);
     circuit.add_h_gate(0);
-    circuit.add_m_gate(0);
 
     // propagate the state through the circuit
     mqis::simulate(circuit, statevector);
 
-    // get a map of the bitstrings to the counts (probabilities are calculated within the function)
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1000);
+    // get a map of the bitstrings to the counts; the ancilla qubit (at index `1`) is being marginalized
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {1});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

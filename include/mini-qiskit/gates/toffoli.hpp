@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <utility>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 

@@ -2,11 +2,12 @@
 
 #include <complex>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include <mini-qiskit/state.hpp>
+#include <mini-qiskit/state/state.hpp>
 
 namespace impl_mqis
 {

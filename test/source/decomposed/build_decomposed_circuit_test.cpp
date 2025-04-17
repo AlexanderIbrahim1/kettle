@@ -11,9 +11,9 @@
 #include <mini-qiskit/decomposed/decomposed_gate.hpp>
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
 #include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
-#include <mini-qiskit/circuit.hpp>
+#include <mini-qiskit/circuit/circuit.hpp>
 #include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
+#include <mini-qiskit/state/state.hpp>
 
 
 template <typename Container, typename Lambda>

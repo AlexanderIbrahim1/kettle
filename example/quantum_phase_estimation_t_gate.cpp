@@ -2,8 +2,6 @@
 #include <iostream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
 
 
 void apply_multiplicity_controlled_t_gate_manually(mqis::QuantumCircuit& circuit)
@@ -27,17 +25,16 @@ auto main() -> int
     circuit.add_x_gate(3);
     apply_multiplicity_controlled_t_gate_manually(circuit);
     mqis::apply_inverse_fourier_transform(circuit, {2, 1, 0});
-    circuit.add_m_gate({0, 1, 2});
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1024, {3});
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
-        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto state_index = mqis::bitstring_to_state_index_little_endian(rstripped_bitstring);
         const auto n_states = 1ul << n_counting_qubits;
         const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
 

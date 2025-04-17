@@ -4,8 +4,6 @@
 #include <unordered_set>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/swap.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
 
 /*
 A basic implementation of Shor's algorithm, inspired by the code from:
@@ -78,19 +76,18 @@ auto main() -> int
     }
 
     mqis::apply_inverse_fourier_transform(circuit, {7, 6, 5, 4, 3, 2, 1, 0});
-    circuit.add_m_gate({0, 1, 2, 3, 4, 5, 6, 7});
 
     auto state = mqis::QuantumState {n_counting_qubits + n_ancilla_qubits};
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, state, 1 << 10);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1 << 10, {8, 9, 10, 11});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
-        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto state_index = mqis::bitstring_to_state_index_little_endian(rstripped_bitstring);
         const auto n_states = 1ul << n_counting_qubits;
         const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
 

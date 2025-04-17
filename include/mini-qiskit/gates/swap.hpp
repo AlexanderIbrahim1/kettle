@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/gates/toffoli.hpp"
 
 namespace mqis

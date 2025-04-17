@@ -4,9 +4,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <mini-qiskit/circuit.hpp>
+#include <mini-qiskit/circuit/circuit.hpp>
 #include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
+#include <mini-qiskit/state/state.hpp>
 #include <mini-qiskit/circuit_operations/append_circuits.hpp>
 #include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_controlled_circuit.hpp>

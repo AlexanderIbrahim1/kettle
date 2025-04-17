@@ -10,10 +10,10 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
-#include "mini-qiskit/circuit.hpp"
-#include "mini-qiskit/state.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
+#include "mini-qiskit/state/state.hpp"
 
 
 namespace impl_mqis
@@ -50,7 +50,8 @@ static const auto GATE_TO_STRING = std::unordered_map<mqis::Gate, std::string> {
     {mqis::Gate::CP, "CP"},
     {mqis::Gate::U, "U"},
     {mqis::Gate::CU, "CU"},
-    {mqis::Gate::M, "M"}
+    {mqis::Gate::M, "M"},
+    {mqis::Gate::CONTROL, "CONTROL"}
 };
 
 auto left_padded_integer_(std::size_t x, std::size_t minimum_width = formatting::DEFAULT_INTEGER_WIDTH) -> std::string
@@ -150,6 +151,13 @@ auto format_gate_control_target_angle_(const mqis::GateInfo& info)
         const auto [temp_target, ignore] = unpack_m_gate(info);
         target = left_padded_integer_(temp_target);
     }
+    // TODO: make this print statement more meaningful; it doesn't make sense right now
+    else if (info.gate == G::CONTROL) {
+        const auto cfi_index = control::unpack_control_flow_index(info);
+        const auto cfi_kind = control::unpack_control_flow_kind(info);
+        target = left_padded_integer_(cfi_index);
+        control= left_padded_integer_(cfi_kind);
+    }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, invalid gate found when formatting gate print output.\n"};
     }
@@ -201,8 +209,11 @@ auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_
 
 void print_state_(const mqis::QuantumState& state)
 {
+    // for the time being, fix this as being little-endian
+    const auto endian = mqis::QuantumStateEndian::LITTLE;
+
     for (std::size_t i {0}; i < state.n_states(); ++i) {
-        const auto bitstring = mqis::state_as_bitstring(i, state.n_qubits());
+        const auto bitstring = mqis::state_index_to_bitstring(i, state.n_qubits(), endian);
         std::cout << bitstring << " : (" << state[i].real() << ", " << state[i].imag() << ")\n";
     }
 }

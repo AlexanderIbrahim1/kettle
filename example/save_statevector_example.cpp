@@ -2,10 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
-#include <mini-qiskit/io/statevector.hpp>
+#include <mini-qiskit/mini-qiskit.hpp>
 
 
 auto main() -> int

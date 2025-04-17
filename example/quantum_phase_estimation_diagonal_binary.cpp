@@ -4,15 +4,6 @@
 #include <sstream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/decomposed/decomposed_gate.hpp>
-#include <mini-qiskit/decomposed/read_decomposition_file.hpp>
-#include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
-#include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state.hpp>
 
 /*
     This example creates the same circuit as displayed in `quantum_phase_estimation_diagonal.cpp`,
@@ -227,7 +218,6 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2, 3, 4, 5});
     mqis::extend_circuit(circuit, subcircuit);
     mqis::apply_inverse_fourier_transform(circuit, {5, 4, 3, 2, 1, 0});
-    circuit.add_m_gate({0, 1, 2, 3, 4, 5});
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates
@@ -239,14 +229,14 @@ auto main() -> int
     mqis::simulate(circuit, statevector);
 
     // perform the measurements
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1024);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1024, {6, 7});
 
     // output the results
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         const auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
-        const auto state_index = mqis::bitstring_to_state_index(rstripped_bitstring);
+        const auto state_index = mqis::bitstring_to_state_index_little_endian(rstripped_bitstring);
         const auto n_states = 1ul << 6;
         const auto binary_fraction = static_cast<double>(state_index) / static_cast<double>(n_states);
 

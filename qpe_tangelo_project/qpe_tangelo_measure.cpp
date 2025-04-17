@@ -1,13 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
-#include <mini-qiskit/calculations/measurements.hpp>
-#include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/circuit.hpp>
-#include <mini-qiskit/state.hpp>
-#include <mini-qiskit/io/statevector.hpp>
+#include <mini-qiskit/mini-qiskit.hpp>
 
 /*
     Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.
@@ -76,15 +70,18 @@ auto main(int argc, char** argv) -> int
     }();
 
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
-    const auto measurement_qubits = get_measurement_qubits(arguments.n_ancilla_qubits, arguments.n_unitary_qubits);
+
+    auto marginal_qubits = std::vector<std::size_t> {};
+    for (std::size_t i {0}; i < arguments.n_ancilla_qubits; ++i) {
+        marginal_qubits.push_back(i);
+    }
 
     auto statevector = mqis::load_statevector(arguments.abs_statevector_filepath);
     auto circuit = mqis::QuantumCircuit {n_total_qubits};
-    circuit.add_m_gate(measurement_qubits);
 
     mqis::simulate(circuit, statevector);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(circuit, statevector, 1ul << 12);
+    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1ul << 12, marginal_qubits);
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "mini-qiskit/circuit.hpp"
+#include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/circuit_operations/append_circuits.hpp"
 #include "mini-qiskit/circuit_operations/compare_circuits.hpp"
@@ -65,40 +65,6 @@ TEST_CASE("append_circuits working")
             REQUIRE(!mqis::almost_eq(combined_circuit01, expected));
         }
     }
-
-    SECTION("throws due to measurement conflicts")
-    {
-        auto circuit0 = mqis::QuantumCircuit {3};
-        auto circuit1 = mqis::QuantumCircuit {3};
-
-        SECTION("adding another measurement")
-        {
-            circuit0.add_m_gate(0);
-            circuit1.add_m_gate(0);
-
-            REQUIRE_THROWS_AS(mqis::append_circuits(circuit0, circuit1), std::runtime_error);
-        }
-
-        SECTION("adding a different gate")
-        {
-            circuit0.add_m_gate(0);
-            circuit1.add_x_gate(0);
-
-            REQUIRE_THROWS_AS(mqis::append_circuits(circuit0, circuit1), std::runtime_error);
-        }
-    }
-
-    SECTION("does not throw due to measurements on other qubits")
-    {
-        auto circuit0 = mqis::QuantumCircuit {3};
-        auto circuit1 = mqis::QuantumCircuit {3};
-
-        circuit0.add_m_gate({0, 1});
-        circuit1.add_x_gate(2);
-        circuit1.add_m_gate(2);
-
-        REQUIRE_NOTHROW(mqis::append_circuits(circuit0, circuit1));
-    }
 }
 
 TEST_CASE("extend_circuit working")
@@ -159,39 +125,5 @@ TEST_CASE("extend_circuit working")
 
             REQUIRE(!mqis::almost_eq(circuit0, expected));
         }
-    }
-
-    SECTION("throws due to measurement conflicts")
-    {
-        auto circuit0 = mqis::QuantumCircuit {3};
-        auto circuit1 = mqis::QuantumCircuit {3};
-
-        SECTION("adding another measurement")
-        {
-            circuit0.add_m_gate(0);
-            circuit1.add_m_gate(0);
-
-            REQUIRE_THROWS_AS(mqis::extend_circuit(circuit0, circuit1), std::runtime_error);
-        }
-
-        SECTION("adding a different gate")
-        {
-            circuit0.add_m_gate(0);
-            circuit1.add_x_gate(0);
-
-            REQUIRE_THROWS_AS(mqis::extend_circuit(circuit0, circuit1), std::runtime_error);
-        }
-    }
-
-    SECTION("does not throw due to measurements on other qubits")
-    {
-        auto circuit0 = mqis::QuantumCircuit {3};
-        auto circuit1 = mqis::QuantumCircuit {3};
-
-        circuit0.add_m_gate({0, 1});
-        circuit1.add_x_gate(2);
-        circuit1.add_m_gate(2);
-
-        REQUIRE_NOTHROW(mqis::extend_circuit(circuit0, circuit1));
     }
 }
