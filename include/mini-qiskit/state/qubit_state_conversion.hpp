@@ -3,6 +3,7 @@
 #include <bitset>
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -176,6 +177,35 @@ constexpr auto dynamic_bitset_to_state_index_little_endian(const std::vector<std
 constexpr auto dynamic_bitset_to_state_index_big_endian(const std::vector<std::uint8_t>& dyn_bitset) -> std::size_t
 {
     return dynamic_bitset_to_state_index(dyn_bitset, mqis::QuantumStateEndian::BIG);
+}
+
+constexpr auto binary_fraction_expansion(
+    const std::string& bitstring,
+    QuantumStateEndian endian = QuantumStateEndian::LITTLE
+) -> double
+{
+    impl_mqis::check_bitstring_is_valid_nonmarginal_(bitstring);
+
+    auto output = double {0.0};
+    auto contrib = double {1.0};
+
+    if (endian == QuantumStateEndian::LITTLE) {
+        for (auto bitchar : bitstring) {
+            contrib *= 0.5;
+            if (bitchar == '1') {
+                output += contrib;
+            }
+        }
+    } else {
+        for (auto bitchar : bitstring | std::views::reverse) {
+            contrib *= 0.5;
+            if (bitchar == '1') {
+                output += contrib;
+            }
+        }
+    }
+
+    return output;
 }
 
 }  // namespace impl_mqis
