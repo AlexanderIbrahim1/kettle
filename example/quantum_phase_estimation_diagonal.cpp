@@ -68,13 +68,13 @@ auto main() -> int
 
     // make the unitary operator circuit a controlled circuit
     // - it will be controlled by 6 other qubits, in a binary controlled manner
-    auto subcircuit = mqis::make_binary_controlled_circuit_naive(unitary_op_circuit, 8, {0, 1, 2, 3, 4, 5}, {6, 7});
+    auto subcircuit = mqis::make_binary_controlled_circuit_naive(unitary_op_circuit, 8, mqis::arange(6ul), {6, 7});
 
     // create the circuit needed to perform quantum phase estimation
     auto circuit = mqis::QuantumCircuit {8};
-    circuit.add_h_gate({0, 1, 2, 3, 4, 5});
+    circuit.add_h_gate(mqis::arange(6ul));
     mqis::extend_circuit(circuit, subcircuit);
-    mqis::apply_inverse_fourier_transform(circuit, {5, 4, 3, 2, 1, 0});
+    mqis::apply_inverse_fourier_transform(circuit, mqis::revarange(6ul));
 
     // create the input statevector
     // - we set the eigenstates for the unitary operator directly, rather than through x-gates

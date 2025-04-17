@@ -8,6 +8,7 @@
 
 #include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
+#include "mini-qiskit/common/arange.hpp"
 #include "mini-qiskit/gates/fourier.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state/state.hpp"
@@ -229,7 +230,7 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
 
 TEST_CASE("inverse QFT after forward QFT")
 {
-    SECTION("2-qubit gates")
+    SECTION("2-qubit, 3-qubit, and 4-qubit gates")
     {
         // clang-format off
         const auto init_bitstring = std::string {GENERATE(
@@ -243,9 +244,7 @@ TEST_CASE("inverse QFT after forward QFT")
         auto state = mqis::QuantumState {init_bitstring};
         auto expected = mqis::QuantumState {init_bitstring};
 
-        const auto n_qubits = init_bitstring.size();
-        auto qubit_indices = std::vector<std::size_t> (n_qubits);
-        std::iota(qubit_indices.begin(), qubit_indices.end(), 0);
+        const auto qubit_indices = mqis::arange(init_bitstring.size());
 
         auto circuit = mqis::QuantumCircuit {init_bitstring.size()};
         mqis::apply_forward_fourier_transform(circuit, qubit_indices);

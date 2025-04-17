@@ -67,7 +67,7 @@ auto main() -> int
     const auto n_ancilla_qubits = 4ul;
 
     auto circuit = mqis::QuantumCircuit {n_counting_qubits + n_ancilla_qubits};
-    circuit.add_h_gate({0, 1, 2, 3, 4, 5, 6, 7});
+    circuit.add_h_gate(mqis::arange(8ul));
     circuit.add_x_gate(n_counting_qubits);
 
     for (auto i : std::views::iota(0ul, n_counting_qubits) | std::views::reverse) {
@@ -75,13 +75,13 @@ auto main() -> int
         control_multiplication_mod15(circuit, base, i, n_counting_qubits, n_iterations);
     }
 
-    mqis::apply_inverse_fourier_transform(circuit, {7, 6, 5, 4, 3, 2, 1, 0});
+    mqis::apply_inverse_fourier_transform(circuit, mqis::revarange(8ul));
 
     auto state = mqis::QuantumState {n_counting_qubits + n_ancilla_qubits};
 
     mqis::simulate(circuit, state);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1 << 10, {8, 9, 10, 11});
+    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1 << 10, mqis::arange(8ul, 12ul));
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
