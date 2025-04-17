@@ -17,6 +17,10 @@ enum class QueryCase
     BALANCED_SWAP   // 0 maps to 1, and 1 maps to 0
 };
 
+/*
+    Apply the Deutsch query to the circuit; which query is applied, is determined by
+    the choice of `query`
+*/
 void apply_query(mqis::QuantumCircuit& circuit, QueryCase parity)
 {
     using QC = QueryCase;

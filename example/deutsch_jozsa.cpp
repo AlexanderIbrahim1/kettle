@@ -41,7 +41,7 @@ auto sampled_indices_of_half_of_all_states(std::size_t n_data_qubits) -> std::ve
     Add the Deutsch-Jozsa query to the circuit; which query is applied, is determined
     by the choice of `query`
 */
-void add_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
+void apply_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
 {
     const auto i_ancilla = circuit.n_qubits() - 1;
 
@@ -90,7 +90,7 @@ auto main() -> int
     // create the circuit with the gates needed for the Deutsch-Jozsa algorithm
     auto circuit = mqis::QuantumCircuit {5};
     circuit.add_h_gate({0, 1, 2, 3, 4});
-    add_deutsch_jozsa_function(circuit, query);
+    apply_deutsch_jozsa_function(circuit, query);
     circuit.add_h_gate({0, 1, 2, 3});
 
     // propagate the state through the circuit
