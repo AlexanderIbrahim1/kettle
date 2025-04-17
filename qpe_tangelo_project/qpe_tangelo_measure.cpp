@@ -1,13 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
-#include <mini-qiskit/calculations/measurements.hpp>
-#include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/circuit/circuit.hpp>
-#include <mini-qiskit/state/state.hpp>
-#include <mini-qiskit/io/statevector.hpp>
+#include <mini-qiskit/mini-qiskit.hpp>
 
 /*
     Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.

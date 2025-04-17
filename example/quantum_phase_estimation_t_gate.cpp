@@ -2,9 +2,6 @@
 #include <iostream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
-#include <mini-qiskit/state/marginal.hpp>
 
 
 void apply_multiplicity_controlled_t_gate_manually(mqis::QuantumCircuit& circuit)

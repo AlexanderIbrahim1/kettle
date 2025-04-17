@@ -2,10 +2,7 @@
 #include <iostream>
 #include <random>
 
-#include <mini-qiskit/circuit/circuit.hpp>
-#include <mini-qiskit/state/state.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/calculations/measurements.hpp>
+#include <mini-qiskit/mini-qiskit.hpp>
 
 auto create_random_one_qubit_state() -> mqis::QuantumState
 {

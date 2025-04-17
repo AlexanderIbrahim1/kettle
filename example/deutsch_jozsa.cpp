@@ -4,8 +4,6 @@
 #include <vector>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/state/qubit_state_conversion.hpp>
-#include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
 
 
 enum class QueryCase

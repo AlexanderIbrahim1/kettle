@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
 
 /*
 Uses the balanced f-query given in the guide in:

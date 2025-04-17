@@ -4,9 +4,6 @@
 #include <unordered_set>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/gates/swap.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/state/marginal.hpp>
 
 /*
 A basic implementation of Shor's algorithm, inspired by the code from:

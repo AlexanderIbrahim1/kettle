@@ -15,7 +15,7 @@
 namespace impl_mqis
 {
 
-auto read_number_of_gates_(std::istream& stream) -> std::size_t
+inline auto read_number_of_gates_(std::istream& stream) -> std::size_t
 {
     // the first line of the decomposition file is `NUMBER_OF_COMMANDS : <number>`, and
     // we want to extract <number>
@@ -33,7 +33,7 @@ auto read_number_of_gates_(std::istream& stream) -> std::size_t
     return n_gates;
 }
 
-auto read_gate_state_and_qubit_index_(std::istream& stream) -> std::tuple<mqis::DecomposedGateState, std::size_t>
+inline auto read_gate_state_and_qubit_index_(std::istream& stream) -> std::tuple<mqis::DecomposedGateState, std::size_t>
 {
     auto sstream = [&]() {
         std::string line;
@@ -60,7 +60,7 @@ auto read_gate_state_and_qubit_index_(std::istream& stream) -> std::tuple<mqis::
     return {state, qubit_index};
 }
 
-auto read_unitary_matrix_(std::istream& stream) -> mqis::Matrix2X2
+inline auto read_unitary_matrix_(std::istream& stream) -> mqis::Matrix2X2
 {
     auto values = std::array<std::complex<double>, 4> {};
 
@@ -86,7 +86,7 @@ auto read_unitary_matrix_(std::istream& stream) -> mqis::Matrix2X2
 namespace mqis
 {
 
-auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGateInfo>
+inline auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGateInfo>
 {
     const auto n_gates = impl_mqis::read_number_of_gates_(stream);
 
@@ -104,7 +104,7 @@ auto read_decomposed_gate_info(std::istream& stream) -> std::vector<DecomposedGa
     return gates;
 }
 
-auto read_decomposed_gate_info(const std::filesystem::path& filepath) -> std::vector<DecomposedGateInfo>
+inline auto read_decomposed_gate_info(const std::filesystem::path& filepath) -> std::vector<DecomposedGateInfo>
 {
     auto instream = std::ifstream {filepath};
 

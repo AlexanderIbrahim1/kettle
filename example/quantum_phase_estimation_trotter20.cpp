@@ -6,15 +6,6 @@
 #include <sstream>
 
 #include <mini-qiskit/mini-qiskit.hpp>
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
-#include <mini-qiskit/circuit_operations/append_circuits.hpp>
-#include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
-#include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
-#include <mini-qiskit/gates/fourier.hpp>
-#include <mini-qiskit/circuit/circuit.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/state/state.hpp>
-#include <mini-qiskit/io/statevector.hpp>
 
 /*
     An attempt at performing QPE for the 9-qubit gate for the rotor paper.
