@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 

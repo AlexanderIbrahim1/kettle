@@ -5,7 +5,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/circuit_operations/compare_circuits.hpp"
 

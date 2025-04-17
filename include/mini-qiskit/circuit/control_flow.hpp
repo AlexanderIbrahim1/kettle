@@ -5,7 +5,7 @@
 
 #include "mini-qiskit/circuit/classical_register.hpp"
 #include "mini-qiskit/circuit/control_flow_function.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 
 namespace mqis
 {

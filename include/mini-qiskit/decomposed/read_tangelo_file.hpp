@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-#include <mini-qiskit/primitive_gate.hpp>
+#include <mini-qiskit/gates/primitive_gate.hpp>
 #include <mini-qiskit/circuit/circuit.hpp>
 #include <mini-qiskit/common/utils.hpp>
 #include <mini-qiskit/gates/swap.hpp>

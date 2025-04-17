@@ -14,7 +14,7 @@
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/prng.hpp"
 #include "mini-qiskit/common/utils.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/state/state.hpp"
 #include "mini-qiskit/state/marginal.hpp"

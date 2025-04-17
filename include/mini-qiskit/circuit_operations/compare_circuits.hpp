@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 

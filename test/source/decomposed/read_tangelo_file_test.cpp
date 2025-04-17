@@ -5,7 +5,7 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <mini-qiskit/primitive_gate.hpp>
+#include <mini-qiskit/gates/primitive_gate.hpp>
 #include <mini-qiskit/decomposed/read_tangelo_file.hpp>
 
 

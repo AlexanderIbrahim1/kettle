@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-#include "mini-qiskit/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate.hpp"
 #include "mini-qiskit/circuit/circuit.hpp"
 
 namespace impl_mqis
