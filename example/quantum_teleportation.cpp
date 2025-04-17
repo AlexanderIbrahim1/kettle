@@ -4,6 +4,14 @@
 
 #include <mini-qiskit/mini-qiskit.hpp>
 
+/*
+    This file contains a demonstration of how to use the library to simulate the
+    prototypical example of quantum teleportation of a one-qubit state from Alice to Bob.
+*/
+
+/*
+    Create an (almost completely random) one-qubit statevector.
+*/
 auto create_random_one_qubit_state() -> mqis::QuantumState
 {
     auto device = std::random_device {};
@@ -66,14 +74,22 @@ auto main() -> int
     const auto alice_counts = mqis::perform_measurements_as_counts_marginal(alice_qubit, 1 << 12);
 
     // what is the probability distribution of the qubit that Bob receives?
+    // - because the measurement causes the final statevector to be different with each simulation,
+    //   to collect the counts, we simulate the statevector and sample a single time for each shot
     const auto bob_counts = mqis::perform_measurements_as_counts_marginal(circuit, input, 1 << 12, {0, 1});
 
     std::cout << "ALICE: (state, count) = (0, " << alice_counts.at("0") << ")\n";
     std::cout << "ALICE: (state, count) = (1, " << alice_counts.at("1") << ")\n";
     std::cout << "BOB  : (state, count) = (0, " << bob_counts.at("xx0") << ")\n";
     std::cout << "BOB  : (state, count) = (1, " << bob_counts.at("xx1") << ")\n";
-    // Expected output: the counts for Alice's original state, and Bob's delivered state,
-    // should be similar
+    // Expected output:
+    // ```
+    // ALICE: (state, count) = (0, 1750)
+    // ALICE: (state, count) = (1, 2346)
+    // BOB  : (state, count) = (0, 1713)
+    // BOB  : (state, count) = (1, 2383)
+    // ```
+    // The counts for Alice's original state, and Bob's delivered state, should be similar
 
     return 0;
 }
