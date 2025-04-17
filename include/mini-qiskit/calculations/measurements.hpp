@@ -266,4 +266,16 @@ inline auto perform_measurements_as_counts_marginal(
     return measurements;
 }
 
+inline auto perform_measurements_as_counts(
+    const QuantumState& state,
+    std::size_t n_shots,
+    const QuantumNoise* noise = nullptr,
+    std::optional<int> seed = std::nullopt
+) -> std::unordered_map<std::string, std::size_t>
+{
+    const auto probabilities_raw = calculate_probabilities_raw(state, noise);
+    const auto marginal_qubits = std::vector<std::size_t> {};
+    return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_qubits, seed);
+}
+
 }  // namespace mqis
