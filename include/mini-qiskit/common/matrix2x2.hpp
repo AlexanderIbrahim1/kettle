@@ -8,6 +8,16 @@
 namespace impl_mqis
 {
 
+/*
+    This function chooses the correct parameters needed to calculate the square root
+    of the 2x2 matrix.
+
+    There are four possible square roots of a given 2x2 matrix; the simplest choice,
+    where the sign of `s` is positive, isn't always possible because it causes the
+    final result to blow up.
+
+    The matrix [-1, 0; 0 -1], or the negative of the identity, is a prime example.
+*/
 inline auto matrix_sqrt_parameters(
     std::complex<double> trace,
     std::complex<double> determinant,
@@ -18,7 +28,7 @@ inline auto matrix_sqrt_parameters(
     const auto t_arg = trace + 2.0 * s;
 
     if (std::norm(t_arg) > tolerance) {
-        const auto t = std::sqrt(trace + 2.0 * s);
+        const auto t = std::sqrt(t_arg);
         return {s, t};
     } else {
         const auto t = std::sqrt(trace - 2.0 * s);
@@ -92,9 +102,6 @@ inline auto matrix_square_root(
     const auto determinant = mat.elem00 * mat.elem11 - mat.elem01 * mat.elem10;
 
     const auto [s, t] = impl_mqis::matrix_sqrt_parameters(trace, determinant, matrix_sqrt_tolerance);
-
-//     const auto s = std::sqrt(determinant);
-//     const auto t = std::sqrt(trace + 2.0 * s);
 
     const auto new00 = (mat.elem00 + s) / t;
     const auto new01 = mat.elem01 / t;
