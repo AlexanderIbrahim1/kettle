@@ -121,6 +121,16 @@ constexpr auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
     return {new00, new01, new10, new11};
 }
 
+constexpr auto determinant(const Matrix2X2& mat) -> std::complex<double>
+{
+    return mat.elem00 * mat.elem11 - mat.elem10 * mat.elem01;
+}
+
+constexpr auto trace(const Matrix2X2& mat) -> std::complex<double>
+{
+    return mat.elem00 + mat.elem11;
+}
+
 constexpr auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,
