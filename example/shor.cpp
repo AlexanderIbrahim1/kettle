@@ -9,12 +9,25 @@
 A basic implementation of Shor's algorithm, inspired by the code from:
     https://github.com/Qiskit/textbook/blob/main/notebooks/ch-algorithms/shor.ipynb
 
-TODO: add code that converts the decimal to a fraction
+This example only works for 
 */
 
+/*
+    This is an exhaustive set of all positive integers less than 15 that are
+    mutually prime with 15
+*/
 auto VALID_BASES = std::unordered_set<int> {2, 4, 7, 8, 11, 13};
 
 
+/*
+    This function applies the unitary operator of interest to the circuit in the manner
+    required for QPE.
+
+    More specifically, it applies the unitary operator in a multiplicity-binary controlled
+    manner, where the gate is applied `2^n` times for the `n`th register qubit.
+
+    The specific gates chosen in each case come directly from the aforementioned resource.
+*/
 void control_multiplication_mod15(
     mqis::QuantumCircuit& circuit,
     int base,
