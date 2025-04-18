@@ -250,46 +250,5 @@ constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size
     return {mqis::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
 }
 
-// constexpr auto create_if_gate(std::size_t circuit_index) -> mqis::GateInfo
-// {
-//     return {mqis::Gate::CONTROL, circuit_index, DUMMY_ARG1, DUMMY_ARG2, IF_STMT};
-// }
-// 
-// // TODO: maybe remove?
-// // constexpr auto unpack_if_gate(const mqis::GateInfo& info) -> std::size_t
-// // {
-// //     return info.arg0;  // index of predicate and subcircuit
-// // }
-// 
-// constexpr auto create_if_else_gate(std::size_t circuit_index) -> mqis::GateInfo
-// {
-//     return {mqis::Gate::CONTROL, circuit_index, DUMMY_ARG1, DUMMY_ARG2, IF_ELSE_STMT};
-// }
-// 
-// // constexpr auto unpack_if_else_gate(const mqis::GateInfo& info) -> std::size_t
-// // {
-// //     return info.arg0;  // index of predicate and subcircuit
-// // }
-// 
-// constexpr auto create_repeat_gate(std::size_t circuit_index) -> mqis::GateInfo
-// {
-//     return {mqis::Gate::CONTROL, circuit_index, DUMMY_ARG1, DUMMY_ARG2, REPEAT_STMT};
-// }
-// 
-// // constexpr auto unpack_repeat_gate(const mqis::GateInfo& info) -> std::size_t
-// // {
-// //     return info.arg0;  // index of predicate and subcircuit
-// // }
-// 
-// constexpr auto create_while_loop_gate(std::size_t circuit_index) -> mqis::GateInfo
-// {
-//     return {mqis::Gate::CONTROL, circuit_index, DUMMY_ARG1, DUMMY_ARG2, WHILE_LOOP_STMT};
-// }
-// 
-// // constexpr auto unpack_while_loop_gate(const mqis::GateInfo& info) -> std::size_t
-// // {
-// //     return info.arg0;  // index of predicate and subcircuit
-// // }
-
 }  // namespace impl_mqis::control
 
