@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <cstddef>
+#include <stdexcept>
 #include <tuple>
 
 namespace mqis
@@ -122,11 +123,13 @@ constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
 constexpr static auto DUMMY_ARG3 = std::size_t {0};
 
-template <mqis::Gate GateKind>
-constexpr auto create_one_target_gate(std::size_t target_index) -> mqis::GateInfo
+constexpr auto create_one_target_gate(mqis::Gate gate, std::size_t target_index) -> mqis::GateInfo
 {
-    static_assert(gate_id::is_one_target_transform_gate(GateKind));
-    return {GateKind, target_index, DUMMY_ARG1, DUMMY_ARG2, DUMMY_ARG3};
+    if (!gate_id::is_one_target_transform_gate(gate)) {
+        throw std::runtime_error {"DEV ERROR: invalid one-target-one-transform gate provided.\n"};
+    }
+
+    return {gate, target_index, DUMMY_ARG1, DUMMY_ARG2, DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_gate(const mqis::GateInfo& info) -> std::size_t

@@ -62,7 +62,7 @@ public:
     void add_h_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "H");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::H>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate(Gate::H, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -76,7 +76,7 @@ public:
     void add_x_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "X");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::X>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate(Gate::X, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -90,7 +90,7 @@ public:
     void add_y_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Y");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Y>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate(Gate::Y, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -104,7 +104,7 @@ public:
     void add_z_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Z");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Z>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate(Gate::Z, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
@@ -118,7 +118,7 @@ public:
     void add_sx_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "SX");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::SX>(target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_gate(Gate::SX, target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>

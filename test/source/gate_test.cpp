@@ -8,7 +8,7 @@ TEST_CASE("Test create and unpack gate functions")
     SECTION("X gate")
     {
         const auto target_index = std::size_t {2};
-        const auto gate_info = impl_mqis::create_one_target_gate<mqis::Gate::X>(target_index);
+        const auto gate_info = impl_mqis::create_one_target_gate(mqis::Gate::X, target_index);
         const auto unpacked_index = impl_mqis::unpack_one_target_gate(gate_info);
 
         REQUIRE(unpacked_index == target_index);
@@ -28,7 +28,7 @@ TEST_CASE("Test create and unpack gate functions")
     SECTION("H gate")
     {
         const auto target_index = std::size_t {0};
-        const auto gate_info = impl_mqis::create_one_target_gate<mqis::Gate::H>(target_index);
+        const auto gate_info = impl_mqis::create_one_target_gate(mqis::Gate::H, target_index);
         const auto unpacked_index = impl_mqis::unpack_one_target_gate(gate_info);
 
         REQUIRE(unpacked_index == target_index);
