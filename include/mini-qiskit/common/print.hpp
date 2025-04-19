@@ -42,6 +42,7 @@ static const auto GATE_TO_STRING = std::unordered_map<mqis::Gate, std::string> {
     {mqis::Gate::RY, "RY"},
     {mqis::Gate::RZ, "RZ"},
     {mqis::Gate::P, "P"},
+    {mqis::Gate::CH, "CH"},
     {mqis::Gate::CX, "CX"},
     {mqis::Gate::CY, "CY"},
     {mqis::Gate::CZ, "CZ"},

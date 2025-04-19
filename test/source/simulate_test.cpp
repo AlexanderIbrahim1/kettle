@@ -124,7 +124,10 @@ auto simulate_double_qubit_with_builtin(
     auto circuit = mqis::QuantumCircuit {n_qubits};
 
     for (const auto& [gate_id, angle, control_index, target_index] : gates_and_angles) {
-        if (gate_id == "CX") {
+        if (gate_id == "CH") {
+            circuit.add_ch_gate(control_index, target_index);
+        }
+        else if (gate_id == "CX") {
             circuit.add_cx_gate(control_index, target_index);
         }
         else if (gate_id == "CY") {
@@ -962,6 +965,14 @@ TEST_CASE("simulate CU gate")
         const auto [control_qubit, target_qubit] = GENERATE(CTPair {0, 1}, CTPair {1, 0});
         const std::string initial_state = GENERATE("00", "10", "01", "11");
         const auto n_qubits = initial_state.size();
+
+        SECTION("CH gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::h_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CH", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
 
         SECTION("CX gate mimic")
         {

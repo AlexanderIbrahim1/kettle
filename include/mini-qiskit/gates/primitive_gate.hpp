@@ -18,6 +18,7 @@ enum class Gate
     RY,
     RZ,
     P,
+    CH,
     CX,
     CY,
     CZ,
@@ -74,7 +75,7 @@ constexpr auto is_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
 constexpr auto is_one_control_one_target_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
-    return gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CSX;
+    return gate == G::CH || gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CSX;
 }
 
 constexpr auto is_one_control_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool

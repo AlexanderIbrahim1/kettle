@@ -115,7 +115,10 @@ void simulate_double_qubit_gate_(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if constexpr (GateType == Gate::CX) {
+        if constexpr (GateType == Gate::CH) {
+            apply_h_gate(state, state0_index, state1_index);
+        }
+        else if constexpr (GateType == Gate::CX) {
             apply_x_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CY) {
@@ -217,6 +220,10 @@ inline void simulate_loop_body_(
         }
         case G::P : {
             simulate_single_qubit_gate_<G::P>(state, gate, circuit.n_qubits(), single_pair);
+            break;
+        }
+        case G::CH : {
+            simulate_double_qubit_gate_<G::CH>(state, gate, circuit.n_qubits(), double_pair);
             break;
         }
         case G::CX : {
