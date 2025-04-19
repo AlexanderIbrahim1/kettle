@@ -112,3 +112,22 @@ TEST_CASE("toffoli gate with 4 qubits")
 
     REQUIRE(mqis::almost_eq(state, info.expected));
 }
+
+TEST_CASE("apply_toffoli_gate() and apply_doubly_controlled_gate() match")
+{
+    const std::string init_bitstring = GENERATE("000", "100", "010", "110", "001", "101", "011", "111");
+
+    auto circuit0 = mqis::QuantumCircuit {3};
+    mqis::apply_toffoli_gate(circuit0, {0, 1}, 2);
+
+    auto circuit1 = mqis::QuantumCircuit {3};
+    mqis::apply_doubly_controlled_gate(circuit0, mqis::x_gate(), {0, 1}, 2);
+
+    auto state0 = mqis::QuantumState {"000"};
+    auto state1 = mqis::QuantumState {"000"};
+
+    mqis::simulate(circuit0, state0);
+    mqis::simulate(circuit1, state1);
+
+    REQUIRE(mqis::almost_eq(state0, state1));
+}
