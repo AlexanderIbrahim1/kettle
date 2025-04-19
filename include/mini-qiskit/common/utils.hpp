@@ -1,10 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <array>
 #include <concepts>
 #include <cstddef>
-#include <stdexcept>
 #include <utility>
 
 namespace impl_mqis
@@ -112,24 +109,5 @@ auto extend_container_to_vector(const Container0& container0, const Container1& 
 }
 
 static constexpr auto MARGINALIZED_QUBIT = char {'x'};
-
-// template <typename Key, typename Value, std::size_t Size>
-// struct LinearMap
-// {
-//     std::array<std::pair<Key, Value>, Size> data_;
-// 
-//     [[nodiscard]]
-//     auto at(const Key& key) const -> Value
-//     {
-//         const auto is_item = [&key](const auto& item) { return item.first == key; };
-//         const auto it = std::ranges::find_if(data_, is_item);
-// 
-//         if (it != std::end(data_)) {
-//             return it.second;
-//         } else {
-//             throw std::range_error("Key not found in ConstexprLinearMap\n");
-//         }
-//     }
-// };
 
 }  // namespace impl_mqis

@@ -9,6 +9,7 @@
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/common/utils.hpp"
 #include "mini-qiskit/gates/primitive_gate.hpp"
+#include "mini-qiskit/gates/primitive_gate_map.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 
 /*
@@ -69,9 +70,7 @@ inline auto decomp_to_single_primitive_gate_(
     }
     else {
         const auto real_11 = std::clamp(unitary.elem11.real(), -1.0, 1.0);
-        const auto imag_11 = std::clamp(unitary.elem11.imag(), -1.0, 1.0);
         const auto theta = std::acos(real_11);
-        const auto p_theta = std::atan2(imag_11, real_11);
 
         if (almost_eq(unitary, mqis::rx_gate(2.0 * theta), tolerance_sq)) {
             return Info {mqis::Gate::RX, 2.0 * theta};
@@ -82,7 +81,11 @@ inline auto decomp_to_single_primitive_gate_(
         else if (almost_eq(unitary, mqis::rz_gate(2.0 * theta), tolerance_sq)) {
             return Info {mqis::Gate::RZ, 2.0 * theta};
         }
-        else if (almost_eq(unitary, mqis::p_gate(p_theta), tolerance_sq)) {
+
+        const auto imag_11 = std::clamp(unitary.elem11.imag(), -1.0, 1.0);
+        const auto p_theta = std::atan2(imag_11, real_11);
+
+        if (almost_eq(unitary, mqis::p_gate(p_theta), tolerance_sq)) {
             return Info {mqis::Gate::P, p_theta};
         }
     }
@@ -106,9 +109,9 @@ inline auto decomp_special_unitary_to_primitive_gates_(
 
     const auto abs00 = std::clamp(std::abs(unitary.elem00), 0.0, 1.0);
 
-    const auto theta = std::acos(abs00);
-    const auto lambda = std::atan2(unitary.elem00.imag(), unitary.elem00.real());
-    const auto mu = std::atan2(unitary.elem01.imag(), unitary.elem01.real());
+    const auto theta = -std::acos(abs00);
+    const auto lambda = -std::atan2(unitary.elem00.imag(), unitary.elem00.real());
+    const auto mu = -std::atan2(unitary.elem01.imag(), unitary.elem01.real());
 
     auto output = std::vector<Info> {};
 
@@ -117,7 +120,7 @@ inline auto decomp_special_unitary_to_primitive_gates_(
     }
 
     if (std::fabs(2.0 * theta) > tolerance_sq) {
-        output.emplace_back(mqis::Gate::RY, theta);
+        output.emplace_back(mqis::Gate::RY, 2.0 * theta);
     }
 
     if (std::fabs(lambda + mu) > tolerance_sq) {
@@ -143,9 +146,57 @@ inline auto decomp_to_primitive_gates_(
         return decomp_special_unitary_to_primitive_gates_(unitary, tolerance_sq);
     }
     else {
-        const auto left_mat = mqis::p_gate(-det_angle);
-        return decomp_special_unitary_to_primitive_gates_(left_mat * unitary, tolerance_sq);
+        const auto special_unitary = mqis::p_gate(-det_angle) * unitary;
+        auto output = decomp_special_unitary_to_primitive_gates_(special_unitary, tolerance_sq);
+        output.emplace_back(mqis::Gate::P, det_angle);
+
+        return output;
     }
+}
+
+inline auto decomp_to_one_target_primitive_gates_(
+    std::size_t target,
+    const mqis::Matrix2X2& unitary,
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+) -> std::vector<mqis::GateInfo>
+{
+    const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
+
+    auto output = std::vector<mqis::GateInfo> {};
+    for (const auto& primitive : primitives) {
+        if (primitive.parameter.has_value()) {
+            const auto angle = primitive.parameter.value();
+            output.emplace_back(create_one_target_one_angle_gate(primitive.gate, angle, target));
+        } else {
+            output.emplace_back(create_one_target_gate(primitive.gate, target));
+        }
+    }
+
+    return output;
+}
+
+inline auto decomp_to_one_control_one_target_primitive_gates_(
+    std::size_t target,
+    std::size_t control,
+    const mqis::Matrix2X2& unitary,
+    double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+) -> std::vector<mqis::GateInfo>
+{
+    const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
+
+    auto output = std::vector<mqis::GateInfo> {};
+    for (const auto& primitive : primitives) {
+        const auto ctrl_gate = UNCONTROLLED_TO_CONTROLLED_GATE.at(primitive.gate);
+
+        if (primitive.parameter.has_value()) {
+            const auto angle = primitive.parameter.value();
+            output.emplace_back(create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
+        } else {
+            output.emplace_back(create_one_control_one_target_gate(ctrl_gate, control, target));
+        }
+    }
+
+    return output;
 }
 
 }  // namespace impl_mqis
