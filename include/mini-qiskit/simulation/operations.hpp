@@ -75,10 +75,10 @@ constexpr void apply_sx_gate(mqis::QuantumState& state, std::size_t i0, std::siz
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
 
-    const auto real0 =   state0.real() - state0.imag() + state1.real() + state1.imag();
-    const auto imag0 =   state0.real() + state0.imag() - state1.real() + state1.imag();
-    const auto real1 =   state0.real() + state0.imag() + state1.real() - state1.imag();
-    const auto imag1 = - state0.real() + state0.imag() + state1.real() + state1.imag();
+    const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
+    const auto real1 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag1 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};

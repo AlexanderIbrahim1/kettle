@@ -232,7 +232,7 @@ inline void simulate_loop_body_(
             break;
         }
         case G::CSX : {
-            simulate_double_qubit_gate_<G::CSX>(state, gate, circuit.n_qubits(), single_pair);
+            simulate_double_qubit_gate_<G::CSX>(state, gate, circuit.n_qubits(), double_pair);
             break;
         }
         case G::CRX : {

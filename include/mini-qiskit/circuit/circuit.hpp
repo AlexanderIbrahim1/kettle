@@ -234,7 +234,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CSX");
         check_qubit_range_(target_index, "target qubit", "CSX");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CZ>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CSX>(control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
