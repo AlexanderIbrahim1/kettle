@@ -63,6 +63,17 @@ struct Matrix2X2
         return *this;
     }
 
+    template <typename Number>
+    constexpr auto operator*=(Number scalar) noexcept -> Matrix2X2
+    {
+        elem00 *= scalar;
+        elem01 *= scalar;
+        elem10 *= scalar;
+        elem11 *= scalar;
+
+        return *this;
+    }
+
     constexpr auto operator+=(const Matrix2X2& other) noexcept -> Matrix2X2
     {
         const auto new00 = elem00 + other.elem00;
@@ -83,6 +94,19 @@ constexpr auto operator*(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix
 {
     lhs *= rhs;
     return lhs;
+}
+
+template <typename Number>
+constexpr auto operator*(Matrix2X2 lhs, Number scalar) noexcept -> Matrix2X2
+{
+    lhs *= scalar;
+    return lhs;
+}
+
+template <typename Number>
+constexpr auto operator*(Number scalar, Matrix2X2 rhs) noexcept -> Matrix2X2
+{
+    return operator*(rhs, scalar);
 }
 
 constexpr auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix2X2

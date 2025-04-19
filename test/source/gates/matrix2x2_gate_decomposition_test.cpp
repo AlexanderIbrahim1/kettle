@@ -107,11 +107,7 @@ TEST_CASE("decomp_to_one_target_primitive_gates_()")
     const auto unitary = [&]() {
         auto matrix = mqis::rz_gate(angle2) * mqis::ry_gate(angle1) * mqis::rz_gate(angle0);
         const auto global_phase = std::complex<double> {std::cos(angle_global), std::sin(angle_global)};
-
-        matrix.elem00 *= global_phase;
-        matrix.elem01 *= global_phase;
-        matrix.elem10 *= global_phase;
-        matrix.elem11 *= global_phase;
+        matrix *= global_phase;
 
         return matrix;
     }();
