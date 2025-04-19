@@ -54,6 +54,9 @@ inline auto decomp_to_primitive_gate(
     else if (almost_eq(unitary, mqis::z_gate(), tolerance_sq)) {
         return Info {mqis::Gate::Z, {}};
     }
+    if (almost_eq(unitary, mqis::sqrt_x_gate(), tolerance_sq)) {
+        return Info {mqis::Gate::SX, {}};
+    }
     else {
         const auto real_11 = std::clamp(unitary.elem11.real(), -1.0, 1.0);
         const auto imag_11 = std::clamp(unitary.elem11.imag(), -1.0, 1.0);

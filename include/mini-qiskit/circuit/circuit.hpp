@@ -87,6 +87,20 @@ public:
         }
     }
 
+    void add_y_gate(std::size_t target_index)
+    {
+        check_qubit_range_(target_index, "qubit", "Y");
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Y>(target_index));
+    }
+
+    template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
+    void add_y_gate(const Container& indices)
+    {
+        for (auto index : indices) {
+            add_y_gate(index);
+        }
+    }
+
     void add_z_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Z");
@@ -101,17 +115,17 @@ public:
         }
     }
 
-    void add_y_gate(std::size_t target_index)
+    void add_sx_gate(std::size_t target_index)
     {
-        check_qubit_range_(target_index, "qubit", "Y");
-        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::Y>(target_index));
+        check_qubit_range_(target_index, "qubit", "SX");
+        gates_.emplace_back(impl_mqis::create_one_target_gate<Gate::SX>(target_index));
     }
 
     template <impl_mqis::QubitIndices Container = impl_mqis::QubitIndicesIList>
-    void add_y_gate(const Container& indices)
+    void add_sx_gate(const Container& indices)
     {
         for (auto index : indices) {
-            add_y_gate(index);
+            add_sx_gate(index);
         }
     }
 
@@ -213,6 +227,21 @@ public:
     {
         for (auto pair : pairs) {
             add_cz_gate(pair.first, pair.second);
+        }
+    }
+
+    void add_csx_gate(std::size_t control_index, std::size_t target_index)
+    {
+        check_qubit_range_(control_index, "control qubit", "CSX");
+        check_qubit_range_(target_index, "target qubit", "CSX");
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CZ>(control_index, target_index));
+    }
+
+    template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
+    void add_csx_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_csx_gate(pair.first, pair.second);
         }
     }
 

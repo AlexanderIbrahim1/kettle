@@ -54,6 +54,9 @@ void simulate_single_qubit_gate_(
         else if constexpr (GateType == Gate::Z) {
             apply_z_gate(state, state1_index);
         }
+        else if constexpr (GateType == Gate::SX) {
+            apply_sx_gate(state, state0_index, state1_index);
+        }
         else if constexpr (GateType == Gate::RX) {
             [[maybe_unused]] const auto [ignore, theta] = unpack_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
@@ -120,6 +123,9 @@ void simulate_double_qubit_gate_(
         }
         else if constexpr (GateType == Gate::CZ) {
             apply_z_gate(state, state1_index);
+        }
+        else if constexpr (GateType == Gate::CSX) {
+            apply_sx_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CRX) {
             [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
@@ -193,6 +199,10 @@ inline void simulate_loop_body_(
             simulate_single_qubit_gate_<G::Z>(state, gate, circuit.n_qubits(), single_pair);
             break;
         }
+        case G::SX : {
+            simulate_single_qubit_gate_<G::SX>(state, gate, circuit.n_qubits(), single_pair);
+            break;
+        }
         case G::RX : {
             simulate_single_qubit_gate_<G::RX>(state, gate, circuit.n_qubits(), single_pair);
             break;
@@ -219,6 +229,10 @@ inline void simulate_loop_body_(
         }
         case G::CZ : {
             simulate_double_qubit_gate_<G::CZ>(state, gate, circuit.n_qubits(), double_pair);
+            break;
+        }
+        case G::CSX : {
+            simulate_double_qubit_gate_<G::CSX>(state, gate, circuit.n_qubits(), single_pair);
             break;
         }
         case G::CRX : {

@@ -128,6 +128,9 @@ constexpr auto non_angle_gate(Gate gate) -> Matrix2X2
     else if (gate == Gate::Z || gate == Gate::CZ) {
         return z_gate();
     }
+    else if (gate == Gate::SX || gate == Gate::CSX) {
+        return sqrt_x_gate();
+    }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, invalid non-angle gate provided\n"};
     }

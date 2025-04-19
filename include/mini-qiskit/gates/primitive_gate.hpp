@@ -13,6 +13,7 @@ enum class Gate
     X,
     Y,
     Z,
+    SX,
     RX,
     RY,
     RZ,
@@ -20,6 +21,7 @@ enum class Gate
     CX,
     CY,
     CZ,
+    CSX,
     CRX,
     CRY,
     CRZ,
@@ -60,7 +62,7 @@ namespace impl_mqis::gate_id
 constexpr auto is_one_target_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
-    return gate == G::X || gate == G::Y || gate == G::Z || gate == G::H;
+    return gate == G::H || gate == G::X || gate == G::Y || gate == G::Z || gate == G::SX;
 }
 
 constexpr auto is_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
@@ -72,7 +74,7 @@ constexpr auto is_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
 constexpr auto is_one_control_one_target_transform_gate(mqis::Gate gate) -> bool
 {
     using G = mqis::Gate;
-    return gate == G::CX || gate == G::CY || gate == G::CZ;
+    return gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CSX;
 }
 
 constexpr auto is_one_control_one_target_one_angle_transform_gate(mqis::Gate gate) -> bool
