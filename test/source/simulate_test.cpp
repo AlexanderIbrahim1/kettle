@@ -8,6 +8,8 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+// TODO: remove
+#include "mini-qiskit/common/print.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
@@ -76,6 +78,9 @@ auto simulate_single_qubit_with_builtin(
         else if (gate_id == "Z") {
             circuit.add_z_gate(target_index);
         }
+        else if (gate_id == "SX") {
+            circuit.add_sx_gate(target_index);
+        }
         else if (gate_id == "RX") {
             circuit.add_rx_gate(target_index, angle);
         }
@@ -127,6 +132,9 @@ auto simulate_double_qubit_with_builtin(
         }
         else if (gate_id == "CZ") {
             circuit.add_cz_gate(control_index, target_index);
+        }
+        else if (gate_id == "CSX") {
+            circuit.add_csx_gate(control_index, target_index);
         }
         else if (gate_id == "CRX") {
             circuit.add_crx_gate(control_index, target_index, angle);
@@ -904,6 +912,14 @@ TEST_CASE("simulate U gate")
         REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
     }
 
+    SECTION("SX gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::sx_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SX", 0.0, 0}}, n_qubits);
+
+        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
     SECTION("simulate U gate with angles")
     {
         const auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 3.0, M_PI / 2.0, 0.75 * M_PI, M_PI, 1.25 * M_PI, 2.0 * M_PI);
@@ -967,6 +983,14 @@ TEST_CASE("simulate CU gate")
         {
             const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::z_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CZ", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CSX gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::sx_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSX", 0.0, control_qubit, target_qubit}}, n_qubits);
 
             REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
         }

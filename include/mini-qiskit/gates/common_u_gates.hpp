@@ -99,7 +99,7 @@ constexpr auto p_gate(double angle) noexcept -> Matrix2X2
     };
 }
 
-constexpr auto sqrt_x_gate() noexcept -> Matrix2X2
+constexpr auto sx_gate() noexcept -> Matrix2X2
 {
     return {
         {0.5, 0.5 },
@@ -107,11 +107,6 @@ constexpr auto sqrt_x_gate() noexcept -> Matrix2X2
         {0.5, -0.5},
         {0.5, 0.5 }
     };
-}
-
-constexpr auto sqrt_x_gate_conj() noexcept -> Matrix2X2
-{
-    return mqis::conjugate_transpose(sqrt_x_gate());
 }
 
 constexpr auto non_angle_gate(Gate gate) -> Matrix2X2
@@ -127,6 +122,9 @@ constexpr auto non_angle_gate(Gate gate) -> Matrix2X2
     }
     else if (gate == Gate::Z || gate == Gate::CZ) {
         return z_gate();
+    }
+    else if (gate == Gate::SX || gate == Gate::CSX) {
+        return sx_gate();
     }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, invalid non-angle gate provided\n"};

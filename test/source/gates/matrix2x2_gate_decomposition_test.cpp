@@ -26,6 +26,7 @@ TEST_CASE("decomp_to_primitive_gate()")
             TestCase {mqis::x_gate(), Info {mqis::Gate::X, {}}},
             TestCase {mqis::y_gate(), Info {mqis::Gate::Y, {}}},
             TestCase {mqis::z_gate(), Info {mqis::Gate::Z, {}}},
+            TestCase {mqis::sx_gate(), Info {mqis::Gate::SX, {}}},
             TestCase {mqis::h_gate() * mqis::rx_gate(1.2345), std::nullopt}
         );
 

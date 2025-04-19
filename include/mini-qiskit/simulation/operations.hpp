@@ -15,6 +15,20 @@
 namespace impl_mqis
 {
 
+constexpr void apply_h_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto real_add = M_SQRT1_2 * (state0.real() + state1.real());
+    const auto imag_add = M_SQRT1_2 * (state0.imag() + state1.imag());
+    const auto real_sub = M_SQRT1_2 * (state0.real() - state1.real());
+    const auto imag_sub = M_SQRT1_2 * (state0.imag() - state1.imag());
+
+    state[i0] = std::complex<double> {real_add, imag_add};
+    state[i1] = std::complex<double> {real_sub, imag_sub};
+}
+
 constexpr void apply_x_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     std::swap(state[i0], state[i1]);
@@ -39,20 +53,6 @@ constexpr void apply_z_gate(mqis::QuantumState& state, std::size_t i1)
     state[i1] *= -1.0;
 }
 
-constexpr void apply_h_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
-{
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
-
-    const auto real_add = M_SQRT1_2 * (state0.real() + state1.real());
-    const auto imag_add = M_SQRT1_2 * (state0.imag() + state1.imag());
-    const auto real_sub = M_SQRT1_2 * (state0.real() - state1.real());
-    const auto imag_sub = M_SQRT1_2 * (state0.imag() - state1.imag());
-
-    state[i0] = std::complex<double> {real_add, imag_add};
-    state[i1] = std::complex<double> {real_sub, imag_sub};
-}
-
 constexpr void apply_rx_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
@@ -65,6 +65,20 @@ constexpr void apply_rx_gate(mqis::QuantumState& state, std::size_t i0, std::siz
     const auto imag0 = state0.imag() * cost - state1.real() * sint;
     const auto real1 = state1.real() * cost + state0.imag() * sint;
     const auto imag1 = state1.imag() * cost - state0.real() * sint;
+
+    state[i0] = std::complex<double> {real0, imag0};
+    state[i1] = std::complex<double> {real1, imag1};
+}
+
+constexpr void apply_sx_gate(mqis::QuantumState& state, std::size_t i0, std::size_t i1)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
+    const auto real1 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag1 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};
