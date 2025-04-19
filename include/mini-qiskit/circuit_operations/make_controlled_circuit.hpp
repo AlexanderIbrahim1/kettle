@@ -104,6 +104,19 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
     }
 }
 
+static constexpr auto SINGLE_GATE_TO_CONTROLLED = ConstexprLinearMap<mqis::Gate, mqis::Gate, 10> {
+    std::pair {mqis::Gate::H, mqis::Gate::CH},
+    std::pair {mqis::Gate::X, mqis::Gate::CX},
+    std::pair {mqis::Gate::Y, mqis::Gate::CY},
+    std::pair {mqis::Gate::Z, mqis::Gate::CZ},
+    std::pair {mqis::Gate::SX, mqis::Gate::CSX},
+    std::pair {mqis::Gate::RX, mqis::Gate::CRX},
+    std::pair {mqis::Gate::RY, mqis::Gate::CRY},
+    std::pair {mqis::Gate::RZ, mqis::Gate::CRZ},
+    std::pair {mqis::Gate::P, mqis::Gate::CP},
+    std::pair {mqis::Gate::U, mqis::Gate::CU}
+};
+
 }  // namespace impl_mqis
 
 namespace mqis
