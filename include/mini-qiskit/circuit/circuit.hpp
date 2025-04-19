@@ -185,6 +185,21 @@ public:
         }
     }
 
+    void add_ch_gate(std::size_t control_index, std::size_t target_index)
+    {
+        check_qubit_range_(control_index, "control qubit", "CH");
+        check_qubit_range_(target_index, "target qubit", "CH");
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CH>(control_index, target_index));
+    }
+
+    template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
+    void add_ch_gate(const Container& pairs)
+    {
+        for (auto pair : pairs) {
+            add_ch_gate(pair.first, pair.second);
+        }
+    }
+
     void add_cx_gate(std::size_t control_index, std::size_t target_index)
     {
         check_qubit_range_(control_index, "control qubit", "CX");

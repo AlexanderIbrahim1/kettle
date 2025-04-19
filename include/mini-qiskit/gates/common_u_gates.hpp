@@ -111,7 +111,7 @@ constexpr auto sx_gate() noexcept -> Matrix2X2
 
 constexpr auto non_angle_gate(Gate gate) -> Matrix2X2
 {
-    if (gate == Gate::H) {
+    if (gate == Gate::H || gate == Gate::CH) {
         return h_gate();
     }
     else if (gate == Gate::X || gate == Gate::CX) {
