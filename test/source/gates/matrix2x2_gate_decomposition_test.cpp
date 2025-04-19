@@ -9,7 +9,7 @@
 #include "mini-qiskit/gates/primitive_gate.hpp"
 
 
-TEST_CASE("decomp_to_single_primitive_gate()")
+TEST_CASE("decomp_to_single_primitive_gate_()")
 {
     using Info = impl_mqis::PrimitiveGateInfo;
 
@@ -30,7 +30,7 @@ TEST_CASE("decomp_to_single_primitive_gate()")
             TestCase {mqis::h_gate() * mqis::rx_gate(1.2345), std::nullopt}
         );
 
-        const auto output = impl_mqis::decomp_to_single_primitive_gate(testcase.input);
+        const auto output = impl_mqis::decomp_to_single_primitive_gate_(testcase.input);
 
         REQUIRE(output.has_value());
         REQUIRE(output->gate == testcase.expected->gate);
@@ -64,7 +64,7 @@ TEST_CASE("decomp_to_single_primitive_gate()")
             TestCase {mqis::p_gate(angle), Info {mqis::Gate::P, angle}}
         );
 
-        const auto output = impl_mqis::decomp_to_single_primitive_gate(testcase.input);
+        const auto output = impl_mqis::decomp_to_single_primitive_gate_(testcase.input);
 
         REQUIRE(output.has_value());
         REQUIRE(output->gate == testcase.expected->gate);
