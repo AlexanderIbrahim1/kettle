@@ -8,6 +8,8 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+// TODO: remove
+#include "mini-qiskit/common/print.hpp"
 #include "mini-qiskit/common/mathtools.hpp"
 #include "mini-qiskit/common/matrix2x2.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
@@ -912,7 +914,7 @@ TEST_CASE("simulate U gate")
 
     SECTION("SX gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::sqrt_x_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::sx_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SX", 0.0, 0}}, n_qubits);
 
         REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
@@ -987,7 +989,7 @@ TEST_CASE("simulate CU gate")
 
         SECTION("CSX gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::sqrt_x_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::sx_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSX", 0.0, control_qubit, target_qubit}}, n_qubits);
 
             REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));

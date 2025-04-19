@@ -54,7 +54,7 @@ inline auto decomp_to_primitive_gate(
     else if (almost_eq(unitary, mqis::z_gate(), tolerance_sq)) {
         return Info {mqis::Gate::Z, {}};
     }
-    if (almost_eq(unitary, mqis::sqrt_x_gate(), tolerance_sq)) {
+    if (almost_eq(unitary, mqis::sx_gate(), tolerance_sq)) {
         return Info {mqis::Gate::SX, {}};
     }
     else {

@@ -50,10 +50,10 @@ TEST_CASE("make_controlled_circuit()")
 
         SECTION("single u-gate")
         {
-            subcircuit.add_u_gate(mqis::sqrt_x_gate(), 0);
+            subcircuit.add_u_gate(mqis::sx_gate(), 0);
             auto new_circuit = mqis::make_controlled_circuit(subcircuit, 2, 0, {1});
 
-            expected.add_cu_gate(mqis::sqrt_x_gate(), 0, 1);
+            expected.add_cu_gate(mqis::sx_gate(), 0, 1);
 
             REQUIRE(mqis::almost_eq(new_circuit, expected));
         }
@@ -118,10 +118,10 @@ TEST_CASE("make_controlled_circuit()")
 
         SECTION("single cu-gate")
         {
-            subcircuit.add_cu_gate(mqis::sqrt_x_gate(), 0, 1);
+            subcircuit.add_cu_gate(mqis::sx_gate(), 0, 1);
             auto new_circuit = mqis::make_controlled_circuit(subcircuit, 3, 0, {1, 2});
 
-            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sqrt_x_gate(), 2, {0, 1});
+            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sx_gate(), 2, {0, 1});
 
             mqis::simulate(new_circuit, state0);
             mqis::simulate(expected, state1);
@@ -269,10 +269,10 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
 
         SECTION("single u-gate")
         {
-            subcircuit.add_u_gate(mqis::sqrt_x_gate(), 0);
+            subcircuit.add_u_gate(mqis::sx_gate(), 0);
             auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 3, {0, 1}, {2});
 
-            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sqrt_x_gate(), 2, {0, 1});
+            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sx_gate(), 2, {0, 1});
 
             mqis::simulate(new_circuit, state0);
             mqis::simulate(expected, state1);
@@ -342,10 +342,10 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
 
         SECTION("single cu-gate")
         {
-            subcircuit.add_cu_gate(mqis::sqrt_x_gate(), 0, 1);
+            subcircuit.add_cu_gate(mqis::sx_gate(), 0, 1);
             auto new_circuit = mqis::make_multiplicity_controlled_circuit(subcircuit, 4, {0, 1}, {2, 3});
 
-            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sqrt_x_gate(), 3, {0, 1, 2});
+            mqis::apply_multiplicity_controlled_u_gate(expected, mqis::sx_gate(), 3, {0, 1, 2});
 
             mqis::simulate(new_circuit, state0);
             mqis::simulate(expected, state1);

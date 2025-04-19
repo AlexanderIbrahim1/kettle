@@ -57,8 +57,8 @@ TEST_CASE("square root of 2x2 matrix")
             {0.0, 0.0}
         };
 
-        const auto sqrt_x_gate = mqis::matrix_square_root(x_gate);
-        const auto squared = sqrt_x_gate * sqrt_x_gate;
+        const auto sx_gate = mqis::matrix_square_root(x_gate);
+        const auto squared = sx_gate * sx_gate;
 
         REQUIRE(mqis::almost_eq(squared, x_gate));
     }

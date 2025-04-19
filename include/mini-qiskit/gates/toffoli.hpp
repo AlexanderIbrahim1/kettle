@@ -18,11 +18,12 @@ void apply_toffoli_gate(
 {
     const auto [control_qubit0, control_qubit1] = control_qubits;
 
-    circuit.add_cu_gate(sqrt_x_gate(), control_qubit1, target_qubit);
+    circuit.add_csx_gate(control_qubit1, target_qubit);
     circuit.add_cx_gate(control_qubit0, control_qubit1);
-    circuit.add_cu_gate(sqrt_x_gate_conj(), control_qubit1, target_qubit);
+    circuit.add_cx_gate(control_qubit1, target_qubit);
+    circuit.add_csx_gate(control_qubit1, target_qubit);
     circuit.add_cx_gate(control_qubit0, control_qubit1);
-    circuit.add_cu_gate(sqrt_x_gate(), control_qubit0, target_qubit);
+    circuit.add_csx_gate(control_qubit0, target_qubit);
 }
 
 }  // namespace mqis
