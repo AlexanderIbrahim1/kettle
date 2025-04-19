@@ -132,7 +132,7 @@ public:
     void add_rx_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RX");
-        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RX>(angle, target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate(Gate::RX, angle, target_index));
     }
 
     template <impl_mqis::QubitIndicesAndAngles Container = impl_mqis::QubitIndicesAndAnglesIList>
@@ -146,7 +146,7 @@ public:
     void add_ry_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RY");
-        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RY>(angle, target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate(Gate::RY, angle, target_index));
     }
 
     template <impl_mqis::QubitIndicesAndAngles Container = impl_mqis::QubitIndicesAndAnglesIList>
@@ -160,7 +160,7 @@ public:
     void add_rz_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RZ");
-        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::RZ>(angle, target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate(Gate::RZ, angle, target_index));
     }
 
     template <impl_mqis::QubitIndicesAndAngles Container = impl_mqis::QubitIndicesAndAnglesIList>
@@ -174,7 +174,7 @@ public:
     void add_p_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "P");
-        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate<Gate::P>(angle, target_index));
+        gates_.emplace_back(impl_mqis::create_one_target_one_angle_gate(Gate::P, angle, target_index));
     }
 
     template <impl_mqis::QubitIndicesAndAngles Container = impl_mqis::QubitIndicesAndAnglesIList>
@@ -189,7 +189,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CH");
         check_qubit_range_(target_index, "target qubit", "CH");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CH>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate(Gate::CH, control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
@@ -204,7 +204,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CX");
         check_qubit_range_(target_index, "target qubit", "CX");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CX>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate(Gate::CX, control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
@@ -219,7 +219,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CY");
         check_qubit_range_(target_index, "target qubit", "CY");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CY>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate(Gate::CY, control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
@@ -234,7 +234,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CZ");
         check_qubit_range_(target_index, "target qubit", "CZ");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CZ>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate(Gate::CZ, control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
@@ -249,7 +249,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CSX");
         check_qubit_range_(target_index, "target qubit", "CSX");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate<Gate::CSX>(control_index, target_index));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_gate(Gate::CSX, control_index, target_index));
     }
 
     template <impl_mqis::ControlAndTargetIndices Container = impl_mqis::ControlAndTargetIndicesIList>
@@ -264,7 +264,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRX");
         check_qubit_range_(target_index, "target qubit", "CRX");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRX>(control_index, target_index, angle));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate(Gate::CRX, control_index, target_index, angle));
     }
 
     template <impl_mqis::ControlAndTargetIndicesAndAngles Container = impl_mqis::ControlAndTargetIndicesAndAnglesIList>
@@ -279,7 +279,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRY");
         check_qubit_range_(target_index, "target qubit", "CRY");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRY>(control_index, target_index, angle));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate(Gate::CRY, control_index, target_index, angle));
     }
 
     template <impl_mqis::ControlAndTargetIndicesAndAngles Container = impl_mqis::ControlAndTargetIndicesAndAnglesIList>
@@ -294,7 +294,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRZ");
         check_qubit_range_(target_index, "target qubit", "CRZ");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CRZ>(control_index, target_index, angle));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate(Gate::CRZ, control_index, target_index, angle));
     }
 
     template <impl_mqis::ControlAndTargetIndicesAndAngles Container = impl_mqis::ControlAndTargetIndicesAndAnglesIList>
@@ -309,7 +309,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CP");
         check_qubit_range_(target_index, "target qubit", "CP");
-        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate<Gate::CP>(control_index, target_index, angle));
+        gates_.emplace_back(impl_mqis::create_one_control_one_target_one_angle_gate(Gate::CP, control_index, target_index, angle));
     }
 
     template <impl_mqis::ControlAndTargetIndicesAndAngles Container = impl_mqis::ControlAndTargetIndicesAndAnglesIList>

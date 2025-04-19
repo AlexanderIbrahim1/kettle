@@ -126,7 +126,7 @@ constexpr static auto DUMMY_ARG3 = std::size_t {0};
 constexpr auto create_one_target_gate(mqis::Gate gate, std::size_t target_index) -> mqis::GateInfo
 {
     if (!gate_id::is_one_target_transform_gate(gate)) {
-        throw std::runtime_error {"DEV ERROR: invalid one-target-one-transform gate provided.\n"};
+        throw std::runtime_error {"DEV ERROR: invalid one-target gate provided.\n"};
     }
 
     return {gate, target_index, DUMMY_ARG1, DUMMY_ARG2, DUMMY_ARG3};
@@ -137,11 +137,13 @@ constexpr auto unpack_one_target_gate(const mqis::GateInfo& info) -> std::size_t
     return info.arg0;  // target_index
 }
 
-template <mqis::Gate GateKind>
-constexpr auto create_one_target_one_angle_gate(double theta, std::size_t target_index) -> mqis::GateInfo
+constexpr auto create_one_target_one_angle_gate(mqis::Gate gate, double theta, std::size_t target_index) -> mqis::GateInfo
 {
-    static_assert(gate_id::is_one_target_one_angle_transform_gate(GateKind));
-    return {GateKind, target_index, DUMMY_ARG1, theta, DUMMY_ARG3};
+    if (!gate_id::is_one_target_one_angle_transform_gate(gate)) {
+        throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
+    }
+
+    return {gate, target_index, DUMMY_ARG1, theta, DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_one_angle_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, double>
@@ -149,28 +151,32 @@ constexpr auto unpack_one_target_one_angle_gate(const mqis::GateInfo& info) -> s
     return {info.arg0, info.arg2};  // target_index, angle
 }
 
-template <mqis::Gate GateKind>
-constexpr auto create_one_control_one_target_one_angle_gate(std::size_t control_index, std::size_t target_index, double theta) -> mqis::GateInfo
+constexpr auto create_one_control_one_target_gate(mqis::Gate gate, std::size_t control_index, std::size_t target_index) -> mqis::GateInfo
 {
-    static_assert(gate_id::is_one_control_one_target_one_angle_transform_gate(GateKind));
-    return {GateKind, control_index, target_index, theta, DUMMY_ARG3};
-}
+    if (!gate_id::is_one_control_one_target_transform_gate(gate)) {
+        throw std::runtime_error {"DEV ERROR: invalid one-control-one-target gate provided.\n"};
+    }
 
-constexpr auto unpack_one_control_one_target_one_angle_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>
-{
-    return {info.arg0, info.arg1, info.arg2};  // control_index, target_index, angle
-}
-
-template <mqis::Gate GateKind>
-constexpr auto create_one_control_one_target_gate(std::size_t control_index, std::size_t target_index) -> mqis::GateInfo
-{
-    static_assert(gate_id::is_one_control_one_target_transform_gate(GateKind));
-    return {GateKind, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
+    return {gate, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_control_one_target_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};  // control_index, target_index
+}
+
+constexpr auto create_one_control_one_target_one_angle_gate(mqis::Gate gate, std::size_t control_index, std::size_t target_index, double theta) -> mqis::GateInfo
+{
+    if (!gate_id::is_one_control_one_target_one_angle_transform_gate(gate)) {
+        throw std::runtime_error {"DEV ERROR: invalid one-control-one-target-one-angle gate provided.\n"};
+    }
+
+    return {gate, control_index, target_index, theta, DUMMY_ARG3};
+}
+
+constexpr auto unpack_one_control_one_target_one_angle_gate(const mqis::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>
+{
+    return {info.arg0, info.arg1, info.arg2};  // control_index, target_index, angle
 }
 
 /* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `target_index` */

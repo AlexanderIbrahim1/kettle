@@ -18,7 +18,7 @@ TEST_CASE("Test create and unpack gate functions")
     {
         const auto theta = 1.57;
         const auto target_index = std::size_t {3};
-        const auto gate_info = impl_mqis::create_one_target_one_angle_gate<mqis::Gate::RX>(theta, target_index);
+        const auto gate_info = impl_mqis::create_one_target_one_angle_gate(mqis::Gate::RX, theta, target_index);
         const auto [unpacked_index, unpacked_theta] = impl_mqis::unpack_one_target_one_angle_gate(gate_info);
 
         REQUIRE(unpacked_index == target_index);
@@ -38,7 +38,7 @@ TEST_CASE("Test create and unpack gate functions")
     {
         const auto control_index = std::size_t {2};
         const auto target_index = std::size_t {3};
-        const auto gate_info = impl_mqis::create_one_control_one_target_gate<mqis::Gate::CX>(control_index, target_index);
+        const auto gate_info = impl_mqis::create_one_control_one_target_gate(mqis::Gate::CX, control_index, target_index);
         const auto [unpacked_control, unpacked_target] = impl_mqis::unpack_one_control_one_target_gate(gate_info);
 
         REQUIRE(unpacked_control == control_index);
@@ -50,7 +50,7 @@ TEST_CASE("Test create and unpack gate functions")
         const auto control_index = std::size_t {4};
         const auto target_index = std::size_t {5};
         const auto theta = 1.23;
-        const auto gate_info = impl_mqis::create_one_control_one_target_one_angle_gate<mqis::Gate::CRX>(control_index, target_index, theta);
+        const auto gate_info = impl_mqis::create_one_control_one_target_one_angle_gate(mqis::Gate::CRX, control_index, target_index, theta);
         const auto [unpacked_control, unpacked_target, unpacked_theta] = impl_mqis::unpack_one_control_one_target_one_angle_gate(gate_info);
 
         REQUIRE(unpacked_control == control_index);
@@ -63,7 +63,7 @@ TEST_CASE("Test create and unpack gate functions")
         const auto control_index = std::size_t {4};
         const auto target_index = std::size_t {5};
         const auto theta = 1.23;
-        const auto gate_info = impl_mqis::create_one_control_one_target_one_angle_gate<mqis::Gate::CP>(control_index, target_index, theta);
+        const auto gate_info = impl_mqis::create_one_control_one_target_one_angle_gate(mqis::Gate::CP, control_index, target_index, theta);
         const auto [unpacked_control, unpacked_target, unpacked_theta] = impl_mqis::unpack_one_control_one_target_one_angle_gate(gate_info);
 
         REQUIRE(unpacked_control == control_index);
