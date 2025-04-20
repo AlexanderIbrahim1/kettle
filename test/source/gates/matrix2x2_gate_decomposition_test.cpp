@@ -5,9 +5,6 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-// TODO: remove
-#include "mini-qiskit/common/print.hpp"
-
 #include "mini-qiskit/circuit/circuit.hpp"
 #include "mini-qiskit/state/state.hpp"
 #include "mini-qiskit/state/random.hpp"
@@ -147,7 +144,7 @@ TEST_CASE("decompose to primtive gates; general")
         mqis::simulate(circuit0, state0);
         mqis::simulate(circuit1, state1);
 
-        REQUIRE(mqis::almost_eq_with_print(state0, state1));
+        REQUIRE(mqis::almost_eq(state0, state1));
     }
 
     SECTION("one control one target gates")
@@ -186,6 +183,6 @@ TEST_CASE("decompose to primtive gates; general")
         mqis::simulate(circuit0, state0);
         mqis::simulate(circuit1, state1);
 
-        REQUIRE(mqis::almost_eq_with_print(state0, state1));
+        REQUIRE(mqis::almost_eq(state0, state1));
     }
 }
