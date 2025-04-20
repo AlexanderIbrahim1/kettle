@@ -3,12 +3,13 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <string>
 
 #include <mini-qiskit/gates/primitive_gate.hpp>
+#include <mini-qiskit/gates/primitive_gate_map.hpp>
 #include <mini-qiskit/circuit/circuit.hpp>
-#include <mini-qiskit/common/utils.hpp>
 #include <mini-qiskit/gates/swap.hpp>
 
 /*
@@ -26,28 +27,27 @@ RZ        target : [5]   parameter : 12.533816585267923
 namespace impl_mqis
 {
 
-template <mqis::Gate GateType>
-void parse_one_target_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+/*
+    Certain names of primitive gates do not match between the tangelo codebase and this codebase;
+    this function converts tangelo-specific names to names used here.
+*/
+inline auto tangelo_to_local_name_(const std::string& name) -> std::string
 {
-    std::string dummy_str;
-    char dummy_ch;
-    std::size_t target_qubit;
-
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit; // target qubit
-    stream >> dummy_ch;     // ']'
-
-    if constexpr (GateType == mqis::Gate::H) {
-        circuit.add_h_gate(target_qubit);
+    if (name == "CPHASE") {
+        return "CP";
+    }
+    else if (name == "CNOT") {
+        return "CX";
+    }
+    else if (name == "PHASE") {
+        return "P";
     }
     else {
-        static_assert(impl_mqis::always_false<void>::value, "Invalid gate template provided to `parse_r_gate()`");
+        return name;
     }
 }
 
-inline void parse_swap_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+inline void parse_swap_gate_(mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -65,7 +65,23 @@ inline void parse_swap_gate(mqis::QuantumCircuit& circuit, std::stringstream& st
     mqis::apply_swap(circuit, target_qubit0, target_qubit1);
 }
 
-inline void parse_cx_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t target_qubit;
+
+    stream >> dummy_str;    // 'target'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> target_qubit; // target qubit
+    stream >> dummy_ch;     // ']'
+
+    const auto func = GATE_TO_FUNCTION_1T.at(gate);
+    (circuit.*func)(target_qubit);
+}
+
+inline void parse_one_control_one_target_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -83,11 +99,11 @@ inline void parse_cx_gate(mqis::QuantumCircuit& circuit, std::stringstream& stre
     stream >> control_qubit; // control qubit
     stream >> dummy_ch;     // ']'
 
-    circuit.add_cx_gate(control_qubit, target_qubit);
+    const auto func = GATE_TO_FUNCTION_1C1T.at(gate);
+    (circuit.*func)(control_qubit, target_qubit);
 }
 
-template <mqis::Gate GateType>
-void parse_one_target_one_angle_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -103,28 +119,11 @@ void parse_one_target_one_angle_gate(mqis::QuantumCircuit& circuit, std::strings
     stream >> dummy_str;    // ':'
     stream >> angle;        // angle
 
-    if constexpr (GateType == mqis::Gate::RX) {
-        circuit.add_rx_gate(target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::RY) {
-        circuit.add_ry_gate(target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::RZ) {
-        circuit.add_rz_gate(target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::P) {
-        circuit.add_p_gate(target_qubit, angle);
-    }
-    else {
-        static_assert(
-            impl_mqis::always_false<void>::value,
-            "Invalid gate template provided to `parse_one_target_one_angle_gate()`"
-        );
-    }
+    const auto func = GATE_TO_FUNCTION_1T1A.at(gate);
+    (circuit.*func)(target_qubit, angle);
 }
 
-template <mqis::Gate GateType>
-void parse_one_target_one_control_one_angle_gate(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_control_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -146,24 +145,8 @@ void parse_one_target_one_control_one_angle_gate(mqis::QuantumCircuit& circuit, 
     stream >> dummy_str;    // ':'
     stream >> angle;        // angle
 
-    if constexpr (GateType == mqis::Gate::CP) {
-        circuit.add_cp_gate(control_qubit, target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::CRX) {
-        circuit.add_crx_gate(control_qubit, target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::CRY) {
-        circuit.add_cry_gate(control_qubit, target_qubit, angle);
-    }
-    else if constexpr (GateType == mqis::Gate::CRZ) {
-        circuit.add_crz_gate(control_qubit, target_qubit, angle);
-    }
-    else {
-        static_assert(
-            impl_mqis::always_false<void>::value,
-            "Invalid gate template provided to `parse_one_target_one_control_one_angle_gate()`"
-        );
-    }
+    const auto func = GATE_TO_FUNCTION_1C1T1A.at(gate);
+    (circuit.*func)(control_qubit, target_qubit, angle);
 }
 
 }  // namespace impl_mqis
@@ -174,6 +157,9 @@ namespace mqis
 
 inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std::size_t n_skip_lines) -> QuantumCircuit
 {
+    namespace gid = impl_mqis::gate_id;
+    using G = mqis::Gate;
+
     auto circuit = mqis::QuantumCircuit {n_qubits};
 
     std::string line;
@@ -192,43 +178,40 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
             continue;
         }
 
-        if (gate_name == "H") {
-            impl_mqis::parse_one_target_gate<Gate::H>(circuit, gatestream);
+        const auto local_name = impl_mqis::tangelo_to_local_name_(gate_name);
+
+        // handle the special cases where tangelo has primitive gates that don't exist in the local code
+        if (local_name == "SWAP") {
+            impl_mqis::parse_swap_gate_(circuit, gatestream);
+            continue;
         }
-        else if (gate_name == "RX") {
-            impl_mqis::parse_one_target_one_angle_gate<Gate::RX>(circuit, gatestream);
+
+        // attempt to parse the gate
+        const auto gate = [&]() {
+            try {
+                return impl_mqis::PRIMITIVE_GATES_TO_STRING.at_reverse(local_name);
+            }
+            catch (const std::runtime_error& e) {
+                auto err_msg = std::stringstream {};
+                err_msg << "Unknown gate found in `read_tangelo_file()` : " << local_name << '\n';
+                throw std::runtime_error {err_msg.str()};
+            }
+        }();
+
+        if (gid::is_one_target_transform_gate(gate)) {
+            impl_mqis::parse_one_target_gate_(gate, circuit, gatestream);
         }
-        else if (gate_name == "RY") {
-            impl_mqis::parse_one_target_one_angle_gate<Gate::RY>(circuit, gatestream);
+        else if (gid::is_one_control_one_target_transform_gate(gate)) {
+            impl_mqis::parse_one_control_one_target_gate_(gate, circuit, gatestream);
         }
-        else if (gate_name == "RZ") {
-            impl_mqis::parse_one_target_one_angle_gate<Gate::RZ>(circuit, gatestream);
+        else if (gid::is_one_target_one_angle_transform_gate(gate)) {
+            impl_mqis::parse_one_target_one_angle_gate_(gate, circuit, gatestream);
         }
-        else if (gate_name == "PHASE") {
-            impl_mqis::parse_one_target_one_angle_gate<Gate::P>(circuit, gatestream);
+        else if (gid::is_one_control_one_target_one_angle_transform_gate(gate)) {
+            impl_mqis::parse_one_control_one_target_one_angle_gate_(gate, circuit, gatestream);
         }
-        else if (gate_name == "CNOT") {
-            impl_mqis::parse_cx_gate(circuit, gatestream);
-        }
-        else if (gate_name == "CPHASE") {
-            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CP>(circuit, gatestream);
-        }
-        else if (gate_name == "CRX") {
-            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRX>(circuit, gatestream);
-        }
-        else if (gate_name == "CRY") {
-            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRY>(circuit, gatestream);
-        }
-        else if (gate_name == "CRZ") {
-            impl_mqis::parse_one_target_one_control_one_angle_gate<Gate::CRZ>(circuit, gatestream);
-        }
-        else if (gate_name == "SWAP") {
-            impl_mqis::parse_swap_gate(circuit, gatestream);
-        }
-        else {
-            auto err_msg = std::stringstream {};
-            err_msg << "Unknown gate found in `read_tangelo_file()` : " << gate_name << '\n';
-            throw std::runtime_error {err_msg.str()};
+        else if (gate == G::M || gate == G::U || gate == G::CU || gate == G::CONTROL) {
+            // DO NOTHING FOR NOW
         }
     }
 
