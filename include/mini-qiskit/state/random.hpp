@@ -16,10 +16,10 @@
 namespace mqis
 {
 
-inline auto generate_random_state(
-    std::size_t n_qubits,
-    std::mt19937& prng
-) -> mqis::QuantumState
+/*
+    Generate a random `QuantumState` instance, taking the PRNG directly.
+*/
+inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> mqis::QuantumState
 {
     if (n_qubits == 0) {
         throw std::runtime_error {"Cannot generate a quantum state with 0 qubits.\n"};
@@ -62,17 +62,26 @@ inline auto generate_random_state(
     return amplitudes;
 }
 
+/*
+    Generate a random `QuantumState` instance, generating a fresh PRNG using the provided seed.
+*/
 inline auto generate_random_state(std::size_t n_qubits, int seed) -> mqis::QuantumState
 {
     auto prng = impl_mqis::get_prng_(seed);
     return generate_random_state(n_qubits, prng);
 }
 
+/*
+    Generate a random `QuantumState` instance, generating the PRNG from the random device.
+*/
 inline auto generate_random_state(std::size_t n_qubits) -> mqis::QuantumState
 {
-    // NOTE: creating a single `generate_random_state()` function that takes as an
-    // argument `std::optional<int> seed = std::nullopt` causes an infinite self-recursion
-    // loop; I guess an instance of `std::mt19937` gets picked up as `std::optional<int>`???
+    // NOTE: creating a single function with the function signature
+    //     `generate_random_state(std::size_t n_qubits, std::optional<int> seed = std::nullopt)`
+    // causes an infinite self-recursion loop
+    //
+    // I guess an instance of `std::mt19937` gets picked up as `std::optional<int>`???
+    // the point is this is why there are two separate functions
     auto prng = impl_mqis::get_prng_(std::nullopt);
     return generate_random_state(n_qubits, prng);
 }
