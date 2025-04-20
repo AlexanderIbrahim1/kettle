@@ -6,7 +6,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <mini-qiskit/gates/primitive_gate.hpp>
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
+#include <mini-qiskit/io/read_tangelo_file.hpp>
 
 
 TEST_CASE("read_tangelo_file()")
