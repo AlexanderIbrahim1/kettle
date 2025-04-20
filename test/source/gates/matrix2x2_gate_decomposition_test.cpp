@@ -1,15 +1,37 @@
 #include <optional>
+#include <string>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "mini-qiskit/circuit/circuit.hpp"
+#include "mini-qiskit/state/state.hpp"
+#include "mini-qiskit/state/random.hpp"
+#include "mini-qiskit/simulation/simulate.hpp"
 #include "mini-qiskit/gates/common_u_gates.hpp"
 #include "mini-qiskit/gates/matrix2x2_gate_decomposition.hpp"
 #include "mini-qiskit/gates/primitive_gate.hpp"
 
 
-TEST_CASE("decomp_to_primitive_gate()")
+/*
+    A primitive way of putting the minimum image of the angle within [0, 2pi);
+    none of the unit tests are expected to create very large angles anyways
+*/
+constexpr auto between_0_and_period(double x, double period) -> double {
+    while (x < 0.0) {
+        x += period;
+    }
+
+    while (x >= period) {
+        x -= period;
+    }
+
+    return x;
+};
+
+
+TEST_CASE("decomp_to_single_primitive_gate_()")
 {
     using Info = impl_mqis::PrimitiveGateInfo;
 
@@ -21,35 +43,35 @@ TEST_CASE("decomp_to_primitive_gate()")
 
     SECTION("unparameterized primitive gates")
     {
-        const auto testcase = GENERATE(
-            TestCase {mqis::h_gate(), Info {mqis::Gate::H, {}}},
-            TestCase {mqis::x_gate(), Info {mqis::Gate::X, {}}},
-            TestCase {mqis::y_gate(), Info {mqis::Gate::Y, {}}},
-            TestCase {mqis::z_gate(), Info {mqis::Gate::Z, {}}},
-            TestCase {mqis::sx_gate(), Info {mqis::Gate::SX, {}}},
-            TestCase {mqis::h_gate() * mqis::rx_gate(1.2345), std::nullopt}
-        );
+        SECTION("successful decomposition")
+        {
+            const auto testcase = GENERATE(
+                TestCase {mqis::h_gate(), Info {mqis::Gate::H, {}}},
+                TestCase {mqis::x_gate(), Info {mqis::Gate::X, {}}},
+                TestCase {mqis::y_gate(), Info {mqis::Gate::Y, {}}},
+                TestCase {mqis::z_gate(), Info {mqis::Gate::Z, {}}},
+                TestCase {mqis::sx_gate(), Info {mqis::Gate::SX, {}}}
+            );
 
-        REQUIRE(impl_mqis::decomp_to_primitive_gate(testcase.input) == testcase.expected);
+            const auto output = impl_mqis::decomp_to_single_primitive_gate_(testcase.input);
+
+            REQUIRE(output.has_value());
+            REQUIRE(output->gate == testcase.expected->gate);
+            REQUIRE(output->parameter == std::nullopt);
+        }
+
+        SECTION("unsuccessful decomposition")
+        {
+            auto testcase = TestCase {mqis::h_gate() * mqis::rx_gate(1.2345), std::nullopt};
+
+            const auto output = impl_mqis::decomp_to_single_primitive_gate_(testcase.input);
+            REQUIRE(!output.has_value());
+        }
     }
 
     SECTION("parameterized primitive gates")
     {
         constexpr auto abs_tol = 1.0e-6;
-
-        const auto between_0_and_2pi = [](double x) -> double {
-            // a primitive way of putting the minimum image of the angle within [0, 2pi);
-            // none of the unit tests are expected to create very large angles anyways
-            while (x < 0.0) {
-                x += 2.0 * M_PI;
-            }
-
-            while (x >= 2.0 * M_PI) {
-                x -= 2.0 * M_PI;
-            }
-
-            return x;
-        };
 
         const auto angle = GENERATE(0.01, 0.25 * M_PI, 1.5 * M_PI, 1.99 * M_PI);
 
@@ -60,15 +82,107 @@ TEST_CASE("decomp_to_primitive_gate()")
             TestCase {mqis::p_gate(angle), Info {mqis::Gate::P, angle}}
         );
 
-        const auto output = impl_mqis::decomp_to_primitive_gate(testcase.input);
+        const auto output = impl_mqis::decomp_to_single_primitive_gate_(testcase.input);
 
         REQUIRE(output.has_value());
-
         REQUIRE(output->gate == testcase.expected->gate);
 
-        const auto output_angle = between_0_and_2pi(output->parameter.value());
-        const auto expected_angle = between_0_and_2pi(testcase.expected->parameter.value());
+        const auto output_angle = between_0_and_period(output->parameter.value(), 2.0 * M_PI);
+        const auto expected_angle = between_0_and_period(testcase.expected->parameter.value(), 2.0 * M_PI);
 
         REQUIRE_THAT(output_angle, Catch::Matchers::WithinAbs(expected_angle, abs_tol));
+    }
+}
+
+TEST_CASE("decompose to primtive gates; general")
+{
+    double angle0 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
+    double angle1 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
+    double angle2 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
+    double angle_global = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
+
+    const auto unitary = [&]() {
+        auto matrix = mqis::rz_gate(angle2) * mqis::ry_gate(angle1) * mqis::rz_gate(angle0);
+        const auto global_phase = std::complex<double> {std::cos(angle_global), std::sin(angle_global)};
+        matrix *= global_phase;
+
+        return matrix;
+    }();
+
+    SECTION("one target gates")
+    {
+        const auto target = std::size_t {0};
+        const auto decomp_gates = impl_mqis::decomp_to_one_target_primitive_gates_(target, unitary);
+
+        // make sure the expect gates come out
+        REQUIRE(decomp_gates.size() == 4);
+        REQUIRE(decomp_gates[0].gate == mqis::Gate::RZ);
+        REQUIRE(decomp_gates[1].gate == mqis::Gate::RY);
+        REQUIRE(decomp_gates[2].gate == mqis::Gate::RZ);
+        REQUIRE(decomp_gates[3].gate == mqis::Gate::P);
+
+        // construct a circuit from the unitary matrix
+        auto circuit0 = mqis::QuantumCircuit {1};
+        circuit0.add_u_gate(unitary, 0);
+
+        // construct a circuit from the decomposed gates
+        const auto [target0, angle_g0] = impl_mqis::unpack_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [target1, angle_g1] = impl_mqis::unpack_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [target2, angle_g2] = impl_mqis::unpack_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [target3, angle_g3] = impl_mqis::unpack_one_target_one_angle_gate(decomp_gates[3]);
+
+        auto circuit1 = mqis::QuantumCircuit {1};
+        circuit1.add_rz_gate(target0, angle_g0);
+        circuit1.add_ry_gate(target0, angle_g1);
+        circuit1.add_rz_gate(target0, angle_g2);
+        circuit1.add_p_gate(target0, angle_g3);
+
+        // simulate the same state through both circuits, and make sure the outcome is the same
+        auto state0 = mqis::generate_random_state(1);
+        auto state1 = state0;
+
+        mqis::simulate(circuit0, state0);
+        mqis::simulate(circuit1, state1);
+
+        REQUIRE(mqis::almost_eq(state0, state1));
+    }
+
+    SECTION("one control one target gates")
+    {
+        const auto target = std::size_t {0};
+        const auto control = std::size_t {1};
+        const auto decomp_gates = impl_mqis::decomp_to_one_control_one_target_primitive_gates_(control, target, unitary);
+
+        // make sure the expect gates come out
+        REQUIRE(decomp_gates.size() == 4);
+        REQUIRE(decomp_gates[0].gate == mqis::Gate::CRZ);
+        REQUIRE(decomp_gates[1].gate == mqis::Gate::CRY);
+        REQUIRE(decomp_gates[2].gate == mqis::Gate::CRZ);
+        REQUIRE(decomp_gates[3].gate == mqis::Gate::CP);
+
+        // construct a circuit from the unitary matrix
+        auto circuit0 = mqis::QuantumCircuit {2};
+        circuit0.add_cu_gate(unitary, control, target);
+
+        // construct a circuit from the decomposed gates
+        const auto [control0, target0, angle_g0] = impl_mqis::unpack_one_control_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [control1, target1, angle_g1] = impl_mqis::unpack_one_control_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [control2, target2, angle_g2] = impl_mqis::unpack_one_control_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [control3, target3, angle_g3] = impl_mqis::unpack_one_control_one_target_one_angle_gate(decomp_gates[3]);
+
+        auto circuit1 = mqis::QuantumCircuit {2};
+        circuit1.add_crz_gate(control0, target0, angle_g0);
+        circuit1.add_cry_gate(control1, target1, angle_g1);
+        circuit1.add_crz_gate(control2, target2, angle_g2);
+        circuit1.add_cp_gate(control3, target3, angle_g3);
+
+        // simulate the same state through both circuits, and make sure the outcome is the same
+        auto state0 = mqis::generate_random_state(2);
+        auto state1 = state0;
+
+        mqis::simulate(circuit0, state0);
+        mqis::simulate(circuit1, state1);
+
+        REQUIRE(mqis::almost_eq(state0, state1));
     }
 }
