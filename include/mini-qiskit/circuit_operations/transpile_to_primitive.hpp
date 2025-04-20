@@ -60,8 +60,8 @@ inline auto transpile_to_primitive(
         }
         else if (ginfo.gate == Gate::CONTROL) {
             const auto cfi_kind = impl_mqis::control::unpack_control_flow_kind(ginfo);
-            const auto cfi_index = impl_mqis::control::unpack_control_flow_index(ginfo);
-            auto instruction = circuit.control_flow_instructions_[cfi_index];
+            const auto current_cfi_index = impl_mqis::control::unpack_control_flow_index(ginfo);
+            auto instruction = circuit.control_flow_instructions_[current_cfi_index];
 
             if (cfi_kind == impl_mqis::control::IF_STMT) {
                 const auto subcircuit = instruction.primary_circuit();
@@ -74,8 +74,8 @@ inline auto transpile_to_primitive(
 
                 new_circuit.control_flow_instructions_.emplace_back(std::move(cfi));
 
-                const auto cfi_index = new_circuit.control_flow_instructions_.size() - 1;
-                new_circuit.gates_.emplace_back(impl_mqis::control::create_control_flow_gate(cfi_index, cfi_kind));
+                const auto new_cfi_index = new_circuit.control_flow_instructions_.size() - 1;
+                new_circuit.gates_.emplace_back(impl_mqis::control::create_control_flow_gate(new_cfi_index, cfi_kind));
             }
         }
         else {
