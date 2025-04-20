@@ -80,7 +80,7 @@ add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circu
 add_test_target(TARGET transpile_to_primitive_test SOURCES "source/circuit_operations/transpile_to_primitive_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
 add_test_target(TARGET build_decomposed_circuit_test SOURCES "source/decomposed/build_decomposed_circuit_test.cpp")
 add_test_target(TARGET multi_product_test SOURCES "source/multi_product_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
-add_test_target(TARGET read_tangelo_file_test SOURCES "source/decomposed/read_tangelo_file_test.cpp")
+add_test_target(TARGET read_tangelo_file_test SOURCES "source/io/read_tangelo_file_test.cpp")
 add_test_target(TARGET io_numpy_statevector_test SOURCES "source/io/numpy_statevector_test.cpp")
 add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.cpp")
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
