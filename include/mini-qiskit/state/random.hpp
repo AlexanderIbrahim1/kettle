@@ -13,14 +13,6 @@
 #include "mini-qiskit/state/state.hpp"
 
 
-namespace impl_mqis
-{
-
-
-
-}  // namespace impl_mqis
-
-
 namespace mqis
 {
 
