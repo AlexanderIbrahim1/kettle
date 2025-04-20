@@ -16,7 +16,7 @@
 #include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
 #include <mini-qiskit/decomposed/decomposed_gate.hpp>
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
-#include <mini-qiskit/decomposed/read_tangelo_file.hpp>
+#include <mini-qiskit/io/read_tangelo_file.hpp>
 #include <mini-qiskit/gates/common_u_gates.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
 #include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
