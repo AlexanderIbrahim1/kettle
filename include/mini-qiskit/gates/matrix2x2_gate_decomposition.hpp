@@ -176,8 +176,8 @@ inline auto decomp_to_one_target_primitive_gates_(
 }
 
 inline auto decomp_to_one_control_one_target_primitive_gates_(
-    std::size_t target,
     std::size_t control,
+    std::size_t target,
     const mqis::Matrix2X2& unitary,
     double tolerance_sq = impl_mqis::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<mqis::GateInfo>

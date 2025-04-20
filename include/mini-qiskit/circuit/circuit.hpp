@@ -434,6 +434,7 @@ public:
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
     friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
+    friend auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq) -> QuantumCircuit;
 
 private:
     std::size_t n_qubits_;

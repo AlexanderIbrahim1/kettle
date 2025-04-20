@@ -154,7 +154,7 @@ TEST_CASE("decompose to primtive gates; general")
     {
         const auto target = std::size_t {0};
         const auto control = std::size_t {1};
-        const auto decomp_gates = impl_mqis::decomp_to_one_control_one_target_primitive_gates_(target, control, unitary);
+        const auto decomp_gates = impl_mqis::decomp_to_one_control_one_target_primitive_gates_(control, control, unitary);
 
         // make sure the expect gates come out
         REQUIRE(decomp_gates.size() == 4);
