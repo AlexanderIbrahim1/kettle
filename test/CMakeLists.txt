@@ -68,6 +68,7 @@ add_test_target(TARGET matrix2x2_test SOURCES "source/common/matrix2x2_test.cpp"
 add_test_target(TARGET probabilities_test SOURCES "source/calculations/probabilities_test.cpp")
 add_test_target(TARGET fourier_test SOURCES "source/gates/fourier_test.cpp")
 add_test_target(TARGET toffoli_test SOURCES "source/gates/toffoli_test.cpp")
+add_test_target(TARGET random_u_gates_test SOURCES "source/gates/random_u_gates_test.cpp")
 add_test_target(TARGET matrix2x2_gate_decomposition_test SOURCES "source/gates/matrix2x2_gate_decomposition_test.cpp")
 add_test_target(TARGET multiplicity_controlled_u_gate_test SOURCES "source/gates/multiplicity_controlled_u_gate_test.cpp")
 add_test_target(TARGET control_swap_test SOURCES "source/gates/control_swap_test.cpp")
