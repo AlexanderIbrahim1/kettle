@@ -7,6 +7,16 @@
 namespace mqis
 {
 
+constexpr auto i_gate() noexcept -> Matrix2X2
+{
+    return {
+        {1.0, 0.0},
+        {0.0, 0.0},
+        {0.0, 0.0},
+        {1.0, 0.0}
+    };
+}
+
 constexpr auto h_gate() noexcept -> Matrix2X2
 {
     return {
