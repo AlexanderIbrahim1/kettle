@@ -155,4 +155,70 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(target_qubit == 9);
         REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-0.39269908169872414));
     }
+
+    SECTION("parse_m_gate()")
+    {
+        auto stream = std::stringstream {"M         target : [1]   bit : [4]\n"};
+        const auto actual = mqis::read_tangelo_circuit(13, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
+        REQUIRE(actual[0].gate == mqis::Gate::M);
+
+        const auto [qubit, bit] = impl_mqis::unpack_m_gate(actual[0]);
+        REQUIRE(qubit == 1);
+        REQUIRE(bit == 4);
+    }
+
+    SECTION("parse_u_gate()")
+    {
+        auto stream = std::stringstream {
+            "U         target : [1]\n"
+            "    [1.234, -4.321]   [2.345, -5.432]\n"
+            "    [3.456, -6.543]   [4.567, -7.654]\n"
+        };
+        const auto actual = mqis::read_tangelo_circuit(10, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
+        REQUIRE(actual[0].gate == mqis::Gate::U);
+
+        const auto [target, matrix_index] = impl_mqis::unpack_u_gate(actual[0]);
+        const auto matrix = actual.unitary_gate(matrix_index);
+        
+        const auto expected_matrix = mqis::Matrix2X2 {
+            {1.234, -4.321},
+            {2.345, -5.432},
+            {3.456, -6.543},
+            {4.567, -7.654}
+        };
+
+        REQUIRE(target == 1);
+        REQUIRE(mqis::almost_eq(matrix, expected_matrix));
+    }
+
+    SECTION("parse_cu_gate()")
+    {
+        auto stream = std::stringstream {
+            "CU        target : [1]   control : [2]\n"
+            "    [1.234, -4.321]   [2.345, -5.432]\n"
+            "    [3.456, -6.543]   [4.567, -7.654]\n"
+        };
+        const auto actual = mqis::read_tangelo_circuit(10, stream, 0);
+
+        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
+        REQUIRE(actual[0].gate == mqis::Gate::CU);
+
+        const auto [control, target, matrix_index] = impl_mqis::unpack_cu_gate(actual[0]);
+        const auto matrix = actual.unitary_gate(matrix_index);
+        
+        const auto expected_matrix = mqis::Matrix2X2 {
+            {1.234, -4.321},
+            {2.345, -5.432},
+            {3.456, -6.543},
+            {4.567, -7.654}
+        };
+
+        REQUIRE(target == 1);
+        REQUIRE(control == 2);
+        REQUIRE(mqis::almost_eq(matrix, expected_matrix));
+    }
 }

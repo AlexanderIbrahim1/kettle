@@ -5,9 +5,6 @@
 #include <mini-qiskit/gates/primitive_gate.hpp>
 #include <mini-qiskit/io/write_tangelo_file.hpp>
 
-// TODO: remove
-#include <mini-qiskit/gates/random_u_gates.hpp>
-
 
 TEST_CASE("format_one_target_gate_()")
 {

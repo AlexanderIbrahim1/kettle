@@ -149,6 +149,100 @@ inline void parse_one_control_one_target_one_angle_gate_(mqis::Gate gate, mqis::
     (circuit.*func)(control_qubit, target_qubit, angle);
 }
 
+inline void parse_m_gate_(mqis::QuantumCircuit& circuit, std::stringstream& stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t qubit;
+    std::size_t bit;
+
+    stream >> dummy_str;    // 'target'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> qubit;        // qubit
+    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;    // 'bit'
+    stream >> dummy_str;    // ':'
+    stream >> dummy_ch;     // '['
+    stream >> bit;          // bit
+    stream >> dummy_ch;     // ']'
+
+    circuit.add_m_gate(qubit, bit);
+}
+
+inline auto parse_complex_(std::stringstream& stream) -> std::complex<double>
+{
+    char dummy_char;
+    double real;
+    double imag;
+
+    stream >> dummy_char;    // '['
+    stream >> real;          // real component
+    stream >> dummy_char;    // ','
+    stream >> imag;          // imaginary component
+    stream >> dummy_char;    // ']'
+
+    return {real, imag};
+}
+
+inline auto parse_matrix2x2_(std::istream& stream) -> mqis::Matrix2X2
+{
+    std::string first_line;
+    std::string second_line;
+
+    std::getline(stream, first_line);
+
+    auto sstream_first = std::stringstream {first_line};
+
+    std::getline(stream, second_line);
+    auto sstream_second = std::stringstream {second_line};
+
+    const auto elem00 = parse_complex_(sstream_first);
+    const auto elem01 = parse_complex_(sstream_first);
+    const auto elem10 = parse_complex_(sstream_second);
+    const auto elem11 = parse_complex_(sstream_second);
+
+    return {elem00, elem01, elem10, elem11};
+}
+
+inline void parse_u_gate_(mqis::QuantumCircuit& circuit, std::stringstream& gateline_stream, std::istream& circuit_stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t target_qubit;
+
+    gateline_stream >> dummy_str;    // 'target'
+    gateline_stream >> dummy_str;    // ':'
+    gateline_stream >> dummy_ch;     // '['
+    gateline_stream >> target_qubit; // target qubit
+    gateline_stream >> dummy_ch;     // ']'
+
+    const auto unitary = parse_matrix2x2_(circuit_stream);
+    circuit.add_u_gate(unitary, target_qubit);
+}
+
+inline void parse_cu_gate_(mqis::QuantumCircuit& circuit, std::stringstream& gateline_stream, std::istream& circuit_stream)
+{
+    std::string dummy_str;
+    char dummy_ch;
+    std::size_t target_qubit;
+    std::size_t control_qubit;
+
+    gateline_stream >> dummy_str;    // 'target'
+    gateline_stream >> dummy_str;    // ':'
+    gateline_stream >> dummy_ch;     // '['
+    gateline_stream >> target_qubit; // target qubit
+    gateline_stream >> dummy_ch;     // ']'
+    gateline_stream >> dummy_str;    // 'control'
+    gateline_stream >> dummy_str;    // ':'
+    gateline_stream >> dummy_ch;     // '['
+    gateline_stream >> control_qubit; // control qubit
+    gateline_stream >> dummy_ch;     // ']'
+
+    const auto unitary = parse_matrix2x2_(circuit_stream);
+    circuit.add_cu_gate(unitary, control_qubit, target_qubit);
+}
+
 }  // namespace impl_mqis
 
 
@@ -210,8 +304,17 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         else if (gid::is_one_control_one_target_one_angle_transform_gate(gate)) {
             impl_mqis::parse_one_control_one_target_one_angle_gate_(gate, circuit, gatestream);
         }
-        else if (gate == G::M || gate == G::U || gate == G::CU || gate == G::CONTROL) {
-            // DO NOTHING FOR NOW
+        else if (gate == G::M) {
+            impl_mqis::parse_m_gate_(circuit, gatestream);
+        }
+        else if (gate == G::U) {
+            impl_mqis::parse_u_gate_(circuit, gatestream, stream);
+        }
+        else if (gate == G::CU) {
+            impl_mqis::parse_cu_gate_(circuit, gatestream, stream);
+        }
+        else {
+            throw std::runtime_error {"DEV ERROR: A gate type with no implemented conversion has been encountered.\n"};
         }
     }
 
