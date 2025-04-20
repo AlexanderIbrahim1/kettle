@@ -65,7 +65,7 @@ inline void parse_swap_gate_(mqis::QuantumCircuit& circuit, std::stringstream& s
     mqis::apply_swap(circuit, target_qubit0, target_qubit1);
 }
 
-void parse_one_target_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
+inline void parse_one_target_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -103,7 +103,7 @@ inline void parse_one_control_one_target_gate_(mqis::Gate gate, mqis::QuantumCir
     (circuit.*func)(control_qubit, target_qubit);
 }
 
-void parse_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
+inline void parse_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
@@ -123,7 +123,7 @@ void parse_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& cir
     (circuit.*func)(target_qubit, angle);
 }
 
-void parse_one_control_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
+inline void parse_one_control_one_target_one_angle_gate_(mqis::Gate gate, mqis::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;
