@@ -9,6 +9,7 @@
 #include <mini-qiskit/circuit_operations/compare_circuits.hpp>
 #include <mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp>
 #include <mini-qiskit/circuit_operations/make_controlled_circuit.hpp>
+#include <mini-qiskit/circuit_operations/transpile_to_primitive.hpp>
 #include <mini-qiskit/common/arange.hpp>
 #include <mini-qiskit/common/mathtools.hpp>
 #include <mini-qiskit/common/matrix2x2.hpp>
@@ -16,15 +17,17 @@
 #include <mini-qiskit/decomposed/build_decomposed_circuit.hpp>
 #include <mini-qiskit/decomposed/decomposed_gate.hpp>
 #include <mini-qiskit/decomposed/read_decomposition_file.hpp>
-#include <mini-qiskit/io/read_tangelo_file.hpp>
 #include <mini-qiskit/gates/common_u_gates.hpp>
 #include <mini-qiskit/gates/fourier.hpp>
 #include <mini-qiskit/gates/multiplicity_controlled_u_gate.hpp>
 #include <mini-qiskit/gates/primitive_gate.hpp>
+#include <mini-qiskit/gates/random_u_gates.hpp>
 #include <mini-qiskit/gates/swap.hpp>
 #include <mini-qiskit/gates/toffoli.hpp>
+#include <mini-qiskit/io/read_tangelo_file.hpp>
 #include <mini-qiskit/io/numpy_statevector.hpp>
 #include <mini-qiskit/io/statevector.hpp>
+#include <mini-qiskit/io/write_tangelo_file.hpp>
 #include <mini-qiskit/simulation/simulate.hpp>
 #include <mini-qiskit/state/endian.hpp>
 #include <mini-qiskit/state/marginal.hpp>
