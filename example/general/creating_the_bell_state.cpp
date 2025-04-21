@@ -1,0 +1,23 @@
+#include <mini-qiskit/mini-qiskit.hpp>
+
+auto main() -> int
+{
+    // create a quantum circuit with 2 qubit registers, and apply the H and CX gates
+    auto circuit = mqis::QuantumCircuit {2};
+    circuit.add_h_gate(0);
+    circuit.add_cx_gate(0, 1);
+
+    // begin with a 2-qubit statevector in the |00> state
+    auto statevector = mqis::QuantumState {"00"};
+
+    // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
+    mqis::simulate(circuit, statevector);
+
+    // perform measurements on this statevector
+    const auto counts = mqis::perform_measurements_as_counts(statevector, 1024);
+    for (const auto& [bitstring, count] : counts) {
+        std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
+    }
+
+    return 0;
+}

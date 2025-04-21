@@ -29,6 +29,7 @@ add_example("algorithms" quantum_teleportation)
 add_example("algorithms" shor)
 add_example("algorithms" simon_ibm_example)
 
+add_example("general" creating_the_bell_state)
 add_example("general" inverse_fourier)
 add_example("general" multithreaded_simulate)
 add_example("general" random_state)
