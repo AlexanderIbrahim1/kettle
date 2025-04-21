@@ -30,11 +30,8 @@ add_example("algorithms" shor)
 add_example("algorithms" simon_ibm_example)
 
 add_example("general" inverse_fourier)
-add_example("general" save_statevector_example)
-add_example("general" read_decomposition_file)
-add_example("general" quantum_phase_estimation_diagonal)
-add_example("general" quantum_phase_estimation_diagonal_binary)
 add_example("general" multithreaded_simulate)
 add_example("general" random_state)
+add_example("general" save_statevector_example)
 
 add_folders(Example)
