@@ -34,7 +34,6 @@ add_example("general" save_statevector_example)
 add_example("general" read_decomposition_file)
 add_example("general" quantum_phase_estimation_diagonal)
 add_example("general" quantum_phase_estimation_diagonal_binary)
-add_example("general" quantum_phase_estimation_trotter20)
 add_example("general" multithreaded_simulate)
 add_example("general" random_state)
 
