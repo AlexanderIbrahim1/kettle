@@ -37,7 +37,7 @@ auto main() -> int
     // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
     mqis::simulate(circuit, statevector);
 
-    // perform measurements on this statevector
+    // perform measurements on this statevector, with 1024 shots
     const auto counts = mqis::perform_measurements_as_counts(statevector, 1024);
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
