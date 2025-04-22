@@ -64,16 +64,31 @@ as the project develops.
 
 # Building and installing
 
-See the [BUILDING](BUILDING.md) document.
+This project uses cmake presets for building.
+So far it has only been built and tested on Ubuntu 23.04.
+
+To build examples and unit tests (requires `FetchContent`-related functions to work with cmake):
+```sh
+cmake --preset=dev
+cmake --build --preset=dev
+```
+
+To build without unit tests, there are three different modes:
+  - `debug`
+  - `release`
+  - `highperf` (just `release` with `-ffast-math` and `-march=native`)
+
+For example:
+```sh
+cmake --preset=release
+cmake --build --preset=release
+```
 
 # Contributing
 
-See the [CONTRIBUTING](CONTRIBUTING.md) document.
+Thank you for considering making contributions to this project!
+You can use the issue tab to open a bug report or feature request.
 
-# Licensing
+# Acknowledgements
 
-<!--
-Please go to https://choosealicense.com/licenses/ and choose a license that
-fits your needs. The recommended license for a project of this type is the
-GNU AGPLv3.
--->
+This project was initially generated with the [`cmake-init`](https://github.com/friendlyanon/cmake-init) project.
