@@ -24,7 +24,7 @@ endif()
 # ---- Examples ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  option(BUILD_EXAMPLES "Build examples tree." "${mini-qiskit_DEVELOPER_MODE}")
+  option(BUILD_EXAMPLES "Build examples tree." "${mini-qiskit_BUILD_EXAMPLES}")
   if(BUILD_EXAMPLES)
     add_subdirectory(example)
   endif()
@@ -33,7 +33,7 @@ endif()
 # ---- QPE Tangelo Project ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  option(BUILD_QPE_TANGELO_PROJECT "Build QPE tangelo project tree." "${mini-qiskit_DEVELOPER_MODE}")
+  option(BUILD_QPE_TANGELO_PROJECT "Build QPE tangelo project tree." "${mini-qiskit_BUILD_QPE_TANGELO_PROJECT}")
   if(BUILD_QPE_TANGELO_PROJECT)
     add_subdirectory(qpe_tangelo_project)
   endif()

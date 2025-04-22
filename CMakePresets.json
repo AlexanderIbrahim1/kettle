@@ -26,7 +26,19 @@
       "hidden": true,
       "inherits": "cmake-pedantic",
       "cacheVariables": {
-        "mini-qiskit_DEVELOPER_MODE": "ON"
+        "mini-qiskit_DEVELOPER_MODE": "ON",
+        "mini-qiskit_BUILD_EXAMPLES": "ON",
+        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON"
+      }
+    },
+    {
+      "name": "debug-mode",
+      "hidden": true,
+      "inherits": "cmake-pedantic",
+      "cacheVariables": {
+        "mini-qiskit_DEVELOPER_MODE": "OFF",
+        "mini-qiskit_BUILD_EXAMPLES": "ON",
+        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON"
       }
     },
     {
@@ -57,9 +69,7 @@
       "name": "flags-linux",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -fstack-protector-strong -fcf-protection=full -fstack-clash-protection -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast",
-        "CMAKE_EXE_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now",
-        "CMAKE_SHARED_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now"
+        "CMAKE_CXX_FLAGS": "-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -fstack-protector-strong -fcf-protection=full -fstack-clash-protection -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast"
       }
     },
     {
@@ -98,40 +108,10 @@
     },
     {
       "name": "ci-win64",
-      "inherits": ["flags-windows", "ci-std"],
       "generator": "Visual Studio 17 2022",
-      "architecture": "x64",
-      "hidden": true
-    },
-    {
-      "name": "coverage-linux",
-      "binaryDir": "${sourceDir}/build/coverage",
-      "inherits": "ci-linux",
       "hidden": true,
-      "cacheVariables": {
-        "ENABLE_COVERAGE": "ON",
-        "CMAKE_BUILD_TYPE": "Coverage",
-        "CMAKE_CXX_FLAGS_COVERAGE": "-Og -g --coverage -fkeep-inline-functions -fkeep-static-functions",
-        "CMAKE_EXE_LINKER_FLAGS_COVERAGE": "--coverage",
-        "CMAKE_SHARED_LINKER_FLAGS_COVERAGE": "--coverage"
-      }
-    },
-    {
-      "name": "ci-coverage",
-      "inherits": ["coverage-linux", "dev-mode"],
-      "cacheVariables": {
-        "COVERAGE_HTML_COMMAND": ""
-      }
-    },
-    {
-      "name": "ci-sanitize",
-      "binaryDir": "${sourceDir}/build/sanitize",
-      "inherits": ["ci-linux", "dev-mode"],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Sanitize",
-        "CMAKE_CXX_FLAGS_SANITIZE": "-O2 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-common",
-        "CMAKE_MAP_IMPORTED_CONFIG_SANITIZE": "Sanitize;RelWithDebInfo;Release;Debug;"
-      }
+      "inherits": ["flags-windows", "ci-std"],
+      "architecture": "x64"
     },
     {
       "name": "ci-linux-highperf",
@@ -139,27 +119,84 @@
       "hidden": true,
       "inherits": ["ci-linux"],
       "cacheVariables": {
+        "mini-qiskit_BUILD_EXAMPLES": "ON",
+        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON",
         "CMAKE_BUILD_TYPE": "HighPerf",
         "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -ffast-math -march=native",
         "CMAKE_MAP_IMPORTED_CONFIG_HIGHPERF": "HighPerf;RelWithDebInfo;Release;Debug;"
       }
     },
     {
-      "name": "ci-build",
-      "binaryDir": "${sourceDir}/build",
-      "hidden": true
+      "name": "ci-linux-release",
+      "generator": "Unix Makefiles",
+      "hidden": true,
+      "inherits": ["ci-linux"],
+      "cacheVariables": {
+        "mini-qiskit_BUILD_EXAMPLES": "ON",
+        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -DNDEBUG",
+        "CMAKE_MAP_IMPORTED_CONFIG_HIGHPERF": "HighPerf;RelWithDebInfo;Release;Debug;"
+      }
     },
     {
-      "name": "ci-macos",
-      "inherits": ["ci-build", "ci-linux", "dev-mode"]
+      "name": "dev-linux",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/dev-linux",
+      "inherits": ["dev-mode", "ci-linux"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
     },
     {
-      "name": "ci-ubuntu",
-      "inherits": ["ci-build", "ci-linux", "clang-tidy", "cppcheck", "dev-mode"]
+      "name": "dev-darwin",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/dev-darwin",
+      "inherits": ["dev-mode", "ci-darwin"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
     },
     {
-      "name": "ci-windows",
-      "inherits": ["ci-build", "ci-win64", "dev-mode"]
+      "name": "dev-win64",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/dev-win64",
+      "inherits": ["dev-mode", "ci-win64"],
+      "environment": {
+        "UseMultiToolTask": "true",
+        "EnforceProcessCountAcrossBuilds": "true"
+      }
+    },
+    {
+      "name": "debug-linux",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/debug-linux",
+      "inherits": ["debug-mode", "ci-linux"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "dev",
+      "binaryDir": "${sourceDir}/build/dev",
+      "inherits": "dev-linux"
+    },
+    {
+      "name": "debug",
+      "binaryDir": "${sourceDir}/build/debug",
+      "inherits": "debug-linux"
+    },
+    {
+      "name": "release",
+      "binaryDir": "${sourceDir}/build/release",
+      "inherits": ["ci-linux-release"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "HighPerf",
+        "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -DNDEBUG",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
     },
     {
       "name": "highperf",
@@ -169,6 +206,43 @@
         "CMAKE_BUILD_TYPE": "HighPerf",
         "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -DNDEBUG -ffast-math -march=native",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "configuration": "Debug",
+      "jobs": 8
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "configuration": "Debug",
+      "jobs": 8
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "jobs": 8
+    },
+    {
+      "name": "highperf",
+      "configurePreset": "highperf",
+      "jobs": 8
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "jobs": 8
       }
     }
   ]
