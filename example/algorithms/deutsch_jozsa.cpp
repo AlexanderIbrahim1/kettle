@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     This file contains a demonstration of how to use the library to simulate
@@ -27,7 +27,7 @@ enum class QueryCase
 auto sampled_indices_of_half_of_all_states(std::size_t n_data_qubits) -> std::vector<std::size_t>
 {
     auto prng = std::mt19937 {std::random_device {}()};
-    const auto state_indices = mqis::arange(1ul << n_data_qubits);
+    const auto state_indices = ket::arange(1ul << n_data_qubits);
 
     const auto n_samples = state_indices.size() / 2;
     auto sampled_indices = std::vector<std::size_t> {};
@@ -41,7 +41,7 @@ auto sampled_indices_of_half_of_all_states(std::size_t n_data_qubits) -> std::ve
     Add the Deutsch-Jozsa query to the circuit; which query is applied, is determined
     by the choice of `query`
 */
-void apply_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query)
+void apply_deutsch_jozsa_function(ket::QuantumCircuit& circuit, QueryCase query)
 {
     const auto i_ancilla = circuit.n_qubits() - 1;
 
@@ -67,14 +67,14 @@ void apply_deutsch_jozsa_function(mqis::QuantumCircuit& circuit, QueryCase query
         }
     };
 
-    const auto data_qubits = mqis::arange(circuit.n_qubits() - 1);
+    const auto data_qubits = ket::arange(circuit.n_qubits() - 1);
     const auto sampled_states = sampled_indices_of_half_of_all_states(data_qubits.size());
 
     for (auto i_state : sampled_states) {
-        const auto bitset = mqis::state_index_to_dynamic_bitset(i_state, data_qubits.size(), mqis::QuantumStateEndian::LITTLE);
+        const auto bitset = ket::state_index_to_dynamic_bitset(i_state, data_qubits.size(), ket::QuantumStateEndian::LITTLE);
 
         add_x_gates_on_set_bits(bitset);
-        mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), i_ancilla, data_qubits);
+        ket::apply_multiplicity_controlled_u_gate(circuit, ket::x_gate(), i_ancilla, data_qubits);
         add_x_gates_on_set_bits(bitset);
     }
 }
@@ -85,19 +85,19 @@ auto main() -> int
     const auto query = QueryCase::BALANCED;
 
     // construct the initial state; we have 4 "data qubits" and 1 "ancilla qubit" (the last)
-    auto statevector = mqis::QuantumState {"00001"};
+    auto statevector = ket::QuantumState {"00001"};
 
     // create the circuit with the gates needed for the Deutsch-Jozsa algorithm
-    auto circuit = mqis::QuantumCircuit {5};
+    auto circuit = ket::QuantumCircuit {5};
     circuit.add_h_gate({0, 1, 2, 3, 4});
     apply_deutsch_jozsa_function(circuit, query);
     circuit.add_h_gate({0, 1, 2, 3});
 
     // propagate the state through the circuit
-    mqis::simulate(circuit, statevector);
+    ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; the ancilla qubit (at index `4`) is being marginalized
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 10000, {4});
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 10000, {4});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

@@ -1,12 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "mini-qiskit/common/linear_bijective_map.hpp"
+#include "kettle/common/linear_bijective_map.hpp"
 
 
 TEST_CASE("LinearBijectiveMap")
 {
-    const auto map = impl_mqis::LinearBijectiveMap<int, char, 10> {
+    const auto map = impl_ket::LinearBijectiveMap<int, char, 10> {
         std::pair {1, 'a'},
         std::pair {2, 'b'},
         std::pair {5, 'c'}

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     Perform QPE for the N = 2 and N = 3 gates for the rotor paper, using the minimal
@@ -65,12 +65,12 @@ struct CommandLineArguments
 
 void simulate_subcircuit(
     const std::filesystem::path& circuit_filepath,
-    mqis::QuantumState& statevector,
+    ket::QuantumState& statevector,
     std::size_t n_total_qubits
 )
 {
-    const auto circuit = mqis::read_tangelo_circuit(n_total_qubits, circuit_filepath, 0);
-    mqis::simulate(circuit, statevector);
+    const auto circuit = ket::read_tangelo_circuit(n_total_qubits, circuit_filepath, 0);
+    ket::simulate(circuit, statevector);
 }
 
 auto statevector_filename(int i) -> std::string
@@ -80,7 +80,7 @@ auto statevector_filename(int i) -> std::string
 
 void simulate_unitary(
     const CommandLineArguments& args,
-    mqis::QuantumState& statevector,
+    ket::QuantumState& statevector,
     std::size_t i_control,
     int& count
 )
@@ -95,7 +95,7 @@ void simulate_unitary(
         return args.abs_circuits_dirpath / output.str();
     }();
 
-    const auto circuit = mqis::read_tangelo_circuit(n_total_qubits, circuit_filepath, 0);
+    const auto circuit = ket::read_tangelo_circuit(n_total_qubits, circuit_filepath, 0);
 
     for (std::size_t i {0}; i < n_powers; ++i) {
         if (args.i_continue != RUN_FROM_START_KEY && count <= args.i_continue) {
@@ -104,10 +104,10 @@ void simulate_unitary(
         }
 
         for (std::size_t i_trotter_ {0}; i_trotter_ < args.n_trotter_steps; ++i_trotter_) {
-            mqis::simulate(circuit, statevector);
+            ket::simulate(circuit, statevector);
         }
 
-        mqis::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
+        ket::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
         ++count;
     }
 }
@@ -129,9 +129,9 @@ auto main(int argc, char** argv) -> int
 
     auto statevector = [&]() {
         if (args.i_continue == RUN_FROM_START_KEY) {
-            return mqis::QuantumState {n_total_qubits};
+            return ket::QuantumState {n_total_qubits};
         } else {
-            return mqis::load_statevector(args.abs_output_dirpath / statevector_filename(args.i_continue));
+            return ket::load_statevector(args.abs_output_dirpath / statevector_filename(args.i_continue));
         }
     }();
 
@@ -148,7 +148,7 @@ auto main(int argc, char** argv) -> int
 
     simulate_subcircuit(args.abs_circuits_dirpath / "iqft_circuit.dat", statevector, n_total_qubits);
 
-    mqis::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
+    ket::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
 
     return 0;
 }

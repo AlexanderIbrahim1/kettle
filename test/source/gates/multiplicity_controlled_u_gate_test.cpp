@@ -3,21 +3,21 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/common/matrix2x2.hpp"
-#include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/gates/multiplicity_controlled_u_gate.hpp"
-#include "mini-qiskit/gates/toffoli.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/state.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
+#include "kettle/gates/multiplicity_controlled_u_gate.hpp"
+#include "kettle/gates/toffoli.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/state.hpp"
 
 template <typename CircuitFunction>
 auto create_state(CircuitFunction func, const std::string& init_bitstring, std::size_t n_qubits)
 {
-    auto circuit = mqis::QuantumCircuit {n_qubits};
+    auto circuit = ket::QuantumCircuit {n_qubits};
     func(circuit);
-    auto state = mqis::QuantumState {init_bitstring};
-    mqis::simulate(circuit, state);
+    auto state = ket::QuantumState {init_bitstring};
+    ket::simulate(circuit, state);
 
     return state;
 }
@@ -35,18 +35,18 @@ TEST_CASE("multiplicity-controlled X gate test")
         const auto init_bitstring = std::string {GENERATE("00", "10", "01", "11")};
         const auto [i_control, i_target] = GENERATE(CTPair {0, 1}, CTPair {1, 0});
 
-        const auto modify_via_cx = [&] (mqis::QuantumCircuit& circuit) {
+        const auto modify_via_cx = [&] (ket::QuantumCircuit& circuit) {
             circuit.add_cx_gate(i_control, i_target);
         };
 
-        const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), i_target, {i_control});
+        const auto modify_via_mcu = [&] (ket::QuantumCircuit& circuit) {
+            ket::apply_multiplicity_controlled_u_gate(circuit, ket::x_gate(), i_target, {i_control});
         };
 
         const auto state_from_cx = create_state(modify_via_cx, init_bitstring, 2);
         const auto state_from_mcu = create_state(modify_via_mcu, init_bitstring, 2);
 
-        REQUIRE(mqis::almost_eq(state_from_cx, state_from_mcu));
+        REQUIRE(ket::almost_eq(state_from_cx, state_from_mcu));
     }
 
     SECTION("mimic toffoli gate") {
@@ -70,18 +70,18 @@ TEST_CASE("multiplicity-controlled X gate test")
             ToffoliQubits {2, 0, 1}
         );
 
-        const auto modify_via_toffoli = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_toffoli_gate(circuit, {control0, control1}, target);
+        const auto modify_via_toffoli = [&] (ket::QuantumCircuit& circuit) {
+            ket::apply_toffoli_gate(circuit, {control0, control1}, target);
         };
 
-        const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_multiplicity_controlled_u_gate(circuit, mqis::x_gate(), target, {control0, control1});
+        const auto modify_via_mcu = [&] (ket::QuantumCircuit& circuit) {
+            ket::apply_multiplicity_controlled_u_gate(circuit, ket::x_gate(), target, {control0, control1});
         };
 
         const auto state_from_cx = create_state(modify_via_toffoli, init_bitstring, 3);
         const auto state_from_mcu = create_state(modify_via_mcu, init_bitstring, 3);
 
-        REQUIRE(mqis::almost_eq(state_from_cx, state_from_mcu));
+        REQUIRE(ket::almost_eq(state_from_cx, state_from_mcu));
     }
 
     SECTION("3-control toffoli")
@@ -145,16 +145,16 @@ TEST_CASE("multiplicity-controlled X gate test")
             TestInfo{{1, 3, 2}, 0, "1111", "0111"}   // changes
         );
 
-        const auto modify_via_mcu = [&] (mqis::QuantumCircuit& circuit) {
-            mqis::apply_multiplicity_controlled_u_gate(
-                circuit, mqis::x_gate(), info.target_qubit, info.control_qubits);
+        const auto modify_via_mcu = [&] (ket::QuantumCircuit& circuit) {
+            ket::apply_multiplicity_controlled_u_gate(
+                circuit, ket::x_gate(), info.target_qubit, info.control_qubits);
         };
 
         const auto state_from_mcu = create_state(modify_via_mcu, info.input_bitstring, 4);
 
-        const auto expected_state = mqis::QuantumState {info.expected_output_bitstring};
+        const auto expected_state = ket::QuantumState {info.expected_output_bitstring};
 
-        REQUIRE(mqis::almost_eq(state_from_mcu, expected_state));
+        REQUIRE(ket::almost_eq(state_from_mcu, expected_state));
     }
     // clang-format on
 }

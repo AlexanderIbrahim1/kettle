@@ -3,10 +3,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/state/state.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/gates/swap.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/state/state.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/gates/swap.hpp"
 
 TEST_CASE("control swap gate on 3-qubit circuit")
 {
@@ -31,22 +31,22 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = mqis::QuantumState {info.input_bitstring};
-        auto expected = mqis::QuantumState {info.expected_bitstring};
-        auto circuit = mqis::QuantumCircuit {3};
+        auto state = ket::QuantumState {info.input_bitstring};
+        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 1 and 2")
         {
-            mqis::apply_control_swap(circuit, 0, 1, 2);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 0, 1, 2);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 2 and 1")
         {
-            mqis::apply_control_swap(circuit, 0, 2, 1);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 0, 2, 1);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
     }
 
@@ -65,22 +65,22 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = mqis::QuantumState {info.input_bitstring};
-        auto expected = mqis::QuantumState {info.expected_bitstring};
-        auto circuit = mqis::QuantumCircuit {3};
+        auto state = ket::QuantumState {info.input_bitstring};
+        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 0 and 2")
         {
-            mqis::apply_control_swap(circuit, 1, 0, 2);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 1, 0, 2);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 2 and 0")
         {
-            mqis::apply_control_swap(circuit, 1, 2, 0);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 1, 2, 0);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
     }
 
@@ -99,22 +99,22 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = mqis::QuantumState {info.input_bitstring};
-        auto expected = mqis::QuantumState {info.expected_bitstring};
-        auto circuit = mqis::QuantumCircuit {3};
+        auto state = ket::QuantumState {info.input_bitstring};
+        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 0 and 1")
         {
-            mqis::apply_control_swap(circuit, 2, 0, 1);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 2, 0, 1);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 1 and 0")
         {
-            mqis::apply_control_swap(circuit, 2, 1, 0);
-            mqis::simulate(circuit, state);
-            REQUIRE(mqis::almost_eq(state, expected));
+            ket::apply_control_swap(circuit, 2, 1, 0);
+            ket::simulate(circuit, state);
+            REQUIRE(ket::almost_eq(state, expected));
         }
     }
 }
@@ -148,32 +148,32 @@ TEST_CASE("control swap gate on 4-qubit circuit")
     );
     // clang-format on
  
-    auto state = mqis::QuantumState {info.input_bitstring};
-    auto expected = mqis::QuantumState {info.expected_bitstring};
-    auto circuit = mqis::QuantumCircuit {4};
+    auto state = ket::QuantumState {info.input_bitstring};
+    auto expected = ket::QuantumState {info.expected_bitstring};
+    auto circuit = ket::QuantumCircuit {4};
  
-    mqis::apply_control_swap(circuit, 0, 1, 3);
-    mqis::simulate(circuit, state);
-    REQUIRE(mqis::almost_eq(state, expected));
+    ket::apply_control_swap(circuit, 0, 1, 3);
+    ket::simulate(circuit, state);
+    REQUIRE(ket::almost_eq(state, expected));
 }
 
 TEST_CASE("control swap gate throws exceptions on invalid inputs")
 {
-    auto circuit = mqis::QuantumCircuit {3};
+    auto circuit = ket::QuantumCircuit {3};
 
     SECTION("swap qubits are identical")
     {
-        REQUIRE_THROWS_AS(mqis::apply_control_swap(circuit, 0, 1, 1), std::runtime_error);
+        REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 1, 1), std::runtime_error);
     }
 
     SECTION("control qubit matches a swap qubit")
     {
         SECTION("matches first swap qubit") {
-            REQUIRE_THROWS_AS(mqis::apply_control_swap(circuit, 0, 0, 1), std::runtime_error);
+            REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 0, 1), std::runtime_error);
         }
 
         SECTION("matches second swap qubit") {
-            REQUIRE_THROWS_AS(mqis::apply_control_swap(circuit, 0, 1, 0), std::runtime_error);
+            REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 1, 0), std::runtime_error);
         }
     }
 }

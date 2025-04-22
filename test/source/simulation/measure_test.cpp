@@ -8,11 +8,11 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <mini-qiskit/common/print.hpp>
-#include <mini-qiskit/circuit/circuit.hpp>
-#include <mini-qiskit/state/state.hpp>
-#include <mini-qiskit/simulation/simulate.hpp>
-#include <mini-qiskit/simulation/measure.hpp>
+#include <kettle/common/print.hpp>
+#include <kettle/circuit/circuit.hpp>
+#include <kettle/state/state.hpp>
+#include <kettle/simulation/simulate.hpp>
+#include <kettle/simulation/measure.hpp>
 
 
 template <int Output>
@@ -56,18 +56,18 @@ void normalize(std::vector<std::complex<double>>& values)
 }
 
 void simulate_measurement_wrapper(
-    mqis::QuantumState& state,
-    const mqis::GateInfo& info,
+    ket::QuantumState& state,
+    const ket::GateInfo& info,
     int measured_state
 )
 {
     const auto n_qubits = state.n_qubits();
 
     if (measured_state == 0) {
-        impl_mqis::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
+        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
     }
     else if (measured_state == 1) {
-        impl_mqis::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
+        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
     }
     else {
         throw std::runtime_error {"Invalid measured state provided to the test case.\n"};
@@ -80,7 +80,7 @@ TEST_CASE("simulate_measurement_()")
     {
         std::size_t measured_qubit;
         int measured_state;
-        mqis::QuantumState expected;
+        ket::QuantumState expected;
     };
 
     SECTION("2 qubits; Hadamard on each")
@@ -89,36 +89,36 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=0,
-                .expected=mqis::QuantumState {{{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}}
+                .expected=ket::QuantumState {{{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}}
             },
             TestCase {
                 .measured_qubit=1,
                 .measured_state=0,
-                .expected=mqis::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}}
+                .expected=ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}}
             },
             TestCase {
                 .measured_qubit=0,
                 .measured_state=1,
-                .expected=mqis::QuantumState {{{0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}}}
+                .expected=ket::QuantumState {{{0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}}}
             },
             TestCase {
                 .measured_qubit=1,
                 .measured_state=1,
-                .expected=mqis::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}
+                .expected=ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}
             }
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_mqis::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
 
-        auto state = mqis::QuantumState {"00"};
-        auto circuit = mqis::QuantumCircuit {2};
+        auto state = ket::QuantumState {"00"};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate({0, 1});
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(mqis::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
     }
 
     SECTION("3 qubits")
@@ -127,7 +127,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=0,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}
                 }}
@@ -135,7 +135,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=1,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}
                 }}
@@ -143,7 +143,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=1,
                 .measured_state=0,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0}
                 }}
@@ -151,7 +151,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=1,
                 .measured_state=1,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.0, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.5, 0.0}
                 }}
@@ -159,7 +159,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=2,
                 .measured_state=0,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}
                 }}
@@ -167,7 +167,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=2,
                 .measured_state=1,
-                .expected=mqis::QuantumState {{
+                .expected=ket::QuantumState {{
                     {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}
                 }}
@@ -175,17 +175,17 @@ TEST_CASE("simulate_measurement_()")
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_mqis::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
 
-        auto state = mqis::QuantumState {"000"};
-        auto circuit = mqis::QuantumCircuit {3};
+        auto state = ket::QuantumState {"000"};
+        auto circuit = ket::QuantumCircuit {3};
         circuit.add_h_gate({0, 1, 2});
 
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(mqis::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
     }
 
     SECTION("random")
@@ -238,14 +238,14 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_mqis::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
 
-            auto state = mqis::QuantumState {testcase.initial_amplitudes};
-            auto expected_state = mqis::QuantumState {testcase.expected_amplitudes};
+            auto state = ket::QuantumState {testcase.initial_amplitudes};
+            auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(mqis::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq_with_print(state, expected_state));
         }
 
         SECTION("3 qubits")
@@ -302,14 +302,14 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_mqis::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
 
-            auto state = mqis::QuantumState {testcase.initial_amplitudes};
-            auto expected_state = mqis::QuantumState {testcase.expected_amplitudes};
+            auto state = ket::QuantumState {testcase.initial_amplitudes};
+            auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(mqis::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq_with_print(state, expected_state));
         }
     }
 }

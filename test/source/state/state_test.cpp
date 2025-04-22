@@ -9,27 +9,27 @@
 
 #define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
 
-#include "mini-qiskit/common/mathtools.hpp"
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/state.hpp"
-#include "mini-qiskit/state/marginal.hpp"
+#include "kettle/common/mathtools.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/state.hpp"
+#include "kettle/state/marginal.hpp"
 
 TEST_CASE("QuantumState endian representation")
 {
     SECTION("2 qubits, state |10>")
     {
-        const auto state_via_little = mqis::QuantumState {
+        const auto state_via_little = ket::QuantumState {
             {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
-            mqis::QuantumStateEndian::LITTLE
+            ket::QuantumStateEndian::LITTLE
         };
 
-        const auto state_via_big = mqis::QuantumState {
+        const auto state_via_big = ket::QuantumState {
             {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
-            mqis::QuantumStateEndian::BIG
+            ket::QuantumStateEndian::BIG
         };
 
-        REQUIRE(mqis::almost_eq(state_via_little, state_via_big));
+        REQUIRE(ket::almost_eq(state_via_little, state_via_big));
     }
 }
 
@@ -39,30 +39,30 @@ TEST_CASE("QuantumState from string")
     {
         SECTION("|0>, big endian")
         {
-            const auto state = mqis::QuantumState {"0", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"0", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
         }
 
         SECTION("|1>, big endian")
         {
-            const auto state = mqis::QuantumState {"1", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+            const auto state = ket::QuantumState {"1", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
         }
 
         SECTION("|0>, little endian")
         {
-            const auto state = mqis::QuantumState {"0", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"0", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
         }
 
         SECTION("|1>, little endian")
         {
-            const auto state = mqis::QuantumState {"1", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
+            const auto state = ket::QuantumState {"1", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
         }
     }
 
@@ -70,74 +70,74 @@ TEST_CASE("QuantumState from string")
     {
         SECTION("|00>, big endian")
         {
-            const auto state = mqis::QuantumState {"00", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"00", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|00>, little endian")
         {
-            const auto state = mqis::QuantumState {"00", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"00", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|01>, big endian")
         {
-            const auto state = mqis::QuantumState {"01", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"01", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|01>, little endian")
         {
-            const auto state = mqis::QuantumState {"01", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"01", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|10>, big endian")
         {
-            const auto state = mqis::QuantumState {"10", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"10", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|10>, little endian")
         {
-            const auto state = mqis::QuantumState {"10", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {1.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {0.0, 0.0}));
+            const auto state = ket::QuantumState {"10", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {0.0, 0.0}));
         }
 
         SECTION("|11>, big endian")
         {
-            const auto state = mqis::QuantumState {"11", mqis::QuantumStateEndian::BIG};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {1.0, 0.0}));
+            const auto state = ket::QuantumState {"11", ket::QuantumStateEndian::BIG};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {1.0, 0.0}));
         }
 
         SECTION("|11>, little endian")
         {
-            const auto state = mqis::QuantumState {"11", mqis::QuantumStateEndian::LITTLE};
-            REQUIRE(mqis::almost_eq(state[0], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[1], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[2], {0.0, 0.0}));
-            REQUIRE(mqis::almost_eq(state[3], {1.0, 0.0}));
+            const auto state = ket::QuantumState {"11", ket::QuantumStateEndian::LITTLE};
+            REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
+            REQUIRE(ket::almost_eq(state[3], {1.0, 0.0}));
         }
     }
 }
@@ -145,7 +145,7 @@ TEST_CASE("QuantumState from string")
 TEST_CASE("QuantumState with 3 qubits")
 {
     const auto n_qubits = 3;
-    const auto state = mqis::QuantumState {n_qubits};
+    const auto state = ket::QuantumState {n_qubits};
 
     // check that there are 8 states (2^3)
     REQUIRE(state.n_states() == 8);
@@ -169,7 +169,7 @@ TEST_CASE("QuantumState with two coefficients")
             {1.0, 0.0},
             {0.0, 0.0}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(1.0));
@@ -185,7 +185,7 @@ TEST_CASE("QuantumState with two coefficients")
             {coeff_val, 0.0},
             {coeff_val, 0.0}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(coeff_val));
@@ -201,7 +201,7 @@ TEST_CASE("QuantumState with two coefficients")
             {coeff_val, coeff_val},
             {coeff_val, coeff_val}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(coeff_val));
@@ -221,7 +221,7 @@ TEST_CASE("QuantumState with four coefficients")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 4);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(1.0));
@@ -241,7 +241,7 @@ TEST_CASE("QuantumState with four coefficients")
             {coeff_val, 0.0},
             {coeff_val, 0.0}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 4);
         for (std::size_t i = 0; i < state.n_states(); ++i) {
@@ -259,7 +259,7 @@ TEST_CASE("QuantumState with four coefficients")
             {coeff_val, coeff_val},
             {coeff_val, coeff_val}
         };
-        const auto state = mqis::QuantumState {coefficients};
+        const auto state = ket::QuantumState {coefficients};
 
         REQUIRE(state.n_states() == 4);
         for (std::size_t i = 0; i < state.n_states(); ++i) {
@@ -277,7 +277,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(mqis::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
     }
 
     SECTION("With coefficients {2.0, 0.0}, {0.0, 0.0}")
@@ -286,7 +286,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {2.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(mqis::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
     }
 
     SECTION("With coefficients {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}")
@@ -296,7 +296,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(mqis::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
     }
 }
 
@@ -315,7 +315,7 @@ TEST_CASE("state_as_dynamic_bitset")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("2 qubit")
@@ -329,7 +329,7 @@ TEST_CASE("state_as_dynamic_bitset")
             );
             // clang-format on
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("3 qubit")
@@ -347,7 +347,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {7, 3, {1, 1, 1}}
             );
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_little_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
     }
 
@@ -357,7 +357,7 @@ TEST_CASE("state_as_dynamic_bitset")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, {0}}, InputAndOutput {1, 1, {1}});
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("2 qubit")
@@ -371,7 +371,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {3, 2, {1, 1}}
             );
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
 
         SECTION("3 qubit")
@@ -389,7 +389,7 @@ TEST_CASE("state_as_dynamic_bitset")
                 InputAndOutput {7, 3, {1, 1, 1}}
             );
 
-            REQUIRE(mqis::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
+            REQUIRE(ket::state_index_to_dynamic_bitset_big_endian(pair.i_state, pair.n_qubits) == pair.bits);
         }
     }
 }
@@ -409,7 +409,7 @@ TEST_CASE("state_as_bitstring")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
 
-            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("2 qubit")
@@ -421,7 +421,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {3, 2, "11"}
             );
 
-            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("3 qubit")
@@ -437,7 +437,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {7, 3, "111"}
             );
 
-            REQUIRE(mqis::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
     }
 
@@ -447,7 +447,7 @@ TEST_CASE("state_as_bitstring")
         {
             auto pair = GENERATE(InputAndOutput {0, 1, "0"}, InputAndOutput {1, 1, "1"});
 
-            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("2 qubit")
@@ -459,7 +459,7 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {3, 2, "11"}
             );
 
-            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
 
         SECTION("3 qubit")
@@ -475,14 +475,14 @@ TEST_CASE("state_as_bitstring")
                 InputAndOutput {7, 3, "111"}
             );
 
-            REQUIRE(mqis::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
+            REQUIRE(ket::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
         }
     }
 }
 
 TEST_CASE("are_all_marginal_bits_on_side_")
 {
-    using MBS = impl_mqis::MarginalBitsSide;
+    using MBS = impl_ket::MarginalBitsSide;
 
     struct TestInfo
     {
@@ -512,7 +512,7 @@ TEST_CASE("are_all_marginal_bits_on_side_")
             TestInfo {"00x1", false}
         );
 
-        REQUIRE(impl_mqis::are_all_marginal_bits_on_side_<MBS::LEFT>(info.input) == info.expected);
+        REQUIRE(impl_ket::are_all_marginal_bits_on_side_<MBS::LEFT>(info.input) == info.expected);
     }
 
     SECTION("right side")
@@ -537,7 +537,7 @@ TEST_CASE("are_all_marginal_bits_on_side_")
             TestInfo {"00x1", false}
         );
 
-        REQUIRE(impl_mqis::are_all_marginal_bits_on_side_<MBS::RIGHT>(info.input) == info.expected);
+        REQUIRE(impl_ket::are_all_marginal_bits_on_side_<MBS::RIGHT>(info.input) == info.expected);
     }
 }
 
@@ -564,7 +564,7 @@ TEST_CASE("rstrip_marginal_bits")
         TestInfo {"xxxx", ""}
     );
 
-    REQUIRE(mqis::rstrip_marginal_bits(info.input) == info.expected);
+    REQUIRE(ket::rstrip_marginal_bits(info.input) == info.expected);
 }
 
 TEST_CASE("lstrip_marginal_bits")
@@ -590,7 +590,7 @@ TEST_CASE("lstrip_marginal_bits")
         TestInfo {"xxxx", ""}
     );
 
-    REQUIRE(mqis::lstrip_marginal_bits(info.input) == info.expected);
+    REQUIRE(ket::lstrip_marginal_bits(info.input) == info.expected);
 }
 
 TEST_CASE("bitstring_to_state_index_little_endian")
@@ -616,7 +616,7 @@ TEST_CASE("bitstring_to_state_index_little_endian")
         TestInfo {"111", 7}
     );
 
-    REQUIRE(mqis::bitstring_to_state_index_little_endian(info.input) == info.expected);
+    REQUIRE(ket::bitstring_to_state_index_little_endian(info.input) == info.expected);
 }
 
 TEST_CASE("tensor product")
@@ -625,13 +625,13 @@ TEST_CASE("tensor product")
 
     SECTION("direct 1-qubit x 1-qubit")
     {
-        const auto state0 = mqis::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto state1 = mqis::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto expected = mqis::QuantumState {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
+        const auto state0 = ket::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto state1 = ket::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto expected = ket::QuantumState {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
 
-        const auto actual = mqis::tensor_product(state0, state1);
+        const auto actual = ket::tensor_product(state0, state1);
 
-        REQUIRE(mqis::almost_eq(actual, expected));
+        REQUIRE(ket::almost_eq(actual, expected));
     }
 
     SECTION("unentangled 1-qubit x 1-qubit")
@@ -642,13 +642,13 @@ TEST_CASE("tensor product")
             std::string message;
         };
 
-        auto state0 = mqis::QuantumState {"0"};
-        auto state1 = mqis::QuantumState {"0"};
-        auto product_state = mqis::QuantumState {"00"};
+        auto state0 = ket::QuantumState {"0"};
+        auto state1 = ket::QuantumState {"0"};
+        auto product_state = ket::QuantumState {"00"};
 
-        auto circuit0 = mqis::QuantumCircuit {1};
-        auto circuit1 = mqis::QuantumCircuit {1};
-        auto product_circuit = mqis::QuantumCircuit {2};
+        auto circuit0 = ket::QuantumCircuit {1};
+        auto circuit1 = ket::QuantumCircuit {1};
+        auto product_circuit = ket::QuantumCircuit {2};
 
         auto testcase = GENERATE_REF(
             TestCase {
@@ -690,13 +690,13 @@ TEST_CASE("tensor product")
 
         testcase.add_gates();
 
-        mqis::simulate(circuit0, state0);
-        mqis::simulate(circuit1, state1);
-        mqis::simulate(product_circuit, product_state);
+        ket::simulate(circuit0, state0);
+        ket::simulate(circuit1, state1);
+        ket::simulate(product_circuit, product_state);
 
-        const auto tensor_product_state = mqis::tensor_product(state0, state1);
+        const auto tensor_product_state = ket::tensor_product(state0, state1);
 
-        REQUIRE_MSG(mqis::almost_eq(product_state, tensor_product_state), testcase.message);
+        REQUIRE_MSG(ket::almost_eq(product_state, tensor_product_state), testcase.message);
     }
 
     SECTION("unentangled 2-qubit x 3-qubit")
@@ -707,13 +707,13 @@ TEST_CASE("tensor product")
             std::string message;
         };
 
-        auto state0 = mqis::QuantumState {"00"};
-        auto state1 = mqis::QuantumState {"000"};
-        auto product_state = mqis::QuantumState {"00000"};
+        auto state0 = ket::QuantumState {"00"};
+        auto state1 = ket::QuantumState {"000"};
+        auto product_state = ket::QuantumState {"00000"};
 
-        auto circuit0 = mqis::QuantumCircuit {2};
-        auto circuit1 = mqis::QuantumCircuit {3};
-        auto product_circuit = mqis::QuantumCircuit {5};
+        auto circuit0 = ket::QuantumCircuit {2};
+        auto circuit1 = ket::QuantumCircuit {3};
+        auto product_circuit = ket::QuantumCircuit {5};
 
         auto testcase = GENERATE_REF(
             TestCase {
@@ -741,33 +741,33 @@ TEST_CASE("tensor product")
 
         testcase.add_gates();
 
-        mqis::simulate(circuit0, state0);
-        mqis::simulate(circuit1, state1);
-        mqis::simulate(product_circuit, product_state);
+        ket::simulate(circuit0, state0);
+        ket::simulate(circuit1, state1);
+        ket::simulate(product_circuit, product_state);
 
-        const auto tensor_product_state = mqis::tensor_product(state0, state1);
+        const auto tensor_product_state = ket::tensor_product(state0, state1);
 
-        REQUIRE_MSG(mqis::almost_eq(product_state, tensor_product_state), testcase.message);
+        REQUIRE_MSG(ket::almost_eq(product_state, tensor_product_state), testcase.message);
     }
 }
 
 TEST_CASE("access amplitudes via bitstring")
 {
-    auto circuit = mqis::QuantumCircuit {3};
+    auto circuit = ket::QuantumCircuit {3};
 
     circuit.add_h_gate(0);  // |000> -> (1/sqrt(2)) [|000> + |100>]
     circuit.add_x_gate(2);  //       -> (1/sqrt(2)) [|001> + |101>]
     circuit.add_h_gate(1);  //       -> (1/2)       [|001> + |011> + |101> + |111>]
 
-    auto state = mqis::QuantumState {"000"};
-    mqis::simulate(circuit, state);
+    auto state = ket::QuantumState {"000"};
+    ket::simulate(circuit, state);
 
-    REQUIRE(mqis::almost_eq(state.at("000"), {0.0, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("100"), {0.0, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("010"), {0.0, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("110"), {0.0, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("001"), {0.5, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("101"), {0.5, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("011"), {0.5, 0.0}));
-    REQUIRE(mqis::almost_eq(state.at("111"), {0.5, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("000"), {0.0, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("100"), {0.0, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("010"), {0.0, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("110"), {0.0, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("001"), {0.5, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("101"), {0.5, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("011"), {0.5, 0.0}));
+    REQUIRE(ket::almost_eq(state.at("111"), {0.5, 0.0}));
 }

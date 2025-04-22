@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     This file contains a demonstration of how to use the library to perform
@@ -29,7 +29,7 @@
     More specifically, it applies the T gate in a multiplicity-binary controlled manner,
     where the gate is applied `2^n` times for the `n`th register qubit.
 */
-void apply_multiplicity_controlled_t_gate_manually(mqis::QuantumCircuit& circuit)
+void apply_multiplicity_controlled_t_gate_manually(ket::QuantumCircuit& circuit)
 {
     const auto angle = M_PI_4;
 
@@ -50,31 +50,31 @@ auto main() -> int
     const auto n_unitary_qubits = 1;
 
     // create the circuit with the gates needed to perform QPE
-    auto circuit = mqis::QuantumCircuit {n_register_qubits + n_unitary_qubits};
+    auto circuit = ket::QuantumCircuit {n_register_qubits + n_unitary_qubits};
     circuit.add_h_gate({0, 1, 2});
     circuit.add_x_gate(3);
     apply_multiplicity_controlled_t_gate_manually(circuit);
-    mqis::apply_inverse_fourier_transform(circuit, {2, 1, 0});
+    ket::apply_inverse_fourier_transform(circuit, {2, 1, 0});
 
     // construct the statevector in the 0-state, and propagate it through the circuit
-    auto statevector = mqis::QuantumState {"0000"};
-    mqis::simulate(circuit, statevector);
+    auto statevector = ket::QuantumState {"0000"};
+    ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; in QPE, we are concerned with the output
     // of the register qubits, and thus we marginalize the unitary qubit (`3`) here
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1024, {3});
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1024, {3});
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
-        auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
+        auto rstripped_bitstring = ket::rstrip_marginal_bits(bitstring);
 
         // the manner in which we apply the controlled unitary gates for QPE affects the output;
         // - in this example, the 0th qubit was applied once, the 1st qubit was applied twice, etc.
         // - this means the largest contributor is on the right of the bitstring
         //   - and we need to reverse the bitstring being calculating the binary fraction expansion
         std::ranges::reverse(rstripped_bitstring);
-        const auto binary_fraction = mqis::binary_fraction_expansion(rstripped_bitstring);
+        const auto binary_fraction = ket::binary_fraction_expansion(rstripped_bitstring);
 
         const auto estimated_phase = 2.0 * M_PI * binary_fraction;
 

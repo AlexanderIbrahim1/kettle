@@ -26,9 +26,9 @@
       "hidden": true,
       "inherits": "cmake-pedantic",
       "cacheVariables": {
-        "mini-qiskit_DEVELOPER_MODE": "ON",
-        "mini-qiskit_BUILD_EXAMPLES": "ON",
-        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON"
+        "kettle_DEVELOPER_MODE": "ON",
+        "kettle_BUILD_EXAMPLES": "ON",
+        "kettle_BUILD_QPE_TANGELO_PROJECT": "ON"
       }
     },
     {
@@ -36,9 +36,9 @@
       "hidden": true,
       "inherits": "cmake-pedantic",
       "cacheVariables": {
-        "mini-qiskit_DEVELOPER_MODE": "OFF",
-        "mini-qiskit_BUILD_EXAMPLES": "ON",
-        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON"
+        "kettle_DEVELOPER_MODE": "OFF",
+        "kettle_BUILD_EXAMPLES": "ON",
+        "kettle_BUILD_QPE_TANGELO_PROJECT": "ON"
       }
     },
     {
@@ -119,8 +119,8 @@
       "hidden": true,
       "inherits": ["ci-linux"],
       "cacheVariables": {
-        "mini-qiskit_BUILD_EXAMPLES": "ON",
-        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON",
+        "kettle_BUILD_EXAMPLES": "ON",
+        "kettle_BUILD_QPE_TANGELO_PROJECT": "ON",
         "CMAKE_BUILD_TYPE": "HighPerf",
         "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -ffast-math -march=native",
         "CMAKE_MAP_IMPORTED_CONFIG_HIGHPERF": "HighPerf;RelWithDebInfo;Release;Debug;"
@@ -132,8 +132,8 @@
       "hidden": true,
       "inherits": ["ci-linux"],
       "cacheVariables": {
-        "mini-qiskit_BUILD_EXAMPLES": "ON",
-        "mini-qiskit_BUILD_QPE_TANGELO_PROJECT": "ON",
+        "kettle_BUILD_EXAMPLES": "ON",
+        "kettle_BUILD_QPE_TANGELO_PROJECT": "ON",
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_FLAGS_HIGHPERF": "-O3 -DNDEBUG",
         "CMAKE_MAP_IMPORTED_CONFIG_HIGHPERF": "HighPerf;RelWithDebInfo;Release;Debug;"

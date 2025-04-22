@@ -2,12 +2,12 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/qubit_state_conversion.hpp"
-#include "mini-qiskit/state/state.hpp"
-#include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/circuit_operations/make_binary_controlled_circuit.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/qubit_state_conversion.hpp"
+#include "kettle/state/state.hpp"
+#include "kettle/gates/common_u_gates.hpp"
+#include "kettle/circuit_operations/make_binary_controlled_circuit.hpp"
 
 #include "../test_utils/powers_of_diagonal_unitary.hpp"
 
@@ -21,26 +21,26 @@ TEST_CASE("make_binary_controlled_circuit()")
     };
 
     const auto angle = M_PI_4;
-    const auto t_gate = mqis::p_gate(angle);
+    const auto t_gate = ket::p_gate(angle);
 
     // create the circuit manually, by repeating the gates
-    auto manual_circuit = mqis::QuantumCircuit {4};
+    auto manual_circuit = ket::QuantumCircuit {4};
     manual_circuit.add_cp_gate({{0, 3, angle}});
     manual_circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
     manual_circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
 
     // create the circuit using the `make_binary_controlled_circuit()` function
-    auto subcircuit = mqis::QuantumCircuit {1};
+    auto subcircuit = ket::QuantumCircuit {1};
     subcircuit.add_u_gate(t_gate, 0);
-    auto binary_made_circuit = mqis::make_binary_controlled_circuit_naive(subcircuit, 4, {0, 1, 2}, {3});
+    auto binary_made_circuit = ket::make_binary_controlled_circuit_naive(subcircuit, 4, {0, 1, 2}, {3});
 
-    auto state0 = mqis::QuantumState {init_bitstring};
-    auto state1 = mqis::QuantumState {init_bitstring};
+    auto state0 = ket::QuantumState {init_bitstring};
+    auto state1 = ket::QuantumState {init_bitstring};
 
-    mqis::simulate(manual_circuit, state0);
-    mqis::simulate(binary_made_circuit, state1);
+    ket::simulate(manual_circuit, state0);
+    ket::simulate(binary_made_circuit, state1);
 
-    REQUIRE(mqis::almost_eq(state0, state1));
+    REQUIRE(ket::almost_eq(state0, state1));
 }
 
 TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for single qubit gate")
@@ -55,28 +55,28 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for single qubit 
     const auto angle = 1.2345;
 
     // create the circuit manually, by repeating the gates
-    auto manual_circuit = mqis::QuantumCircuit {4};
+    auto manual_circuit = ket::QuantumCircuit {4};
     manual_circuit.add_cp_gate({{0, 3, angle}});
     manual_circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
     manual_circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
 
     // create the circuit using the `make_binary_controlled_circuit()` function
-    auto subcircuits = std::vector<mqis::QuantumCircuit> {};
+    auto subcircuits = std::vector<ket::QuantumCircuit> {};
     for (std::size_t i {0}; i < 3; ++i) {
         const auto power_angle = static_cast<double>(1ul << i) * angle;
 
-        auto subcircuit = mqis::QuantumCircuit {1};
-        subcircuit.add_u_gate(mqis::p_gate(power_angle), 0);
+        auto subcircuit = ket::QuantumCircuit {1};
+        subcircuit.add_u_gate(ket::p_gate(power_angle), 0);
         subcircuits.emplace_back(std::move(subcircuit));
     }
 
-    auto binary_made_circuit = mqis::make_binary_controlled_circuit_from_binary_powers(subcircuits, 4, {0, 1, 2}, {3});
+    auto binary_made_circuit = ket::make_binary_controlled_circuit_from_binary_powers(subcircuits, 4, {0, 1, 2}, {3});
 
-    auto state0 = mqis::QuantumState {init_bitstring};
-    auto state1 = mqis::QuantumState {init_bitstring};
+    auto state0 = ket::QuantumState {init_bitstring};
+    auto state1 = ket::QuantumState {init_bitstring};
 
-    mqis::simulate(manual_circuit, state0);
-    mqis::simulate(binary_made_circuit, state1);
+    ket::simulate(manual_circuit, state0);
+    ket::simulate(binary_made_circuit, state1);
 
-    REQUIRE(mqis::almost_eq(state0, state1));
+    REQUIRE(ket::almost_eq(state0, state1));
 }

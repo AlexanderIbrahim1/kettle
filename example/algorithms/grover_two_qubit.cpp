@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     This file contains an example of Grover's algorithm with n = 2 qubits.
@@ -14,7 +14,7 @@
 auto main() -> int
 {
     // construct the circuit with the gates needed for the Grover algorithm
-    auto circuit = mqis::QuantumCircuit {2};
+    auto circuit = ket::QuantumCircuit {2};
 
     // initialize to uniform superposition of all states
     circuit.add_h_gate({0, 1});
@@ -35,11 +35,11 @@ auto main() -> int
     circuit.add_h_gate({0, 1});
 
     // create the initial statevector, and propagate it through the circuit
-    auto statevector = mqis::QuantumState {"00"};
-    mqis::simulate(circuit, statevector);
+    auto statevector = ket::QuantumState {"00"};
+    ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts
-    const auto counts = mqis::perform_measurements_as_counts(statevector, 1024);
+    const auto counts = ket::perform_measurements_as_counts(statevector, 1024);
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(bitstring, count) = (" << bitstring << ", " << count << ")\n";

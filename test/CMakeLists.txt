@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(mini-qiskitTests LANGUAGES CXX)
+project(kettleTests LANGUAGES CXX)
 
 include(../cmake/project-is-top-level.cmake)
 include(../cmake/folders.cmake)
@@ -9,7 +9,7 @@ include(../cmake/windows-set-path.cmake)
 # ---- Dependencies ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(mini-qiskit REQUIRED)
+  find_package(kettle REQUIRED)
   enable_testing()
 endif()
 
@@ -29,8 +29,8 @@ include(CMakeParseArguments)
 
 # ---- Tests ----
 
-cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH MINI_QISKIT_SOURCE_DIR)
-set(SOURCE_FILES_DIR "${MINI_QISKIT_SOURCE_DIR}/source")
+cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH KETTLE_SOURCE_DIR)
+set(SOURCE_FILES_DIR "${KETTLE_SOURCE_DIR}/source")
 
 function(add_test_target)
     set(ONE_VALUE_ARGS TARGET)
@@ -49,7 +49,7 @@ function(add_test_target)
 
     target_link_libraries(
         ${add_test_target_TARGET}
-        PRIVATE mini-qiskit::mini-qiskit
+        PRIVATE kettle::kettle
         PRIVATE Catch2::Catch2WithMain
     )
 

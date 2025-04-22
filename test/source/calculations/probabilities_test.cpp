@@ -9,17 +9,17 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_vector.hpp>
 
-#include "mini-qiskit/calculations/probabilities.hpp"
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/state.hpp"
+#include "kettle/calculations/probabilities.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/state.hpp"
 
 static constexpr auto RELATIVE_TOL = 1.0e-6;
 
 TEST_CASE("cumulative probabilities")
 {
     const auto probabilities = std::vector<double>(4, 0.25);
-    const auto cumulative = impl_mqis::calculate_cumulative_sum(probabilities);
+    const auto cumulative = impl_ket::calculate_cumulative_sum(probabilities);
 
     REQUIRE_THAT(cumulative[0], Catch::Matchers::WithinRel(0.25));
     REQUIRE_THAT(cumulative[1], Catch::Matchers::WithinRel(0.50));
@@ -29,38 +29,38 @@ TEST_CASE("cumulative probabilities")
 
 TEST_CASE("probabilities_raw")
 {
-    using QSE = mqis::QuantumStateEndian;
+    using QSE = ket::QuantumStateEndian;
 
     SECTION("computational basis")
     {
         struct InputAndOutput
         {
-            mqis::QuantumState input;
+            ket::QuantumState input;
             std::vector<double> output;
         };
 
         // clang-format off
         auto pair = GENERATE(
-            InputAndOutput {mqis::QuantumState {"00", QSE::LITTLE}, {1.0, 0.0, 0.0, 0.0}},
-            InputAndOutput {mqis::QuantumState {"10", QSE::LITTLE}, {0.0, 1.0, 0.0, 0.0}},
-            InputAndOutput {mqis::QuantumState {"01", QSE::LITTLE}, {0.0, 0.0, 1.0, 0.0}},
-            InputAndOutput {mqis::QuantumState {"11", QSE::LITTLE}, {0.0, 0.0, 0.0, 1.0}}
+            InputAndOutput {ket::QuantumState {"00", QSE::LITTLE}, {1.0, 0.0, 0.0, 0.0}},
+            InputAndOutput {ket::QuantumState {"10", QSE::LITTLE}, {0.0, 1.0, 0.0, 0.0}},
+            InputAndOutput {ket::QuantumState {"01", QSE::LITTLE}, {0.0, 0.0, 1.0, 0.0}},
+            InputAndOutput {ket::QuantumState {"11", QSE::LITTLE}, {0.0, 0.0, 0.0, 1.0}}
         );
         // clang-format on
 
-        const auto output = mqis::calculate_probabilities_raw(pair.input);
+        const auto output = ket::calculate_probabilities_raw(pair.input);
         REQUIRE_THAT(output, Catch::Matchers::Approx(pair.output));
     }
 
     SECTION("one qubit, after H gate")
     {
-        auto circuit = mqis::QuantumCircuit {1};
+        auto circuit = ket::QuantumCircuit {1};
         circuit.add_h_gate(0);
 
-        auto state = mqis::QuantumState {"0"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"0"};
+        ket::simulate(circuit, state);
 
-        const auto actual = mqis::calculate_probabilities_raw(state);
+        const auto actual = ket::calculate_probabilities_raw(state);
         const auto expected = std::vector<double> {0.5, 0.5};
 
         REQUIRE_THAT(actual, Catch::Matchers::Approx(expected));
@@ -76,10 +76,10 @@ TEST_CASE("probabilities_raw")
             const auto real = distrib(prng);
             const auto imag = std::sqrt(1.0 - real * real);
 
-            const auto state = mqis::QuantumState {
+            const auto state = ket::QuantumState {
                 {{real, imag}, {0.0, 0.0}}
             };
-            const auto actual = mqis::calculate_probabilities_raw(state);
+            const auto actual = ket::calculate_probabilities_raw(state);
             const auto expected = std::vector<double> {1.0, 0.0};
 
             REQUIRE_THAT(actual, Catch::Matchers::Approx(expected));
@@ -89,26 +89,26 @@ TEST_CASE("probabilities_raw")
 
 TEST_CASE("probabilities")
 {
-    using QSE = mqis::QuantumStateEndian;
+    using QSE = ket::QuantumStateEndian;
 
     SECTION("computational basis")
     {
         struct InputAndOutput
         {
-            mqis::QuantumState input;
+            ket::QuantumState input;
             std::unordered_map<std::string, double> output;
         };
 
         // clang-format off
         auto pair = GENERATE(
-            InputAndOutput {mqis::QuantumState {"00", QSE::LITTLE}, {{"00", 1.0}, {"10", 0.0}, {"01", 0.0}, {"11", 0.0}}},
-            InputAndOutput {mqis::QuantumState {"10", QSE::LITTLE}, {{"00", 0.0}, {"10", 1.0}, {"01", 0.0}, {"11", 0.0}}},
-            InputAndOutput {mqis::QuantumState {"01", QSE::LITTLE}, {{"00", 0.0}, {"10", 0.0}, {"01", 1.0}, {"11", 0.0}}},
-            InputAndOutput {mqis::QuantumState {"11", QSE::LITTLE}, {{"00", 0.0}, {"10", 0.0}, {"01", 0.0}, {"11", 1.0}}}
+            InputAndOutput {ket::QuantumState {"00", QSE::LITTLE}, {{"00", 1.0}, {"10", 0.0}, {"01", 0.0}, {"11", 0.0}}},
+            InputAndOutput {ket::QuantumState {"10", QSE::LITTLE}, {{"00", 0.0}, {"10", 1.0}, {"01", 0.0}, {"11", 0.0}}},
+            InputAndOutput {ket::QuantumState {"01", QSE::LITTLE}, {{"00", 0.0}, {"10", 0.0}, {"01", 1.0}, {"11", 0.0}}},
+            InputAndOutput {ket::QuantumState {"11", QSE::LITTLE}, {{"00", 0.0}, {"10", 0.0}, {"01", 0.0}, {"11", 1.0}}}
         );
         // clang-format on
 
-        const auto output = mqis::calculate_probabilities(pair.input);
+        const auto output = ket::calculate_probabilities(pair.input);
 
         for (const auto& bitstring : {"00", "10", "01", "11"}) {
             const auto expected = pair.output.at(bitstring);
@@ -119,13 +119,13 @@ TEST_CASE("probabilities")
 
     SECTION("one qubit, after H gate")
     {
-        auto circuit = mqis::QuantumCircuit {1};
+        auto circuit = ket::QuantumCircuit {1};
         circuit.add_h_gate(0);
 
-        auto state = mqis::QuantumState {"0"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"0"};
+        ket::simulate(circuit, state);
 
-        const auto actual = mqis::calculate_probabilities(state);
+        const auto actual = ket::calculate_probabilities(state);
         const auto expected = std::unordered_map<std::string, double> {
             {"0", 0.5},
             {"1", 0.5}
@@ -145,11 +145,11 @@ TEST_CASE("probabilities")
             const auto real = distrib(prng);
             const auto imag = std::sqrt(1.0 - real * real);
 
-            const auto state = mqis::QuantumState {
+            const auto state = ket::QuantumState {
                 {{real, imag}, {0.0, 0.0}}
             };
 
-            const auto actual = mqis::calculate_probabilities(state);
+            const auto actual = ket::calculate_probabilities(state);
             const auto expected = std::unordered_map<std::string, double> {
                 {"0", 1.0},
                 {"1", 0.0}

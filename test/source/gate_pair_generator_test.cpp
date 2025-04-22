@@ -11,7 +11,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_range_equals.hpp>
 
-#include "mini-qiskit/simulation/gate_pair_generator.hpp"
+#include "kettle/simulation/gate_pair_generator.hpp"
 
 using BasisIndexMap = std::unordered_map<std::string, std::size_t>;
 
@@ -53,7 +53,7 @@ constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::siz
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 1` of them, with 2 possible states per qubit
-    return impl_mqis::pow_2_int(n_qubits - 1);
+    return impl_ket::pow_2_int(n_qubits - 1);
 }
 
 constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
@@ -63,7 +63,7 @@ constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::siz
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 2` of them, with 2 possible states per qubit
-    return impl_mqis::pow_2_int(n_qubits - 2);
+    return impl_ket::pow_2_int(n_qubits - 2);
 }
 
 TEST_CASE("SingleQubitGatePairGenerator with two qubits")
@@ -80,7 +80,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = impl_mqis::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = impl_ket::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -100,7 +100,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = impl_mqis::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = impl_ket::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -137,7 +137,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = impl_mqis::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = impl_ket::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -159,7 +159,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = impl_mqis::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = impl_ket::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -181,7 +181,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 2")
     {
-        auto generator = impl_mqis::SingleQubitGatePairGenerator {2, n_qubits};
+        auto generator = impl_ket::SingleQubitGatePairGenerator {2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -216,7 +216,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("control is 0, target is 1")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -235,7 +235,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("control is 1, target is 0")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -271,7 +271,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -291,7 +291,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (1, 0)")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -311,7 +311,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (0, 2)")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 2, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -331,7 +331,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (1, 2)")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {1, 2, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -378,7 +378,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with four qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = impl_mqis::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -405,7 +405,7 @@ TEST_CASE("SingleQubitGatePairGenerator set_state()")
     const auto n_qubits = std::size_t {5};
 
     // create all the index pairs generated by the generator
-    auto full_generator = impl_mqis::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto full_generator = impl_ket::SingleQubitGatePairGenerator {target_index, n_qubits};
     const auto full_output = get_generated_index_pairs(full_generator, full_generator.size());
 
     // create all the index pairs between two flat indices
@@ -423,7 +423,7 @@ TEST_CASE("SingleQubitGatePairGenerator set_state()")
         TestCase {9, 13}
     );
 
-    auto partial_generator = impl_mqis::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto partial_generator = impl_ket::SingleQubitGatePairGenerator {target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 
@@ -443,7 +443,7 @@ TEST_CASE("DoubleQubitGatePairGenerator set_state()")
     const auto n_qubits = std::size_t {6};
 
     // create all the index pairs generated by the generator
-    auto full_generator = impl_mqis::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto full_generator = impl_ket::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     const auto full_output = get_generated_index_pairs(full_generator, full_generator.size());
 
     // create all the index pairs between two flat indices
@@ -461,7 +461,7 @@ TEST_CASE("DoubleQubitGatePairGenerator set_state()")
         TestCase {9, 13}
     );
 
-    auto partial_generator = impl_mqis::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto partial_generator = impl_ket::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 

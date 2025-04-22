@@ -1,17 +1,17 @@
 #include <iostream>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 
 auto main() -> int
 {
-    auto circuit = mqis::QuantumCircuit {4};
-    mqis::apply_forward_fourier_transform(circuit, {0, 1, 3});
-    mqis::apply_inverse_fourier_transform(circuit, {0, 1, 3});
+    auto circuit = ket::QuantumCircuit {4};
+    ket::apply_forward_fourier_transform(circuit, {0, 1, 3});
+    ket::apply_inverse_fourier_transform(circuit, {0, 1, 3});
 
-    auto state = mqis::QuantumState {"0000"};
+    auto state = ket::QuantumState {"0000"};
 
-    mqis::simulate(circuit, state);
+    ket::simulate(circuit, state);
 
     for (std::size_t i {0}; i < 16; ++i) {
         std::cout << state[i].real() << ", " << state[i].imag() << '\n';

@@ -1,13 +1,13 @@
 #include <complex>
 #include <iostream>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 
 auto main() -> int
 {
-    auto state = mqis::generate_random_state(2);
-    mqis::print_state(state);
+    auto state = ket::generate_random_state(2);
+    ket::print_state(state);
 
     auto norm_squared = double {0.0};
     for (std::size_t i {0}; i < state.n_states(); ++i) {

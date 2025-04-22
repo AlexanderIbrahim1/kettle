@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     This file contains a demonstration of how to use the library to simulate
@@ -21,7 +21,7 @@ enum class QueryCase
     Apply the Deutsch query to the circuit; which query is applied, is determined by
     the choice of `query`
 */
-void apply_query(mqis::QuantumCircuit& circuit, QueryCase parity)
+void apply_query(ket::QuantumCircuit& circuit, QueryCase parity)
 {
     using QC = QueryCase;
 
@@ -53,19 +53,19 @@ auto main() -> int
     const auto query = QueryCase::CONSTANT_1;
 
     // construct the initial state, in this case using a bitstring
-    auto statevector = mqis::QuantumState {"01"};
+    auto statevector = ket::QuantumState {"01"};
 
     // create the circuit with the gates needed for the Deutsch algorithm
-    auto circuit = mqis::QuantumCircuit {2};
+    auto circuit = ket::QuantumCircuit {2};
     circuit.add_h_gate({0, 1});
     apply_query(circuit, query);
     circuit.add_h_gate(0);
 
     // propagate the state through the circuit
-    mqis::simulate(circuit, statevector);
+    ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; the ancilla qubit (at index `1`) is being marginalized
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1000, {1});
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1000, {1});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

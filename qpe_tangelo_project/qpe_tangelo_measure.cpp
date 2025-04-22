@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.
@@ -76,12 +76,12 @@ auto main(int argc, char** argv) -> int
         marginal_qubits.push_back(i);
     }
 
-    auto statevector = mqis::load_statevector(arguments.abs_statevector_filepath);
-    auto circuit = mqis::QuantumCircuit {n_total_qubits};
+    auto statevector = ket::load_statevector(arguments.abs_statevector_filepath);
+    auto circuit = ket::QuantumCircuit {n_total_qubits};
 
-    mqis::simulate(circuit, statevector);
+    ket::simulate(circuit, statevector);
 
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1ul << 12, marginal_qubits);
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1ul << 12, marginal_qubits);
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

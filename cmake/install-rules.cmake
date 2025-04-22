@@ -1,6 +1,6 @@
 if(PROJECT_IS_TOP_LEVEL)
   set(
-      CMAKE_INSTALL_INCLUDEDIR "include/mini-qiskit-${PROJECT_VERSION}"
+      CMAKE_INSTALL_INCLUDEDIR "include/kettle-${PROJECT_VERSION}"
       CACHE PATH ""
   )
 endif()
@@ -12,17 +12,17 @@ include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 # find_package(<package>) call for consumers to find this project
-set(package mini-qiskit)
+set(package kettle)
 
 install(
     DIRECTORY include/
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    COMPONENT mini-qiskit_Development
+    COMPONENT kettle_Development
 )
 
 install(
-    TARGETS mini-qiskit_mini-qiskit
-    EXPORT mini-qiskitTargets
+    TARGETS kettle_kettle
+    EXPORT kettleTargets
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
@@ -34,29 +34,29 @@ write_basic_package_version_file(
 
 # Allow package maintainers to freely override the path for the configs
 set(
-    mini-qiskit_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${package}"
+    kettle_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${package}"
     CACHE PATH "CMake package config location relative to the install prefix"
 )
-mark_as_advanced(mini-qiskit_INSTALL_CMAKEDIR)
+mark_as_advanced(kettle_INSTALL_CMAKEDIR)
 
 install(
     FILES cmake/install-config.cmake
-    DESTINATION "${mini-qiskit_INSTALL_CMAKEDIR}"
+    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
     RENAME "${package}Config.cmake"
-    COMPONENT mini-qiskit_Development
+    COMPONENT kettle_Development
 )
 
 install(
     FILES "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
-    DESTINATION "${mini-qiskit_INSTALL_CMAKEDIR}"
-    COMPONENT mini-qiskit_Development
+    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
+    COMPONENT kettle_Development
 )
 
 install(
-    EXPORT mini-qiskitTargets
-    NAMESPACE mini-qiskit::
-    DESTINATION "${mini-qiskit_INSTALL_CMAKEDIR}"
-    COMPONENT mini-qiskit_Development
+    EXPORT kettleTargets
+    NAMESPACE kettle::
+    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
+    COMPONENT kettle_Development
 )
 
 if(PROJECT_IS_TOP_LEVEL)

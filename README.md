@@ -4,13 +4,13 @@ Kettle is a C++20 header-only library for simulating quantum circuits.
 No external dependencies are needed, although Catch2 is used for unit testing.
 
 Some of the main features:
-  - create a quantum circuit (`mqis::QuantumCircuit`) and add a variety of gates
+  - create a quantum circuit (`ket::QuantumCircuit`) and add a variety of gates
     - the supported single-qubit gates: {`H`, `X`, `Y`, `Z`, `SX`, `RX`, `RY`, `RZ`, `P`}
     - the supported contolled gates: {`CH`, `CX`, `CY`, `CZ`, `CSX`, `CRX`, `CRY`, `CRZ`, `CP`}
     - general 2x2 unitary single-qubit or controlled gates: {`U`, `CU`}
     - measurement gates: `M`
     - control flow based on measured classical bits (if statements)
-  - create a statevector (`mqis::QuantumState`) and propagate it through the circuit (`mqis::simulate()`)
+  - create a statevector (`ket::QuantumState`) and propagate it through the circuit (`ket::simulate()`)
   - perform measurements on the resulting statevector
 
 Other features:
@@ -27,18 +27,18 @@ Here's an example where we create one of the Bell states, and perform measuremen
 auto main() -> int
 {
     // create a quantum circuit with 2 qubit registers, and apply the H and CX gates
-    auto circuit = mqis::QuantumCircuit {2};
+    auto circuit = ket::QuantumCircuit {2};
     circuit.add_h_gate(0);
     circuit.add_cx_gate(0, 1);
 
     // begin with a 2-qubit statevector in the |00> state
-    auto statevector = mqis::QuantumState {"00"};
+    auto statevector = ket::QuantumState {"00"};
 
     // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
-    mqis::simulate(circuit, statevector);
+    ket::simulate(circuit, statevector);
 
     // perform measurements on this statevector, with 1024 shots
-    const auto counts = mqis::perform_measurements_as_counts(statevector, 1024);
+    const auto counts = ket::perform_measurements_as_counts(statevector, 1024);
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
     }

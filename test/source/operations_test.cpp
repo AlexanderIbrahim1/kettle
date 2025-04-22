@@ -3,8 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "mini-qiskit/simulation/operations.hpp"
-#include "mini-qiskit/state/state.hpp"
+#include "kettle/simulation/operations.hpp"
+#include "kettle/state/state.hpp"
 
 constexpr static auto ABS_TOL = double {1.0e-6};
 
@@ -21,11 +21,11 @@ constexpr static auto ABS_TOL = double {1.0e-6};
 TEST_CASE("Swap states operation")
 {
     // Initial state: |00> = {{1.0, 0.0}, {0.0, 0.0}}
-    auto quantum_state = mqis::QuantumState {
+    auto quantum_state = ket::QuantumState {
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    impl_mqis::apply_x_gate(quantum_state, 0, 1);
+    impl_ket::apply_x_gate(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -39,11 +39,11 @@ TEST_CASE("Swap states operation")
 TEST_CASE("Superpose states operation")
 {
     // Initial state: superposition: |+> = {{1.0/sqrt2, 0.0}, {1.0/sqrt2, 0.0}}
-    auto quantum_state = mqis::QuantumState {
+    auto quantum_state = ket::QuantumState {
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    impl_mqis::apply_h_gate(quantum_state, 0, 1);
+    impl_ket::apply_h_gate(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -57,11 +57,11 @@ TEST_CASE("Superpose states operation")
 TEST_CASE("Turn states operation")
 {
     // Initial state: |00> = {{1.0, 0.0}, {0.0, 0.0}}
-    auto quantum_state = mqis::QuantumState {
+    auto quantum_state = ket::QuantumState {
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    impl_mqis::apply_rx_gate(quantum_state, 0, 1, M_PI);
+    impl_ket::apply_rx_gate(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -75,11 +75,11 @@ TEST_CASE("Turn states operation")
 TEST_CASE("Phase turn states operation")
 {
     // Initial state: |+> = {{1.0/sqrt2, 0.0}, {1.0/sqrt2, 0.0}}
-    auto quantum_state = mqis::QuantumState {
+    auto quantum_state = ket::QuantumState {
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    impl_mqis::apply_rz_gate(quantum_state, 0, 1, M_PI);
+    impl_ket::apply_rz_gate(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];

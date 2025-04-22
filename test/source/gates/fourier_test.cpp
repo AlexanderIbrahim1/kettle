@@ -6,25 +6,25 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "mini-qiskit/circuit/circuit.hpp"
-#include "mini-qiskit/common/mathtools.hpp"
-#include "mini-qiskit/common/arange.hpp"
-#include "mini-qiskit/gates/fourier.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/state.hpp"
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/common/mathtools.hpp"
+#include "kettle/common/arange.hpp"
+#include "kettle/gates/fourier.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/state.hpp"
 
 TEST_CASE("Forward QFT on |0> state")
 {
     SECTION("1 qubit")
     {
-        auto state = mqis::QuantumState {"0"};
-        auto circuit = mqis::QuantumCircuit {1};
+        auto state = ket::QuantumState {"0"};
+        auto circuit = ket::QuantumCircuit {1};
 
-        mqis::apply_forward_fourier_transform(circuit, {0});
+        ket::apply_forward_fourier_transform(circuit, {0});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(2.0);
-        const auto expected = mqis::QuantumState {
+        const auto expected = ket::QuantumState {
             {
                 {norm, 0.0},
                 {norm, 0.0}
@@ -32,21 +32,21 @@ TEST_CASE("Forward QFT on |0> state")
         };
         // clang-format on
 
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, expected));
+        REQUIRE(ket::almost_eq(state, expected));
     }
 
     SECTION("2 qubits")
     {
-        auto state = mqis::QuantumState {"00"};
-        auto circuit = mqis::QuantumCircuit {2};
+        auto state = ket::QuantumState {"00"};
+        auto circuit = ket::QuantumCircuit {2};
 
-        mqis::apply_forward_fourier_transform(circuit, {0, 1});
+        ket::apply_forward_fourier_transform(circuit, {0, 1});
 
         // clang-format off
         const auto norm = 1.0 / 2.0;
-        const auto expected = mqis::QuantumState {
+        const auto expected = ket::QuantumState {
             {
                 {norm, 0.0},
                 {norm, 0.0},
@@ -56,21 +56,21 @@ TEST_CASE("Forward QFT on |0> state")
         };
         // clang-format on
 
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, expected));
+        REQUIRE(ket::almost_eq(state, expected));
     }
 
     SECTION("3 qubits")
     {
-        auto state = mqis::QuantumState {"000"};
-        auto circuit = mqis::QuantumCircuit {3};
+        auto state = ket::QuantumState {"000"};
+        auto circuit = ket::QuantumCircuit {3};
 
-        mqis::apply_forward_fourier_transform(circuit, {0, 1, 2});
+        ket::apply_forward_fourier_transform(circuit, {0, 1, 2});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(8.0);
-        const auto expected = mqis::QuantumState {
+        const auto expected = ket::QuantumState {
             {
                 {norm, 0.0},
                 {norm, 0.0},
@@ -84,9 +84,9 @@ TEST_CASE("Forward QFT on |0> state")
         };
         // clang-format on
 
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, expected));
+        REQUIRE(ket::almost_eq(state, expected));
     }
 }
 
@@ -95,27 +95,27 @@ TEST_CASE("basic Forward QFT on 2-qubit computational basis states")
     struct TestPair
     {
         std::string input;
-        mqis::QuantumState expected;
+        ket::QuantumState expected;
     };
 
     const auto norm = 1.0 / 2.0;
 
     // clang-format off
     auto pair = GENERATE_COPY(
-        TestPair {"00", mqis::QuantumState { {{ norm,  0.0}, { norm,  0.0}, { norm,  0.0}, { norm,   0.0}} }},
-        TestPair {"10", mqis::QuantumState { {{ norm,  0.0}, { norm,  0.0}, {-norm,  0.0}, {-norm,   0.0}} }},
-        TestPair {"01", mqis::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0, norm}, {  0.0, -norm}} }},
-        TestPair {"11", mqis::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0,-norm}, {  0.0,  norm}} }}
+        TestPair {"00", ket::QuantumState { {{ norm,  0.0}, { norm,  0.0}, { norm,  0.0}, { norm,   0.0}} }},
+        TestPair {"10", ket::QuantumState { {{ norm,  0.0}, { norm,  0.0}, {-norm,  0.0}, {-norm,   0.0}} }},
+        TestPair {"01", ket::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0, norm}, {  0.0, -norm}} }},
+        TestPair {"11", ket::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0,-norm}, {  0.0,  norm}} }}
     );
     // clang-format on
 
-    auto state = mqis::QuantumState {pair.input};
-    auto circuit = mqis::QuantumCircuit {2};
+    auto state = ket::QuantumState {pair.input};
+    auto circuit = ket::QuantumCircuit {2};
 
-    mqis::apply_forward_fourier_transform(circuit, {0, 1});
-    mqis::simulate(circuit, state);
+    ket::apply_forward_fourier_transform(circuit, {0, 1});
+    ket::simulate(circuit, state);
 
-    REQUIRE(mqis::almost_eq(state, pair.expected));
+    REQUIRE(ket::almost_eq(state, pair.expected));
 }
 
 TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
@@ -155,18 +155,18 @@ TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
             coefficients.push_back({real, imag});
         }
 
-        return mqis::QuantumState {coefficients, mqis::QuantumStateEndian::BIG};
+        return ket::QuantumState {coefficients, ket::QuantumStateEndian::BIG};
     };
 
-    auto state = mqis::QuantumState {pair.input, mqis::QuantumStateEndian::LITTLE};
-    auto circuit = mqis::QuantumCircuit {3};
+    auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+    auto circuit = ket::QuantumCircuit {3};
 
-    mqis::apply_forward_fourier_transform(circuit, {0, 1, 2});
-    mqis::simulate(circuit, state);
+    ket::apply_forward_fourier_transform(circuit, {0, 1, 2});
+    ket::simulate(circuit, state);
 
     const auto expected = create_expected_state(pair);
 
-    REQUIRE(mqis::almost_eq(state, expected));
+    REQUIRE(ket::almost_eq(state, expected));
 }
 
 TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
@@ -214,18 +214,18 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
             coefficients.push_back({real, imag});
         }
 
-        return mqis::QuantumState {coefficients, mqis::QuantumStateEndian::BIG};
+        return ket::QuantumState {coefficients, ket::QuantumStateEndian::BIG};
     };
 
-    auto state = mqis::QuantumState {pair.input, mqis::QuantumStateEndian::LITTLE};
-    auto circuit = mqis::QuantumCircuit {4};
+    auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+    auto circuit = ket::QuantumCircuit {4};
 
-    mqis::apply_forward_fourier_transform(circuit, {0, 1, 2, 3});
-    mqis::simulate(circuit, state);
+    ket::apply_forward_fourier_transform(circuit, {0, 1, 2, 3});
+    ket::simulate(circuit, state);
 
     const auto expected = create_expected_state(pair);
 
-    REQUIRE(mqis::almost_eq(state, expected));
+    REQUIRE(ket::almost_eq(state, expected));
 }
 
 TEST_CASE("inverse QFT after forward QFT")
@@ -241,17 +241,17 @@ TEST_CASE("inverse QFT after forward QFT")
         )};
         // clang-format on
 
-        auto state = mqis::QuantumState {init_bitstring};
-        auto expected = mqis::QuantumState {init_bitstring};
+        auto state = ket::QuantumState {init_bitstring};
+        auto expected = ket::QuantumState {init_bitstring};
 
-        const auto qubit_indices = mqis::arange(init_bitstring.size());
+        const auto qubit_indices = ket::arange(init_bitstring.size());
 
-        auto circuit = mqis::QuantumCircuit {init_bitstring.size()};
-        mqis::apply_forward_fourier_transform(circuit, qubit_indices);
-        mqis::apply_inverse_fourier_transform(circuit, qubit_indices);
+        auto circuit = ket::QuantumCircuit {init_bitstring.size()};
+        ket::apply_forward_fourier_transform(circuit, qubit_indices);
+        ket::apply_inverse_fourier_transform(circuit, qubit_indices);
 
-        mqis::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, expected));
+        REQUIRE(ket::almost_eq(state, expected));
     }
 }

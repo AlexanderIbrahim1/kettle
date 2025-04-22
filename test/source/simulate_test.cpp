@@ -8,11 +8,11 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "mini-qiskit/common/mathtools.hpp"
-#include "mini-qiskit/common/matrix2x2.hpp"
-#include "mini-qiskit/gates/common_u_gates.hpp"
-#include "mini-qiskit/simulation/simulate.hpp"
-#include "mini-qiskit/state/state.hpp"
+#include "kettle/common/mathtools.hpp"
+#include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/state.hpp"
 
 /*
     Here are some commonly encountered trig function evaluations in the latter unit tests
@@ -36,19 +36,19 @@ auto generate_random_double(double left, double right) -> double
 
 auto simulate_single_qubit_with_ugate(
     const std::string& initial_state,
-    const std::vector<std::tuple<mqis::Matrix2X2, std::size_t>>& matrices,
+    const std::vector<std::tuple<ket::Matrix2X2, std::size_t>>& matrices,
     std::size_t n_qubits
-) -> mqis::QuantumState
+) -> ket::QuantumState
 {
-    auto state = mqis::QuantumState {initial_state};
+    auto state = ket::QuantumState {initial_state};
 
-    auto circuit = mqis::QuantumCircuit {n_qubits};
+    auto circuit = ket::QuantumCircuit {n_qubits};
 
     for (const auto& [matrix, target_index] : matrices) {
         circuit.add_u_gate(matrix, target_index);
     }
 
-    mqis::simulate(circuit, state);
+    ket::simulate(circuit, state);
 
     return state;
 }
@@ -57,11 +57,11 @@ auto simulate_single_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t>>& gates_and_angles,
     std::size_t n_qubits
-) -> mqis::QuantumState
+) -> ket::QuantumState
 {
-    auto state = mqis::QuantumState {initial_state};
+    auto state = ket::QuantumState {initial_state};
 
-    auto circuit = mqis::QuantumCircuit {n_qubits};
+    auto circuit = ket::QuantumCircuit {n_qubits};
 
     for (const auto& [gate_id, angle, target_index] : gates_and_angles) {
         if (gate_id == "H") {
@@ -87,26 +87,26 @@ auto simulate_single_qubit_with_builtin(
         }
     }
 
-    mqis::simulate(circuit, state);
+    ket::simulate(circuit, state);
 
     return state;
 }
 
 auto simulate_double_qubit_with_ugate(
     const std::string& initial_state,
-    const std::vector<std::tuple<mqis::Matrix2X2, std::size_t, std::size_t>>& matrices,
+    const std::vector<std::tuple<ket::Matrix2X2, std::size_t, std::size_t>>& matrices,
     std::size_t n_qubits
-) -> mqis::QuantumState
+) -> ket::QuantumState
 {
-    auto state = mqis::QuantumState {initial_state};
+    auto state = ket::QuantumState {initial_state};
 
-    auto circuit = mqis::QuantumCircuit {n_qubits};
+    auto circuit = ket::QuantumCircuit {n_qubits};
 
     for (const auto& [matrix, control_index, target_index] : matrices) {
         circuit.add_cu_gate(matrix, control_index, target_index);
     }
 
-    mqis::simulate(circuit, state);
+    ket::simulate(circuit, state);
 
     return state;
 }
@@ -115,11 +115,11 @@ auto simulate_double_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t, std::size_t>>& gates_and_angles,
     std::size_t n_qubits
-) -> mqis::QuantumState
+) -> ket::QuantumState
 {
-    auto state = mqis::QuantumState {initial_state};
+    auto state = ket::QuantumState {initial_state};
 
-    auto circuit = mqis::QuantumCircuit {n_qubits};
+    auto circuit = ket::QuantumCircuit {n_qubits};
 
     for (const auto& [gate_id, angle, control_index, target_index] : gates_and_angles) {
         if (gate_id == "CH") {
@@ -148,7 +148,7 @@ auto simulate_double_qubit_with_builtin(
         }
     }
 
-    mqis::simulate(circuit, state);
+    ket::simulate(circuit, state);
 
     return state;
 }
@@ -162,16 +162,16 @@ TEST_CASE("simulate X gate")
         // |0> -> |1>
         const auto n_qubits = 1;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_x_gate(0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{0.0, 0.0}, {1.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, X(1)")
@@ -181,16 +181,16 @@ TEST_CASE("simulate X gate")
         // |00> -> |01>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_x_gate(1);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, X(1)X(0)")
@@ -200,17 +200,17 @@ TEST_CASE("simulate X gate")
         // |00> -> |10> -> |11>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_x_gate(0);
         circuit.add_x_gate(1);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -223,16 +223,16 @@ TEST_CASE("simulate H gate")
         // |0> -> (1/sqrt2)|0> + (1/sqrt2)|1>
         const auto n_qubits = 1;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, H(0)")
@@ -242,16 +242,16 @@ TEST_CASE("simulate H gate")
         // |00> -> (1/sqrt2)|00> + (1/sqrt2)|10>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, H(1)")
@@ -261,16 +261,16 @@ TEST_CASE("simulate H gate")
         // |00> -> (1/sqrt2) |00> + (1/sqrt2) |01>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(1);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, H(1)H(0)")
@@ -281,17 +281,17 @@ TEST_CASE("simulate H gate")
         //      -> (1/2) |00> + (1/2) |01> + (1/2) |10> + (1/2) |11>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(0);
         circuit.add_h_gate(1);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -304,16 +304,16 @@ TEST_CASE("simulate RX gate")
         // |0> -> cos(pi/8) |0> - i sin(pi/8)) |1>
         const auto n_qubits = 1;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rx_gate(0, M_PI / 4.0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{COS_PI_8, 0.0}, {0.0, -SIN_PI_8}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, RX(pi/4, 0)")
@@ -323,16 +323,16 @@ TEST_CASE("simulate RX gate")
         // |00> -> cos(pi/8) |00> - i sin(pi/8)) |10>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rx_gate(0, M_PI / 4.0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{COS_PI_8, 0.0}, {0.0, -SIN_PI_8}, {0.0, 0.0}, {0.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("two qubits, RX(pi/8, 1)RX(pi/4, 0)")
@@ -349,20 +349,20 @@ TEST_CASE("simulate RX gate")
         //      -   sin(pi/8) sin(pi/16) |11>
         const auto n_qubits = 2;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rx_gate(0, M_PI / 4.0);
         circuit.add_rx_gate(1, M_PI / 8.0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{COS_PI_8 * COS_PI_16, 0.0},
              {0.0, -SIN_PI_8 * COS_PI_16},
              {0.0, -COS_PI_8 * SIN_PI_16},
              {-SIN_PI_8 * SIN_PI_16, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -375,16 +375,16 @@ TEST_CASE("simulate RY gate")
         // |0> -> cos(pi/8) |0> + sin(pi/8)) |1>
         const auto n_qubits = 1;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_ry_gate(0, M_PI / 4.0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{COS_PI_8, 0.0}, {SIN_PI_8, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("one qubit, random angles")
@@ -394,18 +394,18 @@ TEST_CASE("simulate RY gate")
         // |0> -> cos(theta/2) |0> + sin(theta/2)) |1>
         for (std::size_t i {0}; i < 5; ++i) {
             const auto n_qubits = 1;
-            auto circuit = mqis::QuantumCircuit {n_qubits};
+            auto circuit = ket::QuantumCircuit {n_qubits};
 
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
             circuit.add_ry_gate(0, angle);
 
-            auto state = mqis::QuantumState {n_qubits};
-            mqis::simulate(circuit, state);
+            auto state = ket::QuantumState {n_qubits};
+            ket::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
+            const auto expected_state = ket::QuantumState {
                 {{std::cos(angle / 2.0), 0.0}, {std::sin(angle / 2.0), 0.0}}
             };
-            REQUIRE(mqis::almost_eq(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
     }
 }
@@ -419,16 +419,16 @@ TEST_CASE("simulate RZ gate")
         // |0> -> [cos(pi/8) - i sin(pi/8)] |0>
         const auto n_qubits = 1;
 
-        auto circuit = mqis::QuantumCircuit {n_qubits};
+        auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rz_gate(0, M_PI / 4.0);
 
-        auto state = mqis::QuantumState {n_qubits};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {n_qubits};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{COS_PI_8, -SIN_PI_8}, {0.0, 0.0}}
         };
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("one qubit, random angles")
@@ -438,18 +438,18 @@ TEST_CASE("simulate RZ gate")
         // |0> -> [cos(angle/2) - i sin(angle/2)] |0>
         for (std::size_t i {0}; i < 5; ++i) {
             const auto n_qubits = 1;
-            auto circuit = mqis::QuantumCircuit {n_qubits};
+            auto circuit = ket::QuantumCircuit {n_qubits};
 
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
             circuit.add_rz_gate(0, angle);
 
-            auto state = mqis::QuantumState {n_qubits};
-            mqis::simulate(circuit, state);
+            auto state = ket::QuantumState {n_qubits};
+            ket::simulate(circuit, state);
 
-            const auto expected_state = mqis::QuantumState {
+            const auto expected_state = ket::QuantumState {
                 {{std::cos(angle / 2.0), -std::sin(angle / 2.0)}, {0.0, 0.0}}
             };
-            REQUIRE(mqis::almost_eq(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
     }
 
@@ -464,24 +464,24 @@ TEST_CASE("simulate RZ gate")
             const auto n_qubits = 2;
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
 
-            auto circuit0 = mqis::QuantumCircuit {n_qubits};
+            auto circuit0 = ket::QuantumCircuit {n_qubits};
             circuit0.add_rz_gate(0, angle);
 
-            auto state0 = mqis::QuantumState {n_qubits};
-            mqis::simulate(circuit0, state0);
+            auto state0 = ket::QuantumState {n_qubits};
+            ket::simulate(circuit0, state0);
 
-            auto circuit1 = mqis::QuantumCircuit {n_qubits};
+            auto circuit1 = ket::QuantumCircuit {n_qubits};
             circuit1.add_rz_gate(1, angle);
 
-            auto state1 = mqis::QuantumState {n_qubits};
-            mqis::simulate(circuit1, state1);
+            auto state1 = ket::QuantumState {n_qubits};
+            ket::simulate(circuit1, state1);
 
-            const auto expected_state = mqis::QuantumState {
+            const auto expected_state = ket::QuantumState {
                 {{std::cos(angle / 2.0), -std::sin(angle / 2.0)}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
             };
 
-            REQUIRE(mqis::almost_eq(state0, expected_state));
-            REQUIRE(mqis::almost_eq(state1, expected_state));
+            REQUIRE(ket::almost_eq(state0, expected_state));
+            REQUIRE(ket::almost_eq(state1, expected_state));
         }
     }
 }
@@ -490,28 +490,28 @@ TEST_CASE("simulate CX gate")
 {
     struct InputAndOutput
     {
-        mqis::QuantumState state;
-        mqis::QuantumState expected;
+        ket::QuantumState state;
+        ket::QuantumState expected;
     };
 
     // expectation is that qubit 1 flips if qubit 0 is set
     SECTION("two qubits")
     {
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
 
         SECTION("CX(control=0, target=1)")
         {
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
-                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"01"}},
-                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"11"}},
-                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {"10"}}
+                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
+                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
+                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"11"}},
+                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {"10"}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
 
         SECTION("CX(control=1, target=0)")
@@ -519,38 +519,38 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(1, 0);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
-                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"11"}},
-                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"10"}},
-                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {"01"}}
+                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
+                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"11"}},
+                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
+                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {"01"}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
     }
 
     SECTION("three qubits")
     {
-        auto circuit = mqis::QuantumCircuit {3};
+        auto circuit = ket::QuantumCircuit {3};
 
         SECTION("CX(control=0, target=1)")
         {
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
-                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"110"}},
-                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
-                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {"100"}},
-                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
-                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {"111"}},
-                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
-                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {"101"}}
+                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
+                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"110"}},
+                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
+                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"100"}},
+                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
+                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"111"}},
+                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
+                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {"101"}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
 
         SECTION("CX(control=0, target=2)")
@@ -558,18 +558,18 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 2);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
-                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"101"}},
-                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
-                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {"111"}},
-                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
-                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {"100"}},
-                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
-                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {"110"}}
+                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
+                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"101"}},
+                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
+                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"111"}},
+                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
+                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"100"}},
+                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
+                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {"110"}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
     }
 }
@@ -578,28 +578,28 @@ TEST_CASE("simulate CZ gate")
 {
     struct InputAndOutput
     {
-        mqis::QuantumState state;
-        mqis::QuantumState expected;
+        ket::QuantumState state;
+        ket::QuantumState expected;
     };
 
     // expectation is that qubit 1 flips if qubit 0 is set
     SECTION("two qubits")
     {
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
 
         SECTION("CZ(control=0, target=1)")
         {
             circuit.add_cz_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
-                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"01"}},
-                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"10"}},
-                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
+                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
+                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
+                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
 
         SECTION("CZ(control=1, target=0)")
@@ -607,38 +607,38 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(1, 0);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"00"}, mqis::QuantumState {"00"}},
-                InputAndOutput {mqis::QuantumState {"01"}, mqis::QuantumState {"01"}},
-                InputAndOutput {mqis::QuantumState {"10"}, mqis::QuantumState {"10"}},
-                InputAndOutput {mqis::QuantumState {"11"}, mqis::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
+                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
+                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
+                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
     }
 
     SECTION("three qubits")
     {
-        auto circuit = mqis::QuantumCircuit {3};
+        auto circuit = ket::QuantumCircuit {3};
 
         SECTION("CZ(control=0, target=1)")
         {
             circuit.add_cz_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
-                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"100"}},
-                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
-                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {{{}, {}, {}, {-1.0, 0.0}, {}, {}, {}, {}}}},
-                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
-                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {"101"}},
-                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
-                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
+                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"100"}},
+                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
+                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {{{}, {}, {}, {-1.0, 0.0}, {}, {}, {}, {}}}},
+                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
+                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"101"}},
+                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
+                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
 
         SECTION("CZ(control=0, target=2)")
@@ -646,18 +646,18 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(0, 2);
 
             auto pair = GENERATE(
-                InputAndOutput {mqis::QuantumState {"000"}, mqis::QuantumState {"000"}},
-                InputAndOutput {mqis::QuantumState {"100"}, mqis::QuantumState {"100"}},
-                InputAndOutput {mqis::QuantumState {"010"}, mqis::QuantumState {"010"}},
-                InputAndOutput {mqis::QuantumState {"110"}, mqis::QuantumState {"110"}},
-                InputAndOutput {mqis::QuantumState {"001"}, mqis::QuantumState {"001"}},
-                InputAndOutput {mqis::QuantumState {"101"}, mqis::QuantumState {{{}, {}, {}, {}, {}, {-1.0, 0.0}, {}, {}}}},
-                InputAndOutput {mqis::QuantumState {"011"}, mqis::QuantumState {"011"}},
-                InputAndOutput {mqis::QuantumState {"111"}, mqis::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
+                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"100"}},
+                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
+                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"110"}},
+                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
+                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {{{}, {}, {}, {}, {}, {-1.0, 0.0}, {}, {}}}},
+                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
+                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
             );
 
-            mqis::simulate(circuit, pair.state);
-            REQUIRE(mqis::almost_eq(pair.expected, pair.state));
+            ket::simulate(circuit, pair.state);
+            REQUIRE(ket::almost_eq(pair.expected, pair.state));
         }
     }
 }
@@ -669,19 +669,19 @@ TEST_CASE("simulate H and CX gates")
         // expectation
         // APPLY H(0)     : |00> -> (1/sqrt2) |00> + (1/sqrt2) |10>
         // APPLY CX(0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) |11>
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate(0);
         circuit.add_cx_gate(0, 1);
 
-        auto state = mqis::QuantumState {"00"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"00"};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}},
-            mqis::QuantumStateEndian::LITTLE
+            ket::QuantumStateEndian::LITTLE
         };
 
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("2 qubits, CX(0, 1) CX(1, 0) CX(0, 1) X(0)")
@@ -691,18 +691,18 @@ TEST_CASE("simulate H and CX gates")
         // APPLY CX(0, 1) :      -> |11>
         // APPLY CX(1, 0) :      -> |01>
         // APPLY CX(0, 1) :      -> |01>
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_x_gate(0);
         circuit.add_cx_gate(0, 1);
         circuit.add_cx_gate(1, 0);
         circuit.add_cx_gate(0, 1);
 
-        auto state = mqis::QuantumState {"00"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"00"};
+        ket::simulate(circuit, state);
 
-        const auto expected_state = mqis::QuantumState {"01"};
+        const auto expected_state = ket::QuantumState {"01"};
 
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -713,7 +713,7 @@ TEST_CASE("simulate CRX gate")
         struct TestPair
         {
             std::string input;
-            mqis::QuantumState expected;
+            ket::QuantumState expected;
         };
 
         // clang-format off
@@ -723,20 +723,20 @@ TEST_CASE("simulate CRX gate")
         const auto sint = std::sin(angle / 2.0);
 
         auto pair = GENERATE_COPY(
-            TestPair {"00", mqis::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"10", mqis::QuantumState { {{0.0, 0.0}, {cost, 0.0}, {0.0, 0.0}, {0.0, -sint}} }},
-            TestPair {"01", mqis::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"11", mqis::QuantumState { {{0.0, 0.0}, {0.0, -sint}, {0.0, 0.0}, {cost, 0.0}} }}
+            TestPair {"00", ket::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"10", ket::QuantumState { {{0.0, 0.0}, {cost, 0.0}, {0.0, 0.0}, {0.0, -sint}} }},
+            TestPair {"01", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"11", ket::QuantumState { {{0.0, 0.0}, {0.0, -sint}, {0.0, 0.0}, {cost, 0.0}} }}
         );
         // clang-format on
 
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_crx_gate(0, 1, angle);
 
-        auto state = mqis::QuantumState {pair.input, mqis::QuantumStateEndian::LITTLE};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, pair.expected));
+        REQUIRE(ket::almost_eq(state, pair.expected));
     }
 
     SECTION("2 qubits, CRX(t, 0, 1) H(0)")
@@ -746,22 +746,22 @@ TEST_CASE("simulate CRX gate")
         // APPLY CRX(t, 0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) cos(t/2) |10> - (i/sqrt2) sint(t/2) |11>
         auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
 
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate(0);
         circuit.add_crx_gate(0, 1, angle);
 
-        auto state = mqis::QuantumState {"00"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"00"};
+        ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, 0.0}, {0.0, 0.0}, {0.0, -M_SQRT1_2 * sint}},
-            mqis::QuantumStateEndian::LITTLE
+            ket::QuantumStateEndian::LITTLE
         };
 
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -774,22 +774,22 @@ TEST_CASE("simulate CRZ gate")
         // APPLY CRZ(t, 0, 1) :      -> (1/sqrt2) |00> + (1/sqrt2) exp(-i t/2) |10>
         auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
 
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate(0);
         circuit.add_crz_gate(0, 1, angle);
 
-        auto state = mqis::QuantumState {"00"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"00"};
+        ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, -M_SQRT1_2 * sint}, {0.0, 0.0}, {0.0, 0.0}},
-            mqis::QuantumStateEndian::LITTLE
+            ket::QuantumStateEndian::LITTLE
         };
 
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 
     SECTION("2 qubits, evenly spaced")
@@ -800,23 +800,23 @@ TEST_CASE("simulate CRZ gate")
         // APPLY CRZ(t, 0, 1) :      -> (1/2) [|00> + exp(-i t/2) |10> + |10> + exp(i t/2) |11>]
         auto angle = GENERATE(0.0, M_PI / 6.0, M_PI / 4.0, M_PI / 3.0, M_PI / 2.0, M_PI / 1.5, 0.99 * M_PI, M_PI);
 
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate(0);
         circuit.add_h_gate(1);
         circuit.add_crz_gate(0, 1, angle);
 
-        auto state = mqis::QuantumState {"00"};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {"00"};
+        ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = mqis::QuantumState {
+        const auto expected_state = ket::QuantumState {
             {{0.5, 0.0}, {0.5 * cost, -0.5 * sint}, {0.5, 0.0}, {0.5 * cost, 0.5 * sint}},
-            mqis::QuantumStateEndian::LITTLE
+            ket::QuantumStateEndian::LITTLE
         };
 
-        REQUIRE(mqis::almost_eq(state, expected_state));
+        REQUIRE(ket::almost_eq(state, expected_state));
     }
 }
 
@@ -827,7 +827,7 @@ TEST_CASE("simulate CP gate")
         struct TestPair
         {
             std::string input;
-            mqis::QuantumState expected;
+            ket::QuantumState expected;
         };
 
         // clang-format off
@@ -837,20 +837,20 @@ TEST_CASE("simulate CP gate")
         const auto sint = std::sin(angle);
 
         auto pair = GENERATE_COPY(
-            TestPair {"00", mqis::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"10", mqis::QuantumState { {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"01", mqis::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"11", mqis::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {cost, sint}} }}
+            TestPair {"00", ket::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"10", ket::QuantumState { {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"01", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"11", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {cost, sint}} }}
         );
         // clang-format on
 
-        auto circuit = mqis::QuantumCircuit {2};
+        auto circuit = ket::QuantumCircuit {2};
         circuit.add_cp_gate(0, 1, angle);
 
-        auto state = mqis::QuantumState {pair.input};
-        mqis::simulate(circuit, state);
+        auto state = ket::QuantumState {pair.input};
+        ket::simulate(circuit, state);
 
-        REQUIRE(mqis::almost_eq(state, pair.expected));
+        REQUIRE(ket::almost_eq(state, pair.expected));
     }
 }
 
@@ -867,58 +867,58 @@ TEST_CASE("simulate U gate")
 
     SECTION("H gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::h_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::h_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"H", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("two H gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::h_gate(), 0}, {mqis::h_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::h_gate(), 0}, {ket::h_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"H", 0.0, 0}, {"H", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("X gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::x_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::x_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"X", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("two X gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::x_gate(), 0}, {mqis::x_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::x_gate(), 0}, {ket::x_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"X", 0.0, 0}, {"X", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("Y gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::y_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::y_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"Y", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("Z gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::z_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::z_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"Z", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("SX gate mimic")
     {
-        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::sx_gate(), 0}}, n_qubits);
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::sx_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SX", 0.0, 0}}, n_qubits);
 
-        REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
     SECTION("simulate U gate with angles")
@@ -927,26 +927,26 @@ TEST_CASE("simulate U gate")
 
         SECTION("RX gate mimic")
         {
-            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::rx_gate(angle), 0}}, n_qubits);
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::rx_gate(angle), 0}}, n_qubits);
             const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"RX", angle, 0}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("two RX gate mimic")
         {
-            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::rx_gate(angle), 0}, {mqis::rx_gate(angle), 0}}, n_qubits);
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::rx_gate(angle), 0}, {ket::rx_gate(angle), 0}}, n_qubits);
             const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"RX", angle, 0}, {"RX", angle, 0}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("H and then X and then RX")
         {
-            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{mqis::h_gate(), 0}, {mqis::x_gate(), 0}, {mqis::rx_gate(angle), 0}}, n_qubits);
+            const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::h_gate(), 0}, {ket::x_gate(), 0}, {ket::rx_gate(angle), 0}}, n_qubits);
             const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"H", 0.0, 0}, {"X", 0.0, 0}, {"RX", angle, 0}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
     }
     // clang-format on
@@ -966,42 +966,42 @@ TEST_CASE("simulate CU gate")
 
         SECTION("CH gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::h_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::h_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CH", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("CX gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::x_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::x_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CX", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("CY gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::y_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::y_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CY", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("CZ gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::z_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::z_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CZ", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("CSX gate mimic")
         {
-            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::sx_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::sx_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSX", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-            REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
         SECTION("simulate 2-qubit CU with angles")
@@ -1010,18 +1010,18 @@ TEST_CASE("simulate CU gate")
 
             SECTION("CRX gate mimic")
             {
-                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::rx_gate(angle), control_qubit, target_qubit}}, n_qubits);
+                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::rx_gate(angle), control_qubit, target_qubit}}, n_qubits);
                 const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CRX", angle, control_qubit, target_qubit}}, n_qubits);
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
 
             SECTION("CP gate mimic")
             {
-                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::p_gate(angle), control_qubit, target_qubit}}, n_qubits);
+                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::p_gate(angle), control_qubit, target_qubit}}, n_qubits);
                 const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CP", angle, control_qubit, target_qubit}}, n_qubits);
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
 
             SECTION("CX then CRX")
@@ -1036,8 +1036,8 @@ TEST_CASE("simulate CU gate")
                 const auto state_from_matrix = simulate_double_qubit_with_ugate(
                     initial_state,
                     {
-                        {mqis::x_gate(), first_control_qubit, first_target_qubit},
-                        {mqis::rx_gate(angle), second_control_qubit, second_target_qubit}
+                        {ket::x_gate(), first_control_qubit, first_target_qubit},
+                        {ket::rx_gate(angle), second_control_qubit, second_target_qubit}
                     },
                     n_qubits
                 );
@@ -1051,7 +1051,7 @@ TEST_CASE("simulate CU gate")
                     n_qubits
                 );
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
         }
     }
@@ -1072,26 +1072,26 @@ TEST_CASE("simulate CU gate")
 
             SECTION("CX gate mimic")
             {
-                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::x_gate(), control_qubit, target_qubit}}, n_qubits);
+                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::x_gate(), control_qubit, target_qubit}}, n_qubits);
                 const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CX", 0.0, control_qubit, target_qubit}}, n_qubits);
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
 
             SECTION("CRX gate mimic")
             {
-                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::rx_gate(angle), control_qubit, target_qubit}}, n_qubits);
+                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::rx_gate(angle), control_qubit, target_qubit}}, n_qubits);
                 const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CRX", angle, control_qubit, target_qubit}}, n_qubits);
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
 
             SECTION("CP gate mimic")
             {
-                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{mqis::p_gate(angle), control_qubit, target_qubit}}, n_qubits);
+                const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::p_gate(angle), control_qubit, target_qubit}}, n_qubits);
                 const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CP", angle, control_qubit, target_qubit}}, n_qubits);
 
-                REQUIRE(mqis::almost_eq(state_from_matrix, state_from_builtin));
+                REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
             }
         }
     }
@@ -1100,8 +1100,8 @@ TEST_CASE("simulate CU gate")
 
 TEST_CASE("Invalid simulation; circuit and state have different numbers of qubits")
 {
-    auto circuit = mqis::QuantumCircuit {4};
-    auto state = mqis::QuantumState {"000"};
+    auto circuit = ket::QuantumCircuit {4};
+    auto state = ket::QuantumState {"000"};
 
-    REQUIRE_THROWS_AS(mqis::simulate(circuit, state), std::runtime_error);
+    REQUIRE_THROWS_AS(ket::simulate(circuit, state), std::runtime_error);
 }

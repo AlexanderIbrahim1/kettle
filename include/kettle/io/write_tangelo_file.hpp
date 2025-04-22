@@ -1,0 +1,175 @@
+#pragma once
+
+#include <cstddef>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/primitive_gate.hpp"
+#include "kettle/gates/primitive_gate_map.hpp"
+#include "kettle/circuit/circuit.hpp"
+
+/*
+This script writes the gates of a `QuantumCircuit` instance into a tangelo-like format file
+
+Some examples:
+```
+H         target : [4]
+RX        target : [5]   parameter : 1.5707963267948966
+CNOT      target : [4]   control : [2]
+RZ        target : [5]   parameter : 12.533816585267923
+```
+*/
+
+namespace impl_ket
+{
+
+inline auto format_double_(double x) -> std::string
+{
+    auto output = std::format("{: .17f}", x);
+    if (output.size() > 16) {
+        output = output.substr(0, 16);
+    }
+
+    return output;
+}
+
+inline auto format_matrix2x2_(const ket::Matrix2X2& mat) -> std::string
+{
+    auto output = std::stringstream {};
+    output << std::format("    [{}, {}]", format_double_(mat.elem00.real()), format_double_(mat.elem00.imag()));
+    output << std::format("   [{}, {}]\n", format_double_(mat.elem01.real()), format_double_(mat.elem01.imag()));
+    output << std::format("    [{}, {}]", format_double_(mat.elem10.real()), format_double_(mat.elem10.imag()));
+    output << std::format("   [{}, {}]\n", format_double_(mat.elem11.real()), format_double_(mat.elem11.imag()));
+
+    return output.str();
+}
+
+inline auto format_one_target_gate_(const ket::GateInfo& info) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto target = unpack_single_qubit_gate_index(info);
+
+    return std::format("{:<10}target : [{}]\n", gate_name, target);
+}
+
+inline auto format_one_control_one_target_gate_(const ket::GateInfo& info) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto [control, target] = unpack_double_qubit_gate_indices(info);
+
+    return std::format("{:<10}target : [{}]   control : [{}]\n", gate_name, target, control);
+}
+
+inline auto format_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto [target, angle] = unpack_one_target_one_angle_gate(info);
+
+    return std::format("{:<10}target : [{}]   parameter : {:.16f}\n", gate_name, target, angle);
+}
+
+inline auto format_one_control_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto [control, target, angle] = unpack_one_control_one_target_one_angle_gate(info);
+
+    return std::format("{:<10}target : [{}]   control : [{}]   parameter : {:.16f}\n", gate_name, target, control, angle);
+}
+
+inline auto format_m_gate_(const ket::GateInfo& info) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto [qubit, bit] = unpack_m_gate(info);
+
+    return std::format("{:<10}target : [{}]   bit : [{}]\n", gate_name, qubit, bit);
+}
+
+inline auto format_u_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto target = unpack_single_qubit_gate_index(info);
+
+    auto output = std::stringstream {};
+    output << std::format("{:<10}target : [{}]\n", gate_name, target);
+    output << format_matrix2x2_(mat);
+
+    return output.str();
+}
+
+inline auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
+{
+    const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
+    const auto [control, target] = unpack_double_qubit_gate_indices(info);
+
+    auto output = std::stringstream {};
+    output << std::format("{:<10}target : [{}]   control : [{}]\n", gate_name, target, control);
+    output << format_matrix2x2_(mat);
+
+    return output.str();
+}
+
+}  // impl_ket
+
+namespace ket
+{
+
+inline void write_tangelo_circuit(const ket::QuantumCircuit& circuit, std::ostream& stream)
+{
+    namespace gid = impl_ket::gate_id;
+    using G = ket::Gate;
+
+    for (const auto& ginfo : circuit) {
+        if (gid::is_one_target_transform_gate(ginfo.gate)) {
+            stream << impl_ket::format_one_target_gate_(ginfo);
+        }
+        else if (gid::is_one_control_one_target_transform_gate(ginfo.gate)) {
+            stream << impl_ket::format_one_control_one_target_gate_(ginfo);
+        }
+        else if (gid::is_one_target_one_angle_transform_gate(ginfo.gate)) {
+            stream << impl_ket::format_one_target_one_angle_gate_(ginfo);
+        }
+        else if (gid::is_one_control_one_target_one_angle_transform_gate(ginfo.gate)) {
+            stream << impl_ket::format_one_control_one_target_one_angle_gate_(ginfo);
+        }
+        else if (ginfo.gate == G::M) {
+            stream << impl_ket::format_m_gate_(ginfo);
+        }
+        else if (ginfo.gate == G::U) {
+            const auto matrix_index = impl_ket::unpack_gate_matrix_index(ginfo);
+            stream << impl_ket::format_u_gate_(ginfo, circuit.unitary_gate(matrix_index));
+        }
+        else if (ginfo.gate == G::CU) {
+            const auto matrix_index = impl_ket::unpack_gate_matrix_index(ginfo);
+            stream << impl_ket::format_cu_gate_(ginfo, circuit.unitary_gate(matrix_index));
+        }
+        else {
+            throw std::runtime_error {"DEV ERROR: A gate type with no implemented output has been encountered.\n"};
+        }
+    }
+}
+
+inline void write_tangelo_circuit(const QuantumCircuit& circuit, const std::filesystem::path& filepath)
+{
+    auto outstream = std::ofstream {filepath};
+
+    if (!outstream.is_open()) {
+        auto err_msg = std::stringstream {};
+        err_msg << "ERROR: unable to open file to write tangelo-style circuit: '" << filepath << "'\n";
+
+        throw std::ios::failure {err_msg.str()};
+    }
+
+    write_tangelo_circuit(circuit, outstream);
+}
+
+inline void print_tangelo_circuit(const QuantumCircuit& circuit)
+{
+    write_tangelo_circuit(circuit, std::cout);
+}
+
+}  // namespace ket

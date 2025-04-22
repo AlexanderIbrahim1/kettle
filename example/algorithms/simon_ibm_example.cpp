@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     Uses the Simon oracle given in the qiskit textbook:
@@ -28,7 +28,7 @@
 /*
     Apply the Simon's oracle as implemented in the link above.
 */
-void apply_simon_function(mqis::QuantumCircuit& circuit, const std::vector<std::uint8_t>& hidden_bitset)
+void apply_simon_function(ket::QuantumCircuit& circuit, const std::vector<std::uint8_t>& hidden_bitset)
 {
     // make sure we aren't using the zero bitstring; it invalidates the Simon property
     const auto it = std::find(hidden_bitset.begin(), hidden_bitset.end(), std::uint8_t {1});
@@ -60,8 +60,8 @@ void apply_simon_function(mqis::QuantumCircuit& circuit, const std::vector<std::
     Check if the measured portion of the bitstring is "orthogonal" (mod 2) to the hidden bitset
 */
 void check_bitstring(const std::string& bitstring, const std::string& hidden_bitstring) {
-    const auto bitset = mqis::bitstring_to_dynamic_bitset(bitstring);
-    const auto hidden_bitset = mqis::bitstring_to_dynamic_bitset(hidden_bitstring);
+    const auto bitset = ket::bitstring_to_dynamic_bitset(bitstring);
+    const auto hidden_bitset = ket::bitstring_to_dynamic_bitset(hidden_bitstring);
     const auto product = std::inner_product(bitset.begin(), bitset.end(), hidden_bitset.begin(), std::uint8_t {0});
 
     if (product % 2 == 0) {
@@ -77,22 +77,22 @@ auto main() -> int
 {
     // choose the hidden bitstring
     const auto hidden_bitstring = "101";
-    const auto hidden_bitset = mqis::bitstring_to_dynamic_bitset(hidden_bitstring);
+    const auto hidden_bitset = ket::bitstring_to_dynamic_bitset(hidden_bitstring);
 
     // create the circuit needed for Simon's algorithm
-    auto circuit = mqis::QuantumCircuit {6};
+    auto circuit = ket::QuantumCircuit {6};
     circuit.add_h_gate({0, 1, 2});
     apply_simon_function(circuit, hidden_bitset);
     circuit.add_h_gate({0, 1, 2});
 
     // create the statevector, and propagate it through the circuit
-    auto state = mqis::QuantumState {"000000"};
-    mqis::simulate(circuit, state);
+    auto state = ket::QuantumState {"000000"};
+    ket::simulate(circuit, state);
 
     // get a map of the bitstrings to the counts; in Simon's algorithm, we are concerned
     // with the leftmost half of the qubits, which given the bitstrings that are "orthogonal"
     // to the hidden bitstring; so we marginalize out the right half of the qubits (3, 4, 5)
-    const auto counts = mqis::perform_measurements_as_counts_marginal(state, 1024, {3, 4, 5});
+    const auto counts = ket::perform_measurements_as_counts_marginal(state, 1024, {3, 4, 5});
 
     for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
@@ -101,7 +101,7 @@ auto main() -> int
     // check if the output is correct;
     // i.e. check if the resulting bitstrings are orthogonal to the hidden bistring
     for (const auto& kv_pair : counts) {
-        const auto bitstring = mqis::rstrip_marginal_bits(kv_pair.first);
+        const auto bitstring = ket::rstrip_marginal_bits(kv_pair.first);
         check_bitstring(bitstring, hidden_bitstring);
     }
     // Example output:

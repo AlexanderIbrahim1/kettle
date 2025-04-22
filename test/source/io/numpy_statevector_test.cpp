@@ -5,8 +5,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <mini-qiskit/state/state.hpp>
-#include <mini-qiskit/io/numpy_statevector.hpp>
+#include <kettle/state/state.hpp>
+#include <kettle/io/numpy_statevector.hpp>
 
 
 TEST_CASE("read_numpy_statevector()")
@@ -23,7 +23,7 @@ TEST_CASE("read_numpy_statevector()")
         " (3.960590171906697154e-01+3.960590171906697154e-01j)\n"
     };
 
-    const auto actual = mqis::read_numpy_statevector(stream);
+    const auto actual = ket::read_numpy_statevector(stream);
 
     auto expected_amplitudes = []() {
         auto output = std::vector<std::complex<double>> {};
@@ -43,7 +43,7 @@ TEST_CASE("read_numpy_statevector()")
         return output;
     }();
 
-    const auto expected = mqis::QuantumState {std::move(expected_amplitudes)};
+    const auto expected = ket::QuantumState {std::move(expected_amplitudes)};
 
-    REQUIRE(mqis::almost_eq(actual, expected));
+    REQUIRE(ket::almost_eq(actual, expected));
 }

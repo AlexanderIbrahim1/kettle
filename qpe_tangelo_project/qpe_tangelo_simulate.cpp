@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     Perform QPE for the N = 2 and N = 3 gates for the rotor paper.
@@ -60,12 +60,12 @@ auto main(int argc, char** argv) -> int
     }();
 
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
-    const auto circuit = mqis::read_tangelo_circuit(n_total_qubits, arguments.abs_gate_filepath, 0);
+    const auto circuit = ket::read_tangelo_circuit(n_total_qubits, arguments.abs_gate_filepath, 0);
 
-    auto statevector = mqis::QuantumState {n_total_qubits};
-    mqis::simulate(circuit, statevector);
+    auto statevector = ket::QuantumState {n_total_qubits};
+    ket::simulate(circuit, statevector);
 
-    mqis::save_statevector(arguments.abs_statevector_output_filepath, statevector);
+    ket::save_statevector(arguments.abs_statevector_output_filepath, statevector);
 
     return 0;
 }

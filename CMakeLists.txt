@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 include(cmake/prelude.cmake)
 
 project(
-    mini-qiskit
+    kettle
     VERSION 0.1.0
     DESCRIPTION "A reproduction of MicroQiskit, with some changes in implementation."
     HOMEPAGE_URL "https://example.com/"
@@ -13,7 +13,7 @@ project(
 include(cmake/project-is-top-level.cmake)
 include(cmake/variables.cmake)
 
-add_subdirectory(include) # mini-qiskit
+add_subdirectory(include) # kettle
 
 # ---- Install rules ----
 
@@ -24,7 +24,7 @@ endif()
 # ---- Examples ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  option(BUILD_EXAMPLES "Build examples tree." "${mini-qiskit_BUILD_EXAMPLES}")
+  option(BUILD_EXAMPLES "Build examples tree." "${kettle_BUILD_EXAMPLES}")
   if(BUILD_EXAMPLES)
     add_subdirectory(example)
   endif()
@@ -33,7 +33,7 @@ endif()
 # ---- QPE Tangelo Project ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  option(BUILD_QPE_TANGELO_PROJECT "Build QPE tangelo project tree." "${mini-qiskit_BUILD_QPE_TANGELO_PROJECT}")
+  option(BUILD_QPE_TANGELO_PROJECT "Build QPE tangelo project tree." "${kettle_BUILD_QPE_TANGELO_PROJECT}")
   if(BUILD_QPE_TANGELO_PROJECT)
     add_subdirectory(qpe_tangelo_project)
   endif()
@@ -41,12 +41,12 @@ endif()
 
 # ---- Developer mode ----
 
-if(NOT mini-qiskit_DEVELOPER_MODE)
+if(NOT kettle_DEVELOPER_MODE)
   return()
 elseif(NOT PROJECT_IS_TOP_LEVEL)
   message(
       AUTHOR_WARNING
-      "Developer mode is intended for developers of mini-qiskit"
+      "Developer mode is intended for developers of kettle"
   )
 endif()
 

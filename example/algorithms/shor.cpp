@@ -5,7 +5,7 @@
 #include <tuple>
 #include <unordered_set>
 
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 /*
     A basic implementation of Shor's algorithm, inspired by the code from:
@@ -44,7 +44,7 @@ auto VALID_BASES = std::unordered_set<int> {2, 4, 7, 8, 11, 13};
     The specific gates chosen in each case come directly from the aforementioned resource.
 */
 void control_multiplication_mod15(
-    mqis::QuantumCircuit& circuit,
+    ket::QuantumCircuit& circuit,
     int base,
     std::size_t control_qubit,
     std::size_t n_counting_qubits,
@@ -62,20 +62,20 @@ void control_multiplication_mod15(
 
     for (std::size_t i {0}; i < n_iterations; ++i) {
         if (base == 2 || base == 13) {
-            mqis::apply_control_swap(circuit, control_qubit, i2, i3);
-            mqis::apply_control_swap(circuit, control_qubit, i1, i2);
-            mqis::apply_control_swap(circuit, control_qubit, i0, i1);
+            ket::apply_control_swap(circuit, control_qubit, i2, i3);
+            ket::apply_control_swap(circuit, control_qubit, i1, i2);
+            ket::apply_control_swap(circuit, control_qubit, i0, i1);
         }
 
         if (base == 7 || base == 8) {
-            mqis::apply_control_swap(circuit, control_qubit, i0, i1);
-            mqis::apply_control_swap(circuit, control_qubit, i1, i2);
-            mqis::apply_control_swap(circuit, control_qubit, i2, i3);
+            ket::apply_control_swap(circuit, control_qubit, i0, i1);
+            ket::apply_control_swap(circuit, control_qubit, i1, i2);
+            ket::apply_control_swap(circuit, control_qubit, i2, i3);
         }
 
         if (base == 4 || base == 11) {
-            mqis::apply_control_swap(circuit, control_qubit, i1, i3);
-            mqis::apply_control_swap(circuit, control_qubit, i0, i2);
+            ket::apply_control_swap(circuit, control_qubit, i1, i3);
+            ket::apply_control_swap(circuit, control_qubit, i0, i2);
         }
 
         if (base == 7 || base == 11 || base == 13) {
@@ -147,14 +147,14 @@ auto main(int argc, char** argv) -> int
     // determine the number of qubits needed for the problem
     // - the first 8 qubits are the counting qubits
     // - the last 4 qubits are the ancilla qubits
-    const auto counting_qubits = mqis::arange(8ul);
-    const auto ancilla_qubits = mqis::arange(8ul, 12ul);
+    const auto counting_qubits = ket::arange(8ul);
+    const auto ancilla_qubits = ket::arange(8ul, 12ul);
     const auto n_counting_qubits = counting_qubits.size();
     const auto n_ancilla_qubits = ancilla_qubits.size();
     const auto n_total_qubits = n_counting_qubits + n_ancilla_qubits;
 
     // create the circuit
-    auto circuit = mqis::QuantumCircuit {n_total_qubits};
+    auto circuit = ket::QuantumCircuit {n_total_qubits};
 
     // apply the gates needed to:
     // - turn the counting qubits into a uniform superposition of all possible states
@@ -163,31 +163,31 @@ auto main(int argc, char** argv) -> int
     circuit.add_x_gate(n_counting_qubits);
 
     // apply the unitary operator for QPE
-    for (auto i : mqis::revarange(n_counting_qubits)) {
+    for (auto i : ket::revarange(n_counting_qubits)) {
         const auto n_iterations = 1ul << i;
         control_multiplication_mod15(circuit, base, i, n_counting_qubits, n_iterations);
     }
 
     // the final step of QPE requires the inverse QFT
-    mqis::apply_inverse_fourier_transform(circuit, mqis::revarange(n_counting_qubits));
+    ket::apply_inverse_fourier_transform(circuit, ket::revarange(n_counting_qubits));
 
     // create the statevector and evolve the quantum state
-    auto statevector = mqis::QuantumState {n_total_qubits};
-    mqis::simulate(circuit, statevector);
+    auto statevector = ket::QuantumState {n_total_qubits};
+    ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; in Shor's algorithm, we are concerned
     // with the output of the counting qubits, and thus we marginalize the ancilla qubits
-    const auto counts = mqis::perform_measurements_as_counts_marginal(statevector, 1 << 10, ancilla_qubits);
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1 << 10, ancilla_qubits);
 
     for (const auto& [bitstring, count] : counts) {
         // the manner in which we apply the controlled unitary gates for QPE affects the output;
         // - in this example, the 0th qubit was applied once, the 1st qubit was applied twice, etc.
         // - this means the largest contributor is on the right of the bitstring
         //   - and we need to reverse the bitstring being calculating the binary fraction expansion
-        auto rstripped_bitstring = mqis::rstrip_marginal_bits(bitstring);
+        auto rstripped_bitstring = ket::rstrip_marginal_bits(bitstring);
         std::ranges::reverse(rstripped_bitstring);
 
-        const auto binary_fraction = mqis::binary_fraction_expansion(rstripped_bitstring);
+        const auto binary_fraction = ket::binary_fraction_expansion(rstripped_bitstring);
         const auto [numer, denom] = numerator_and_denominator(binary_fraction, 15);
 
         std::cout << "(state, count)     = (" << bitstring << ", " << count << ")\n";
