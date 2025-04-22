@@ -1,6 +1,6 @@
-# mini-qiskit
+# kettle
 
-Mini-qiskit is a C++20 header-only library for simulating quantum circuits.
+Kettle is a C++20 header-only library for simulating quantum circuits.
 No external dependencies are needed, although Catch2 is used for unit testing.
 
 Some of the main features:
@@ -22,7 +22,7 @@ Other features:
 Here's an example where we create one of the Bell states, and perform measurements on it
 
 ```cpp
-#include <mini-qiskit/mini-qiskit.hpp>
+#include <kettle/kettle.hpp>
 
 auto main() -> int
 {
