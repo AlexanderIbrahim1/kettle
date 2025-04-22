@@ -62,7 +62,7 @@ Currently, only noiseless statevector simulations are supported.
 This project is still a work-in-progress, and the API is subject to further changes
 as the project develops.
 
-# Building and installing
+## Building
 
 This project uses cmake presets for building.
 So far it has only been built and tested on Ubuntu 23.04.
@@ -84,11 +84,11 @@ cmake --preset=release
 cmake --build --preset=release
 ```
 
-# Contributing
+## Contributing
 
 Thank you for considering making contributions to this project!
 You can use the issue tab to open a bug report or feature request.
 
-# Acknowledgements
+## Acknowledgements
 
 This project was initially generated with the [`cmake-init`](https://github.com/friendlyanon/cmake-init) project.
