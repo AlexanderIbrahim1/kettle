@@ -468,3 +468,33 @@ TEST_CASE("QuantumCircuit: almost_eq()")
         }
     }
 }
+
+TEST_CASE("CircuitElement")
+{
+    SECTION("construct with ket::GateInfo")
+    {
+        const auto ginfo = impl_ket::create_one_target_gate(ket::Gate::X, 0);
+        const auto circuit_element = impl_ket::CircuitElement {ginfo};
+
+        REQUIRE(circuit_element.is_gate());
+        REQUIRE(!circuit_element.is_control_flow());
+
+        const auto gate_from_circuit_element = circuit_element.get_gate();
+        REQUIRE(gate_from_circuit_element.gate == ginfo.gate);
+        REQUIRE(impl_ket::unpack_single_qubit_gate_index(gate_from_circuit_element) == 0);
+    }
+
+    SECTION("construct with ControlFlowInstruction")
+    {
+        auto cfi = impl_ket::ControlFlowInstruction {
+            impl_ket::SingleBitControlFlowFunction {0, impl_ket::ControlBooleanKind::IF},
+            nullptr
+        };
+
+        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
+
+        REQUIRE(circuit_element.is_control_flow());
+        REQUIRE(!circuit_element.is_gate());
+        REQUIRE_NOTHROW(circuit_element.get_control_flow());
+    }
+}
