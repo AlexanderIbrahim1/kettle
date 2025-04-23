@@ -40,22 +40,22 @@ inline auto transpile_to_primitive(
 
     for (const auto& ginfo : circuit.gates_) {
         if (impl_ket::is_primitive_gate(ginfo.gate) || ginfo.gate == Gate::M) {
-            new_circuit.gates_.push_back(ginfo);
+            new_circuit.elements_.push_back(ginfo);
         }
         else if (ginfo.gate == Gate::U) {
             const auto [target, i_matrix] = impl_ket::unpack_u_gate(ginfo);
-            const auto& unitary = circuit.unitary_gates_[i_matrix];
+            const auto& unitary = circuit.unitaries_[i_matrix];
             const auto decomp_gates = decomp_1t(target, unitary, tolerance_sq);
             for (const auto& decomp_gate : decomp_gates) {
-                new_circuit.gates_.push_back(decomp_gate);
+                new_circuit.elements_.push_back(decomp_gate);
             }
         }
         else if (ginfo.gate == Gate::CU) {
             const auto [control, target, i_matrix] = impl_ket::unpack_cu_gate(ginfo);
-            const auto& unitary = circuit.unitary_gates_[i_matrix];
+            const auto& unitary = circuit.unitaries_[i_matrix];
             const auto decomp_gates = decomp_1c_1t(control, target, unitary, tolerance_sq);
             for (const auto& decomp_gate : decomp_gates) {
-                new_circuit.gates_.push_back(decomp_gate);
+                new_circuit.elements_.push_back(decomp_gate);
             }
         }
         else if (ginfo.gate == Gate::CONTROL) {
@@ -75,7 +75,7 @@ inline auto transpile_to_primitive(
                 new_circuit.control_flow_instructions_.emplace_back(std::move(cfi));
 
                 const auto new_cfi_index = new_circuit.control_flow_instructions_.size() - 1;
-                new_circuit.gates_.emplace_back(impl_ket::control::create_control_flow_gate(new_cfi_index, cfi_kind));
+                new_circuit.elements_.emplace_back(impl_ket::control::create_control_flow_gate(new_cfi_index, cfi_kind));
             }
         }
         else {

@@ -30,8 +30,7 @@ enum class Gate
     CP,
     U,
     CU,
-    M,
-    CONTROL
+    M
 };
 
 /*
@@ -238,29 +237,28 @@ constexpr auto unpack_gate_matrix_index(const ket::GateInfo& info) -> std::size_
 
 }  // namespace impl_ket
 
-
-namespace impl_ket::control
-{
-
-constexpr static auto IF_STMT = std::size_t {0};
-constexpr static auto IF_ELSE_STMT = std::size_t {1};
-constexpr static auto REPEAT_STMT = std::size_t {2};
-constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
-
-constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
-{
-    return info.arg3;
-}
-
-constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
-{
-    return info.arg0;
-}
-
-constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
-{
-    return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
-}
-
-}  // namespace impl_ket::control
+// namespace impl_ket::control
+// {
+// 
+// constexpr static auto IF_STMT = std::size_t {0};
+// constexpr static auto IF_ELSE_STMT = std::size_t {1};
+// constexpr static auto REPEAT_STMT = std::size_t {2};
+// constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
+// 
+// constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
+// {
+//     return info.arg3;
+// }
+// 
+// constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
+// {
+//     return info.arg0;
+// }
+// 
+// constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
+// {
+//     return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
+// }
+// 
+// }  // namespace impl_ket::control
 

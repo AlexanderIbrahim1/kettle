@@ -106,24 +106,32 @@ auto almost_eq(
         return false;
     }
 
+    // TODO: implement comparison for control flow!!!
     for (std::size_t i_gate {0}; i_gate < n_left_gates; ++i_gate) {
-        const auto& left_info = left[i_gate];
-        const auto& right_info = right[i_gate];
+        const auto& left_element = left[i_gate];
+        const auto& right_element = right[i_gate];
 
-        if (left_info.gate == Gate::M && right_info.gate == Gate::M) {
-            return impl_ket::unpack_m_gate(left_info) == impl_ket::unpack_m_gate(right_info);
+        if (left_element.is_control_flow() || right_element.is_control_flow()) {
+            throw std::runtime_error {"DEV ERROR: comparison for control flow not yet implemented!\n"};
         }
-        else if (left_info.gate == Gate::M && right_info.gate != Gate::M) {
+
+        const auto& left_gate = left_element.get_gate();
+        const auto& right_gate = right_element.get_gate();
+
+        if (left_gate.gate == Gate::M && right_gate.gate == Gate::M) {
+            return impl_ket::unpack_m_gate(left_gate) == impl_ket::unpack_m_gate(right_gate);
+        }
+        else if (left_gate.gate == Gate::M && right_gate.gate != Gate::M) {
             return false;
         }
-        else if (left_info.gate != Gate::M && right_info.gate == Gate::M) {
+        else if (left_gate.gate != Gate::M && right_gate.gate == Gate::M) {
             return false;
         }
         else {
-            const auto [new_left_info, new_left_matrix] = impl_ket::as_u_gate(left, left_info);
-            const auto [new_right_info, new_right_matrix] = impl_ket::as_u_gate(right, right_info);
+            const auto [new_left_gate, new_left_matrix] = impl_ket::as_u_gate(left, left_gate);
+            const auto [new_right_gate, new_right_matrix] = impl_ket::as_u_gate(right, right_gate);
 
-            if (!impl_ket::is_matching_u_gate_info(new_left_info, new_right_info)) {
+            if (!impl_ket::is_matching_u_gate_info(new_left_gate, new_right_gate)) {
                 return false;
             }
 
