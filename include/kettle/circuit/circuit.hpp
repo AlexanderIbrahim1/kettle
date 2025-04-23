@@ -17,52 +17,8 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
+#include "kettle/circuit/circuit_element.hpp"
 
-
-namespace impl_ket
-{
-
-/*
-    A thin wrapper around `std::variant`, with member functions to make it more
-    convenient to work with.
-*/
-struct CircuitElement
-{
-public:
-    CircuitElement(const ket::GateInfo& ginfo)
-        : element_ {ginfo}
-    {}
-
-    CircuitElement(ControlFlowInstruction instruction)
-        : element_ {std::move(instruction)}
-    {}
-
-    constexpr auto is_gate() const -> bool
-    {
-        return std::holds_alternative<ket::GateInfo>(element_);
-    }
-
-    constexpr auto is_control_flow() const -> bool
-    {
-        return std::holds_alternative<ControlFlowInstruction>(element_);
-    }
-
-    constexpr auto get_gate() const -> const ket::GateInfo&
-    {
-        return std::get<ket::GateInfo>(element_);
-    }
-
-    constexpr auto get_control_flow() const -> const ControlFlowInstruction&
-    {
-        return std::get<ControlFlowInstruction>(element_);
-    }
-
-private:
-    std::variant<ket::GateInfo, ControlFlowInstruction> element_;
-};
-
-
-}  // namespace impl_ket
 
 namespace ket
 {
