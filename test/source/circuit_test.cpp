@@ -11,22 +11,37 @@
 
 static constexpr auto ABS_TOL = double {1.0e-6};
 
+auto is_target_and_type(
+    const impl_ket::CircuitElement& element,
+    std::size_t expected_target,
+    ket::Gate expected_gate
+) -> bool
+{
+    REQUIRE(element.is_gate());
+
+    const auto& gate = element.get_gate();
+
+    REQUIRE(impl_ket::unpack_one_target_gate(gate) == expected_target);
+    REQUIRE(gate.gate == expected_gate);
+}
+
+
 TEST_CASE("add multiple X gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_gates = [](const ket::QuantumCircuit& circ)
-    { return std::distance(circ.begin(), circ.end()); };
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
+    {
+        return std::distance(circ.begin(), circ.end());
+    };
 
     SECTION("add 1")
     {
         const auto indices = std::vector<std::size_t> {1};
         circuit.add_x_gate(indices);
 
-        REQUIRE(number_of_gates(circuit) == 1);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[0]) == 1);
-        REQUIRE(circuit[0].gate == ket::Gate::X);
+        REQUIRE(number_of_elements(circuit) == 1);
+        REQUIRE(is_target_and_type(circuit[0], 1, ket::Gate::X));
     }
 
     SECTION("add 0, 2")
@@ -34,13 +49,9 @@ TEST_CASE("add multiple X gates")
         const auto indices = std::vector<std::size_t> {0, 2};
         circuit.add_x_gate(indices);
 
-        REQUIRE(number_of_gates(circuit) == 2);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[0]) == 0);
-        REQUIRE(circuit[0].gate == ket::Gate::X);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[1]) == 2);
-        REQUIRE(circuit[1].gate == ket::Gate::X);
+        REQUIRE(number_of_elements(circuit) == 2);
+        REQUIRE(is_target_and_type(circuit[0], 0, ket::Gate::X));
+        REQUIRE(is_target_and_type(circuit[1], 2, ket::Gate::X));
     }
 
     SECTION("add 0, 1, 2")
@@ -48,32 +59,20 @@ TEST_CASE("add multiple X gates")
         const auto indices = std::vector<std::size_t> {0, 1, 2};
         circuit.add_x_gate(indices);
 
-        REQUIRE(number_of_gates(circuit) == 3);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[0]) == 0);
-        REQUIRE(circuit[0].gate == ket::Gate::X);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[1]) == 1);
-        REQUIRE(circuit[1].gate == ket::Gate::X);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[2]) == 2);
-        REQUIRE(circuit[2].gate == ket::Gate::X);
+        REQUIRE(number_of_elements(circuit) == 3);
+        REQUIRE(is_target_and_type(circuit[0], 0, ket::Gate::X));
+        REQUIRE(is_target_and_type(circuit[1], 1, ket::Gate::X));
+        REQUIRE(is_target_and_type(circuit[2], 2, ket::Gate::X));
     }
 
     SECTION("add 0, 1, 2 via initializer list")
     {
         circuit.add_x_gate({0, 1, 2});
 
-        REQUIRE(number_of_gates(circuit) == 3);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[0]) == 0);
-        REQUIRE(circuit[0].gate == ket::Gate::X);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[1]) == 1);
-        REQUIRE(circuit[1].gate == ket::Gate::X);
-
-        REQUIRE(impl_ket::unpack_one_target_gate(circuit[2]) == 2);
-        REQUIRE(circuit[2].gate == ket::Gate::X);
+        REQUIRE(number_of_elements(circuit) == 3);
+        REQUIRE(is_target_and_type(circuit[0], 0, ket::Gate::X));
+        REQUIRE(is_target_and_type(circuit[1], 1, ket::Gate::X));
+        REQUIRE(is_target_and_type(circuit[2], 2, ket::Gate::X));
     }
 }
 
@@ -81,7 +80,7 @@ TEST_CASE("add multiple RX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_gates = [](const ket::QuantumCircuit& circ)
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
     { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
@@ -92,7 +91,7 @@ TEST_CASE("add multiple RX gates")
             {2, 0.75}
         });
 
-        REQUIRE(number_of_gates(circuit) == 3);
+        REQUIRE(number_of_elements(circuit) == 3);
 
         const auto rx_gate0 = impl_ket::unpack_one_target_one_angle_gate(circuit[0]);
         REQUIRE(std::get<0>(rx_gate0) == 0);
@@ -115,7 +114,7 @@ TEST_CASE("add multiple CX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_gates = [](const ket::QuantumCircuit& circ)
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
     { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
@@ -126,7 +125,7 @@ TEST_CASE("add multiple CX gates")
             {2, 0}
         });
 
-        REQUIRE(number_of_gates(circuit) == 3);
+        REQUIRE(number_of_elements(circuit) == 3);
 
         const auto cx_gate0 = impl_ket::unpack_one_control_one_target_gate(circuit[0]);
         REQUIRE(std::get<0>(cx_gate0) == 0);
@@ -149,7 +148,7 @@ TEST_CASE("add multiple CRX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_gates = [](const ket::QuantumCircuit& circ)
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
     { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
@@ -160,7 +159,7 @@ TEST_CASE("add multiple CRX gates")
             {2, 0, 0.75}
         });
 
-        REQUIRE(number_of_gates(circuit) == 3);
+        REQUIRE(number_of_elements(circuit) == 3);
 
         const auto crx_gate0 = impl_ket::unpack_one_control_one_target_one_angle_gate(circuit[0]);
         REQUIRE(std::get<0>(crx_gate0) == 0);

@@ -411,8 +411,9 @@ public:
     {
         check_bit_range_(bit_index);
 
-        auto cfi = impl_ket::ControlFlowInstruction {
-            impl_ket::SingleBitControlFlowFunction {bit_index, impl_ket::ControlBooleanKind::IF},
+        // TODO: create nicer objects for very common control flow predicates
+        auto cfi = impl_ket::ClassicalIfStatement {
+            ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
             std::make_unique<QuantumCircuit>(std::move(circuit))
         };
 

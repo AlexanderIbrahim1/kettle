@@ -123,29 +123,32 @@ inline void write_tangelo_circuit(const ket::QuantumCircuit& circuit, std::ostre
     namespace gid = impl_ket::gate_id;
     using G = ket::Gate;
 
-    for (const auto& ginfo : circuit) {
-        if (gid::is_one_target_transform_gate(ginfo.gate)) {
-            stream << impl_ket::format_one_target_gate_(ginfo);
+    for (const auto& circuit_element : circuit) {
+        // TODO: implement control flow after I get this to compile
+        const auto& gate_info = circuit_element.get_gate();
+
+        if (gid::is_one_target_transform_gate(gate_info.gate)) {
+            stream << impl_ket::format_one_target_gate_(gate_info);
         }
-        else if (gid::is_one_control_one_target_transform_gate(ginfo.gate)) {
-            stream << impl_ket::format_one_control_one_target_gate_(ginfo);
+        else if (gid::is_one_control_one_target_transform_gate(gate_info.gate)) {
+            stream << impl_ket::format_one_control_one_target_gate_(gate_info);
         }
-        else if (gid::is_one_target_one_angle_transform_gate(ginfo.gate)) {
-            stream << impl_ket::format_one_target_one_angle_gate_(ginfo);
+        else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate)) {
+            stream << impl_ket::format_one_target_one_angle_gate_(gate_info);
         }
-        else if (gid::is_one_control_one_target_one_angle_transform_gate(ginfo.gate)) {
-            stream << impl_ket::format_one_control_one_target_one_angle_gate_(ginfo);
+        else if (gid::is_one_control_one_target_one_angle_transform_gate(gate_info.gate)) {
+            stream << impl_ket::format_one_control_one_target_one_angle_gate_(gate_info);
         }
-        else if (ginfo.gate == G::M) {
-            stream << impl_ket::format_m_gate_(ginfo);
+        else if (gate_info.gate == G::M) {
+            stream << impl_ket::format_m_gate_(gate_info);
         }
-        else if (ginfo.gate == G::U) {
-            const auto matrix_index = impl_ket::unpack_gate_matrix_index(ginfo);
-            stream << impl_ket::format_u_gate_(ginfo, circuit.unitary_gate(matrix_index));
+        else if (gate_info.gate == G::U) {
+            const auto matrix_index = impl_ket::unpack_gate_matrix_index(gate_info);
+            stream << impl_ket::format_u_gate_(gate_info, circuit.unitary_gate(matrix_index));
         }
-        else if (ginfo.gate == G::CU) {
-            const auto matrix_index = impl_ket::unpack_gate_matrix_index(ginfo);
-            stream << impl_ket::format_cu_gate_(ginfo, circuit.unitary_gate(matrix_index));
+        else if (gate_info.gate == G::CU) {
+            const auto matrix_index = impl_ket::unpack_gate_matrix_index(gate_info);
+            stream << impl_ket::format_cu_gate_(gate_info, circuit.unitary_gate(matrix_index));
         }
         else {
             throw std::runtime_error {"DEV ERROR: A gate type with no implemented output has been encountered.\n"};

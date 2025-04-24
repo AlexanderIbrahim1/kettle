@@ -110,7 +110,9 @@ TEST_CASE("transpile_to_primitive()")
         ket::simulate(original, state0);
         ket::simulate(transpiled, state1);
 
-        for (const auto& gate : transpiled) {
+        for (const auto& circuit_element : transpiled) {
+            const auto& gate = circuit_element.get_gate();
+
             REQUIRE(impl_ket::gate_id::is_single_qubit_transform_gate(gate.gate));
             REQUIRE(gate.gate != ket::Gate::U);
         }

@@ -201,7 +201,13 @@ inline auto make_controlled_circuit(
 
     auto new_circuit = ket::QuantumCircuit {n_new_qubits};
 
-    for (const auto& gate_info : subcircuit) {
+    for (const auto& circuit_element : subcircuit) {
+        if (circuit_element.is_control_flow()) {
+            throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
+        }
+
+        const auto& gate_info = circuit_element.get_gate();
+
         if (gid::is_one_target_transform_gate(gate_info.gate)) {
             const auto original_target = impl_ket::unpack_one_target_gate(gate_info);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
@@ -274,7 +280,14 @@ inline auto make_multiplicity_controlled_circuit(
 
     auto new_circuit = QuantumCircuit {n_new_qubits};
 
-    for (const auto& gate_info : subcircuit) {
+    for (const auto& circuit_element : subcircuit) {
+
+        if (circuit_element.is_control_flow()) {
+            throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
+        }
+
+        const auto& gate_info = circuit_element.get_gate();
+
         if (gid::is_one_target_transform_gate(gate_info.gate)) {
             const auto original_target = impl_ket::unpack_one_target_gate(gate_info);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);

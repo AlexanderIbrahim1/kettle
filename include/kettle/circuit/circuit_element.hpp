@@ -26,7 +26,11 @@ public:
         : element_ {ginfo}
     {}
 
-    CircuitElement(ControlFlowInstruction instruction)
+    CircuitElement(ClassicalIfStatement instruction)
+        : element_ {std::move(instruction)}
+    {}
+
+    CircuitElement(ClassicalIfElseStatement instruction)
         : element_ {std::move(instruction)}
     {}
 
@@ -37,7 +41,7 @@ public:
 
     constexpr auto is_control_flow() const -> bool
     {
-        return std::holds_alternative<ControlFlowInstruction>(element_);
+        return std::holds_alternative<ClassicalControlFlowInstruction>(element_);
     }
 
     constexpr auto get_gate() const -> const ket::GateInfo&
@@ -45,13 +49,13 @@ public:
         return std::get<ket::GateInfo>(element_);
     }
 
-    constexpr auto get_control_flow() const -> const ControlFlowInstruction&
+    constexpr auto get_control_flow() const -> const ClassicalControlFlowInstruction&
     {
-        return std::get<ControlFlowInstruction>(element_);
+        return std::get<ClassicalControlFlowInstruction>(element_);
     }
 
 private:
-    std::variant<ket::GateInfo, ControlFlowInstruction> element_;
+    std::variant<ket::GateInfo, ClassicalControlFlowInstruction> element_;
 };
 
 
