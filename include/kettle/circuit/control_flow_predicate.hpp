@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
@@ -86,6 +87,8 @@ public:
     {
         return control_kind_;
     }
+
+    friend constexpr auto operator<=>(const ControlFlowPredicate& left, const ControlFlowPredicate& right) noexcept = default;
 
 private:
     std::vector<std::size_t> bit_indices_to_check_;
