@@ -46,6 +46,11 @@ public:
         return n_bits_;
     }
 
+    constexpr auto n_circuit_elements() const noexcept -> std::size_t
+    {
+        return elements_.size();
+    }
+
     constexpr auto operator[](std::size_t index) const noexcept -> const impl_ket::CircuitElement&
     {
         return elements_[index];
