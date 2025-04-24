@@ -135,7 +135,7 @@ public:
     void add_rx_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RX");
-        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RX, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RX, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -149,7 +149,7 @@ public:
     void add_ry_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RY");
-        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RY, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RY, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -163,7 +163,7 @@ public:
     void add_rz_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RZ");
-        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RZ, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RZ, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -177,7 +177,7 @@ public:
     void add_p_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "P");
-        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::P, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::P, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>

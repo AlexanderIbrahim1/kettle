@@ -166,7 +166,7 @@ inline auto decomp_to_one_target_primitive_gates_(
     for (const auto& primitive : primitives) {
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
-            output.emplace_back(create_one_target_one_angle_gate(primitive.gate, angle, target));
+            output.emplace_back(create_one_target_one_angle_gate(primitive.gate, target, angle));
         } else {
             output.emplace_back(create_one_target_gate(primitive.gate, target));
         }

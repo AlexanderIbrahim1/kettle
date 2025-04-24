@@ -9,8 +9,17 @@
 #include <kettle/io/read_tangelo_file.hpp>
 
 
+auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
+{
+    return static_cast<std::size_t>(std::distance(circuit.begin(), circuit.end()));
+}
+
+
 TEST_CASE("read_tangelo_file()")
 {
+    using G = ket::Gate;
+    namespace comp = impl_ket::compare;
+
     SECTION("single h gate")
     {
         auto stream = std::stringstream {
@@ -18,12 +27,10 @@ TEST_CASE("read_tangelo_file()")
         };
 
         const auto actual = ket::read_tangelo_circuit(9, stream, 0);
+        const auto expected = impl_ket::create_one_target_gate(G::H, 4);
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == ket::Gate::H);
-
-        const auto target_qubit = impl_ket::unpack_one_target_gate(actual[0]);
-        REQUIRE(target_qubit == 4);
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(comp::is_1t_gate_equal(actual[0].get_gate(), expected));
     }
 
     SECTION("multiple gates")
@@ -39,38 +46,46 @@ TEST_CASE("read_tangelo_file()")
 
         const auto actual = ket::read_tangelo_circuit(9, stream, 2);
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 4);
+        const auto expected0 = impl_ket::create_one_target_gate(G::H, 4);
+        const auto expected1 = impl_ket::create_one_target_one_angle_gate(G::RX, 5, 1.5707963267948966);
+        const auto expected2 = impl_ket::create_one_control_one_target_gate(G::CX, 2, 4);
+        const auto expected3 = impl_ket::create_one_target_one_angle_gate(G::RZ, 5, 12.533816585267923);
 
-        SECTION("H gate")
-        {
-            REQUIRE(actual[0].gate == ket::Gate::H);
-            const auto target_qubit = impl_ket::unpack_one_target_gate(actual[0]);
-            REQUIRE(target_qubit == 4);
-        }
-
-        SECTION("RX gate")
-        {
-            REQUIRE(actual[1].gate == ket::Gate::RX);
-            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[1]);
-            REQUIRE(target_qubit == 5);
-            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(1.5707963267948966));
-        }
-
-        SECTION("CX gate")
-        {
-            REQUIRE(actual[2].gate == ket::Gate::CX);
-            const auto [control_qubit, target_qubit] = impl_ket::unpack_one_control_one_target_gate(actual[2]);
-            REQUIRE(target_qubit == 4);
-            REQUIRE(control_qubit == 2);
-        }
-
-        SECTION("RZ gate")
-        {
-            REQUIRE(actual[3].gate == ket::Gate::RZ);
-            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[3]);
-            REQUIRE(target_qubit == 5);
-            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(12.533816585267923));
-        }
+        REQUIRE(number_of_elements(actual) == 4);
+        REQUIRE(comp::is_1t_gate_equal(actual[0].get_gate(), expected0));
+        REQUIRE(comp::is_1t1a_gate_equal(actual[1].get_gate(), expected1));
+        REQUIRE(comp::is_1c1t_gate_equal(actual[2].get_gate(), expected2));
+        REQUIRE(comp::is_1t1a_gate_equal(actual[3].get_gate(), expected3));
+//        SECTION("H gate")
+//        {
+//            REQUIRE(actual[0].gate == ket::Gate::H);
+//            const auto target_qubit = impl_ket::unpack_one_target_gate(actual[0]);
+//            REQUIRE(target_qubit == 4);
+//        }
+//
+//        SECTION("RX gate")
+//        {
+//            REQUIRE(actual[1].gate == ket::Gate::RX);
+//            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[1]);
+//            REQUIRE(target_qubit == 5);
+//            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(1.5707963267948966));
+//        }
+//
+//        SECTION("CX gate")
+//        {
+//            REQUIRE(actual[2].gate == ket::Gate::CX);
+//            const auto [control_qubit, target_qubit] = impl_ket::unpack_one_control_one_target_gate(actual[2]);
+//            REQUIRE(target_qubit == 4);
+//            REQUIRE(control_qubit == 2);
+//        }
+//
+//        SECTION("RZ gate")
+//        {
+//            REQUIRE(actual[3].gate == ket::Gate::RZ);
+//            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[3]);
+//            REQUIRE(target_qubit == 5);
+//            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(12.533816585267923));
+//        }
     }
 
     SECTION("single SWAP gate")
@@ -80,15 +95,18 @@ TEST_CASE("read_tangelo_file()")
         };
 
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
+        const auto gate0 = actual[0].get_gate();
+        const auto gate1 = actual[1].get_gate();
+        const auto gate2 = actual[2].get_gate();
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 3);
-        REQUIRE(actual[0].gate == ket::Gate::CX);
-        REQUIRE(actual[1].gate == ket::Gate::CX);
-        REQUIRE(actual[2].gate == ket::Gate::CX);
+        REQUIRE(number_of_elements(actual) == 3);
+        REQUIRE(gate0.gate == ket::Gate::CX);
+        REQUIRE(gate1.gate == ket::Gate::CX);
+        REQUIRE(gate2.gate == ket::Gate::CX);
 
-        const auto [q_left_0, q_right_0] = impl_ket::unpack_one_control_one_target_gate(actual[0]);
-        const auto [q_left_1, q_right_1] = impl_ket::unpack_one_control_one_target_gate(actual[1]);
-        const auto [q_left_2, q_right_2] = impl_ket::unpack_one_control_one_target_gate(actual[2]);
+        const auto [q_left_0, q_right_0] = impl_ket::unpack_one_control_one_target_gate(gate0);
+        const auto [q_left_1, q_right_1] = impl_ket::unpack_one_control_one_target_gate(gate1);
+        const auto [q_left_2, q_right_2] = impl_ket::unpack_one_control_one_target_gate(gate2);
 
         REQUIRE(q_left_0 == q_right_1);
         REQUIRE(q_right_1 == q_left_2);
@@ -103,16 +121,13 @@ TEST_CASE("read_tangelo_file()")
         };
 
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
+        const auto expected0 = impl_ket::create_one_target_one_angle_gate(G::P, 11, -1.3474016644659843);
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == ket::Gate::P);
-
-        const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[0]);
-        REQUIRE(target_qubit == 11);
-        REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-1.3474016644659843));
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(comp::is_1t1a_gate_equal(actual[0].get_gate(), expected0));
     }
 
-    SECTION("parse_one_target_one_control_one_angle_gate()")
+    SECTION("parse_one_control_one_target_one_angle_gate()")
     {
         struct TestCase
         {
@@ -121,52 +136,49 @@ TEST_CASE("read_tangelo_file()")
             std::function<std::tuple<std::size_t, std::size_t, double>(ket::GateInfo)> unpack_func;
         };
 
+        const auto unpack = impl_ket::unpack_one_control_one_target_one_angle_gate;
+        const auto create = impl_ket::create_one_control_one_target_one_angle_gate;
+
         auto testcase = GENERATE_REF(
             TestCase {
                 "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 ket::Gate::CP,
-                impl_ket::unpack_one_control_one_target_one_angle_gate
+                unpack
             },
             TestCase {
                 "CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 ket::Gate::CRX,
-                impl_ket::unpack_one_control_one_target_one_angle_gate
+                unpack
             },
             TestCase {
                 "CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 ket::Gate::CRY,
-                impl_ket::unpack_one_control_one_target_one_angle_gate
+                unpack
             },
             TestCase {
                 "CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
                 ket::Gate::CRZ,
-                impl_ket::unpack_one_control_one_target_one_angle_gate
+                unpack
             }
         );
 
         auto stream = std::stringstream {testcase.stream_contents};
+
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
+        const auto expected = create(testcase.gate, 12, 9, -0.39269908169872414);
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == testcase.gate);
-
-        const auto [control_qubit, target_qubit, angle] = testcase.unpack_func(actual[0]);
-        REQUIRE(control_qubit == 12);
-        REQUIRE(target_qubit == 9);
-        REQUIRE_THAT(angle, Catch::Matchers::WithinRel(-0.39269908169872414));
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(comp::is_1c1t1a_gate_equal(actual[0].get_gate(), expected));
     }
 
     SECTION("parse_m_gate()")
     {
         auto stream = std::stringstream {"M         target : [1]   bit : [4]\n"};
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
+        const auto expected = impl_ket::create_m_gate(1, 4);
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == ket::Gate::M);
-
-        const auto [qubit, bit] = impl_ket::unpack_m_gate(actual[0]);
-        REQUIRE(qubit == 1);
-        REQUIRE(bit == 4);
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(comp::is_m_gate_equal(actual[0].get_gate(), expected));
     }
 
     SECTION("parse_u_gate()")
@@ -177,11 +189,12 @@ TEST_CASE("read_tangelo_file()")
             "    [3.456, -6.543]   [4.567, -7.654]\n"
         };
         const auto actual = ket::read_tangelo_circuit(10, stream, 0);
+        const auto gate = actual[0].get_gate();
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == ket::Gate::U);
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(gate.gate == ket::Gate::U);
 
-        const auto [target, matrix_index] = impl_ket::unpack_u_gate(actual[0]);
+        const auto [target, matrix_index] = impl_ket::unpack_u_gate(gate);
         const auto matrix = actual.unitary_gate(matrix_index);
         
         const auto expected_matrix = ket::Matrix2X2 {
@@ -203,11 +216,12 @@ TEST_CASE("read_tangelo_file()")
             "    [3.456, -6.543]   [4.567, -7.654]\n"
         };
         const auto actual = ket::read_tangelo_circuit(10, stream, 0);
+        const auto gate = actual[0].get_gate();
 
-        REQUIRE(std::distance(actual.begin(), actual.end()) == 1);
-        REQUIRE(actual[0].gate == ket::Gate::CU);
+        REQUIRE(number_of_elements(actual) == 1);
+        REQUIRE(gate.gate == ket::Gate::CU);
 
-        const auto [control, target, matrix_index] = impl_ket::unpack_cu_gate(actual[0]);
+        const auto [control, target, matrix_index] = impl_ket::unpack_cu_gate(gate);
         const auto matrix = actual.unitary_gate(matrix_index);
         
         const auto expected_matrix = ket::Matrix2X2 {

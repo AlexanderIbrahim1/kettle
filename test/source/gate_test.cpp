@@ -18,7 +18,7 @@ TEST_CASE("Test create and unpack gate functions")
     {
         const auto theta = 1.57;
         const auto target_index = std::size_t {3};
-        const auto gate_info = impl_ket::create_one_target_one_angle_gate(ket::Gate::RX, theta, target_index);
+        const auto gate_info = impl_ket::create_one_target_one_angle_gate(ket::Gate::RX, target_index, theta);
         const auto [unpacked_index, unpacked_theta] = impl_ket::unpack_one_target_one_angle_gate(gate_info);
 
         REQUIRE(unpacked_index == target_index);
