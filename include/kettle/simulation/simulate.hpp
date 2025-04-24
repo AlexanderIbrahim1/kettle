@@ -194,20 +194,27 @@ inline void simulate_loop_body_(
             if (if_stmt(c_register)) {
                 const auto& subcircuit = *if_stmt.circuit();
                 for (const auto& sub_element : subcircuit) {
-                    simulate_loop_body_(
-                        subcircuit,
-                        state,
-                        single_pair,
-                        double_pair,
-                        sub_element,
-                        thread_id,
-                        prng_seed,
-                        c_register
-                    );
+                    simulate_loop_body_(subcircuit, state, single_pair, double_pair, sub_element, thread_id, prng_seed, c_register);
                 }
             }
-            
-            // TODO: implement the if-else statement when I get this to compile
+        }
+        else if (control_flow.is_if_else_statement()) {
+            const auto& if_else_stmt = control_flow.get_if_else_statement();
+
+            const auto subcircuit = [&]() {
+                if (if_else_stmt(c_register)) {
+                    return *if_else_stmt.if_circuit();
+                } else {
+                    return *if_else_stmt.else_circuit();
+                }
+            }();
+
+            for (const auto& sub_element : subcircuit) {
+                simulate_loop_body_(subcircuit, state, single_pair, double_pair, sub_element, thread_id, prng_seed, c_register);
+            }
+        }
+        else {
+            throw std::runtime_error {"DEV ERROR: unimplemented control flow function found\n"};
         }
 
         return;

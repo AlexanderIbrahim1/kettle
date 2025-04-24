@@ -42,30 +42,32 @@ inline auto transpile_to_primitive(
         if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();
 
+            // TODO: write unit tests for the transpiled control flow
             if (control_flow.is_if_statement()) {
-                // TODO: implement when I get this thing to compile
+                const auto if_stmt = control_flow.get_if_statement();
+                const auto& current_subcircuit = *if_stmt.circuit();
+                auto predicate = if_stmt.predicate();
+                auto transpiled_subcircuit = transpile_to_primitive(current_subcircuit, tolerance_sq);
+
+                new_circuit.elements_.emplace_back(std::move(predicate), std::move(transpiled_subcircuit));
+            }
+            else if (control_flow.is_if_else_statement()) {
+                const auto if_else_stmt = control_flow.get_if_else_statement();
+                const auto& if_subcircuit = *if_else_stmt.if_circuit();
+                const auto& else_subcircuit = *if_else_stmt.else_circuit();
+                auto predicate = if_else_stmt.predicate();
+                auto transpiled_if_subcircuit = transpile_to_primitive(if_subcircuit, tolerance_sq);
+                auto transpiled_else_subcircuit = transpile_to_primitive(else_subcircuit, tolerance_sq);
+
+                new_circuit.elements_.emplace_back(
+                    std::move(predicate),
+                    std::move(transpiled_if_subcircuit),
+                    std::move(transpiled_else_subcircuit)
+                );
             }
             else {
-                // TODO: implement when I get this thing to compile
+                throw std::runtime_error {"DEV ERROR: invalid control flow element found\n"};
             }
-            // const auto cfi_kind = impl_ket::control::unpack_control_flow_kind(ginfo);
-            // const auto current_cfi_index = impl_ket::control::unpack_control_flow_index(ginfo);
-            // auto instruction = circuit.control_flow_instructions_[current_cfi_index];
-
-            // if (cfi_kind == impl_ket::control::IF_STMT) {
-            //     const auto subcircuit = instruction.primary_circuit();
-            //     auto transpiled_subcircuit = transpile_to_primitive(subcircuit, tolerance_sq);
-
-            //     auto cfi = impl_ket::ControlFlowInstruction {
-            //         std::move(instruction),
-            //         std::make_unique<QuantumCircuit>(std::move(transpiled_subcircuit))
-            //     };
-
-            //     new_circuit.control_flow_instructions_.emplace_back(std::move(cfi));
-
-            //     const auto new_cfi_index = new_circuit.control_flow_instructions_.size() - 1;
-            //     new_circuit.elements_.emplace_back(impl_ket::control::create_control_flow_gate(new_cfi_index, cfi_kind));
-            // }
         }
 
         const auto& gate_info = circuit_element.get_gate();
