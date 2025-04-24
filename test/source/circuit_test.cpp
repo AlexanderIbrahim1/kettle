@@ -505,18 +505,37 @@ TEST_CASE("CircuitElement")
         REQUIRE(impl_ket::unpack_single_qubit_gate_index(gate_from_circuit_element) == 0);
     }
 
-//    // TODO reimplement
-//    SECTION("construct with ControlFlowInstruction")
-//    {
-//        auto cfi = impl_ket::ControlFlowInstruction {
-//            impl_ket::SingleBitControlFlowFunction {0, impl_ket::ControlBooleanKind::IF},
-//            nullptr
-//        };
-//
-//        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
-//
-//        REQUIRE(circuit_element.is_control_flow());
-//        REQUIRE(!circuit_element.is_gate());
-//        REQUIRE_NOTHROW(circuit_element.get_control_flow());
-//    }
+    SECTION("construct with ClassicalIfStatement")
+    {
+        auto circuit0 = ket::QuantumCircuit {2};
+
+        auto cfi = impl_ket::ClassicalIfStatement {
+            ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF},
+            std::make_unique<ket::QuantumCircuit>(std::move(circuit0))
+        };
+
+        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
+
+        REQUIRE(circuit_element.is_control_flow());
+        REQUIRE(!circuit_element.is_gate());
+        REQUIRE_NOTHROW(circuit_element.get_control_flow());
+    }
+
+    SECTION("construct with ClassicalIfElseStatement")
+    {
+        auto circuit0 = ket::QuantumCircuit {2};
+        auto circuit1 = ket::QuantumCircuit {2};
+
+        auto cfi = impl_ket::ClassicalIfElseStatement {
+            ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF},
+            std::make_unique<ket::QuantumCircuit>(std::move(circuit0)),
+            std::make_unique<ket::QuantumCircuit>(std::move(circuit1))
+        };
+
+        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
+
+        REQUIRE(circuit_element.is_control_flow());
+        REQUIRE(!circuit_element.is_gate());
+        REQUIRE_NOTHROW(circuit_element.get_control_flow());
+    }
 }
