@@ -56,6 +56,8 @@ inline void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
     const auto n_new_gates = left.elements_.size() + right.elements_.size();
     left.elements_.reserve(n_new_gates);
 
+    // TODO: write unit tests for extending the circuit with control flow
+
     // the U and CU gates refer to the indices of the held matrix in a vector in the QuantumCircuit;
     // they need to have their indices updated to reflect the new indices
     for (const auto& right_element : right.elements_) {

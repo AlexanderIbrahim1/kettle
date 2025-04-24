@@ -42,7 +42,6 @@ inline auto transpile_to_primitive(
         if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();
 
-            // TODO: write unit tests for the transpiled control flow
             if (control_flow.is_if_statement()) {
                 const auto if_stmt = control_flow.get_if_statement();
                 const auto& current_subcircuit = *if_stmt.circuit();

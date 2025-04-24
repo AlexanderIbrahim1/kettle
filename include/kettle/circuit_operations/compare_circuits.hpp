@@ -106,11 +106,11 @@ auto almost_eq(
         return false;
     }
 
-    // TODO: implement comparison for control flow!!!
     for (std::size_t i_gate {0}; i_gate < n_left_gates; ++i_gate) {
         const auto& left_element = left[i_gate];
         const auto& right_element = right[i_gate];
 
+        // TODO: implement comparison for control flow!!!
         if (left_element.is_control_flow() || right_element.is_control_flow()) {
             throw std::runtime_error {"DEV ERROR: comparison for control flow not yet implemented!\n"};
         }
