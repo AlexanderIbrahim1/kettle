@@ -423,12 +423,41 @@ public:
         elements_.emplace_back(std::move(cfi));
     }
 
+    void add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit)
+    {
+        for (auto bit_index : predicate.bit_indices_to_check()) {
+            check_bit_range_(bit_index);
+        }
+
+        auto cfi = impl_ket::ClassicalIfStatement {
+            std::move(predicate),
+            std::make_unique<QuantumCircuit>(std::move(circuit))
+        };
+
+        elements_.emplace_back(std::move(cfi));
+    }
+
     void add_if_else_statement(std::size_t bit_index, QuantumCircuit circuit0, QuantumCircuit circuit1)
     {
         check_bit_range_(bit_index);
 
         auto cfi = impl_ket::ClassicalIfElseStatement {
             ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
+            std::make_unique<QuantumCircuit>(std::move(circuit0)),
+            std::make_unique<QuantumCircuit>(std::move(circuit1))
+        };
+
+        elements_.emplace_back(std::move(cfi));
+    }
+
+    void add_if_else_statement(ControlFlowPredicate predicate, QuantumCircuit circuit0, QuantumCircuit circuit1)
+    {
+        for (auto bit_index : predicate.bit_indices_to_check()) {
+            check_bit_range_(bit_index);
+        }
+
+        auto cfi = impl_ket::ClassicalIfElseStatement {
+            std::move(predicate),
             std::make_unique<QuantumCircuit>(std::move(circuit0)),
             std::make_unique<QuantumCircuit>(std::move(circuit1))
         };

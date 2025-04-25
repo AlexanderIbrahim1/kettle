@@ -4,13 +4,15 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <optional>
 #include <sstream>
 #include <string>
 
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/gates/primitive_gate_map.hpp>
-#include <kettle/circuit/circuit.hpp>
 #include <kettle/gates/swap.hpp>
+#include <kettle/circuit/circuit.hpp>
+#include <kettle/io/io_control_flow.hpp>
 
 /*
 This script parses the file of gates produced by the tangelo code.
@@ -249,7 +251,12 @@ inline void parse_cu_gate_(ket::QuantumCircuit& circuit, std::stringstream& gate
 namespace ket
 {
 
-inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std::size_t n_skip_lines) -> QuantumCircuit
+inline auto read_tangelo_circuit(
+    std::size_t n_qubits,
+    std::istream& stream,
+    std::size_t n_skip_lines,
+    std::optional<std::size_t> line_starts_with_spaces = std::nullopt
+) -> QuantumCircuit
 {
     namespace gid = impl_ket::gate_id;
     using G = ket::Gate;
@@ -262,17 +269,57 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         std::getline(stream, line);
     }
 
+    auto curr_pos = stream.tellg();
     while (std::getline(stream, line)) {
         auto gatestream = std::stringstream {line};
 
-        std::string gate_name;
-        gatestream >> gate_name;
+        // if the start of the line needs to satisfy a certain condition, and it doesn't; break early
+        if (line_starts_with_spaces.has_value())
+        {
+            const auto whitespace = std::string(line_starts_with_spaces.value(), ' ');
 
-        if (gate_name == "") {
+            if (!line.starts_with(whitespace)) {
+                stream.seekg(curr_pos);
+                return circuit;
+            }
+        }
+
+        std::string name;
+        gatestream >> name;
+
+        if (name == "") {
             continue;
         }
 
-        const auto local_name = impl_ket::tangelo_to_local_name_(gate_name);
+        // TODO: refactor this after I make changes to how unitary matrices are treated; the inability
+        // to pop circuit elements (due to the book-keeping of general unitary matrices) means the rest
+        // of the code ends up suffering
+        if (name == "IF") {
+            auto predicate = impl_ket::parse_control_flow_predicate_(gatestream);
+            
+            // TODO: put the number of lines somewhere else, so it isn't hardcoded
+            const auto n_prefix_lines = std::size_t {4};
+            auto if_circuit = read_tangelo_circuit(n_qubits, stream, 0, n_prefix_lines);
+
+            const auto pos = stream.tellg();
+            std::getline(stream, line);
+
+            auto nextline_stream = std::stringstream {line};
+            std::string nextline_name;
+            nextline_stream >> nextline_name;
+            if (nextline_name == "ELSE") {
+                auto else_circuit = read_tangelo_circuit(n_qubits, stream, 0, n_prefix_lines);
+                circuit.add_if_else_statement(std::move(predicate), std::move(if_circuit), std::move(else_circuit));
+            }
+            else {
+                stream.seekg(pos);
+                circuit.add_if_statement(std::move(predicate), std::move(if_circuit));
+            }
+
+            continue;
+        }
+
+        const auto local_name = impl_ket::tangelo_to_local_name_(name);
 
         // handle the special cases where tangelo has primitive gates that don't exist in the local code
         if (local_name == "SWAP") {
@@ -316,6 +363,8 @@ inline auto read_tangelo_circuit(std::size_t n_qubits, std::istream& stream, std
         else {
             throw std::runtime_error {"DEV ERROR: A gate type with no implemented conversion has been encountered.\n"};
         }
+
+        curr_pos = stream.tellg();
     }
 
     return circuit;

@@ -5,8 +5,10 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <kettle/circuit_operations/compare_circuits.hpp>
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/io/read_tangelo_file.hpp>
+#include <kettle/io/write_tangelo_file.hpp>
 
 
 auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
@@ -235,4 +237,58 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(control == 2);
         REQUIRE(ket::almost_eq(matrix, expected_matrix));
     }
+}
+
+TEST_CASE("read_tangelo_file() with control flow")
+{
+    const auto x_and_x_subcircuit = []()
+    {
+        auto circ = ket::QuantumCircuit {3};
+        circ.add_x_gate({0, 2});
+        return circ;
+    };
+
+    const auto x_and_h_subcircuit = []()
+    {
+        auto circ = ket::QuantumCircuit {3};
+        circ.add_x_gate(1);
+        circ.add_h_gate(2);
+        return circ;
+    };
+
+    const auto cx_and_h_subcircuit = []()
+    {
+        auto circ = ket::QuantumCircuit {3};
+        circ.add_cx_gate(1, 2);
+        circ.add_h_gate(2);
+        return circ;
+    };
+
+    // this circuit was taken directly from one of the user-facing examples
+    const auto original = [&]() {
+        auto circuit = ket::QuantumCircuit {3};
+        circuit.add_x_gate({0, 1});
+        circuit.add_h_gate({0, 1, 2});
+
+        circuit.add_m_gate({0, 1});
+
+        circuit.add_if_statement(0, x_and_x_subcircuit());
+
+        circuit.add_y_gate(0);
+        circuit.add_z_gate(1);
+
+        circuit.add_if_else_statement(1, x_and_h_subcircuit(), cx_and_h_subcircuit());
+
+        circuit.add_y_gate(0);
+        circuit.add_z_gate(1);
+
+        return circuit;
+    }();
+
+    auto sstream = std::stringstream {};
+    ket::write_tangelo_circuit(original, sstream);
+
+    const auto reconstructed = ket::read_tangelo_circuit(3, sstream, 0);
+
+    REQUIRE(ket::almost_eq(original, reconstructed));
 }
