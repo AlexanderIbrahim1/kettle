@@ -74,7 +74,7 @@ TEST_CASE("format classical control flow statements")
         REQUIRE(expected == actual);
     }
 
-    SECTION("if statement")
+    SECTION("if else statement")
     {
         const auto if_else_stmt = impl_ket::ClassicalIfElseStatement {
             predicate,
