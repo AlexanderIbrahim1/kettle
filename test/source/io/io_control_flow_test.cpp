@@ -4,6 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/circuit/control_flow.hpp>
@@ -88,4 +89,48 @@ TEST_CASE("format classical control flow statements")
         REQUIRE(expected0 == actual0);
         REQUIRE(expected1 == actual1);
     }
+}
+
+TEST_CASE("parse_csv_in_backets_()")
+{
+    struct TestCase
+    {
+        std::string input;
+        std::vector<int> expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase {"[]", std::vector<int> {}},
+        TestCase {"[0]", std::vector<int> {0}},
+        TestCase {"[0, 2]", std::vector<int> {0, 2}},
+        TestCase {"[2, 3, 1]", std::vector<int> {2, 3, 1}}
+    );
+
+    auto stream = std::stringstream {testcase.input};
+
+    REQUIRE_THAT(impl_ket::parse_csv_in_brackets_<int>(stream), Catch::Matchers::Equals(testcase.expected));
+}
+
+TEST_CASE("parse_control_flow_predicate_()")
+{
+    using Predicate = ket::ControlFlowPredicate;
+    using Kind = ket::ControlFlowBooleanKind;
+
+    struct TestCase
+    {
+        std::string input;
+        Predicate expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase {"BITS[0] == [1]", Predicate { {0}, {1}, Kind::IF}},
+        TestCase {"BITS[0] != [1]", Predicate { {0}, {1}, Kind::IF_NOT}},
+        TestCase {"BITS[0, 3] == [1, 0]", Predicate { {0, 3}, {1, 0}, Kind::IF}},
+        TestCase {"BITS[0, 3] != [1, 0]", Predicate { {0, 3}, {1, 0}, Kind::IF_NOT}},
+        TestCase {"BITS[0, 3, 1] == [0, 0, 1]", Predicate { {0, 3, 1}, {0, 0, 1}, Kind::IF}}
+    );
+
+    auto stream = std::stringstream {testcase.input};
+
+    REQUIRE(impl_ket::parse_control_flow_predicate_(stream) == testcase.expected);
 }
