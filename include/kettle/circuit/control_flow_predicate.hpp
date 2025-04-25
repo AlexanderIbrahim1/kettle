@@ -40,6 +40,11 @@ public:
         if (bit_indices_to_check_.size() == 0) {
             throw std::runtime_error {"The control flow predicate must depend on at least one bit.\n"};
         }
+
+        const auto is_0_or_1 = [](int x) { return x == 0 || x == 1; };
+        if (!std::all_of(expected_bits_.begin(), expected_bits_.end(), is_0_or_1)) {
+            throw std::runtime_error {"The expected bits must all be 0 or 1.\n"};
+        }
     }
 
     auto operator()(const ClassicalRegister& creg) const -> bool
