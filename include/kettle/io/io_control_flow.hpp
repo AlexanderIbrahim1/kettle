@@ -3,6 +3,7 @@
 #include <concepts>
 #include <cstddef>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
@@ -42,15 +43,38 @@ auto format_csv_integers_(const std::vector<Integer>& integers) -> std::string
     return output.str();
 }
 
-inline auto format_control_flow_predicate(const ket::ControlFlowPredicate& predicate) -> std::string
+inline auto format_control_flow_predicate_(const ket::ControlFlowPredicate& predicate) -> std::string
 {
     auto output = std::stringstream {};
     output << "BITS";
     output << format_csv_integers_(predicate.bit_indices_to_check());
-    output << " = ";
+
+    if (predicate.control_kind() == ket::ControlFlowBooleanKind::IF) {
+        output << " == ";
+    } else {
+        output << " != ";
+    }
+
     output << format_csv_integers_(predicate.expected_bits());
 
     return output.str();
+}
+
+inline auto format_classical_if_statement_header_(
+    const impl_ket::ClassicalIfStatement& stmt
+) -> std::string
+{
+    return std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
+}
+
+inline auto format_classical_if_else_statement_header_(
+    const impl_ket::ClassicalIfElseStatement& stmt
+) -> std::tuple<std::string, std::string>
+{
+    const auto if_part = std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
+    const auto else_part = std::string {"ELSE"};
+
+    return {if_part, else_part};
 }
 
 }  // namespace impl_ket
