@@ -19,10 +19,19 @@ class QuantumCircuit;
 namespace impl_ket
 {
 
-class ClassicalIfStatement
+/*
+    A class that holds a single predicate and a single pointer to a circuit that
+    is accessible if the predicate evaluates to true.
+
+    This class holds the functionality needed for implementations of the classical
+    if-statement, while-loop-statement, and do-while-loop-statement. It is the
+    responsibility of other sections of the codebase that interface with control
+    flow statements to handle the logic of how the circuit is treated.
+*/
+class ClassicalOneBranchBooleanStatement
 {
 public:
-    ClassicalIfStatement(
+    ClassicalOneBranchBooleanStatement(
         const ket::ControlFlowPredicate& control_flow_predicate,
         std::unique_ptr<ket::QuantumCircuit> circuit
     )
@@ -48,6 +57,13 @@ public:
 private:
     ket::ControlFlowPredicate control_flow_predicate_;
     ClonePtr<ket::QuantumCircuit> circuit_;
+};
+
+
+class ClassicalIfStatement : public ClassicalOneBranchBooleanStatement
+{
+public:
+    using ClassicalOneBranchBooleanStatement::ClassicalOneBranchBooleanStatement;
 };
 
 
