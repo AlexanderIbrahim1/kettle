@@ -9,3 +9,5 @@ CMakeLists.txt.user
 CMakeUserPresets.json
 
 playground/
+
+compile_commands.json
