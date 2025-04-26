@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cstdint>
 #include <stdexcept>
 
@@ -35,7 +34,7 @@ inline auto bitwise_or(const std::vector<std::uint8_t>& left, const std::vector<
     auto output = std::vector<std::uint8_t> {};
     output.reserve(size);
     for (std::size_t i {0}; i < size; ++i) {
-        output.push_back(static_cast<std::uint8_t>(left[i] || right[i]));
+        output.push_back(static_cast<std::uint8_t>(left[i] || right[i]));  // NOLINT(readability-implicit-bool-conversion)
     }
 
     return output;

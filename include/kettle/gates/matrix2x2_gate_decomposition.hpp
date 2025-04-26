@@ -2,12 +2,10 @@
 
 #include <algorithm>
 #include <cmath>
-#include <compare>
 #include <optional>
 #include <vector>
 
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/gates/primitive_gate_map.hpp"
 #include "kettle/gates/common_u_gates.hpp"

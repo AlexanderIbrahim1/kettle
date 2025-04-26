@@ -14,9 +14,9 @@ namespace impl_ket
 inline auto read_complex_numpy_format(std::istream& stream) -> std::complex<double>
 {
     // reads in text that looks like (1.23456e005+5.43210e002j) into a std::complex<double> instance
-    double real;
-    double imag;
-    char ch;
+    double real;  // NOLINT(cppcoreguidelines-init-variables)
+    double imag;  // NOLINT(cppcoreguidelines-init-variables)
+    char ch;  // NOLINT(cppcoreguidelines-init-variables)
 
     stream >> ch; // '('
     stream >> real;
@@ -40,13 +40,13 @@ inline auto read_numpy_statevector(
 {
     // the very first line contains the number of qubits
     const auto n_qubits = [&]() {
-        std::size_t n_qubits_;
+        std::size_t n_qubits_;  // NOLINT(cppcoreguidelines-init-variables)
         instream >> n_qubits_;
 
         return n_qubits_;
     }();
 
-    const auto n_states = 1ul << n_qubits;
+    const auto n_states = 1UL << n_qubits;
 
     auto amplitudes = std::vector<std::complex<double>> {};
     amplitudes.reserve(n_states);

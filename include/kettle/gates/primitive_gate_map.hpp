@@ -1,8 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <array>
-#include <stdexcept>
 #include <string>
 
 #include "kettle/common/linear_bijective_map.hpp"
@@ -89,7 +86,5 @@ static auto GATE_TO_FUNCTION_1C1T1A = LinearBijectiveMap<ket::Gate, GateFuncPtr1
     std::pair {ket::Gate::CRZ, static_cast<GateFuncPtr1C1T1A>(&ket::QuantumCircuit::add_crz_gate)},
     std::pair {ket::Gate::CP, static_cast<GateFuncPtr1C1T1A>(&ket::QuantumCircuit::add_cp_gate)},
 };
-
-
 
 }  // namespace impl_ket

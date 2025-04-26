@@ -69,7 +69,7 @@ void apply_inverse_fourier_transform(QuantumCircuit& circuit, const Container& c
 
     const auto size = static_cast<std::size_t>(std::distance(container.begin(), container.end()));
 
-    for (std::size_t i_target_pre : sv::iota(0ul, size) | sv::reverse) {
+    for (std::size_t i_target_pre : sv::iota(0UL, size) | sv::reverse) {
         const auto i_target = impl_ket::get_container_index(container, i_target_pre);
 
         auto i_angle_denom = size - i_target_pre;

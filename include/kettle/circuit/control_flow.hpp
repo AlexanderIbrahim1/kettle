@@ -6,7 +6,6 @@
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/common/clone_ptr.hpp"
-#include "kettle/gates/primitive_gate.hpp"
 
 namespace ket
 {
@@ -32,14 +31,14 @@ class ClassicalOneBranchBooleanStatement
 {
 public:
     ClassicalOneBranchBooleanStatement(
-        const ket::ControlFlowPredicate& control_flow_predicate,
+        ket::ControlFlowPredicate control_flow_predicate,
         std::unique_ptr<ket::QuantumCircuit> circuit
     )
-        : control_flow_predicate_ {control_flow_predicate}
+        : control_flow_predicate_ {std::move(control_flow_predicate)}
         , circuit_ {std::move(circuit)}
     {}
 
-    auto operator()(const ket::ClassicalRegister& c_register) const -> int
+    auto operator()(const ket::ClassicalRegister& c_register) const -> bool
     {
         return control_flow_predicate_(c_register);
     }
@@ -71,16 +70,16 @@ class ClassicalIfElseStatement
 {
 public:
     ClassicalIfElseStatement(
-        const ket::ControlFlowPredicate& control_flow_predicate,
+        ket::ControlFlowPredicate control_flow_predicate,
         std::unique_ptr<ket::QuantumCircuit> if_circuit,
         std::unique_ptr<ket::QuantumCircuit> else_circuit
     )
-        : control_flow_predicate_ {control_flow_predicate}
+        : control_flow_predicate_ {std::move(control_flow_predicate)}
         , if_circuit_ {std::move(if_circuit)}
         , else_circuit_ {std::move(else_circuit)}
     {}
 
-    auto operator()(const ket::ClassicalRegister& c_register) const -> int
+    auto operator()(const ket::ClassicalRegister& c_register) const -> bool
     {
         return control_flow_predicate_(c_register);
     }
@@ -110,10 +109,12 @@ private:
 struct ClassicalControlFlowInstruction
 {
 public:
+    // NOLINTNEXTLINE(*explicit*)
     ClassicalControlFlowInstruction(ClassicalIfStatement instruction)
         : instruction_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*explicit*)
     ClassicalControlFlowInstruction(ClassicalIfElseStatement instruction)
         : instruction_ {std::move(instruction)}
     {}

@@ -1,23 +1,18 @@
 #pragma once
 
-#include <bitset>
 #include <complex>
 #include <cstddef>
-#include <limits>
-#include <stdexcept>
-#include <string>
 
 namespace impl_ket
 {
 
 constexpr static auto NORMALIZATION_TOLERANCE = double {1.0e-6};
 constexpr static auto COMPLEX_ALMOST_EQ_TOLERANCE_SQ = double {1.0e-6};
-constexpr static auto ANGLE_ALMOST_EQ_TOLERANCE = double {1.0e-8};
 constexpr static auto MATRIX_2X2_SQRT_TOLERANCE = double {1.0e-6};
 
 constexpr auto pow_2_int(std::size_t exponent) noexcept -> std::size_t
 {
-    return 1 << exponent;
+    return std::size_t {1} << exponent;
 }
 
 constexpr auto is_power_of_2(std::size_t value) noexcept -> bool
@@ -93,7 +88,7 @@ constexpr auto almost_eq(
 {
     const auto diff_real = left.real() - right.real();
     const auto diff_imag = left.imag() - right.imag();
-    const auto diff_sq = diff_real * diff_real + diff_imag * diff_imag;
+    const auto diff_sq = (diff_real * diff_real) + (diff_imag * diff_imag);
 
     return diff_sq < tolerance_sq;
 }

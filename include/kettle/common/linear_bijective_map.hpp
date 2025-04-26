@@ -30,9 +30,9 @@ struct LinearBijectiveMap
 
         if (it != std::end(data_)) {
             return it->second;
-        } else {
-            throw std::range_error("Key not found in LinearBijectiveMap\n");
         }
+
+        throw std::range_error("Key not found in LinearBijectiveMap\n");
     }
 
     [[nodiscard]]
@@ -43,9 +43,9 @@ struct LinearBijectiveMap
 
         if (it != std::end(data_)) {
             return it->first;
-        } else {
-            throw std::range_error("Value not found in LinearBijectiveMap\n");
         }
+
+        throw std::range_error("Value not found in LinearBijectiveMap\n");
     }
 };
 

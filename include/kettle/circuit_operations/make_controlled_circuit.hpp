@@ -1,10 +1,8 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <stdexcept>
 #include <unordered_set>
-#include <unordered_map>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/utils.hpp"

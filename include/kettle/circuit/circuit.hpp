@@ -1,20 +1,14 @@
 #pragma once
 
 #include <cmath>
-#include <concepts>
-#include <cstdint>
-#include <functional>
 #include <iterator>
 #include <memory>
-#include <optional>
 #include <sstream>
 #include <stdexcept>
-#include <variant>
 #include <vector>
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
-#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/circuit_element.hpp"
@@ -477,10 +471,10 @@ public:
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
-    std::vector<impl_ket::CircuitElement> elements_ {};
-    std::vector<Matrix2X2> unitaries_ {};
+    std::vector<impl_ket::CircuitElement> elements_;
+    std::vector<Matrix2X2> unitaries_;
 
-    void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
+    void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const
     {
         if (target_index >= n_qubits_) {
             auto err_msg = std::stringstream {};
@@ -494,7 +488,7 @@ private:
         }
     }
 
-    void check_bit_range_(std::size_t bit_index)
+    void check_bit_range_(std::size_t bit_index) const
     {
         if (bit_index >= n_bits_) {
             auto err_msg = std::stringstream {};

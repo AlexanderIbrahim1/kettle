@@ -114,11 +114,12 @@ inline auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat
     return output.str();
 }
 
-}  // impl_ket
+}  // namespace impl_ket
 
 namespace ket
 {
 
+// NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity)
 inline void write_tangelo_circuit(
     const ket::QuantumCircuit& circuit,
     std::ostream& stream,

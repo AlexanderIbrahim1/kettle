@@ -132,7 +132,7 @@ inline auto matrix_square_root(
     const auto new10 = mat.elem10 / t;
     const auto new11 = (mat.elem11 + s) / t;
 
-    return {new00, new01, new10, new11};
+    return {.elem00=new00, .elem01=new01, .elem10=new10, .elem11=new11};
 }
 
 constexpr auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
@@ -142,7 +142,7 @@ constexpr auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
     const auto new10 = std::conj(mat.elem01);
     const auto new11 = std::conj(mat.elem11);
 
-    return {new00, new01, new10, new11};
+    return {.elem00=new00, .elem01=new01, .elem10=new10, .elem11=new11};
 }
 
 constexpr auto determinant(const Matrix2X2& mat) -> std::complex<double>

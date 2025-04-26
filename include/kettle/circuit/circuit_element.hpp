@@ -22,14 +22,17 @@ namespace impl_ket
 struct CircuitElement
 {
 public:
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(const ket::GateInfo& ginfo)
         : element_ {ginfo}
     {}
 
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(ClassicalIfStatement instruction)
         : element_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(ClassicalIfElseStatement instruction)
         : element_ {std::move(instruction)}
     {}

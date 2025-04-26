@@ -5,6 +5,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/toffoli.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"

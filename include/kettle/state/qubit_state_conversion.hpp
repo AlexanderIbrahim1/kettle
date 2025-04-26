@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bitset>
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
@@ -20,7 +19,7 @@ constexpr auto bitstring_to_state_index_bigendian_(const std::string& bitstring)
     auto output = std::size_t {0};
 
     for (auto bitchar : bitstring) {
-        output <<= 1;
+        output <<= 1UL;
         if (bitchar == '1') {
             output += 1;
         }
@@ -208,4 +207,4 @@ constexpr auto binary_fraction_expansion(
     return output;
 }
 
-}  // namespace impl_ket
+}  // namespace ket

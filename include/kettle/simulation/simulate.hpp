@@ -1,11 +1,9 @@
 #pragma once
 
-#include <algorithm>
 #include <barrier>
 #include <optional>
 #include <stdexcept>
 #include <thread>
-#include <tuple>
 #include <vector>
 
 #include "kettle/circuit/classical_register.hpp"
@@ -172,6 +170,7 @@ inline void simulate_double_qubit_gate_general_(
     }
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 inline void simulate_loop_body_(
     const ket::QuantumCircuit& circuit,
     ket::QuantumState& state,
@@ -344,9 +343,7 @@ inline void simulate_multithreaded_loop_(
     ket::ClassicalRegister& c_register
 )
 {
-    int count = 0;
     for (const auto& element : circuit) {
-        ++count;
         simulate_loop_body_(circuit, state, single_pair, double_pair, element, thread_id, prng_seed, c_register);
         sync_point.arrive_and_wait();
     }

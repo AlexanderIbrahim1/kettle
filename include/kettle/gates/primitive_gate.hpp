@@ -1,15 +1,15 @@
 #pragma once
 
 #include <cmath>
-#include <concepts>
 #include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <tuple>
 
 namespace ket
 {
 
-enum class Gate
+enum class Gate : std::uint8_t
 {
     H,
     X,
@@ -118,7 +118,6 @@ namespace impl_ket
     Parameters indicating to the developer that a given gate does not use a certain data member in
     a ket::GateInfo instance.
 */
-constexpr static auto DUMMY_ARG0 = std::size_t {0};
 constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
 constexpr static auto DUMMY_ARG3 = std::size_t {0};
@@ -283,29 +282,3 @@ constexpr auto is_1c1t1a_gate_equal(
 }
 
 }  // namespace impl_ket::compare
-
-// namespace impl_ket::control
-// {
-// 
-// constexpr static auto IF_STMT = std::size_t {0};
-// constexpr static auto IF_ELSE_STMT = std::size_t {1};
-// constexpr static auto REPEAT_STMT = std::size_t {2};
-// constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
-// 
-// constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
-// {
-//     return info.arg3;
-// }
-// 
-// constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
-// {
-//     return info.arg0;
-// }
-// 
-// constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
-// {
-//     return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
-// }
-// 
-// }  // namespace impl_ket::control
-

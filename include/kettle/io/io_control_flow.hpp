@@ -77,7 +77,7 @@ inline auto format_classical_if_else_statement_header_(
 */
 inline void discard_until_char_(std::stringstream& stream, char delimiter)
 {
-    char ch;
+    char ch {};
     while (stream.peek() != EOF && stream.peek() != delimiter) {
         stream.get(ch);
     }
@@ -95,9 +95,9 @@ auto parse_csv_in_brackets_(std::stringstream& stream) -> std::vector<Integer>
 {
     auto output = std::vector<Integer> {};
 
-    char ch;
+    char ch {};
     std::string str;
-    Integer value;
+    Integer value {};
 
     stream >> ch;  // '['
 

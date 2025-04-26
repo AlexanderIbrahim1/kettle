@@ -22,7 +22,7 @@ template <typename T>
 class ClonePtr
 {
 public:
-    ClonePtr(std::unique_ptr<T> data)
+    explicit ClonePtr(std::unique_ptr<T> data)
         : data_ {std::move(data)}
     {}
 
@@ -46,6 +46,8 @@ public:
     {
         return *data_;
     }
+
+    ~ClonePtr() = default;
 
 private:
     std::unique_ptr<T> data_;

@@ -4,13 +4,11 @@
 #include <optional>
 #include <random>
 
-#include "kettle/common/mathtools.hpp"
 #include "kettle/common/prng.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
-#include "kettle/simulation/simulate_utils.hpp"
 
 namespace impl_ket
 {

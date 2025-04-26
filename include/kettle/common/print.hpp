@@ -1,25 +1,17 @@
 #pragma once
 
 #include <complex>
-#include <iomanip>
 #include <iostream>
-#include <optional>
 #include <sstream>
-#include <stdexcept>
 #include <string>
-#include <tuple>
-#include <unordered_map>
 
-#include "kettle/gates/primitive_gate.hpp"
-#include "kettle/common/matrix2x2.hpp"
-#include "kettle/circuit/circuit.hpp"
 #include "kettle/state/state.hpp"
 
 
 namespace impl_ket
 {
 
-void print_state_(const ket::QuantumState& state)
+inline void print_state_(const ket::QuantumState& state)
 {
     // for the time being, fix this as being little-endian
     const auto endian = ket::QuantumStateEndian::LITTLE;
@@ -30,7 +22,7 @@ void print_state_(const ket::QuantumState& state)
     }
 }
 
-auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_right_qubits)
+inline auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_right_qubits)
 -> std::string
 {
     auto err_msg = std::stringstream {};
@@ -42,7 +34,7 @@ auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_
     return err_msg.str();
 }
 
-auto ae_err_msg_diff_states_(
+inline auto ae_err_msg_diff_states_(
     const ket::QuantumState& left,
     const ket::QuantumState& right
 ) -> std::string
@@ -66,12 +58,12 @@ auto ae_err_msg_diff_states_(
 namespace ket
 {
 
-void print_state(const QuantumState& state)
+inline void print_state(const QuantumState& state)
 {
     impl_ket::print_state_(state);
 }
 
-enum PrintAlmostEq
+enum PrintAlmostEq : std::uint8_t
 {
     PRINT,
     NOPRINT

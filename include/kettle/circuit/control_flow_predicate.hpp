@@ -1,7 +1,8 @@
 #pragma once
 
-#include <compare>
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -11,7 +12,7 @@
 namespace ket
 {
 
-enum class ControlFlowBooleanKind
+enum class ControlFlowBooleanKind : std::uint8_t
 {
     IF,
     IF_NOT
@@ -42,7 +43,7 @@ public:
         }
 
         const auto is_0_or_1 = [](int x) { return x == 0 || x == 1; };
-        if (!std::all_of(expected_bits_.begin(), expected_bits_.end(), is_0_or_1)) {
+        if (!std::ranges::all_of(expected_bits_, is_0_or_1)) {
             throw std::runtime_error {"The expected bits must all be 0 or 1.\n"};
         }
     }
@@ -73,9 +74,9 @@ public:
         // possibly flip the output, depending on what kind of control flow predicate is being used
         if (control_kind_ == ControlFlowBooleanKind::IF) {
             return output;
-        } else {
-            return !output;
         }
+
+        return !output;
     }
 
     constexpr auto bit_indices_to_check() const -> const std::vector<std::size_t>&
