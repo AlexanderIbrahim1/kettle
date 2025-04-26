@@ -86,8 +86,8 @@ TEST_CASE("format_one_target_one_angle_gate_()")
 
     const auto gate_info = impl_ket::create_one_target_one_angle_gate(
         testcase.gate,
-        testcase.angle,
-        testcase.target
+        testcase.target,
+        testcase.angle
     );
 
     const auto actual = impl_ket::format_one_target_one_angle_gate_(gate_info);

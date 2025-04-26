@@ -38,48 +38,63 @@ inline auto transpile_to_primitive(
     const auto decomp_1t = impl_ket::decomp_to_one_target_primitive_gates_;
     const auto decomp_1c_1t = impl_ket::decomp_to_one_control_one_target_primitive_gates_;
 
-    for (const auto& ginfo : circuit.gates_) {
-        if (impl_ket::is_primitive_gate(ginfo.gate) || ginfo.gate == Gate::M) {
-            new_circuit.gates_.push_back(ginfo);
-        }
-        else if (ginfo.gate == Gate::U) {
-            const auto [target, i_matrix] = impl_ket::unpack_u_gate(ginfo);
-            const auto& unitary = circuit.unitary_gates_[i_matrix];
-            const auto decomp_gates = decomp_1t(target, unitary, tolerance_sq);
-            for (const auto& decomp_gate : decomp_gates) {
-                new_circuit.gates_.push_back(decomp_gate);
-            }
-        }
-        else if (ginfo.gate == Gate::CU) {
-            const auto [control, target, i_matrix] = impl_ket::unpack_cu_gate(ginfo);
-            const auto& unitary = circuit.unitary_gates_[i_matrix];
-            const auto decomp_gates = decomp_1c_1t(control, target, unitary, tolerance_sq);
-            for (const auto& decomp_gate : decomp_gates) {
-                new_circuit.gates_.push_back(decomp_gate);
-            }
-        }
-        else if (ginfo.gate == Gate::CONTROL) {
-            const auto cfi_kind = impl_ket::control::unpack_control_flow_kind(ginfo);
-            const auto current_cfi_index = impl_ket::control::unpack_control_flow_index(ginfo);
-            auto instruction = circuit.control_flow_instructions_[current_cfi_index];
+    for (const auto& circuit_element : circuit.elements_) {
+        if (circuit_element.is_control_flow()) {
+            const auto& control_flow = circuit_element.get_control_flow();
 
-            if (cfi_kind == impl_ket::control::IF_STMT) {
-                const auto subcircuit = instruction.primary_circuit();
-                auto transpiled_subcircuit = transpile_to_primitive(subcircuit, tolerance_sq);
+            if (control_flow.is_if_statement()) {
+                const auto if_stmt = control_flow.get_if_statement();
+                const auto& current_subcircuit = *if_stmt.circuit();
+                auto transpiled_subcircuit = transpile_to_primitive(current_subcircuit, tolerance_sq);
 
-                auto cfi = impl_ket::ControlFlowInstruction {
-                    std::move(instruction),
+                auto cfi = impl_ket::ClassicalIfStatement {
+                    if_stmt.predicate(),
                     std::make_unique<QuantumCircuit>(std::move(transpiled_subcircuit))
                 };
 
-                new_circuit.control_flow_instructions_.emplace_back(std::move(cfi));
+                new_circuit.elements_.emplace_back(std::move(cfi));
+            }
+            else if (control_flow.is_if_else_statement()) {
+                const auto if_else_stmt = control_flow.get_if_else_statement();
+                const auto& if_subcircuit = *if_else_stmt.if_circuit();
+                const auto& else_subcircuit = *if_else_stmt.else_circuit();
+                auto transpiled_if_subcircuit = transpile_to_primitive(if_subcircuit, tolerance_sq);
+                auto transpiled_else_subcircuit = transpile_to_primitive(else_subcircuit, tolerance_sq);
 
-                const auto new_cfi_index = new_circuit.control_flow_instructions_.size() - 1;
-                new_circuit.gates_.emplace_back(impl_ket::control::create_control_flow_gate(new_cfi_index, cfi_kind));
+                auto cfi = impl_ket::ClassicalIfElseStatement {
+                    if_else_stmt.predicate(),
+                    std::make_unique<QuantumCircuit>(std::move(transpiled_if_subcircuit)),
+                    std::make_unique<QuantumCircuit>(std::move(transpiled_else_subcircuit))
+                };
+
+                new_circuit.elements_.emplace_back(std::move(cfi));
+            }
+            else {
+                throw std::runtime_error {"DEV ERROR: invalid control flow element found\n"};
             }
         }
         else {
-            throw std::runtime_error {"DEV ERROR: found a gate that couldn't be transpiled.\n"};
+            const auto& gate_info = circuit_element.get_gate();
+
+            if (impl_ket::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
+                new_circuit.elements_.push_back(gate_info);
+            }
+            else if (gate_info.gate == Gate::U) {
+                const auto [target, i_matrix] = impl_ket::unpack_u_gate(gate_info);
+                const auto& unitary = circuit.unitaries_[i_matrix];
+                const auto decomp_gates = decomp_1t(target, unitary, tolerance_sq);
+                for (const auto& decomp_gate : decomp_gates) {
+                    new_circuit.elements_.push_back(decomp_gate);
+                }
+            }
+            else if (gate_info.gate == Gate::CU) {
+                const auto [control, target, i_matrix] = impl_ket::unpack_cu_gate(gate_info);
+                const auto& unitary = circuit.unitaries_[i_matrix];
+                const auto decomp_gates = decomp_1c_1t(control, target, unitary, tolerance_sq);
+                for (const auto& decomp_gate : decomp_gates) {
+                    new_circuit.elements_.push_back(decomp_gate);
+                }
+            }
         }
     }
 

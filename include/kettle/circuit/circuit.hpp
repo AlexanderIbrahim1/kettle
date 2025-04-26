@@ -9,6 +9,7 @@
 #include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <variant>
 #include <vector>
 
 #include "kettle/common/matrix2x2.hpp"
@@ -16,11 +17,12 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
+#include "kettle/circuit/circuit_element.hpp"
+
 
 namespace ket
 {
 
-// TODO: use templates to replace a lot of duplicated code with these gate-creating member functions
 class QuantumCircuit
 {
 public:
@@ -44,25 +46,30 @@ public:
         return n_bits_;
     }
 
-    constexpr auto operator[](std::size_t index) const noexcept -> const GateInfo&
+    constexpr auto n_circuit_elements() const noexcept -> std::size_t
     {
-        return gates_[index];
+        return elements_.size();
+    }
+
+    constexpr auto operator[](std::size_t index) const noexcept -> const impl_ket::CircuitElement&
+    {
+        return elements_[index];
     }
 
     constexpr auto begin() const noexcept
     {
-        return std::begin(gates_);
+        return std::begin(elements_);
     }
 
     constexpr auto end() const noexcept
     {
-        return std::end(gates_);
+        return std::end(elements_);
     }
 
     void add_h_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "H");
-        gates_.emplace_back(impl_ket::create_one_target_gate(Gate::H, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_gate(Gate::H, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -76,7 +83,7 @@ public:
     void add_x_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "X");
-        gates_.emplace_back(impl_ket::create_one_target_gate(Gate::X, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_gate(Gate::X, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -90,7 +97,7 @@ public:
     void add_y_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Y");
-        gates_.emplace_back(impl_ket::create_one_target_gate(Gate::Y, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_gate(Gate::Y, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -104,7 +111,7 @@ public:
     void add_z_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "Z");
-        gates_.emplace_back(impl_ket::create_one_target_gate(Gate::Z, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_gate(Gate::Z, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -118,7 +125,7 @@ public:
     void add_sx_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "SX");
-        gates_.emplace_back(impl_ket::create_one_target_gate(Gate::SX, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_gate(Gate::SX, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -132,7 +139,7 @@ public:
     void add_rx_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RX");
-        gates_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RX, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RX, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -146,7 +153,7 @@ public:
     void add_ry_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RY");
-        gates_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RY, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RY, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -160,7 +167,7 @@ public:
     void add_rz_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "RZ");
-        gates_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RZ, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::RZ, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -174,7 +181,7 @@ public:
     void add_p_gate(std::size_t target_index, double angle)
     {
         check_qubit_range_(target_index, "qubit", "P");
-        gates_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::P, angle, target_index));
+        elements_.emplace_back(impl_ket::create_one_target_one_angle_gate(Gate::P, target_index, angle));
     }
 
     template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
@@ -189,7 +196,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CH");
         check_qubit_range_(target_index, "target qubit", "CH");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CH, control_index, target_index));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CH, control_index, target_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
@@ -204,7 +211,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CX");
         check_qubit_range_(target_index, "target qubit", "CX");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CX, control_index, target_index));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CX, control_index, target_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
@@ -219,7 +226,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CY");
         check_qubit_range_(target_index, "target qubit", "CY");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CY, control_index, target_index));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CY, control_index, target_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
@@ -234,7 +241,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CZ");
         check_qubit_range_(target_index, "target qubit", "CZ");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CZ, control_index, target_index));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CZ, control_index, target_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
@@ -249,7 +256,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CSX");
         check_qubit_range_(target_index, "target qubit", "CSX");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CSX, control_index, target_index));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_gate(Gate::CSX, control_index, target_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
@@ -264,7 +271,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRX");
         check_qubit_range_(target_index, "target qubit", "CRX");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRX, control_index, target_index, angle));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRX, control_index, target_index, angle));
     }
 
     template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
@@ -279,7 +286,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRY");
         check_qubit_range_(target_index, "target qubit", "CRY");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRY, control_index, target_index, angle));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRY, control_index, target_index, angle));
     }
 
     template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
@@ -294,7 +301,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CRZ");
         check_qubit_range_(target_index, "target qubit", "CRZ");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRZ, control_index, target_index, angle));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CRZ, control_index, target_index, angle));
     }
 
     template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
@@ -309,7 +316,7 @@ public:
     {
         check_qubit_range_(control_index, "control qubit", "CP");
         check_qubit_range_(target_index, "target qubit", "CP");
-        gates_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CP, control_index, target_index, angle));
+        elements_.emplace_back(impl_ket::create_one_control_one_target_one_angle_gate(Gate::CP, control_index, target_index, angle));
     }
 
     template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
@@ -324,21 +331,21 @@ public:
     {
         check_qubit_range_(target_index, "qubit", "U");
 
-        unitary_gates_.push_back(gate);
-        const auto gate_index = unitary_gates_.size() - 1;
+        unitaries_.push_back(gate);
+        const auto gate_index = unitaries_.size() - 1;
 
-        gates_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
+        elements_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
     void add_u_gate(const Matrix2X2& gate, const Container& indices)
     {
-        unitary_gates_.push_back(gate);
-        const auto gate_index = unitary_gates_.size() - 1;
+        unitaries_.push_back(gate);
+        const auto gate_index = unitaries_.size() - 1;
 
         for (auto target_index : indices) {
             check_qubit_range_(target_index, "qubit", "U");
-            gates_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
+            elements_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
         }
     }
 
@@ -347,17 +354,17 @@ public:
         check_qubit_range_(control_index, "control qubit", "CU");
         check_qubit_range_(target_index, "target qubit", "CU");
 
-        unitary_gates_.push_back(gate);
-        const auto gate_index = unitary_gates_.size() - 1;
+        unitaries_.push_back(gate);
+        const auto gate_index = unitaries_.size() - 1;
 
-        gates_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
+        elements_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
     void add_cu_gate(const Matrix2X2& gate, const Container& tuples)
     {
-        unitary_gates_.push_back(gate);
-        const auto gate_index = unitary_gates_.size() - 1;
+        unitaries_.push_back(gate);
+        const auto gate_index = unitaries_.size() - 1;
 
         for (auto tuple : tuples) {
             const auto control_index = std::get<0>(tuple);
@@ -366,7 +373,7 @@ public:
             check_qubit_range_(control_index, "control qubit", "CU");
             check_qubit_range_(target_index, "target qubit", "CU");
 
-            gates_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
+            elements_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
         }
     }
 
@@ -378,7 +385,7 @@ public:
     {
         check_qubit_range_(target_index, "qubit", "M");
         check_bit_range_(target_index);
-        gates_.emplace_back(impl_ket::create_m_gate(target_index, target_index));
+        elements_.emplace_back(impl_ket::create_m_gate(target_index, target_index));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
@@ -393,7 +400,7 @@ public:
     {
         check_qubit_range_(target_index, "qubit", "M");
         check_bit_range_(bit_index);
-        gates_.emplace_back(impl_ket::create_m_gate(target_index, bit_index));
+        elements_.emplace_back(impl_ket::create_m_gate(target_index, bit_index));
     }
 
     template <impl_ket::QubitAndBitIndices Container = impl_ket::QubitAndBitIndicesIList>
@@ -406,30 +413,61 @@ public:
 
     void add_if_statement(std::size_t bit_index, QuantumCircuit circuit)
     {
-        namespace ctrl = impl_ket::control;
-
         check_bit_range_(bit_index);
 
-        auto cfi = impl_ket::ControlFlowInstruction {
-            impl_ket::SingleBitControlFlowFunction {bit_index, impl_ket::ControlBooleanKind::IF},
+        auto cfi = impl_ket::ClassicalIfStatement {
+            ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
             std::make_unique<QuantumCircuit>(std::move(circuit))
         };
 
-        control_flow_instructions_.push_back(std::move(cfi));
+        elements_.emplace_back(std::move(cfi));
+    }
 
-        const auto cfi_index = control_flow_instructions_.size() - 1;
+    void add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit)
+    {
+        for (auto bit_index : predicate.bit_indices_to_check()) {
+            check_bit_range_(bit_index);
+        }
 
-        gates_.emplace_back(ctrl::create_control_flow_gate(cfi_index, ctrl::IF_STMT));
+        auto cfi = impl_ket::ClassicalIfStatement {
+            std::move(predicate),
+            std::make_unique<QuantumCircuit>(std::move(circuit))
+        };
+
+        elements_.emplace_back(std::move(cfi));
+    }
+
+    void add_if_else_statement(std::size_t bit_index, QuantumCircuit circuit0, QuantumCircuit circuit1)
+    {
+        check_bit_range_(bit_index);
+
+        auto cfi = impl_ket::ClassicalIfElseStatement {
+            ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
+            std::make_unique<QuantumCircuit>(std::move(circuit0)),
+            std::make_unique<QuantumCircuit>(std::move(circuit1))
+        };
+
+        elements_.emplace_back(std::move(cfi));
+    }
+
+    void add_if_else_statement(ControlFlowPredicate predicate, QuantumCircuit circuit0, QuantumCircuit circuit1)
+    {
+        for (auto bit_index : predicate.bit_indices_to_check()) {
+            check_bit_range_(bit_index);
+        }
+
+        auto cfi = impl_ket::ClassicalIfElseStatement {
+            std::move(predicate),
+            std::make_unique<QuantumCircuit>(std::move(circuit0)),
+            std::make_unique<QuantumCircuit>(std::move(circuit1))
+        };
+
+        elements_.emplace_back(std::move(cfi));
     }
 
     constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
     {
-        return unitary_gates_[matrix_index];
-    }
-
-    auto control_flow_instruction(std::size_t index) const noexcept -> const impl_ket::ControlFlowInstruction&
-    {
-        return control_flow_instructions_[index];
+        return unitaries_[matrix_index];
     }
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
@@ -439,9 +477,8 @@ public:
 private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
-    std::vector<GateInfo> gates_ {};
-    std::vector<Matrix2X2> unitary_gates_ {};
-    std::vector<impl_ket::ControlFlowInstruction> control_flow_instructions_ {};
+    std::vector<impl_ket::CircuitElement> elements_ {};
+    std::vector<Matrix2X2> unitaries_ {};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name)
     {

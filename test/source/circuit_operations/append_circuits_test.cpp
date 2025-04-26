@@ -127,3 +127,99 @@ TEST_CASE("extend_circuit working")
         }
     }
 }
+
+TEST_CASE("extend_circuit() with control flow")
+{
+    const auto if_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_x_gate(0); return circ; }();
+    const auto else_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_h_gate(0); return circ; }();
+
+    SECTION("if_statement()")
+    {
+        auto total_circuit = ket::QuantumCircuit {2};
+        total_circuit.add_x_gate(0);
+        total_circuit.add_m_gate(0);
+        total_circuit.add_if_statement(0, if_subcirc);
+        total_circuit.add_y_gate(1);
+        total_circuit.add_if_statement(0, if_subcirc);
+        total_circuit.add_y_gate(1);
+
+        SECTION("left circuit has if statement")
+        {
+            auto left_circuit = ket::QuantumCircuit {2};
+            left_circuit.add_x_gate(0);
+            left_circuit.add_m_gate(0);
+            left_circuit.add_if_statement(0, if_subcirc);
+            left_circuit.add_y_gate(1);
+            left_circuit.add_if_statement(0, if_subcirc);
+
+            auto right_circuit = ket::QuantumCircuit {2};
+            right_circuit.add_y_gate(1);
+
+            ket::extend_circuit(left_circuit, right_circuit);
+
+            REQUIRE(ket::almost_eq(total_circuit, left_circuit));
+        }
+
+        SECTION("right circuit has if statement")
+        {
+            auto left_circuit = ket::QuantumCircuit {2};
+            left_circuit.add_x_gate(0);
+            left_circuit.add_m_gate(0);
+
+            auto right_circuit = ket::QuantumCircuit {2};
+            right_circuit.add_if_statement(0, if_subcirc);
+            right_circuit.add_y_gate(1);
+            right_circuit.add_if_statement(0, if_subcirc);
+            right_circuit.add_y_gate(1);
+
+            ket::extend_circuit(left_circuit, right_circuit);
+
+            REQUIRE(ket::almost_eq(total_circuit, left_circuit));
+        }
+
+        SECTION("both left and right circuits have if statement")
+        {
+            auto left_circuit = ket::QuantumCircuit {2};
+            left_circuit.add_x_gate(0);
+            left_circuit.add_m_gate(0);
+            left_circuit.add_if_statement(0, if_subcirc);
+
+            auto right_circuit = ket::QuantumCircuit {2};
+            right_circuit.add_y_gate(1);
+            right_circuit.add_if_statement(0, if_subcirc);
+            right_circuit.add_y_gate(1);
+
+            ket::extend_circuit(left_circuit, right_circuit);
+
+            REQUIRE(ket::almost_eq(total_circuit, left_circuit));
+        }
+    }
+
+    SECTION("if_else_statement()")
+    {
+        auto total_circuit = ket::QuantumCircuit {2};
+        total_circuit.add_x_gate(0);
+        total_circuit.add_m_gate(0);
+        total_circuit.add_if_else_statement(0, if_subcirc, else_subcirc);
+        total_circuit.add_y_gate(1);
+        total_circuit.add_if_else_statement(0, if_subcirc, else_subcirc);
+        total_circuit.add_y_gate(1);
+
+        SECTION("both left and right circuits have if statement")
+        {
+            auto left_circuit = ket::QuantumCircuit {2};
+            left_circuit.add_x_gate(0);
+            left_circuit.add_m_gate(0);
+            left_circuit.add_if_else_statement(0, if_subcirc, else_subcirc);
+
+            auto right_circuit = ket::QuantumCircuit {2};
+            right_circuit.add_y_gate(1);
+            right_circuit.add_if_else_statement(0, if_subcirc, else_subcirc);
+            right_circuit.add_y_gate(1);
+
+            ket::extend_circuit(left_circuit, right_circuit);
+
+            REQUIRE(ket::almost_eq(total_circuit, left_circuit));
+        }
+    }
+}

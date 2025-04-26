@@ -1,10 +1,11 @@
 #pragma once
 
-#include <functional>
 #include <memory>
+#include <variant>
 
 #include "kettle/circuit/classical_register.hpp"
-#include "kettle/circuit/control_flow_function.hpp"
+#include "kettle/circuit/control_flow_predicate.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
 namespace ket
@@ -18,83 +19,127 @@ class QuantumCircuit;
 namespace impl_ket
 {
 
-class ControlFlowInstruction
+/*
+    A class that holds a single predicate and a single pointer to a circuit that
+    is accessible if the predicate evaluates to true.
+
+    This class holds the functionality needed for implementations of the classical
+    if-statement, while-loop-statement, and do-while-loop-statement. It is the
+    responsibility of other sections of the codebase that interface with control
+    flow statements to handle the logic of how the circuit is treated.
+*/
+class ClassicalOneBranchBooleanStatement
 {
 public:
-    ControlFlowInstruction(
-        const ket::ControlFlowFunction& control_flow_function,
-        std::unique_ptr<ket::QuantumCircuit> primary_circuit,
-        std::unique_ptr<ket::QuantumCircuit> secondary_circuit = nullptr
+    ClassicalOneBranchBooleanStatement(
+        const ket::ControlFlowPredicate& control_flow_predicate,
+        std::unique_ptr<ket::QuantumCircuit> circuit
     )
-        : control_flow_function_ {control_flow_function}
-        , primary_circuit_ {std::move(primary_circuit)}
-        , secondary_circuit_ {std::move(secondary_circuit)}
+        : control_flow_predicate_ {control_flow_predicate}
+        , circuit_ {std::move(circuit)}
     {}
 
     auto operator()(const ket::ClassicalRegister& c_register) const -> int
     {
-        return control_flow_function_(c_register);
+        return control_flow_predicate_(c_register);
     }
 
-    auto primary_circuit() const -> const ket::QuantumCircuit&
+    auto circuit() const -> const ClonePtr<ket::QuantumCircuit>&
     {
-        return *primary_circuit_;
+        return circuit_;
     }
 
-    auto secondary_circuit() const -> const ket::QuantumCircuit&
+    auto predicate() const -> const ket::ControlFlowPredicate&
     {
-        if (!secondary_circuit_) {
-            throw std::runtime_error {"DEV ERROR: there is no secondary circuit\n"};
-        }
-
-        return *secondary_circuit_;
-    }
-
-    ControlFlowInstruction(const ControlFlowInstruction& other)
-        : control_flow_function_ {other.control_flow_function_}
-        , primary_circuit_ {std::make_unique<ket::QuantumCircuit>(*other.primary_circuit_)}
-    {
-        if (other.secondary_circuit_) {
-            secondary_circuit_ = std::make_unique<ket::QuantumCircuit>(*other.secondary_circuit_);
-        }
-    }
-
-    auto operator=(const ControlFlowInstruction& other) -> ControlFlowInstruction&
-    {
-        if (this != &other)
-        {
-            control_flow_function_ = other.control_flow_function_;
-            primary_circuit_ = std::make_unique<ket::QuantumCircuit>(*other.primary_circuit_);
-            if (other.secondary_circuit_) {
-                secondary_circuit_ = std::make_unique<ket::QuantumCircuit>(*other.secondary_circuit_);
-            }
-        }
-
-        return *this;
-    }
-
-    ControlFlowInstruction(ControlFlowInstruction&& other)
-        : control_flow_function_ {std::move(other.control_flow_function_)}
-        , primary_circuit_ {std::move(other.primary_circuit_)}
-        , secondary_circuit_ {std::move(other.secondary_circuit_)}
-    {}
-
-    auto operator=(ControlFlowInstruction&& other) -> ControlFlowInstruction&
-    {
-        if (this != &other)
-        {
-            control_flow_function_ = std::move(other.control_flow_function_);
-            primary_circuit_ = std::move(other.primary_circuit_);
-            secondary_circuit_ = std::move(other.secondary_circuit_);
-        }
-
-        return *this;
+        return control_flow_predicate_;
     }
 
 private:
-    ket::ControlFlowFunction control_flow_function_;
-    std::unique_ptr<ket::QuantumCircuit> primary_circuit_ = nullptr;
-    std::unique_ptr<ket::QuantumCircuit> secondary_circuit_ = nullptr;
+    ket::ControlFlowPredicate control_flow_predicate_;
+    ClonePtr<ket::QuantumCircuit> circuit_;
+};
+
+
+class ClassicalIfStatement : public ClassicalOneBranchBooleanStatement
+{
+public:
+    using ClassicalOneBranchBooleanStatement::ClassicalOneBranchBooleanStatement;
+};
+
+
+class ClassicalIfElseStatement
+{
+public:
+    ClassicalIfElseStatement(
+        const ket::ControlFlowPredicate& control_flow_predicate,
+        std::unique_ptr<ket::QuantumCircuit> if_circuit,
+        std::unique_ptr<ket::QuantumCircuit> else_circuit
+    )
+        : control_flow_predicate_ {control_flow_predicate}
+        , if_circuit_ {std::move(if_circuit)}
+        , else_circuit_ {std::move(else_circuit)}
+    {}
+
+    auto operator()(const ket::ClassicalRegister& c_register) const -> int
+    {
+        return control_flow_predicate_(c_register);
+    }
+
+    auto if_circuit() const -> const ClonePtr<ket::QuantumCircuit>&
+    {
+        return if_circuit_;
+    }
+
+    auto else_circuit() const -> const ClonePtr<ket::QuantumCircuit>&
+    {
+        return else_circuit_;
+    }
+
+    auto predicate() const -> const ket::ControlFlowPredicate&
+    {
+        return control_flow_predicate_;
+    }
+
+private:
+    ket::ControlFlowPredicate control_flow_predicate_;
+    ClonePtr<ket::QuantumCircuit> if_circuit_;
+    ClonePtr<ket::QuantumCircuit> else_circuit_;
+};
+
+
+struct ClassicalControlFlowInstruction
+{
+public:
+    ClassicalControlFlowInstruction(ClassicalIfStatement instruction)
+        : instruction_ {std::move(instruction)}
+    {}
+
+    ClassicalControlFlowInstruction(ClassicalIfElseStatement instruction)
+        : instruction_ {std::move(instruction)}
+    {}
+
+    constexpr auto is_if_statement() const -> bool
+    {
+        return std::holds_alternative<ClassicalIfStatement>(instruction_);
+    }
+
+    constexpr auto is_if_else_statement() const -> bool
+    {
+        return std::holds_alternative<ClassicalIfElseStatement>(instruction_);
+    }
+
+    constexpr auto get_if_statement() const -> const ClassicalIfStatement&
+    {
+        return std::get<ClassicalIfStatement>(instruction_);
+    }
+
+    constexpr auto get_if_else_statement() const -> const ClassicalIfElseStatement&
+    {
+        return std::get<ClassicalIfElseStatement>(instruction_);
+    }
+
+private:
+    std::variant<ClassicalIfStatement, ClassicalIfElseStatement> instruction_;
 };
 
 }  // namespace impl_ket

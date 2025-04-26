@@ -4,7 +4,6 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/common/print.hpp>
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/state/state.hpp>
 #include <kettle/simulation/simulate.hpp>
@@ -46,5 +45,53 @@ TEST_CASE("add_if_statement()")
     auto statevector = ket::QuantumState {"00"};
     ket::simulate(circuit, statevector);
 
-    REQUIRE(ket::almost_eq_with_print(statevector, testcase.expected));
+    REQUIRE(ket::almost_eq(statevector, testcase.expected));
+}
+
+TEST_CASE("add_if_else_statement()")
+{
+    auto if_circuit = []() {
+        auto subcircuit = ket::QuantumCircuit {2};
+        subcircuit.add_x_gate(1);
+        return subcircuit;
+    }();
+
+    auto else_circuit = []() {
+        auto subcircuit = ket::QuantumCircuit {2};
+        subcircuit.add_x_gate(0);
+        return subcircuit;
+    }();
+
+    SECTION("if branch runs")
+    {
+        auto circuit = ket::QuantumCircuit {2};  // state begins with |00>
+        circuit.add_x_gate(0);                   // state becomes |10>
+        circuit.add_m_gate(0);                   // 0th bit is guaranteed to be 1, state collapses to |10>
+
+        // the if-branch is run, the state gets converted from |10> to |11>
+        circuit.add_if_else_statement(0, std::move(if_circuit), std::move(else_circuit));
+
+        auto statevector = ket::QuantumState {"00"};
+        ket::simulate(circuit, statevector);
+
+        const auto expected = ket::QuantumState {"11"};
+
+        REQUIRE(ket::almost_eq(statevector, expected));
+    }
+
+    SECTION("else branch runs")
+    {
+        auto circuit = ket::QuantumCircuit {2};  // state begins with |00>
+        circuit.add_m_gate(0);                   // 0th bit is guaranteed to be 0, state collapses to |00>
+
+        // the else-branch is run, the state gets converted from |00> to |10>
+        circuit.add_if_else_statement(0, std::move(if_circuit), std::move(else_circuit));
+
+        auto statevector = ket::QuantumState {"00"};
+        ket::simulate(circuit, statevector);
+
+        const auto expected = ket::QuantumState {"10"};
+
+        REQUIRE(ket::almost_eq(statevector, expected));
+    }
 }

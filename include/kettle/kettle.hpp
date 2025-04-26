@@ -4,7 +4,7 @@
 #include <kettle/calculations/probabilities.hpp>
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/circuit/classical_register.hpp>
-#include <kettle/circuit/control_flow_function.hpp>
+#include <kettle/circuit/control_flow_predicate.hpp>
 #include <kettle/circuit_operations/append_circuits.hpp>
 #include <kettle/circuit_operations/compare_circuits.hpp>
 #include <kettle/circuit_operations/make_binary_controlled_circuit.hpp>

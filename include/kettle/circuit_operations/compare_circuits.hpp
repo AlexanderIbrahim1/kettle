@@ -86,9 +86,12 @@ namespace ket
 auto almost_eq(
     const QuantumCircuit& left,
     const QuantumCircuit& right,
-    double matrix_complex_tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tol_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool
 {
+    namespace gid = impl_ket::gate_id;
+    namespace comp = impl_ket::compare;
+
     // begin with the fastest checks first (qubits, bits, and bitmask values)
     if (left.n_qubits() != right.n_qubits()) {
         return false;
@@ -107,29 +110,72 @@ auto almost_eq(
     }
 
     for (std::size_t i_gate {0}; i_gate < n_left_gates; ++i_gate) {
-        const auto& left_info = left[i_gate];
-        const auto& right_info = right[i_gate];
+        const auto& left_element = left[i_gate];
+        const auto& right_element = right[i_gate];
 
-        if (left_info.gate == Gate::M && right_info.gate == Gate::M) {
-            return impl_ket::unpack_m_gate(left_info) == impl_ket::unpack_m_gate(right_info);
+        if (left_element.is_control_flow() && right_element.is_control_flow()) {
+            const auto& left_ctrl = left_element.get_control_flow();
+            const auto& right_ctrl = right_element.get_control_flow();
+
+            if (left_ctrl.is_if_statement() && right_ctrl.is_if_statement()) {
+                const auto& left_if_stmt = left_ctrl.get_if_statement();
+                const auto& right_if_stmt = right_ctrl.get_if_statement();
+
+                if (left_if_stmt.predicate() != right_if_stmt.predicate()) {
+                    return false;
+                }
+
+                if (!almost_eq(*left_if_stmt.circuit(), *right_if_stmt.circuit(), tol_sq)) {
+                    return false;
+                }
+            }
+            else if (left_ctrl.is_if_else_statement() && right_ctrl.is_if_else_statement()) {
+                const auto& left_if_else_stmt = left_ctrl.get_if_else_statement();
+                const auto& right_if_else_stmt = right_ctrl.get_if_else_statement();
+
+                if (left_if_else_stmt.predicate() != right_if_else_stmt.predicate()) {
+                    return false;
+                }
+
+                if (!almost_eq(*left_if_else_stmt.if_circuit(), *right_if_else_stmt.if_circuit(), tol_sq)) {
+                    return false;
+                }
+
+                if (!almost_eq(*left_if_else_stmt.else_circuit(), *right_if_else_stmt.else_circuit(), tol_sq)) {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
         }
-        else if (left_info.gate == Gate::M && right_info.gate != Gate::M) {
-            return false;
-        }
-        else if (left_info.gate != Gate::M && right_info.gate == Gate::M) {
-            return false;
+        else if (left_element.is_gate() && right_element.is_gate()) {
+            const auto& left_gate = left_element.get_gate();
+            const auto& right_gate = right_element.get_gate();
+
+            if (left_gate.gate == Gate::M && right_gate.gate == Gate::M) {
+                if (!comp::is_m_gate_equal(left_gate, right_gate)) {
+                    return false;
+                }
+            }
+            else if (left_gate.gate != Gate::M && right_gate.gate != Gate::M) {
+                const auto [new_left_gate, new_left_matrix] = impl_ket::as_u_gate(left, left_gate);
+                const auto [new_right_gate, new_right_matrix] = impl_ket::as_u_gate(right, right_gate);
+
+                if (!impl_ket::is_matching_u_gate_info(new_left_gate, new_right_gate)) {
+                    return false;
+                }
+
+                if (!almost_eq(new_left_matrix, new_right_matrix, tol_sq)) {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
         }
         else {
-            const auto [new_left_info, new_left_matrix] = impl_ket::as_u_gate(left, left_info);
-            const auto [new_right_info, new_right_matrix] = impl_ket::as_u_gate(right, right_info);
-
-            if (!impl_ket::is_matching_u_gate_info(new_left_info, new_right_info)) {
-                return false;
-            }
-
-            if (!almost_eq(new_left_matrix, new_right_matrix, matrix_complex_tolerance_sq)) {
-                return false;
-            }
+            return false;
         }
     }
 

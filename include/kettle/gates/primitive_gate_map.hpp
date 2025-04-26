@@ -49,7 +49,6 @@ static constexpr auto PRIMITIVE_GATES_TO_STRING = LinearBijectiveMap<ket::Gate, 
     std::pair {ket::Gate::U, "U"},
     std::pair {ket::Gate::CU, "CU"},
     std::pair {ket::Gate::M, "M"},
-    std::pair {ket::Gate::CONTROL, "CONTROL"}
 };
 
 using GateFuncPtr1T = void(ket::QuantumCircuit::*)(std::size_t);

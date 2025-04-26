@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <concepts>
 #include <cstddef>
 #include <stdexcept>
@@ -30,8 +31,7 @@ enum class Gate
     CP,
     U,
     CU,
-    M,
-    CONTROL
+    M
 };
 
 /*
@@ -137,7 +137,7 @@ constexpr auto unpack_one_target_gate(const ket::GateInfo& info) -> std::size_t
     return info.arg0;  // target_index
 }
 
-constexpr auto create_one_target_one_angle_gate(ket::Gate gate, double theta, std::size_t target_index) -> ket::GateInfo
+constexpr auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t target_index, double theta) -> ket::GateInfo
 {
     if (!gate_id::is_one_target_one_angle_transform_gate(gate)) {
         throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
@@ -238,29 +238,74 @@ constexpr auto unpack_gate_matrix_index(const ket::GateInfo& info) -> std::size_
 
 }  // namespace impl_ket
 
-
-namespace impl_ket::control
+namespace impl_ket::compare
 {
 
-constexpr static auto IF_STMT = std::size_t {0};
-constexpr static auto IF_ELSE_STMT = std::size_t {1};
-constexpr static auto REPEAT_STMT = std::size_t {2};
-constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
+inline constexpr auto GATE_ANGLE_TOLERANCE_ = double {1.0e-6};
 
-constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
+constexpr auto is_m_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool
 {
-    return info.arg3;
+    return unpack_m_gate(info0) == unpack_m_gate(info1);
 }
 
-constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
+constexpr auto is_1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool
 {
-    return info.arg0;
+    return unpack_one_target_gate(info0) == unpack_one_target_gate(info1);
 }
 
-constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
+constexpr auto is_1c1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool
 {
-    return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
+    return unpack_one_control_one_target_gate(info0) == unpack_one_control_one_target_gate(info1);
 }
 
-}  // namespace impl_ket::control
+constexpr auto is_1t1a_gate_equal(
+    const ket::GateInfo& info0,
+    const ket::GateInfo& info1,
+    double tol = GATE_ANGLE_TOLERANCE_
+) -> bool
+{
+    const auto [target0, angle0] = unpack_one_target_one_angle_gate(info0);
+    const auto [target1, angle1] = unpack_one_target_one_angle_gate(info1);
+
+    return target0 == target1 && std::fabs(angle0 - angle1) < tol;
+}
+
+constexpr auto is_1c1t1a_gate_equal(
+    const ket::GateInfo& info0,
+    const ket::GateInfo& info1,
+    double tol = GATE_ANGLE_TOLERANCE_
+) -> bool
+{
+    const auto [control0, target0, angle0] = unpack_one_control_one_target_one_angle_gate(info0);
+    const auto [control1, target1, angle1] = unpack_one_control_one_target_one_angle_gate(info1);
+
+    return control0 == control1 && target0 == target1 && std::fabs(angle0 - angle1) < tol;
+}
+
+}  // namespace impl_ket::compare
+
+// namespace impl_ket::control
+// {
+// 
+// constexpr static auto IF_STMT = std::size_t {0};
+// constexpr static auto IF_ELSE_STMT = std::size_t {1};
+// constexpr static auto REPEAT_STMT = std::size_t {2};
+// constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
+// 
+// constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
+// {
+//     return info.arg3;
+// }
+// 
+// constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
+// {
+//     return info.arg0;
+// }
+// 
+// constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
+// {
+//     return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
+// }
+// 
+// }  // namespace impl_ket::control
 

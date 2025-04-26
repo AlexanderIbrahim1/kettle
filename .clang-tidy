@@ -13,6 +13,7 @@ Checks: "*,\
   -modernize-use-trailing-return-type,
   -bugprone-easily-swappable-parameters,
   -readability-magic-numbers,
+  -readability-identifier-naming,
   -cppcoreguidelines-avoid-magic-numbers"
 WarningsAsErrors: ''
 CheckOptions:
@@ -124,14 +125,16 @@ CheckOptions:
     value: 'lower_case'
   - key: 'readability-identifier-naming.PrivateMemberCase'
     value: 'lower_case'
-  - key: 'readability-identifier-naming.PrivateMemberPrefix'
-    value: 'm_'
+  - key: 'readability-identifier-naming.PrivateMemberStyle'
+    value: 'underscore'
+  - key: 'readability-identifier-naming.PrivateMemberSuffix'
+    value: '_'
   - key: 'readability-identifier-naming.PrivateMethodCase'
     value: 'lower_case'
   - key: 'readability-identifier-naming.ProtectedMemberCase'
     value: 'lower_case'
-  - key: 'readability-identifier-naming.ProtectedMemberPrefix'
-    value: 'm_'
+  - key: 'readability-identifier-naming.ProtectedMemberSuffix'
+    value: '_'
   - key: 'readability-identifier-naming.ProtectedMethodCase'
     value: 'lower_case'
   - key: 'readability-identifier-naming.PublicMemberCase'
