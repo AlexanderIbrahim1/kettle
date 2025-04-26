@@ -1,3 +1,4 @@
+.cache/
 .idea/
 .vs/
 .vscode/
@@ -11,3 +12,4 @@ CMakeUserPresets.json
 playground/
 
 compile_commands.json
+
