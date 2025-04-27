@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>

@@ -29,7 +29,7 @@ constexpr auto log_2_int(std::size_t power) noexcept -> std::size_t
     auto log2 = std::size_t {0};
     while (power > 0) {
         ++log2;
-        power = (power >> 1);
+        power = (power >> 1UL);
     }
 
     return log2 - 1;
