@@ -35,6 +35,7 @@ public:
         std::tie(i0_, i1_) = flat_index_to_grid_indices_2d(i_state, i1_max_);
     }
 
+    [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_;
@@ -44,7 +45,7 @@ public:
     {
         // indices corresponding to the computational basis states where the [i1]^th digit
         // are 0 and 1, respectively
-        const auto state0_index = i0_ + 2 * i1_ * i0_max_;
+        const auto state0_index = i0_ + (2 * i1_ * i0_max_);
         const auto state1_index = state0_index + i0_max_;
 
         ++i1_;
@@ -96,6 +97,7 @@ public:
         std::tie(i0_, i1_, i2_) = flat_index_to_grid_indices_3d(i_state, i1_max_, i2_max_);
     }
 
+    [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_ * i2_max_;
@@ -103,7 +105,7 @@ public:
 
     constexpr auto next() noexcept -> std::tuple<std::size_t, std::size_t>
     {
-        const auto state0_index = i0_ + i1_ * lower_shift_ + i2_ * upper_shift_ + control_shift_;
+        const auto state0_index = i0_ + (i1_ * lower_shift_) + (i2_ * upper_shift_) + control_shift_;
         const auto state1_index = state0_index + target_shift_;
 
         ++i2_;

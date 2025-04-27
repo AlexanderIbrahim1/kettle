@@ -1,15 +1,15 @@
 #pragma once
 
 #include <cmath>
-#include <concepts>
 #include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <tuple>
 
 namespace ket
 {
 
-enum class Gate
+enum class Gate : std::uint8_t
 {
     H,
     X,
@@ -118,7 +118,6 @@ namespace impl_ket
     Parameters indicating to the developer that a given gate does not use a certain data member in
     a ket::GateInfo instance.
 */
-constexpr static auto DUMMY_ARG0 = std::size_t {0};
 constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
 constexpr static auto DUMMY_ARG3 = std::size_t {0};
@@ -129,7 +128,7 @@ constexpr auto create_one_target_gate(ket::Gate gate, std::size_t target_index) 
         throw std::runtime_error {"DEV ERROR: invalid one-target gate provided.\n"};
     }
 
-    return {gate, target_index, DUMMY_ARG1, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_gate(const ket::GateInfo& info) -> std::size_t
@@ -143,7 +142,7 @@ constexpr auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t targ
         throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
     }
 
-    return {gate, target_index, DUMMY_ARG1, theta, DUMMY_ARG3};
+    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=theta, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, double>
@@ -157,7 +156,7 @@ constexpr auto create_one_control_one_target_gate(ket::Gate gate, std::size_t co
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target gate provided.\n"};
     }
 
-    return {gate, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_control_one_target_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
@@ -171,7 +170,7 @@ constexpr auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std:
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target-one-angle gate provided.\n"};
     }
 
-    return {gate, control_index, target_index, theta, DUMMY_ARG3};
+    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=theta, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>
@@ -182,7 +181,7 @@ constexpr auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo&
 /* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `target_index` */
 constexpr auto create_u_gate(std::size_t target_index, std::size_t matrix_index) -> ket::GateInfo
 {
-    return {ket::Gate::U, target_index, DUMMY_ARG1, DUMMY_ARG2, matrix_index};
+    return {.gate=ket::Gate::U, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .arg3=matrix_index};
 }
 
 /* Parse the relevant information for the U-gate */
@@ -195,7 +194,7 @@ constexpr auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_
 constexpr auto create_cu_gate(std::size_t control_index, std::size_t target_index, std::size_t matrix_index)
     -> ket::GateInfo
 {
-    return {ket::Gate::CU, control_index, target_index, DUMMY_ARG2, matrix_index};
+    return {.gate=ket::Gate::CU, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .arg3=matrix_index};
 }
 
 /* Parse the relevant information for the CU-gate */
@@ -207,7 +206,7 @@ constexpr auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size
 /* Apply a measurement gate to a given qubit and bit */
 constexpr auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> ket::GateInfo
 {
-    return {ket::Gate::M, qubit_index, bit_index, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=ket::Gate::M, .arg0=qubit_index, .arg1=bit_index, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 /* Parse the relevant information for the M-gate */
@@ -283,29 +282,3 @@ constexpr auto is_1c1t1a_gate_equal(
 }
 
 }  // namespace impl_ket::compare
-
-// namespace impl_ket::control
-// {
-// 
-// constexpr static auto IF_STMT = std::size_t {0};
-// constexpr static auto IF_ELSE_STMT = std::size_t {1};
-// constexpr static auto REPEAT_STMT = std::size_t {2};
-// constexpr static auto WHILE_LOOP_STMT = std::size_t {3};
-// 
-// constexpr auto unpack_control_flow_kind(const ket::GateInfo& info) -> std::size_t
-// {
-//     return info.arg3;
-// }
-// 
-// constexpr auto unpack_control_flow_index(const ket::GateInfo& info) -> std::size_t
-// {
-//     return info.arg0;
-// }
-// 
-// constexpr auto create_control_flow_gate(std::size_t instruction_index, std::size_t control_flow_kind) -> ket::GateInfo
-// {
-//     return {ket::Gate::CONTROL, instruction_index, DUMMY_ARG1, DUMMY_ARG2, control_flow_kind};
-// }
-// 
-// }  // namespace impl_ket::control
-

@@ -1,10 +1,8 @@
 #pragma once
 
-#include <cstddef>
 #include <stdexcept>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/utils.hpp"
 #include "kettle/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
@@ -28,6 +26,7 @@ constexpr auto is_primitive_gate(ket::Gate gate) -> bool
 namespace ket
 {
 
+// NOLINTNEXTLINE(misc-no-recursion)
 inline auto transpile_to_primitive(
     const QuantumCircuit& circuit,
     double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
@@ -43,7 +42,7 @@ inline auto transpile_to_primitive(
             const auto& control_flow = circuit_element.get_control_flow();
 
             if (control_flow.is_if_statement()) {
-                const auto if_stmt = control_flow.get_if_statement();
+                const auto& if_stmt = control_flow.get_if_statement();
                 const auto& current_subcircuit = *if_stmt.circuit();
                 auto transpiled_subcircuit = transpile_to_primitive(current_subcircuit, tolerance_sq);
 
@@ -55,7 +54,7 @@ inline auto transpile_to_primitive(
                 new_circuit.elements_.emplace_back(std::move(cfi));
             }
             else if (control_flow.is_if_else_statement()) {
-                const auto if_else_stmt = control_flow.get_if_else_statement();
+                const auto& if_else_stmt = control_flow.get_if_else_statement();
                 const auto& if_subcircuit = *if_else_stmt.if_circuit();
                 const auto& else_subcircuit = *if_else_stmt.else_circuit();
                 auto transpiled_if_subcircuit = transpile_to_primitive(if_subcircuit, tolerance_sq);

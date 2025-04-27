@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <concepts>
 #include <cstddef>
@@ -15,7 +16,7 @@
 namespace impl_ket
 {
 
-enum class RightCompare_
+enum class RightCompare_ : std::uint8_t
 {
     LESS_THAN,
     GREATER_THAN
@@ -95,7 +96,7 @@ auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<I
         if (left >= right) {
             return {};
         } else {
-            const auto n_terms = Integer{1} + (right - left) / abs_step;
+            const auto n_terms = Integer{1} + ((right - left) / abs_step);
             return impl_ket::arange_helper_<Integer, RC::LESS_THAN>(left, right, step, n_terms);
         }
     }
@@ -103,7 +104,7 @@ auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<I
         if (right >= left) {
             return {};
         } else {
-            const auto n_terms = Integer{1} + (left - right) / abs_step;
+            const auto n_terms = Integer{1} + ((left - right) / abs_step);
             return impl_ket::arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
         }
     }
@@ -116,7 +117,7 @@ template <std::integral Integer = std::size_t>
 auto revarange(Integer value) -> std::vector<Integer>
 {
     auto output = arange(value);
-    std::reverse(output.begin(), output.end());
+    std::ranges::reverse(output);
 
     return output;
 }
@@ -128,7 +129,7 @@ template <std::integral Integer = std::size_t>
 auto revarange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<Integer>
 {
     auto output = arange(left, right, step);
-    std::reverse(output.begin(), output.end());
+    std::ranges::reverse(output);
 
     return output;
 }

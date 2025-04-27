@@ -2,7 +2,6 @@
 
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/common/utils.hpp"
 
 namespace ket
 {
@@ -10,50 +9,50 @@ namespace ket
 constexpr auto i_gate() noexcept -> Matrix2X2
 {
     return {
-        {1.0, 0.0},
-        {0.0, 0.0},
-        {0.0, 0.0},
-        {1.0, 0.0}
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={1.0, 0.0}
     };
 }
 
 constexpr auto h_gate() noexcept -> Matrix2X2
 {
     return {
-        {M_SQRT1_2, 0.0},
-        {M_SQRT1_2, 0.0},
-        {M_SQRT1_2, 0.0},
-        {-M_SQRT1_2, 0.0}
+        .elem00={M_SQRT1_2, 0.0},
+        .elem01={M_SQRT1_2, 0.0},
+        .elem10={M_SQRT1_2, 0.0},
+        .elem11={-M_SQRT1_2, 0.0}
     };
 }
 
 constexpr auto x_gate() noexcept -> Matrix2X2
 {
     return {
-        {0.0, 0.0},
-        {1.0, 0.0},
-        {1.0, 0.0},
-        {0.0, 0.0}
+        .elem00={0.0, 0.0},
+        .elem01={1.0, 0.0},
+        .elem10={1.0, 0.0},
+        .elem11={0.0, 0.0}
     };
 }
 
 constexpr auto y_gate() noexcept -> Matrix2X2
 {
     return {
-        {0.0, 0.0},
-        {0.0, -1.0},
-        {0.0, 1.0},
-        {0.0, 0.0}
+        .elem00={0.0, 0.0},
+        .elem01={0.0, -1.0},
+        .elem10={0.0, 1.0},
+        .elem11={0.0, 0.0}
     };
 }
 
 constexpr auto z_gate() noexcept -> Matrix2X2
 {
     return {
-        {1.0, 0.0},
-        {0.0, 0.0},
-        {0.0, 0.0},
-        {-1.0, 0.0}
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={-1.0, 0.0}
     };
 }
 
@@ -63,10 +62,10 @@ constexpr auto rx_gate(double angle) noexcept -> Matrix2X2
     const auto sint = std::sin(angle / 2.0);
 
     return {
-        {cost, 0.0},
-        {0.0, -sint},
-        {0.0, -sint},
-        {cost, 0.0}
+        .elem00={cost, 0.0},
+        .elem01={0.0, -sint},
+        .elem10={0.0, -sint},
+        .elem11={cost, 0.0}
     };
 }
 
@@ -76,10 +75,10 @@ constexpr auto ry_gate(double angle) noexcept -> Matrix2X2
     const auto sint = std::sin(angle / 2.0);
 
     return {
-        {cost, 0.0},
-        {-sint, 0.0},
-        {sint, 0.0},
-        {cost, 0.0}
+        .elem00={cost, 0.0},
+        .elem01={-sint, 0.0},
+        .elem10={sint, 0.0},
+        .elem11={cost, 0.0}
     };
 }
 
@@ -89,10 +88,10 @@ constexpr auto rz_gate(double angle) noexcept -> Matrix2X2
     const auto sint = std::sin(angle / 2.0);
 
     return {
-        {cost, -sint},
-        {0.0, 0.0},
-        {0.0, 0.0},
-        {cost, sint}
+        .elem00={cost, -sint},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={cost, sint}
     };
 }
 
@@ -102,20 +101,20 @@ constexpr auto p_gate(double angle) noexcept -> Matrix2X2
     const auto sint = std::sin(angle);
 
     return {
-        {1.0, 0.0},
-        {0.0, 0.0},
-        {0.0, 0.0},
-        {cost, sint}
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={cost, sint}
     };
 }
 
 constexpr auto sx_gate() noexcept -> Matrix2X2
 {
     return {
-        {0.5, 0.5 },
-        {0.5, -0.5},
-        {0.5, -0.5},
-        {0.5, 0.5 }
+        .elem00={0.5, 0.5 },
+        .elem01={0.5, -0.5},
+        .elem10={0.5, -0.5},
+        .elem11={0.5, 0.5 }
     };
 }
 

@@ -1,10 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include <concepts>
-#include <cstdint>
 #include <stdexcept>
-#include <vector>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -19,13 +16,13 @@ inline auto non_u_gate_to_u_gate(const ket::GateInfo& info) -> ket::Matrix2X2
     if (impl_ket::gate_id::is_non_angle_transform_gate(info.gate)) {
         return ket::non_angle_gate(info.gate);
     }
-    else if (impl_ket::gate_id::is_angle_transform_gate(info.gate)) {
+
+    if (impl_ket::gate_id::is_angle_transform_gate(info.gate)) {
         const auto angle = impl_ket::unpack_gate_angle(info);
         return ket::angle_gate(info.gate, angle);
     }
-    else {
-        throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};
-    }
+
+    throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};
 }
 
 inline auto as_u_gate(const ket::QuantumCircuit& circuit, const ket::GateInfo& info) -> std::tuple<ket::GateInfo, ket::Matrix2X2>
@@ -36,26 +33,25 @@ inline auto as_u_gate(const ket::QuantumCircuit& circuit, const ket::GateInfo& i
         const auto i_matrix = impl_ket::unpack_gate_matrix_index(info);
         return {info, circuit.unitary_gate(i_matrix)};
     }
-    else {
-        const auto matrix = non_u_gate_to_u_gate(info);
-        const auto dummy_gate_index = 0;
 
-        if (gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
-            const auto target = impl_ket::unpack_single_qubit_gate_index(info);
-            const auto u_gate_info = impl_ket::create_u_gate(target, dummy_gate_index);
+    const auto matrix = non_u_gate_to_u_gate(info);
+    const auto dummy_gate_index = 0;
 
-            return {u_gate_info, matrix};
-        }
-        else if (gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
-            const auto [control, target] = impl_ket::unpack_double_qubit_gate_indices(info);
-            const auto u_gate_info = impl_ket::create_cu_gate(control, target, dummy_gate_index);
+    if (gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
+        const auto target = impl_ket::unpack_single_qubit_gate_index(info);
+        const auto u_gate_info = impl_ket::create_u_gate(target, dummy_gate_index);
 
-            return {u_gate_info, matrix};
-        }
-        else {
-            throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'as_u_gate()'"};
-        }
+        return {u_gate_info, matrix};
     }
+
+    if (gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
+        const auto [control, target] = impl_ket::unpack_double_qubit_gate_indices(info);
+        const auto u_gate_info = impl_ket::create_cu_gate(control, target, dummy_gate_index);
+
+        return {u_gate_info, matrix};
+    }
+
+    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'as_u_gate()'"};
 }
 
 inline auto is_matching_u_gate_info(const ket::GateInfo& left_info, const ket::GateInfo& right_info) -> bool
@@ -68,13 +64,13 @@ inline auto is_matching_u_gate_info(const ket::GateInfo& left_info, const ket::G
         const auto unpack = impl_ket::unpack_single_qubit_gate_index;
         return unpack(left_info) == unpack(right_info);
     }
-    else if (left_info.gate == ket::Gate::CU) {
+
+    if (left_info.gate == ket::Gate::CU) {
         const auto unpack = impl_ket::unpack_double_qubit_gate_indices;
         return unpack(left_info) == unpack(right_info);
     }
-    else {
-        throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'is_matching_u_gate_info()'"};
-    }
+
+    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'is_matching_u_gate_info()'"};
 }
 
 }  // namespace impl_ket
@@ -83,13 +79,13 @@ inline auto is_matching_u_gate_info(const ket::GateInfo& left_info, const ket::G
 namespace ket
 {
 
-auto almost_eq(
+// NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity)
+inline auto almost_eq(
     const QuantumCircuit& left,
     const QuantumCircuit& right,
     double tol_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool
 {
-    namespace gid = impl_ket::gate_id;
     namespace comp = impl_ket::compare;
 
     // begin with the fastest checks first (qubits, bits, and bitmask values)

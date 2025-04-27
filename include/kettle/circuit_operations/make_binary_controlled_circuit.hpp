@@ -5,7 +5,6 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/utils.hpp"
-#include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/circuit_operations/append_circuits.hpp"
 #include "kettle/circuit_operations/make_controlled_circuit.hpp"
 
@@ -48,7 +47,7 @@ inline auto make_binary_controlled_circuit_naive(
 
     for (std::size_t i {0}; i < size; ++i) {
         const auto control = impl_ket::get_container_index(control_qubits, i);
-        const auto n_iterations = static_cast<std::size_t>(1 << i);
+        const auto n_iterations = 1UL << i;
 
         for (std::size_t i_iter {0}; i_iter < n_iterations; ++i_iter) {
             const auto controlled_subcircuit = make_controlled_circuit(subcircuit, n_new_qubits, control, mapped_qubits);

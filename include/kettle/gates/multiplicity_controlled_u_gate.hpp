@@ -1,7 +1,6 @@
 #pragma once
 
 #include <initializer_list>
-#include <iterator>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"

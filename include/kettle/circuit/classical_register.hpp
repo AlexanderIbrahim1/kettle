@@ -18,11 +18,13 @@ public:
         : measured_bits_ (n_bits, std::nullopt)
     {}
 
+    [[nodiscard]]
     constexpr auto is_measured(std::size_t qubit_index) const -> bool
     {
         return measured_bits_[qubit_index].has_value();
     }
 
+    [[nodiscard]]
     constexpr auto get(std::size_t qubit_index) const -> int
     {
         return measured_bits_[qubit_index].value();

@@ -1,14 +1,12 @@
 #pragma once
 
-#include <algorithm>
 #include <iterator>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
-#include "kettle/common/mathtools.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
@@ -33,8 +31,8 @@ constexpr void apply_noise_(double noise, std::size_t i_qubit, std::size_t n_qub
 
         const auto current_prob0 = probabilities[state0_index];
         const auto current_prob1 = probabilities[state1_index];
-        const auto new_prob0 = (1.0 - noise) * current_prob0 + noise * current_prob1;
-        const auto new_prob1 = (1.0 - noise) * current_prob1 + noise * current_prob0;
+        const auto new_prob0 = ((1.0 - noise) * current_prob0) + (noise * current_prob1);
+        const auto new_prob1 = ((1.0 - noise) * current_prob1) + (noise * current_prob0);
 
         probabilities[state0_index] = new_prob0;
         probabilities[state1_index] = new_prob1;
@@ -81,6 +79,18 @@ constexpr auto cumulative_end_offset(const std::vector<double>& cumulative_proba
     return (last - second_last) * CUMULATIVE_END_OFFSET_FRACTION;
 }
 
+/*
+    Ensures that the noise parameter lies in [0.0, 1.0]; otherwise, the noise application is invalid.
+*/
+constexpr void check_noise_value_(double value)
+{
+    const auto between_0_and_1 = [](double x) { return 0.0 <= x && x <= 1.0; };
+
+    if (!between_0_and_1(value)) {
+        throw std::runtime_error {"ERROR: Cannot set probability in QuantumNoise object outside of [0, 1]."};
+    }
+}
+
 }  // namespace impl_ket
 
 namespace ket
@@ -96,7 +106,7 @@ namespace ket
 class QuantumNoise
 {
 public:
-    QuantumNoise(std::size_t n_qubits)
+    explicit QuantumNoise(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , noise_(n_qubits, 0.0)
     {}
@@ -104,7 +114,7 @@ public:
     constexpr void set(std::size_t index, double noise)
     {
         check_index_(index);
-        check_noise_value_(noise);
+        impl_ket::check_noise_value_(noise);
         noise_[index] = noise;
     }
 
@@ -116,16 +126,7 @@ public:
 
 private:
     std::size_t n_qubits_;
-    std::vector<double> noise_ {};
-
-    constexpr void check_noise_value_(double value) const
-    {
-        const auto between_0_and_1 = [](double x) { return 0.0 <= x && x <= 1.0; };
-
-        if (!between_0_and_1(value)) {
-            throw std::runtime_error {"ERROR: Cannot set probability in QuantumNoise object outside of [0, 1]."};
-        }
-    }
+    std::vector<double> noise_;
 
     constexpr void check_index_(std::size_t index) const
     {
@@ -135,7 +136,7 @@ private:
     }
 };
 
-constexpr auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
+constexpr auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* noise = nullptr)
     -> std::vector<double>
 {
     const auto n_states = state.n_states();
@@ -149,7 +150,7 @@ constexpr auto calculate_probabilities_raw(const QuantumState& state, const Quan
         probabilities.push_back(prob);
     }
 
-    if (noise) {
+    if (noise != nullptr) {
         for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
             const auto prob_noise = noise->get(i_qubit);
             impl_ket::apply_noise_(prob_noise, i_qubit, n_qubits, probabilities);
@@ -159,7 +160,7 @@ constexpr auto calculate_probabilities_raw(const QuantumState& state, const Quan
     return probabilities;
 }
 
-auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr) noexcept
+inline auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr)
     -> std::unordered_map<std::string, double>
 {
     const auto n_states = state.n_states();
@@ -172,7 +173,7 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
     // applying noise involves generating the indices of pairs of states, and this is much more convenient
     // when done with indices rather than strings; so the downsides of using twice the memory don't seem
     // that bad
-    if (noise) {
+    if (noise != nullptr) {
         const auto probabilities_raw = calculate_probabilities_raw(state, noise);
 
         for (std::size_t i_state {0}; i_state < n_states; ++i_state) {

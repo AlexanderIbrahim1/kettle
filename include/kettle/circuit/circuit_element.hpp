@@ -22,33 +22,40 @@ namespace impl_ket
 struct CircuitElement
 {
 public:
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(const ket::GateInfo& ginfo)
         : element_ {ginfo}
     {}
 
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(ClassicalIfStatement instruction)
         : element_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*-explicit-*)
     CircuitElement(ClassicalIfElseStatement instruction)
         : element_ {std::move(instruction)}
     {}
 
+    [[nodiscard]]
     constexpr auto is_gate() const -> bool
     {
         return std::holds_alternative<ket::GateInfo>(element_);
     }
 
+    [[nodiscard]]
     constexpr auto is_control_flow() const -> bool
     {
         return std::holds_alternative<ClassicalControlFlowInstruction>(element_);
     }
 
+    [[nodiscard]]
     constexpr auto get_gate() const -> const ket::GateInfo&
     {
         return std::get<ket::GateInfo>(element_);
     }
 
+    [[nodiscard]]
     constexpr auto get_control_flow() const -> const ClassicalControlFlowInstruction&
     {
         return std::get<ClassicalControlFlowInstruction>(element_);

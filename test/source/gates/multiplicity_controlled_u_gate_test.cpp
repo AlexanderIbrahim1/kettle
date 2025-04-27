@@ -4,7 +4,6 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/gates/toffoli.hpp"
@@ -12,7 +11,7 @@
 #include "kettle/state/state.hpp"
 
 template <typename CircuitFunction>
-auto create_state(CircuitFunction func, const std::string& init_bitstring, std::size_t n_qubits)
+static auto create_state(CircuitFunction func, const std::string& init_bitstring, std::size_t n_qubits)
 {
     auto circuit = ket::QuantumCircuit {n_qubits};
     func(circuit);

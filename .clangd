@@ -1,0 +1,31 @@
+CompileFlags:
+  Add: [-xc++, -std=c++20, -U_FORTIFY_SOURCE, -D_FORTIFY_SOURCE=3, -fstack-protector-strong, -fcf-protection=full, -fstack-clash-protection, -Wall, -Wextra, -Wpedantic, -Wconversion, -Wsign-conversion, -Wcast-qual, -Wformat=2, -Wundef, -Wshadow, -Wcast-align, -Wunused, -Wnull-dereference, -Wimplicit-fallthrough, -Wextra-semi, -Woverloaded-virtual, -Wnon-virtual-dtor, -Wold-style-cast]
+  Compiler: g++
+
+Diagnostics:
+  ClangTidy:
+    Remove: [readability-redundant-casting, boost-use-ranges, llvm-else-after-return, readability-else-after-return, cppcoreguidelines-avoid-do-while]
+
+Index:
+  Background: Build
+
+Hover:
+  ShowAKA: Yes
+
+---
+
+# Ignore certain diagnostics for Catch2
+If:
+  PathMatch: test/.*
+Diagnostics:
+  ClangTidy:
+    Remove: [misc-use-anonymous-namespace, readability-function-cognitive-complexity, cert-err58-cpp, google-build-using-namespace, bugprone-chained-comparison, cppcoreguidelines-pro-type-member-init, hicpp-member-init]
+
+---
+
+# Ignore certain diagnostics for examples
+If:
+  PathMatch: example/.*
+Diagnostics:
+  ClangTidy:
+    Remove: [misc-use-anonymous-namespace, misc-use-internal-linkage, bugprone-exception-escape, performance-enum-size, hicpp-signed-bitwise, cert-err58-cpp, cppcoreguidelines-pro-bounds-pointer-arithmetic]

@@ -4,7 +4,6 @@
 #include <cmath>
 #include <complex>
 #include <iomanip>
-#include <numeric>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -12,7 +11,6 @@
 #include <vector>
 
 #include "kettle/common/mathtools.hpp"
-#include "kettle/common/utils.hpp"
 #include "kettle/state/bitstring_utils.hpp"
 #include "kettle/state/endian.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
@@ -39,7 +37,7 @@ public:
         coefficients_[0] = {1, 0};
     }
 
-    QuantumState(
+    explicit QuantumState(
         std::vector<std::complex<double>> coefficients,
         QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
     )
@@ -61,7 +59,7 @@ public:
         }
     }
 
-    QuantumState(
+    explicit QuantumState(
         const std::string& computational_state,
         QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
     )
@@ -85,6 +83,7 @@ public:
         return coefficients_[index];
     }
 
+    [[nodiscard]]
     constexpr auto at(std::size_t index) const -> const std::complex<double>&
     {
         check_index_(index);
@@ -97,6 +96,7 @@ public:
         return coefficients_[index];
     }
 
+    [[nodiscard]]
     constexpr auto at(
         const std::string& bitstring,
         QuantumStateEndian endian = QuantumStateEndian::LITTLE
@@ -117,11 +117,13 @@ public:
         return coefficients_[state_index];
     }
 
+    [[nodiscard]]
     constexpr auto n_states() const noexcept -> std::size_t
     {
         return n_states_;
     }
 
+    [[nodiscard]]
     constexpr auto n_qubits() const noexcept -> std::size_t
     {
         return n_qubits_;

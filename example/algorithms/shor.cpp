@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -31,7 +30,7 @@
     This is an exhaustive set of all positive integers less than 15 that are
     mutually prime with 15
 */
-auto VALID_BASES = std::unordered_set<int> {2, 4, 7, 8, 11, 13};
+const auto VALID_BASES = std::unordered_set<int> {2, 4, 7, 8, 11, 13};
 
 
 /*
@@ -147,8 +146,8 @@ auto main(int argc, char** argv) -> int
     // determine the number of qubits needed for the problem
     // - the first 8 qubits are the counting qubits
     // - the last 4 qubits are the ancilla qubits
-    const auto counting_qubits = ket::arange(8ul);
-    const auto ancilla_qubits = ket::arange(8ul, 12ul);
+    const auto counting_qubits = ket::arange(8UL);
+    const auto ancilla_qubits = ket::arange(8UL, 12UL);
     const auto n_counting_qubits = counting_qubits.size();
     const auto n_ancilla_qubits = ancilla_qubits.size();
     const auto n_total_qubits = n_counting_qubits + n_ancilla_qubits;
@@ -164,7 +163,7 @@ auto main(int argc, char** argv) -> int
 
     // apply the unitary operator for QPE
     for (auto i : ket::revarange(n_counting_qubits)) {
-        const auto n_iterations = 1ul << i;
+        const auto n_iterations = 1UL << i;
         control_multiplication_mod15(circuit, base, i, n_counting_qubits, n_iterations);
     }
 

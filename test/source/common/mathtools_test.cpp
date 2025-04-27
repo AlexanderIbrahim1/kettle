@@ -13,7 +13,7 @@ TEST_CASE("flat_index_to_grid_indices_2d")
     };
 
     const auto grid_indices_to_flat_index = [](const TestCase& tc) {
-        return tc.i1 + tc.i0 * tc.size1;
+        return tc.i1 + (tc.i0 * tc.size1);
     };
 
     const auto testcase = GENERATE(
@@ -41,7 +41,7 @@ TEST_CASE("flat_index_to_grid_indices_3d")
     };
 
     const auto grid_indices_to_flat_index = [](const TestCase& tc) {
-        return tc.i2 + tc.i1 * tc.size2 + tc.i0 * tc.size1 * tc.size2;
+        return tc.i2 + (tc.i1 * tc.size2) + (tc.i0 * tc.size1 * tc.size2);
     };
 
     const auto testcase = GENERATE(

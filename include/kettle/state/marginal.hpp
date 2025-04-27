@@ -27,7 +27,7 @@ inline auto state_index_to_bitstring_marginal_(
     auto bitstring = std::string {};
     bitstring.reserve(dyn_bitset.size());
     for (std::size_t i_bit {0}; i_bit < dyn_bitset.size(); ++i_bit) {
-        if (marginal_bitmask[i_bit]) {
+        if (marginal_bitmask[i_bit] == 1) {
             bitstring.push_back(MARGINALIZED_QUBIT);
         }
         else if (dyn_bitset[i_bit] == 0) {
@@ -41,7 +41,7 @@ inline auto state_index_to_bitstring_marginal_(
     return bitstring;
 }
 
-enum class MarginalBitsSide
+enum class MarginalBitsSide : std::uint8_t
 {
     LEFT,
     RIGHT

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cmath>
 #include <complex>
 #include <cstddef>
@@ -19,13 +18,13 @@ namespace ket
 /*
     Generate a random `QuantumState` instance, taking the PRNG directly.
 */
-inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> ket::QuantumState
+inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> QuantumState
 {
     if (n_qubits == 0) {
         throw std::runtime_error {"Cannot generate a quantum state with 0 qubits.\n"};
     }
 
-    const auto n_states = 1ul << n_qubits;
+    const auto n_states = 1UL << n_qubits;
     auto magnitudes = std::vector<double> {};
     magnitudes.reserve(n_states);
 
@@ -42,7 +41,7 @@ inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> k
         magnitudes.begin(),
         magnitudes.end(),
         0.0,
-        [](auto sum_so_far, auto new_elem) { return sum_so_far + new_elem * new_elem; }
+        [](auto sum_so_far, auto new_elem) { return sum_so_far + (new_elem * new_elem); }
     );
 
     const auto norm = 1.0 / std::sqrt(sum_of_squares);
@@ -59,13 +58,13 @@ inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> k
         amplitudes.emplace_back(x, y);
     }
 
-    return amplitudes;
+    return QuantumState {amplitudes};
 }
 
 /*
     Generate a random `QuantumState` instance, generating a fresh PRNG using the provided seed.
 */
-inline auto generate_random_state(std::size_t n_qubits, int seed) -> ket::QuantumState
+inline auto generate_random_state(std::size_t n_qubits, int seed) -> QuantumState
 {
     auto prng = impl_ket::get_prng_(seed);
     return generate_random_state(n_qubits, prng);
@@ -74,7 +73,7 @@ inline auto generate_random_state(std::size_t n_qubits, int seed) -> ket::Quantu
 /*
     Generate a random `QuantumState` instance, generating the PRNG from the random device.
 */
-inline auto generate_random_state(std::size_t n_qubits) -> ket::QuantumState
+inline auto generate_random_state(std::size_t n_qubits) -> QuantumState
 {
     // NOTE: creating a single function with the function signature
     //     `generate_random_state(std::size_t n_qubits, std::optional<int> seed = std::nullopt)`

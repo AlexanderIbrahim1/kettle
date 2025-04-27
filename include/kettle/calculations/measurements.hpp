@@ -13,8 +13,6 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"
 #include "kettle/common/prng.hpp"
-#include "kettle/common/utils.hpp"
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/marginal.hpp"
@@ -29,7 +27,7 @@ namespace impl_ket
 class ProbabilitySampler_
 {
 public:
-    ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed = std::nullopt)
+    explicit ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed = std::nullopt)
         : cumulative_ {calculate_cumulative_sum(probabilities)}
         , prng_ {get_prng_(seed)}
     {
@@ -42,7 +40,7 @@ public:
     {
         const auto prob = uniform_dist_(prng_);
 
-        const auto it_state = std::lower_bound(cumulative_.begin(), cumulative_.end(), prob);
+        const auto it_state = std::ranges::lower_bound(cumulative_, prob);
 
         if (it_state == cumulative_.end()) {
             throw std::runtime_error {
@@ -67,7 +65,7 @@ inline auto build_marginal_bitmask_(
 ) -> std::vector<std::uint8_t>
 {
     const auto is_in_range = [&](auto i) { return i >= n_qubits; };
-    if (std::any_of(marginal_qubits.begin(), marginal_qubits.end(), is_in_range))
+    if (std::ranges::any_of(marginal_qubits, is_in_range))
     {
         throw std::runtime_error {"ERROR: marginal qubit index out of range."};
     }

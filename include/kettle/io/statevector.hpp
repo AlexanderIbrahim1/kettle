@@ -120,7 +120,7 @@ inline auto load_statevector(std::istream& instream) -> QuantumState
     // the next line contains the number of states
     const auto n_states = [&]() {
         std::string dummy;
-        std::size_t n_states_;
+        std::size_t n_states_;  // NOLINT(cppcoreguidelines-init-variables)
 
         instream >> dummy;  // 'NUMBER'
         instream >> dummy;  // 'OF'
@@ -135,8 +135,8 @@ inline auto load_statevector(std::istream& instream) -> QuantumState
     amplitudes.reserve(n_states);
 
     for (std::size_t i {0}; i < n_states; ++i) {
-        double real;
-        double imag;
+        double real;  // NOLINT(cppcoreguidelines-init-variables)
+        double imag;  // NOLINT(cppcoreguidelines-init-variables)
 
         instream >> real;
         instream >> imag;

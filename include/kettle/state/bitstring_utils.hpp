@@ -1,15 +1,11 @@
 #pragma once
 
 #include <algorithm>
-#include <bitset>
 #include <cstddef>
-#include <limits>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
 #include "kettle/common/utils.hpp"
-#include "kettle/state/endian.hpp"
 
 namespace impl_ket
 {
@@ -19,9 +15,9 @@ constexpr auto endian_flip_(std::size_t value, std::size_t n_relevant_bits) -> s
     auto backward = std::size_t {0};
 
     for (std::size_t i {0}; i < n_relevant_bits; ++i) {
-        backward <<= 1;
-        backward |= (value & 1);
-        value >>= 1;
+        backward <<= 1UL;
+        backward |= (value & 1UL);
+        value >>= 1UL;
     }
 
     return backward;

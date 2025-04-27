@@ -1,6 +1,5 @@
 #pragma once
 
-#include <compare>
 #include <cstddef>
 #include <stdexcept>
 
@@ -29,7 +28,7 @@ constexpr auto number_of_single_qubit_gate_pairs_(std::size_t n_qubits) -> std::
         };
     }
 
-    return static_cast<std::size_t>(1 << (n_qubits - 1));
+    return 1UL << (n_qubits - 1);
 }
 
 constexpr auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
@@ -49,7 +48,7 @@ constexpr auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::
     if (n_qubits == 1) {
         return 0;
     } else {
-        return 1ul << (n_qubits - 2);
+        return 1UL << (n_qubits - 2);
     }
 }
 

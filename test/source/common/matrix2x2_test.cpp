@@ -8,17 +8,17 @@ TEST_CASE("conjugate transpose")
     SECTION("real matrix")
     {
         const auto mat = ket::Matrix2X2 {
-            {1.0, 0.0},
-            {2.0, 0.0},
-            {3.0, 0.0},
-            {4.0, 0.0},
+            .elem00={1.0, 0.0},
+            .elem01={2.0, 0.0},
+            .elem10={3.0, 0.0},
+            .elem11={4.0, 0.0},
         };
 
         const auto expected = ket::Matrix2X2 {
-            {1.0, 0.0},
-            {3.0, 0.0},
-            {2.0, 0.0},
-            {4.0, 0.0},
+            .elem00={1.0, 0.0},
+            .elem01={3.0, 0.0},
+            .elem10={2.0, 0.0},
+            .elem11={4.0, 0.0},
         };
 
         const auto actual = ket::conjugate_transpose(mat);
@@ -28,17 +28,17 @@ TEST_CASE("conjugate transpose")
     SECTION("complex matrix")
     {
         const auto mat = ket::Matrix2X2 {
-            {1.0, 2.0},
-            {3.0, 4.0},
-            {5.0, 6.0},
-            {7.0, 8.0},
+            .elem00={1.0, 2.0},
+            .elem01={3.0, 4.0},
+            .elem10={5.0, 6.0},
+            .elem11={7.0, 8.0},
         };
 
         const auto expected = ket::Matrix2X2 {
-            {1.0, -2.0},
-            {5.0, -6.0},
-            {3.0, -4.0},
-            {7.0, -8.0},
+            .elem00={1.0, -2.0},
+            .elem01={5.0, -6.0},
+            .elem10={3.0, -4.0},
+            .elem11={7.0, -8.0},
         };
 
         const auto actual = ket::conjugate_transpose(mat);
@@ -51,10 +51,10 @@ TEST_CASE("square root of 2x2 matrix")
     SECTION("X gate")
     {
         const auto x_gate = ket::Matrix2X2 {
-            {0.0, 0.0},
-            {1.0, 0.0},
-            {1.0, 0.0},
-            {0.0, 0.0}
+            .elem00={0.0, 0.0},
+            .elem01={1.0, 0.0},
+            .elem10={1.0, 0.0},
+            .elem11={0.0, 0.0}
         };
 
         const auto sx_gate = ket::matrix_square_root(x_gate);

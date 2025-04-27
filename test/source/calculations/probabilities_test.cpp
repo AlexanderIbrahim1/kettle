@@ -74,7 +74,7 @@ TEST_CASE("probabilities_raw")
 
         for (std::size_t i {0}; i < 10; ++i) {
             const auto real = distrib(prng);
-            const auto imag = std::sqrt(1.0 - real * real);
+            const auto imag = std::sqrt(1.0 - (real * real));
 
             const auto state = ket::QuantumState {
                 {{real, imag}, {0.0, 0.0}}
@@ -143,7 +143,7 @@ TEST_CASE("probabilities")
 
         for (std::size_t i {0}; i < 10; ++i) {
             const auto real = distrib(prng);
-            const auto imag = std::sqrt(1.0 - real * real);
+            const auto imag = std::sqrt(1.0 - (real * real));
 
             const auto state = ket::QuantumState {
                 {{real, imag}, {0.0, 0.0}}
