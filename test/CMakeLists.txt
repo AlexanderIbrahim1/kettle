@@ -62,9 +62,9 @@ add_test_target(TARGET circuit_test SOURCES "source/circuit/circuit_test.cpp")
 
 add_test_target(TARGET append_circuits_test SOURCES "source/circuit_operations/append_circuits_test.cpp")
 add_test_target(TARGET compare_circuits_test SOURCES "source/circuit_operations/compare_circuits_test.cpp")
-add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circuit_operations/make_binary_controlled_circuit_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
+add_test_target(TARGET make_binary_controlled_circuit_test SOURCES "source/circuit_operations/make_binary_controlled_circuit_test.cpp")
 add_test_target(TARGET make_controlled_circuit_test SOURCES "source/circuit_operations/make_controlled_circuit_test.cpp")
-add_test_target(TARGET transpile_to_primitive_test SOURCES "source/circuit_operations/transpile_to_primitive_test.cpp" "source/test_utils/powers_of_diagonal_unitary.cpp")
+add_test_target(TARGET transpile_to_primitive_test SOURCES "source/circuit_operations/transpile_to_primitive_test.cpp")
 
 add_test_target(TARGET mathtools_test SOURCES "source/common/mathtools_test.cpp")
 add_test_target(TARGET linear_bijective_map_test SOURCES "source/common/linear_bijective_map_test.cpp")
