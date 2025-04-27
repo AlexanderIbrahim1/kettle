@@ -1,5 +1,4 @@
 #include <optional>
-#include <string>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -18,7 +17,7 @@
     A primitive way of putting the minimum image of the angle within [0, 2pi);
     none of the unit tests are expected to create very large angles anyways
 */
-constexpr auto between_0_and_period(double x, double period) -> double {
+static constexpr auto between_0_and_period(double x, double period) -> double {
     while (x < 0.0) {
         x += period;
     }
@@ -28,7 +27,7 @@ constexpr auto between_0_and_period(double x, double period) -> double {
     }
 
     return x;
-};
+}
 
 
 TEST_CASE("decomp_to_single_primitive_gate_()")

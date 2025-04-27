@@ -1,5 +1,4 @@
 #include <cmath>
-#include <ranges>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -7,7 +6,6 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/mathtools.hpp"
 #include "kettle/common/arange.hpp"
 #include "kettle/gates/fourier.hpp"
 #include "kettle/simulation/simulate.hpp"

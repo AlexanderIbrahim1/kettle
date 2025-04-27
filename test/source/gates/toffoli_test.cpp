@@ -124,8 +124,8 @@ TEST_CASE("apply_toffoli_gate() and apply_doubly_controlled_gate() match")
     auto circuit1 = ket::QuantumCircuit {3};
     ket::apply_doubly_controlled_gate(circuit0, ket::x_gate(), {0, 1}, 2);
 
-    auto state0 = ket::QuantumState {"000"};
-    auto state1 = ket::QuantumState {"000"};
+    auto state0 = ket::QuantumState {init_bitstring};
+    auto state1 = ket::QuantumState {init_bitstring};
 
     ket::simulate(circuit0, state0);
     ket::simulate(circuit1, state1);

@@ -157,6 +157,7 @@ TEST_CASE("extend_circuit() with control flow")
 
             ket::extend_circuit(left_circuit, right_circuit);
 
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             REQUIRE(ket::almost_eq(total_circuit, left_circuit));
         }
 
@@ -174,6 +175,7 @@ TEST_CASE("extend_circuit() with control flow")
 
             ket::extend_circuit(left_circuit, right_circuit);
 
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             REQUIRE(ket::almost_eq(total_circuit, left_circuit));
         }
 
@@ -191,6 +193,7 @@ TEST_CASE("extend_circuit() with control flow")
 
             ket::extend_circuit(left_circuit, right_circuit);
 
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             REQUIRE(ket::almost_eq(total_circuit, left_circuit));
         }
     }
@@ -219,6 +222,7 @@ TEST_CASE("extend_circuit() with control flow")
 
             ket::extend_circuit(left_circuit, right_circuit);
 
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             REQUIRE(ket::almost_eq(total_circuit, left_circuit));
         }
     }

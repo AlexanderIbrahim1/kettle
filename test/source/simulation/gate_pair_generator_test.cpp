@@ -1,9 +1,7 @@
 #include <algorithm>
-#include <compare>
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -30,7 +28,7 @@ struct IndexPair
 };
 
 template <typename Generator>
-auto get_generated_index_pairs(
+static auto get_generated_index_pairs(
     Generator& generator,
     std::optional<std::size_t> end_index = std::nullopt
 ) -> std::vector<IndexPair>
@@ -47,7 +45,7 @@ auto get_generated_index_pairs(
     return index_pairs;
 }
 
-constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::size_t
+static constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::size_t
 {
     // The number of yielded pairs is always 2^(n_qubits - 1):
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
@@ -56,7 +54,7 @@ constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::siz
     return impl_ket::pow_2_int(n_qubits - 1);
 }
 
-constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
+static constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
 {
     // The number of yielded pairs is always 2^(n_qubits - 2):
     // - the qubit at `control_index` is fixed for the pair (always set to 1)

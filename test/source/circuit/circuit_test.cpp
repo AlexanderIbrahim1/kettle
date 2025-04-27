@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -8,8 +7,6 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
-
-static constexpr auto ABS_TOL = double {1.0e-6};
 
 
 TEST_CASE("add multiple X gates")
@@ -100,21 +97,6 @@ TEST_CASE("add multiple RX gates")
         REQUIRE(comp::is_1t1a_gate_equal(circuit[0].get_gate(), expected0));
         REQUIRE(comp::is_1t1a_gate_equal(circuit[1].get_gate(), expected1));
         REQUIRE(comp::is_1t1a_gate_equal(circuit[2].get_gate(), expected2));
-//
-//        const auto rx_gate0 = impl_ket::unpack_one_target_one_angle_gate(circuit[0]);
-//        REQUIRE(std::get<0>(rx_gate0) == 0);
-//        REQUIRE_THAT(std::get<1>(rx_gate0), Catch::Matchers::WithinAbs(0.25, ABS_TOL));
-//        REQUIRE(circuit[0].gate == ket::Gate::RX);
-//
-//        const auto rx_gate1 = impl_ket::unpack_one_target_one_angle_gate(circuit[1]);
-//        REQUIRE(std::get<0>(rx_gate1) == 1);
-//        REQUIRE_THAT(std::get<1>(rx_gate1), Catch::Matchers::WithinAbs(0.5, ABS_TOL));
-//        REQUIRE(circuit[1].gate == ket::Gate::RX);
-//
-//        const auto rx_gate2 = impl_ket::unpack_one_target_one_angle_gate(circuit[2]);
-//        REQUIRE(std::get<0>(rx_gate2) == 2);
-//        REQUIRE_THAT(std::get<1>(rx_gate2), Catch::Matchers::WithinAbs(0.75, ABS_TOL));
-//        REQUIRE(circuit[2].gate == ket::Gate::RX);
     }
 }
 
@@ -140,21 +122,6 @@ TEST_CASE("add multiple CX gates")
         REQUIRE(comp::is_1c1t_gate_equal(circuit[0].get_gate(), expected0));
         REQUIRE(comp::is_1c1t_gate_equal(circuit[1].get_gate(), expected1));
         REQUIRE(comp::is_1c1t_gate_equal(circuit[2].get_gate(), expected2));
-//
-//        const auto cx_gate0 = impl_ket::unpack_one_control_one_target_gate(circuit[0]);
-//        REQUIRE(std::get<0>(cx_gate0) == 0);
-//        REQUIRE(std::get<1>(cx_gate0) == 1);
-//        REQUIRE(circuit[0].gate == ket::Gate::CX);
-//
-//        const auto cx_gate1 = impl_ket::unpack_one_control_one_target_gate(circuit[1]);
-//        REQUIRE(std::get<0>(cx_gate1) == 1);
-//        REQUIRE(std::get<1>(cx_gate1) == 2);
-//        REQUIRE(circuit[1].gate == ket::Gate::CX);
-//
-//        const auto cx_gate2 = impl_ket::unpack_one_control_one_target_gate(circuit[2]);
-//        REQUIRE(std::get<0>(cx_gate2) == 2);
-//        REQUIRE(std::get<1>(cx_gate2) == 0);
-//        REQUIRE(circuit[2].gate == ket::Gate::CX);
     }
 }
 
@@ -180,26 +147,6 @@ TEST_CASE("add multiple CRX gates")
         REQUIRE(comp::is_1c1t1a_gate_equal(circuit[0].get_gate(), expected0));
         REQUIRE(comp::is_1c1t1a_gate_equal(circuit[1].get_gate(), expected1));
         REQUIRE(comp::is_1c1t1a_gate_equal(circuit[2].get_gate(), expected2));
-//
-//        REQUIRE(number_of_elements(circuit) == 3);
-//
-//        const auto crx_gate0 = impl_ket::unpack_one_control_one_target_one_angle_gate(circuit[0]);
-//        REQUIRE(std::get<0>(crx_gate0) == 0);
-//        REQUIRE(std::get<1>(crx_gate0) == 1);
-//        REQUIRE_THAT(std::get<2>(crx_gate0), Catch::Matchers::WithinAbs(0.25, ABS_TOL));
-//        REQUIRE(circuit[0].gate == ket::Gate::CRX);
-//
-//        const auto crx_gate1 = impl_ket::unpack_one_control_one_target_one_angle_gate(circuit[1]);
-//        REQUIRE(std::get<0>(crx_gate1) == 1);
-//        REQUIRE(std::get<1>(crx_gate1) == 2);
-//        REQUIRE_THAT(std::get<2>(crx_gate1), Catch::Matchers::WithinAbs(0.5, ABS_TOL));
-//        REQUIRE(circuit[1].gate == ket::Gate::CRX);
-//
-//        const auto crx_gate2 = impl_ket::unpack_one_control_one_target_one_angle_gate(circuit[2]);
-//        REQUIRE(std::get<0>(crx_gate2) == 2);
-//        REQUIRE(std::get<1>(crx_gate2) == 0);
-//        REQUIRE_THAT(std::get<2>(crx_gate2), Catch::Matchers::WithinAbs(0.75, ABS_TOL));
-//        REQUIRE(circuit[2].gate == ket::Gate::CRX);
     }
 }
 

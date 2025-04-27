@@ -11,3 +11,12 @@ Index:
 
 Hover:
   ShowAKA: Yes
+
+---
+
+# Ignore certain diagnostics for Catch2
+If:
+  PathMatch: test/.*
+Diagnostics:
+  ClangTidy:
+    Remove: [misc-use-anonymous-namespace, readability-function-cognitive-complexity, cert-err58-cpp, google-build-using-namespace, bugprone-chained-comparison, cppcoreguidelines-pro-type-member-init, hicpp-member-init]

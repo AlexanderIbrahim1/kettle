@@ -8,7 +8,6 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "kettle/common/mathtools.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
@@ -24,7 +23,7 @@ const auto COS_PI_4 = std::cos(M_PI / 4.0);
 const auto COS_PI_8 = std::cos(M_PI / 8.0);
 const auto COS_PI_16 = std::cos(M_PI / 16.0);
 
-auto generate_random_double(double left, double right) -> double
+static auto generate_random_double(double left, double right) -> double
 {
     auto device = std::random_device {};
     auto prng = std::mt19937 {device()};
@@ -34,7 +33,7 @@ auto generate_random_double(double left, double right) -> double
     return unif(prng);
 }
 
-auto simulate_single_qubit_with_ugate(
+static auto simulate_single_qubit_with_ugate(
     const std::string& initial_state,
     const std::vector<std::tuple<ket::Matrix2X2, std::size_t>>& matrices,
     std::size_t n_qubits
@@ -53,7 +52,7 @@ auto simulate_single_qubit_with_ugate(
     return state;
 }
 
-auto simulate_single_qubit_with_builtin(
+static auto simulate_single_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t>>& gates_and_angles,
     std::size_t n_qubits
@@ -92,7 +91,7 @@ auto simulate_single_qubit_with_builtin(
     return state;
 }
 
-auto simulate_double_qubit_with_ugate(
+static auto simulate_double_qubit_with_ugate(
     const std::string& initial_state,
     const std::vector<std::tuple<ket::Matrix2X2, std::size_t, std::size_t>>& matrices,
     std::size_t n_qubits
@@ -111,7 +110,7 @@ auto simulate_double_qubit_with_ugate(
     return state;
 }
 
-auto simulate_double_qubit_with_builtin(
+static auto simulate_double_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t, std::size_t>>& gates_and_angles,
     std::size_t n_qubits

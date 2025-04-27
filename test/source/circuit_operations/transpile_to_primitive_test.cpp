@@ -13,7 +13,7 @@
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
 */
-constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
+static constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
 {
     auto output = ket::i_gate();
 
@@ -63,12 +63,6 @@ constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_in
     }
 
     return output;
-}
-
-
-constexpr auto n_gates(const ket::QuantumCircuit& circuit) -> std::ptrdiff_t
-{
-    return std::distance(circuit.begin(), circuit.end());
 }
 
 

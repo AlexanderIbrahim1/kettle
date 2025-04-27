@@ -11,7 +11,7 @@
 #include <kettle/io/write_tangelo_file.hpp>
 
 
-auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
+static auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
 {
     return static_cast<std::size_t>(std::distance(circuit.begin(), circuit.end()));
 }

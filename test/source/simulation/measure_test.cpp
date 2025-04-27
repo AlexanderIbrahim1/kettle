@@ -1,6 +1,5 @@
 #include <complex>
 #include <cstddef>
-#include <functional>
 #include <random>
 #include <vector>
 
@@ -31,7 +30,7 @@ public:
 };
 
 
-auto create_random_complex(std::mt19937& prng) -> std::complex<double>
+static auto create_random_complex(std::mt19937& prng) -> std::complex<double>
 {
     auto uniform = std::uniform_real_distribution<double> {-1.0, 1.0};
     const auto real = uniform(prng);
@@ -41,7 +40,7 @@ auto create_random_complex(std::mt19937& prng) -> std::complex<double>
 }
 
 
-void normalize(std::vector<std::complex<double>>& values)
+static void normalize(std::vector<std::complex<double>>& values)
 {
     auto norm_sq = double {0.0};
     for (auto value : values) {
@@ -55,7 +54,7 @@ void normalize(std::vector<std::complex<double>>& values)
     }
 }
 
-void simulate_measurement_wrapper(
+static void simulate_measurement_wrapper(
     ket::QuantumState& state,
     const ket::GateInfo& info,
     int measured_state

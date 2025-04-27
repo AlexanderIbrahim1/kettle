@@ -4,12 +4,9 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/qubit_state_conversion.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/make_binary_controlled_circuit.hpp"
-
-#include "../test_utils/powers_of_diagonal_unitary.hpp"
 
 TEST_CASE("make_binary_controlled_circuit()")
 {
@@ -63,7 +60,7 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for single qubit 
     // create the circuit using the `make_binary_controlled_circuit()` function
     auto subcircuits = std::vector<ket::QuantumCircuit> {};
     for (std::size_t i {0}; i < 3; ++i) {
-        const auto power_angle = static_cast<double>(1ul << i) * angle;
+        const auto power_angle = static_cast<double>(1UL << i) * angle;
 
         auto subcircuit = ket::QuantumCircuit {1};
         subcircuit.add_u_gate(ket::p_gate(power_angle), 0);
