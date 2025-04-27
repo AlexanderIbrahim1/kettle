@@ -464,6 +464,7 @@ public:
         elements_.emplace_back(std::move(cfi));
     }
 
+    [[nodiscard]]
     constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
     {
         return unitaries_[matrix_index];
