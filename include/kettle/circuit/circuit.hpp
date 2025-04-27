@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -410,18 +411,12 @@ public:
         }
     }
 
-    void add_if_statement(std::size_t bit_index, QuantumCircuit circuit)
-    {
-        check_bit_range_(bit_index);
+    /*
+        Add a classical if statement to the `QuantumCircuit`.
 
-        auto cfi = impl_ket::ClassicalIfStatement {
-            ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
-            std::make_unique<QuantumCircuit>(std::move(circuit))
-        };
-
-        elements_.emplace_back(std::move(cfi));
-    }
-
+        This function takes a custom `ControlFlowPredicate` instance, and if it evaluates to `true`
+        for the current classical register, then `subcircuit` executed.
+    */
     void add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit)
     {
         for (auto bit_index : predicate.bit_indices_to_check()) {
@@ -436,20 +431,47 @@ public:
         elements_.emplace_back(std::move(cfi));
     }
 
-    void add_if_else_statement(std::size_t bit_index, QuantumCircuit circuit0, QuantumCircuit circuit1)
+    /*
+        Add a classical if statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`, and if it is set to `1`, executes `subcircuit`.
+    */
+    void add_if_statement(
+        std::size_t bit_index,
+        QuantumCircuit subcircuit
+    )
     {
-        check_bit_range_(bit_index);
-
-        auto cfi = impl_ket::ClassicalIfElseStatement {
-            ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF},
-            std::make_unique<QuantumCircuit>(std::move(circuit0)),
-            std::make_unique<QuantumCircuit>(std::move(circuit1))
-        };
-
-        elements_.emplace_back(std::move(cfi));
+        auto predicate = ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF};
+        add_if_statement(std::move(predicate), std::move(subcircuit));
     }
 
-    void add_if_else_statement(ControlFlowPredicate predicate, QuantumCircuit circuit0, QuantumCircuit circuit1)
+    /*
+        Add a classical if statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`, and if it is set to `0`, executes `subcircuit`.
+    */
+    void add_if_not_statement(
+        std::size_t bit_index,
+        QuantumCircuit subcircuit
+    )
+    {
+        auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
+        add_if_statement(std::move(predicate), std::move(subcircuit));
+    }
+
+    /*
+        Add a classical if-else statement to the `QuantumCircuit`.
+
+        This function takes a custom `ControlFlowPredicate` instance, and if it evaluates to `true`
+        for the current classical register, then `if_subcircuit` is executed, and if it evaluates
+        to `false`, then `else_subcircuit` is executed.
+    */
+    void add_if_else_statement(
+        ControlFlowPredicate predicate,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit)
     {
         for (auto bit_index : predicate.bit_indices_to_check()) {
             check_bit_range_(bit_index);
@@ -457,11 +479,45 @@ public:
 
         auto cfi = impl_ket::ClassicalIfElseStatement {
             std::move(predicate),
-            std::make_unique<QuantumCircuit>(std::move(circuit0)),
-            std::make_unique<QuantumCircuit>(std::move(circuit1))
+            std::make_unique<QuantumCircuit>(std::move(if_subcircuit)),
+            std::make_unique<QuantumCircuit>(std::move(else_subcircuit))
         };
 
         elements_.emplace_back(std::move(cfi));
+    }
+
+    /*
+        Add a classical if-else statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`; if the classical bit is `1`, then `if_subcircuit` is executed, and
+        if the classical bit is `0`, then `else_subcircuit` is executed.
+    */
+    void add_if_else_statement(
+        std::size_t bit_index,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit
+    )
+    {
+        auto predicate = ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF};
+        add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
+    }
+
+    /*
+        Add a classical if-else statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`; if the classical bit is `0`, then `if_subcircuit` is executed, and
+        if the classical bit is `1`, then `else_subcircuit` is executed.
+    */
+    void add_if_not_else_statement(
+        std::size_t bit_index,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit
+    )
+    {
+        auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
+        add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
     }
 
     [[nodiscard]]
