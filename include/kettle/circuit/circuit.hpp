@@ -30,16 +30,19 @@ public:
         , n_bits_ {n_qubits}
     {}
 
+    [[nodiscard]]
     constexpr auto n_qubits() const noexcept -> std::size_t
     {
         return n_qubits_;
     }
 
+    [[nodiscard]]
     constexpr auto n_bits() const noexcept -> std::size_t
     {
         return n_bits_;
     }
 
+    [[nodiscard]]
     constexpr auto n_circuit_elements() const noexcept -> std::size_t
     {
         return elements_.size();
@@ -50,11 +53,13 @@ public:
         return elements_[index];
     }
 
+    [[nodiscard]]
     constexpr auto begin() const noexcept
     {
         return std::begin(elements_);
     }
 
+    [[nodiscard]]
     constexpr auto end() const noexcept
     {
         return std::end(elements_);

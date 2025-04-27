@@ -79,16 +79,19 @@ public:
         return !output;
     }
 
+    [[nodiscard]]
     constexpr auto bit_indices_to_check() const -> const std::vector<std::size_t>&
     {
         return bit_indices_to_check_;
     }
 
+    [[nodiscard]]
     constexpr auto expected_bits() const -> const std::vector<int>&
     {
         return expected_bits_;
     }
 
+    [[nodiscard]]
     constexpr auto control_kind() const -> ControlFlowBooleanKind
     {
         return control_kind_;

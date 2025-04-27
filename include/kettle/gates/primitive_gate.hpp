@@ -128,7 +128,7 @@ constexpr auto create_one_target_gate(ket::Gate gate, std::size_t target_index) 
         throw std::runtime_error {"DEV ERROR: invalid one-target gate provided.\n"};
     }
 
-    return {gate, target_index, DUMMY_ARG1, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_gate(const ket::GateInfo& info) -> std::size_t
@@ -142,7 +142,7 @@ constexpr auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t targ
         throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
     }
 
-    return {gate, target_index, DUMMY_ARG1, theta, DUMMY_ARG3};
+    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=theta, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, double>
@@ -156,7 +156,7 @@ constexpr auto create_one_control_one_target_gate(ket::Gate gate, std::size_t co
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target gate provided.\n"};
     }
 
-    return {gate, control_index, target_index, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_control_one_target_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
@@ -170,7 +170,7 @@ constexpr auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std:
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target-one-angle gate provided.\n"};
     }
 
-    return {gate, control_index, target_index, theta, DUMMY_ARG3};
+    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=theta, .arg3=DUMMY_ARG3};
 }
 
 constexpr auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>
@@ -181,7 +181,7 @@ constexpr auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo&
 /* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `target_index` */
 constexpr auto create_u_gate(std::size_t target_index, std::size_t matrix_index) -> ket::GateInfo
 {
-    return {ket::Gate::U, target_index, DUMMY_ARG1, DUMMY_ARG2, matrix_index};
+    return {.gate=ket::Gate::U, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .arg3=matrix_index};
 }
 
 /* Parse the relevant information for the U-gate */
@@ -194,7 +194,7 @@ constexpr auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_
 constexpr auto create_cu_gate(std::size_t control_index, std::size_t target_index, std::size_t matrix_index)
     -> ket::GateInfo
 {
-    return {ket::Gate::CU, control_index, target_index, DUMMY_ARG2, matrix_index};
+    return {.gate=ket::Gate::CU, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .arg3=matrix_index};
 }
 
 /* Parse the relevant information for the CU-gate */
@@ -206,7 +206,7 @@ constexpr auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size
 /* Apply a measurement gate to a given qubit and bit */
 constexpr auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> ket::GateInfo
 {
-    return {ket::Gate::M, qubit_index, bit_index, DUMMY_ARG2, DUMMY_ARG3};
+    return {.gate=ket::Gate::M, .arg0=qubit_index, .arg1=bit_index, .arg2=DUMMY_ARG2, .arg3=DUMMY_ARG3};
 }
 
 /* Parse the relevant information for the M-gate */

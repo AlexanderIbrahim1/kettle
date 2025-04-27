@@ -43,11 +43,13 @@ public:
         return control_flow_predicate_(c_register);
     }
 
+    [[nodiscard]]
     auto circuit() const -> const ClonePtr<ket::QuantumCircuit>&
     {
         return circuit_;
     }
 
+    [[nodiscard]]
     auto predicate() const -> const ket::ControlFlowPredicate&
     {
         return control_flow_predicate_;
@@ -84,16 +86,19 @@ public:
         return control_flow_predicate_(c_register);
     }
 
+    [[nodiscard]]
     auto if_circuit() const -> const ClonePtr<ket::QuantumCircuit>&
     {
         return if_circuit_;
     }
 
+    [[nodiscard]]
     auto else_circuit() const -> const ClonePtr<ket::QuantumCircuit>&
     {
         return else_circuit_;
     }
 
+    [[nodiscard]]
     auto predicate() const -> const ket::ControlFlowPredicate&
     {
         return control_flow_predicate_;
@@ -119,21 +124,25 @@ public:
         : instruction_ {std::move(instruction)}
     {}
 
+    [[nodiscard]]
     constexpr auto is_if_statement() const -> bool
     {
         return std::holds_alternative<ClassicalIfStatement>(instruction_);
     }
 
+    [[nodiscard]]
     constexpr auto is_if_else_statement() const -> bool
     {
         return std::holds_alternative<ClassicalIfElseStatement>(instruction_);
     }
 
+    [[nodiscard]]
     constexpr auto get_if_statement() const -> const ClassicalIfStatement&
     {
         return std::get<ClassicalIfStatement>(instruction_);
     }
 
+    [[nodiscard]]
     constexpr auto get_if_else_statement() const -> const ClassicalIfElseStatement&
     {
         return std::get<ClassicalIfElseStatement>(instruction_);

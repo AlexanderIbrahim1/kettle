@@ -39,7 +39,7 @@ inline auto generate_random_unitary2x2(std::mt19937& prng) -> ket::Matrix2X2
     const auto elem10 = - gphase * sinpsi / expchi;
     const auto elem11 =   gphase * cospsi / expphi;
 
-    return {elem00, elem01, elem10, elem11};
+    return {.elem00=elem00, .elem01=elem01, .elem10=elem10, .elem11=elem11};
 }
 
 /*

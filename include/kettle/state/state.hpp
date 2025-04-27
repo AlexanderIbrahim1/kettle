@@ -83,6 +83,7 @@ public:
         return coefficients_[index];
     }
 
+    [[nodiscard]]
     constexpr auto at(std::size_t index) const -> const std::complex<double>&
     {
         check_index_(index);
@@ -95,6 +96,7 @@ public:
         return coefficients_[index];
     }
 
+    [[nodiscard]]
     constexpr auto at(
         const std::string& bitstring,
         QuantumStateEndian endian = QuantumStateEndian::LITTLE
@@ -115,11 +117,13 @@ public:
         return coefficients_[state_index];
     }
 
+    [[nodiscard]]
     constexpr auto n_states() const noexcept -> std::size_t
     {
         return n_states_;
     }
 
+    [[nodiscard]]
     constexpr auto n_qubits() const noexcept -> std::size_t
     {
         return n_qubits_;

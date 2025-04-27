@@ -35,6 +35,7 @@ public:
         std::tie(i0_, i1_) = flat_index_to_grid_indices_2d(i_state, i1_max_);
     }
 
+    [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_;
@@ -96,6 +97,7 @@ public:
         std::tie(i0_, i1_, i2_) = flat_index_to_grid_indices_3d(i_state, i1_max_, i2_max_);
     }
 
+    [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
         return i0_max_ * i1_max_ * i2_max_;
