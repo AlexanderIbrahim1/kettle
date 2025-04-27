@@ -27,7 +27,7 @@ enum class QueryCase
 auto sampled_indices_of_half_of_all_states(std::size_t n_data_qubits) -> std::vector<std::size_t>
 {
     auto prng = std::mt19937 {std::random_device {}()};
-    const auto state_indices = ket::arange(1ul << n_data_qubits);
+    const auto state_indices = ket::arange(1UL << n_data_qubits);
 
     const auto n_samples = state_indices.size() / 2;
     auto sampled_indices = std::vector<std::size_t> {};

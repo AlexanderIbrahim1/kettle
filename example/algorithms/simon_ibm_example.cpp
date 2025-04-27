@@ -50,7 +50,7 @@ void apply_simon_function(ket::QuantumCircuit& circuit, const std::vector<std::u
     // step 2: map |x>|x> -> |x>|x XOR b>
     const auto i_first_set = static_cast<std::size_t>(std::distance(hidden_bitset.begin(), it));
     for (std::size_t i {0}; i < n_data_qubits; ++i) {
-        if (hidden_bitset[i]) {
+        if (hidden_bitset[i] == 1) {
             circuit.add_cx_gate(i_first_set, n_data_qubits + i);
         }
     }
@@ -76,7 +76,7 @@ void check_bitstring(const std::string& bitstring, const std::string& hidden_bit
 auto main() -> int
 {
     // choose the hidden bitstring
-    const auto hidden_bitstring = "101";
+    const auto hidden_bitstring = std::string {"101"};
     const auto hidden_bitset = ket::bitstring_to_dynamic_bitset(hidden_bitstring);
 
     // create the circuit needed for Simon's algorithm

@@ -20,3 +20,12 @@ If:
 Diagnostics:
   ClangTidy:
     Remove: [misc-use-anonymous-namespace, readability-function-cognitive-complexity, cert-err58-cpp, google-build-using-namespace, bugprone-chained-comparison, cppcoreguidelines-pro-type-member-init, hicpp-member-init]
+
+---
+
+# Ignore certain diagnostics for examples
+If:
+  PathMatch: example/.*
+Diagnostics:
+  ClangTidy:
+    Remove: [misc-use-anonymous-namespace, misc-use-internal-linkage, bugprone-exception-escape, performance-enum-size, hicpp-signed-bitwise, cert-err58-cpp, cppcoreguidelines-pro-bounds-pointer-arithmetic]
