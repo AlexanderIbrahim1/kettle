@@ -68,6 +68,13 @@ public:
 };
 
 
+class ClassicalWhileLoopStatement : public ClassicalOneBranchBooleanStatement
+{
+public:
+    using ClassicalOneBranchBooleanStatement::ClassicalOneBranchBooleanStatement;
+};
+
+
 class ClassicalIfElseStatement
 {
 public:
@@ -124,6 +131,11 @@ public:
         : instruction_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*explicit*)
+    ClassicalControlFlowInstruction(ClassicalWhileLoopStatement instruction)
+        : instruction_ {std::move(instruction)}
+    {}
+
     [[nodiscard]]
     constexpr auto is_if_statement() const -> bool
     {
@@ -134,6 +146,12 @@ public:
     constexpr auto is_if_else_statement() const -> bool
     {
         return std::holds_alternative<ClassicalIfElseStatement>(instruction_);
+    }
+
+    [[nodiscard]]
+    constexpr auto is_while_loop_statement() const -> bool
+    {
+        return std::holds_alternative<ClassicalWhileLoopStatement>(instruction_);
     }
 
     [[nodiscard]]
@@ -148,8 +166,18 @@ public:
         return std::get<ClassicalIfElseStatement>(instruction_);
     }
 
+    [[nodiscard]]
+    constexpr auto get_while_loop_statement() const -> const ClassicalWhileLoopStatement&
+    {
+        return std::get<ClassicalWhileLoopStatement>(instruction_);
+    }
+
 private:
-    std::variant<ClassicalIfStatement, ClassicalIfElseStatement> instruction_;
+    std::variant<
+        ClassicalIfStatement,
+        ClassicalIfElseStatement,
+        ClassicalWhileLoopStatement
+    > instruction_;
 };
 
 }  // namespace impl_ket

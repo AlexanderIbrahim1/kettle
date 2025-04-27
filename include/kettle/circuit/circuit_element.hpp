@@ -37,6 +37,11 @@ public:
         : element_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*-explicit-*)
+    CircuitElement(ClassicalWhileLoopStatement instruction)
+        : element_ {std::move(instruction)}
+    {}
+
     [[nodiscard]]
     constexpr auto is_gate() const -> bool
     {

@@ -17,6 +17,8 @@
 #include "kettle/simulation/simulate_utils.hpp"
 #include "kettle/state/state.hpp"
 
+// TODO: implement while loop
+
 namespace impl_ket
 {
 

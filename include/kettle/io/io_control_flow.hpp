@@ -14,6 +14,8 @@
     predicate statements
 */
 
+// TODO: implement while loop
+
 namespace impl_ket
 {
 

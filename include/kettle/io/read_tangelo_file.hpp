@@ -25,6 +25,8 @@ RZ        target : [5]   parameter : 12.533816585267923
 ```
 */
 
+// TODO: implement while loop
+
 namespace impl_ket
 {
 

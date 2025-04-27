@@ -109,6 +109,7 @@ inline auto almost_eq(
         const auto& left_element = left[i_gate];
         const auto& right_element = right[i_gate];
 
+        // TODO: implement while loop
         if (left_element.is_control_flow() && right_element.is_control_flow()) {
             const auto& left_ctrl = left_element.get_control_flow();
             const auto& right_ctrl = right_element.get_control_flow();

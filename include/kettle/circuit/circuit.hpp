@@ -520,6 +520,51 @@ public:
         add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
     }
 
+    /*
+        Add a classical while loop statement to the `QuantumCircuit`.
+
+        This function takes a custom `ControlFlowPredicate` instance, and while it evaluates to
+        `true`, repeatedly executes `subcircuit`.
+    */
+    void add_while_loop_statement(ControlFlowPredicate predicate, QuantumCircuit circuit)
+    {
+        for (auto bit_index : predicate.bit_indices_to_check()) {
+            check_bit_range_(bit_index);
+        }
+
+        auto cfi = impl_ket::ClassicalWhileLoopStatement {
+            std::move(predicate),
+            std::make_unique<QuantumCircuit>(std::move(circuit))
+        };
+
+        elements_.emplace_back(std::move(cfi));
+    }
+
+    /*
+        Add a classical while loop statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`, and while it is set to `1`, executes `subcircuit`.
+    */
+    void add_while_loop_statement(std::size_t bit_index, QuantumCircuit subcircuit)
+    {
+        auto predicate = ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF};
+        add_while_loop_statement(std::move(predicate), std::move(subcircuit));
+    }
+
+    /*
+        Add a classical while loop statement to the `QuantumCircuit`.
+
+        This statement reads the value of the measured classical bit in the classical register
+        given by `bit_index`, and while it is set to `0`, executes `subcircuit`.
+    */
+    void add_while_not_loop_statement(std::size_t bit_index, QuantumCircuit subcircuit)
+    {
+        auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
+        add_while_loop_statement(std::move(predicate), std::move(subcircuit));
+    }
+
+
     [[nodiscard]]
     constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
     {
