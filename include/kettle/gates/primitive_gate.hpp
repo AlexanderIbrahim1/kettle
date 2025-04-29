@@ -38,16 +38,21 @@ enum class Gate : std::uint8_t
 };
 
 /*
-    Each gate in the reference specification can have either 1, 2, or 3 arguments. This implementation
-    forces the type that carries the information for each gate to hold enough data for the largest
-    possible number of arguments (3 in this case).
+    The `GateInfo` type holds all the information needed to describe any of the primitive gates in
+    the project's specification. This implementation forces the gate to carry the information needed
+    for every possible type of gate, even if some parameters are not used. For example, the `GateInfo`
+    instance for an X-gate only needs the target index (one `std::size_t`), but it still holds all the
+    other parameters.
 
-    This wastes a fair bit of memory.
+    Each of the primitive gates can have up to two index arguments:
+      - a target qubit index
+      - possibly a control qubit index
+      - in the case of measurement gates, a qubit index and a classical bit index
 
-    A more memory-considerate implementation might treat the information needed for each gate simply
-    as a collection of bytes, and use an opcode to determine how many arguments are required.
+    Some of the primitive gates can have one real parameter, an angle.
 
-    But this implementation is not concerned with that.
+    The U and CU primitive gates can hold a pointer to a unitary 2x2 matrix.
+
 */
 struct GateInfo
 {
@@ -128,6 +133,9 @@ constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
 const static auto DUMMY_ARG3 = ClonePtr<ket::Matrix2X2> {nullptr};
 
+/*
+    Create a single-qubit gate with no parameters.
+*/
 inline auto create_one_target_gate(ket::Gate gate, std::size_t target_index) -> ket::GateInfo
 {
     if (!gate_id::is_one_target_transform_gate(gate)) {
@@ -137,11 +145,17 @@ inline auto create_one_target_gate(ket::Gate gate, std::size_t target_index) -> 
     return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3};
 }
 
+/*
+    Returns the `target_qubit` of a single-qubit gate with no parameters.
+*/
 inline auto unpack_one_target_gate(const ket::GateInfo& info) -> std::size_t
 {
-    return info.arg0;  // target_index
+    return info.arg0;  // target index
 }
 
+/*
+    Create a single-qubit gate with an angle parameter.
+*/
 inline auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t target_index, double theta) -> ket::GateInfo
 {
     if (!gate_id::is_one_target_one_angle_transform_gate(gate)) {
@@ -151,11 +165,17 @@ inline auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t target_
     return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=theta, .unitary_ptr=DUMMY_ARG3};
 }
 
+/*
+    Returns the `{target_qubit, angle}` of a single-qubit gate with an angle parameter.
+*/
 inline auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, double>
 {
-    return {info.arg0, info.arg2};  // target_index, angle
+    return {info.arg0, info.arg2};  // target index, angle
 }
 
+/*
+    Create a controlled gate with no parameters.
+*/
 inline auto create_one_control_one_target_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index) -> ket::GateInfo
 {
     if (!gate_id::is_one_control_one_target_transform_gate(gate)) {
@@ -165,11 +185,17 @@ inline auto create_one_control_one_target_gate(ket::Gate gate, std::size_t contr
     return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3};
 }
 
+/*
+    Returns the `{control_qubit, target_qubit}` of a double-qubit gate with no parameters.
+*/
 inline auto unpack_one_control_one_target_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
-    return {info.arg0, info.arg1};  // control_index, target_index
+    return {info.arg0, info.arg1};  // control index, target_index
 }
 
+/*
+    Create a controlled gate with an angle parameter.
+*/
 inline auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index, double theta) -> ket::GateInfo
 {
     if (!gate_id::is_one_control_one_target_one_angle_transform_gate(gate)) {
@@ -179,69 +205,97 @@ inline auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::si
     return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=theta, .unitary_ptr=DUMMY_ARG3};
 }
 
+/*
+    Returns the `{control_qubit, target_qubit, angle}` of a double-qubit gate with an angle parameter.
+*/
 inline auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>
 {
-    return {info.arg0, info.arg1, info.arg2};  // control_index, target_index, angle
+    return {info.arg0, info.arg1, info.arg2};  // control index, target index, angle
 }
 
-/* Apply the U-gate, with the 2x2 matrix identified by `matrix_index` to the qubit at index `target_index` */
+/*
+    Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.
+*/
 inline auto create_u_gate(std::size_t target_index, impl_ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
     return {.gate=ket::Gate::U, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary)};
 }
 
-/* Parse the relevant information for the U-gate */
+/*
+    Returns the `{target_qubit, unitary_ptr}` of a U-gate.
+*/
 inline auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const impl_ket::ClonePtr<ket::Matrix2X2>&>
 {
-    return {info.arg0, info.unitary_ptr};  // target_index, unitary_ptr
+    return {info.arg0, info.unitary_ptr};  // target index, unitary_ptr
 }
 
-/* Apply CU-gate, with the 2x2 matrix identified by `matrix_index` to qubits at the `control_index` and `target_index` */
-inline auto create_cu_gate(std::size_t control_index, std::size_t target_index, impl_ket::ClonePtr<ket::Matrix2X2> unitary)
-    -> ket::GateInfo
+/*
+    Create a CU-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`,
+    controlled by the qubit at index `control_index`.
+*/
+inline auto create_cu_gate(std::size_t control_index, std::size_t target_index, impl_ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
     return {.gate=ket::Gate::CU, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary)};
 }
 
-/* Parse the relevant information for the CU-gate */
+/*
+    Returns the `{control_qubit, target_qubit, unitary_ptr}` of a CU-gate.
+*/
 inline auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const impl_ket::ClonePtr<ket::Matrix2X2>&>
 {
     return {info.arg0, info.arg1, info.unitary_ptr};  // control index, target index, unitary_ptr
 }
 
-/* Apply a measurement gate to a given qubit and bit */
+/*
+    Create an M-gate, which measures the qubit at `qubit_index`, and stores the result at `bit_index`.
+*/
 inline auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> ket::GateInfo
 {
     return {.gate=ket::Gate::M, .arg0=qubit_index, .arg1=bit_index, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3};
 }
 
-/* Parse the relevant information for the M-gate */
+/*
+    Returns the `{qubit_index, bit_index}` of an M-gate.
+*/
 inline auto unpack_m_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};  // qubit index, bit index
 }
 
+/*
+    Returns the `target_qubit` of a single-qubit gate, with or without parameters.
+*/
 inline auto unpack_single_qubit_gate_index(const ket::GateInfo& info) -> std::size_t
 {
     return info.arg0;  // target_index
 }
 
+/*
+    Returns the `{control_qubit, target_qubit}` of a double-qubit gate, with or without parameters.
+*/
 inline auto unpack_double_qubit_gate_indices(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t>
 {
     return {info.arg0, info.arg1};  // control_index, target_index
 }
 
+/*
+    Returns the `angle` of a single-qubit gate or double-qubit gate, as long as it is parameterized.
+*/
 inline auto unpack_gate_angle(const ket::GateInfo& info) -> double
 {
     return info.arg2;  // angle
 }
 
+/*
+    Returns the `unitary_ptr` of a U-gate or CU-gate.
+*/
 inline auto unpack_unitary_matrix(const ket::GateInfo& info) -> const impl_ket::ClonePtr<ket::Matrix2X2>&
 {
-    return info.unitary_ptr;  // matrix_index
+    return info.unitary_ptr;  // unitary_ptr
 }
 
 }  // namespace impl_ket
+
 
 namespace impl_ket::compare
 {
