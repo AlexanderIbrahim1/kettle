@@ -139,15 +139,15 @@ inline void write_tangelo_circuit(
                 const auto& stmt = control_flow.get_if_statement();
                 const auto if_part = impl_ket::format_classical_if_statement_header_(stmt);
                 stream << if_part << '\n';
-                write_tangelo_circuit(*stmt.circuit(), stream, 4);
+                write_tangelo_circuit(*stmt.circuit(), stream, impl_ket::CONTROL_FLOW_WHITESPACE_DEFAULT);
             }
             else if (control_flow.is_if_else_statement()) {
                 const auto& stmt = control_flow.get_if_else_statement();
                 const auto [if_part, else_part] = impl_ket::format_classical_if_else_statement_header_(stmt);
                 stream << if_part << '\n';
-                write_tangelo_circuit(*stmt.if_circuit(), stream, 4);
+                write_tangelo_circuit(*stmt.if_circuit(), stream, impl_ket::CONTROL_FLOW_WHITESPACE_DEFAULT);
                 stream << else_part << '\n';
-                write_tangelo_circuit(*stmt.else_circuit(), stream, 4);
+                write_tangelo_circuit(*stmt.else_circuit(), stream, impl_ket::CONTROL_FLOW_WHITESPACE_DEFAULT);
             }
             else {
                 throw std::runtime_error {"DEV ERROR: invalid control flow statement encountered for write\n"};
