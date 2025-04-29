@@ -22,15 +22,15 @@ template <typename T>
 class ClonePtr
 {
 public:
-    explicit ClonePtr(std::unique_ptr<T> data)
+    constexpr explicit ClonePtr(std::unique_ptr<T> data)
         : data_ {std::move(data)}
     {}
 
-    ClonePtr(const ClonePtr& other)
+    constexpr ClonePtr(const ClonePtr& other)
         : data_ {other.data_ ? std::make_unique<T>(*other.data_) : nullptr}
     {}
 
-    ClonePtr& operator=(const ClonePtr& other)
+    constexpr ClonePtr& operator=(const ClonePtr& other)
     {
         if (this != &other)
         {
@@ -39,15 +39,15 @@ public:
         return *this;
     }
 
-    ClonePtr(ClonePtr&& other) noexcept = default;
-    ClonePtr& operator=(ClonePtr&& other) noexcept = default;
+    constexpr ClonePtr(ClonePtr&& other) noexcept = default;
+    constexpr ClonePtr& operator=(ClonePtr&& other) noexcept = default;
 
     auto operator*() const -> T
     {
         return *data_;
     }
 
-    ~ClonePtr() = default;
+    constexpr ~ClonePtr() = default;
 
 private:
     std::unique_ptr<T> data_;
