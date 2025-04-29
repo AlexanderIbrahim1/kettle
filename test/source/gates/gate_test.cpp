@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "kettle/common/clone_ptr.hpp"
+#include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
 TEST_CASE("Test create and unpack gate functions")
@@ -85,24 +88,27 @@ TEST_CASE("Test create and unpack gate functions")
     SECTION("U gate")
     {
         const auto target_index = std::size_t {0};
-        const auto gate_index = std::size_t {3};
-        const auto gate_info = impl_ket::create_u_gate(target_index, gate_index);
-        const auto [unpacked_target_index, unpacked_gate_index] = impl_ket::unpack_u_gate(gate_info);
+        const auto unitary_ptr = impl_ket::ClonePtr<ket::Matrix2X2> {ket::x_gate()};
+
+        const auto gate_info = impl_ket::create_u_gate(target_index, unitary_ptr);
+        const auto [unpacked_target_index, unpacked_unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
 
         REQUIRE(unpacked_target_index == target_index);
-        REQUIRE(unpacked_gate_index == gate_index);
+        REQUIRE(ket::almost_eq(*unitary_ptr, *unpacked_unitary_ptr));
     }
 
     SECTION("CU gate")
     {
         const auto control_index = std::size_t {0};
         const auto target_index = std::size_t {1};
-        const auto gate_index = std::size_t {3};
-        const auto gate_info = impl_ket::create_cu_gate(control_index, target_index, gate_index);
-        const auto [u_control_index, u_target_index, u_gate_index] = impl_ket::unpack_cu_gate(gate_info);
+
+        const auto unitary_ptr = impl_ket::ClonePtr<ket::Matrix2X2> {ket::x_gate()};
+
+        const auto gate_info = impl_ket::create_cu_gate(control_index, target_index, unitary_ptr);
+        const auto [u_control_index, u_target_index, u_unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
 
         REQUIRE(u_control_index == control_index);
         REQUIRE(u_target_index == target_index);
-        REQUIRE(u_gate_index == gate_index);
+        REQUIRE(ket::almost_eq(*unitary_ptr, *u_unitary_ptr));
     }
 }

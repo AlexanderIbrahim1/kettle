@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -330,22 +331,14 @@ public:
     void add_u_gate(const Matrix2X2& gate, std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "U");
-
-        unitaries_.push_back(gate);
-        const auto gate_index = unitaries_.size() - 1;
-
-        elements_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
+        elements_.emplace_back(impl_ket::create_u_gate(target_index, impl_ket::ClonePtr<Matrix2X2> {gate}));
     }
 
     template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
     void add_u_gate(const Matrix2X2& gate, const Container& indices)
     {
-        unitaries_.push_back(gate);
-        const auto gate_index = unitaries_.size() - 1;
-
         for (auto target_index : indices) {
-            check_qubit_range_(target_index, "qubit", "U");
-            elements_.emplace_back(impl_ket::create_u_gate(target_index, gate_index));
+            add_u_gate(gate, target_index);
         }
     }
 
@@ -354,26 +347,14 @@ public:
         check_qubit_range_(control_index, "control qubit", "CU");
         check_qubit_range_(target_index, "target qubit", "CU");
 
-        unitaries_.push_back(gate);
-        const auto gate_index = unitaries_.size() - 1;
-
-        elements_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
+        elements_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, impl_ket::ClonePtr<Matrix2X2> {gate}));
     }
 
     template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
-    void add_cu_gate(const Matrix2X2& gate, const Container& tuples)
+    void add_cu_gate(const Matrix2X2& gate, const Container& pairs)
     {
-        unitaries_.push_back(gate);
-        const auto gate_index = unitaries_.size() - 1;
-
-        for (auto tuple : tuples) {
-            const auto control_index = std::get<0>(tuple);
-            const auto target_index = std::get<1>(tuple);
-
-            check_qubit_range_(control_index, "control qubit", "CU");
-            check_qubit_range_(target_index, "target qubit", "CU");
-
-            elements_.emplace_back(impl_ket::create_cu_gate(control_index, target_index, gate_index));
+        for (auto pair : pairs) {
+            add_cu_gate(gate, pair.first, pair.second);
         }
     }
 
@@ -520,12 +501,6 @@ public:
         add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
     }
 
-    [[nodiscard]]
-    constexpr auto unitary_gate(std::size_t matrix_index) const noexcept -> const Matrix2X2&
-    {
-        return unitaries_[matrix_index];
-    }
-
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
     friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
     friend auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq) -> QuantumCircuit;
@@ -534,7 +509,6 @@ private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
     std::vector<impl_ket::CircuitElement> elements_;
-    std::vector<Matrix2X2> unitaries_;
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const
     {

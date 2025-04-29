@@ -22,7 +22,11 @@ template <typename T>
 class ClonePtr
 {
 public:
-    constexpr explicit ClonePtr(std::unique_ptr<T> data)
+    constexpr explicit ClonePtr(T data)
+        : data_ {std::make_unique<T>(data)}
+    {}
+
+    constexpr explicit ClonePtr(std::unique_ptr<T> data) noexcept
         : data_ {std::move(data)}
     {}
 

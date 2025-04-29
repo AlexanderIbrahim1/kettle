@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
@@ -25,36 +26,34 @@ inline auto non_u_gate_to_u_gate(const ket::GateInfo& info) -> ket::Matrix2X2
     throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};
 }
 
-inline auto as_u_gate(const ket::QuantumCircuit& circuit, const ket::GateInfo& info) -> std::tuple<ket::GateInfo, ket::Matrix2X2>
+inline auto as_u_gate(const ket::GateInfo& info) -> ket::GateInfo
 {
     using G = ket::Gate;
 
     if (info.gate == G::U || info.gate == G::CU) {
-        const auto i_matrix = impl_ket::unpack_gate_matrix_index(info);
-        return {info, circuit.unitary_gate(i_matrix)};
+        return info;
     }
 
-    const auto matrix = non_u_gate_to_u_gate(info);
-    const auto dummy_gate_index = 0;
+    auto unitary = ClonePtr<ket::Matrix2X2> {non_u_gate_to_u_gate(info)};
 
     if (gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
         const auto target = impl_ket::unpack_single_qubit_gate_index(info);
-        const auto u_gate_info = impl_ket::create_u_gate(target, dummy_gate_index);
+        const auto u_gate_info = impl_ket::create_u_gate(target, std::move(unitary));
 
-        return {u_gate_info, matrix};
+        return u_gate_info;
     }
 
     if (gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
         const auto [control, target] = impl_ket::unpack_double_qubit_gate_indices(info);
-        const auto u_gate_info = impl_ket::create_cu_gate(control, target, dummy_gate_index);
+        const auto u_gate_info = impl_ket::create_cu_gate(control, target, std::move(unitary));
 
-        return {u_gate_info, matrix};
+        return u_gate_info;
     }
 
     throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'as_u_gate()'"};
 }
 
-inline auto is_matching_u_gate_info(const ket::GateInfo& left_info, const ket::GateInfo& right_info) -> bool
+inline auto have_matching_indices_(const ket::GateInfo& left_info, const ket::GateInfo& right_info) -> bool
 {
     if (left_info.gate != right_info.gate) {
         return false;
@@ -70,7 +69,7 @@ inline auto is_matching_u_gate_info(const ket::GateInfo& left_info, const ket::G
         return unpack(left_info) == unpack(right_info);
     }
 
-    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'is_matching_u_gate_info()'"};
+    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'have_matching_indices_()'"};
 }
 
 }  // namespace impl_ket
@@ -155,14 +154,14 @@ inline auto almost_eq(
                 }
             }
             else if (left_gate.gate != Gate::M && right_gate.gate != Gate::M) {
-                const auto [new_left_gate, new_left_matrix] = impl_ket::as_u_gate(left, left_gate);
-                const auto [new_right_gate, new_right_matrix] = impl_ket::as_u_gate(right, right_gate);
+                const auto new_left_gate = impl_ket::as_u_gate(left_gate);
+                const auto new_right_gate = impl_ket::as_u_gate(right_gate);
 
-                if (!impl_ket::is_matching_u_gate_info(new_left_gate, new_right_gate)) {
+                if (!impl_ket::have_matching_indices_(new_left_gate, new_right_gate)) {
                     return false;
                 }
 
-                if (!almost_eq(new_left_matrix, new_right_matrix, tol_sq)) {
+                if (!almost_eq(*new_left_gate.unitary_ptr, *new_right_gate.unitary_ptr, tol_sq)) {
                     return false;
                 }
             }

@@ -172,12 +172,12 @@ inline void write_tangelo_circuit(
                 stream << whitespace << impl_ket::format_m_gate_(gate_info);
             }
             else if (gate_info.gate == G::U) {
-                const auto matrix_index = impl_ket::unpack_gate_matrix_index(gate_info);
-                stream << whitespace << impl_ket::format_u_gate_(gate_info, circuit.unitary_gate(matrix_index));
+                const auto& unitary_ptr = impl_ket::unpack_unitary_matrix(gate_info);
+                stream << whitespace << impl_ket::format_u_gate_(gate_info, *unitary_ptr);
             }
             else if (gate_info.gate == G::CU) {
-                const auto matrix_index = impl_ket::unpack_gate_matrix_index(gate_info);
-                stream << whitespace << impl_ket::format_cu_gate_(gate_info, circuit.unitary_gate(matrix_index));
+                const auto& unitary_ptr = impl_ket::unpack_unitary_matrix(gate_info);
+                stream << whitespace << impl_ket::format_cu_gate_(gate_info, *unitary_ptr);
             }
             else {
                 throw std::runtime_error {"DEV ERROR: A gate type with no implemented output has been encountered.\n"};
