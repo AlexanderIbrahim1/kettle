@@ -55,6 +55,15 @@ public:
         return elements_[index];
     }
 
+    constexpr void pop_back()
+    {
+        if (elements_.size() == 0) {
+            throw std::runtime_error {"ERROR: called `pop_back()` on a `QuantumCircuit` instance with no circuit elements.\n"};
+        }
+
+        elements_.pop_back();
+    }
+
     [[nodiscard]]
     constexpr auto begin() const noexcept
     {

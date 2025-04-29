@@ -447,7 +447,7 @@ TEST_CASE("CircuitElement")
         REQUIRE(circuit_element.is_gate());
         REQUIRE(!circuit_element.is_control_flow());
 
-        const auto gate_from_circuit_element = circuit_element.get_gate();
+        const auto& gate_from_circuit_element = circuit_element.get_gate();
         REQUIRE(gate_from_circuit_element.gate == ginfo.gate);
         REQUIRE(impl_ket::unpack_single_qubit_gate_index(gate_from_circuit_element) == 0);
     }
@@ -484,5 +484,42 @@ TEST_CASE("CircuitElement")
         REQUIRE(circuit_element.is_control_flow());
         REQUIRE(!circuit_element.is_gate());
         REQUIRE_NOTHROW(circuit_element.get_control_flow());
+    }
+}
+
+TEST_CASE("pop_back()")
+{
+    auto circuit = ket::QuantumCircuit {1};
+
+    SECTION("pop_back() changes the size of the circuit")
+    {
+        REQUIRE(circuit.n_circuit_elements() == 0);
+
+        circuit.add_x_gate(0);
+        REQUIRE(circuit.n_circuit_elements() == 1);
+
+        circuit.add_x_gate(0);
+        REQUIRE(circuit.n_circuit_elements() == 2);
+
+        circuit.pop_back();
+        REQUIRE(circuit.n_circuit_elements() == 1);
+
+        circuit.pop_back();
+        REQUIRE(circuit.n_circuit_elements() == 0);
+    }
+
+    SECTION("throws if there are no elements")
+    {
+        SECTION("empty from the start")
+        {
+            REQUIRE_THROWS_AS(circuit.pop_back(), std::runtime_error);
+        }
+
+        SECTION("empty after having elements")
+        {
+            circuit.add_x_gate(0);
+            circuit.pop_back();
+            REQUIRE_THROWS_AS(circuit.pop_back(), std::runtime_error);
+        }
     }
 }
