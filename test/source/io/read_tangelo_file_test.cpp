@@ -58,36 +58,6 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(comp::is_1t1a_gate_equal(actual[1].get_gate(), expected1));
         REQUIRE(comp::is_1c1t_gate_equal(actual[2].get_gate(), expected2));
         REQUIRE(comp::is_1t1a_gate_equal(actual[3].get_gate(), expected3));
-//        SECTION("H gate")
-//        {
-//            REQUIRE(actual[0].gate == ket::Gate::H);
-//            const auto target_qubit = impl_ket::unpack_one_target_gate(actual[0]);
-//            REQUIRE(target_qubit == 4);
-//        }
-//
-//        SECTION("RX gate")
-//        {
-//            REQUIRE(actual[1].gate == ket::Gate::RX);
-//            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[1]);
-//            REQUIRE(target_qubit == 5);
-//            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(1.5707963267948966));
-//        }
-//
-//        SECTION("CX gate")
-//        {
-//            REQUIRE(actual[2].gate == ket::Gate::CX);
-//            const auto [control_qubit, target_qubit] = impl_ket::unpack_one_control_one_target_gate(actual[2]);
-//            REQUIRE(target_qubit == 4);
-//            REQUIRE(control_qubit == 2);
-//        }
-//
-//        SECTION("RZ gate")
-//        {
-//            REQUIRE(actual[3].gate == ket::Gate::RZ);
-//            const auto [target_qubit, angle] = impl_ket::unpack_one_target_one_angle_gate(actual[3]);
-//            REQUIRE(target_qubit == 5);
-//            REQUIRE_THAT(angle, Catch::Matchers::WithinRel(12.533816585267923));
-//        }
     }
 
     SECTION("single SWAP gate")
@@ -196,18 +166,17 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(gate.gate == ket::Gate::U);
 
-        const auto [target, matrix_index] = impl_ket::unpack_u_gate(gate);
-        const auto matrix = actual.unitary_gate(matrix_index);
+        const auto [target, unitary_ptr] = impl_ket::unpack_u_gate(gate);
         
         const auto expected_matrix = ket::Matrix2X2 {
-            {1.234, -4.321},
-            {2.345, -5.432},
-            {3.456, -6.543},
-            {4.567, -7.654}
+            .elem00={1.234, -4.321},
+            .elem01={2.345, -5.432},
+            .elem10={3.456, -6.543},
+            .elem11={4.567, -7.654}
         };
 
         REQUIRE(target == 1);
-        REQUIRE(ket::almost_eq(matrix, expected_matrix));
+        REQUIRE(ket::almost_eq(*unitary_ptr, expected_matrix));
     }
 
     SECTION("parse_cu_gate()")
@@ -223,19 +192,18 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(gate.gate == ket::Gate::CU);
 
-        const auto [control, target, matrix_index] = impl_ket::unpack_cu_gate(gate);
-        const auto matrix = actual.unitary_gate(matrix_index);
+        const auto [control, target, unitary_ptr] = impl_ket::unpack_cu_gate(gate);
         
         const auto expected_matrix = ket::Matrix2X2 {
-            {1.234, -4.321},
-            {2.345, -5.432},
-            {3.456, -6.543},
-            {4.567, -7.654}
+            .elem00={1.234, -4.321},
+            .elem01={2.345, -5.432},
+            .elem10={3.456, -6.543},
+            .elem11={4.567, -7.654}
         };
 
         REQUIRE(target == 1);
         REQUIRE(control == 2);
-        REQUIRE(ket::almost_eq(matrix, expected_matrix));
+        REQUIRE(ket::almost_eq(*unitary_ptr, expected_matrix));
     }
 }
 

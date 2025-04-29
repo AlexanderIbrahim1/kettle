@@ -17,6 +17,8 @@
 namespace impl_ket
 {
 
+static constexpr auto CONTROL_FLOW_WHITESPACE_DEFAULT = std::size_t {4};
+
 template <std::integral Integer>
 auto format_csv_integers_(const std::vector<Integer>& integers) -> std::string
 {

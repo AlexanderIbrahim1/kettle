@@ -232,17 +232,15 @@ inline auto make_controlled_circuit(
             apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
         }
         else if (gate_info.gate == Gate::U) {
-            const auto [original_target, original_gate_index] = impl_ket::unpack_u_gate(gate_info);
+            const auto [original_target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto& matrix = subcircuit.unitary_gate(original_gate_index);
-            new_circuit.add_cu_gate(matrix, control, new_target);
+            new_circuit.add_cu_gate(*unitary_ptr, control, new_target);
         }
         else if (gate_info.gate == Gate::CU) {
-            const auto [original_control, original_target, original_gate_index] = impl_ket::unpack_cu_gate(gate_info);
+            const auto [original_control, original_target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
             const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto& matrix = subcircuit.unitary_gate(original_gate_index);
-            apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
+            apply_doubly_controlled_gate(new_circuit, *unitary_ptr, {control, new_control}, new_target);
         }
         else if (gate_info.gate == Gate::M) {
             throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};
@@ -316,18 +314,16 @@ inline auto make_multiplicity_controlled_circuit(
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, new_controls);
         }
         else if (gate_info.gate == Gate::U) {
-            const auto [original_target, original_gate_index] = impl_ket::unpack_u_gate(gate_info);
+            const auto [original_target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto& matrix = subcircuit.unitary_gate(original_gate_index);
-            apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, control_qubits);
+            apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, control_qubits);
         }
         else if (gate_info.gate == Gate::CU) {
-            const auto [original_control, original_target, original_gate_index] = impl_ket::unpack_cu_gate(gate_info);
+            const auto [original_control, original_target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
             const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
             const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
             const auto new_controls = impl_ket::extend_container_to_vector(control_qubits, {new_control});
-            const auto& matrix = subcircuit.unitary_gate(original_gate_index);
-            apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, new_controls);
+            apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, new_controls);
         }
         else if (gate_info.gate == Gate::M) {
             throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};

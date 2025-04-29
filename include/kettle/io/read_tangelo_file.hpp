@@ -291,31 +291,28 @@ inline auto read_tangelo_circuit(
             continue;
         }
 
-        // TODO: refactor this after I make changes to how unitary matrices are treated; the inability
-        // to pop circuit elements (due to the book-keeping of general unitary matrices) means the rest
-        // of the code ends up suffering
         if (name == "IF") {
             auto predicate = impl_ket::parse_control_flow_predicate_(gatestream);
             
-            // TODO: put the number of lines somewhere else, so it isn't hardcoded
-            const auto n_prefix_lines = std::size_t {4};
-            auto if_circuit = read_tangelo_circuit(n_qubits, stream, 0, n_prefix_lines);
+            auto if_circuit = read_tangelo_circuit(n_qubits, stream, 0, impl_ket::CONTROL_FLOW_WHITESPACE_DEFAULT);
+            circuit.add_if_statement(std::move(predicate), std::move(if_circuit));
 
-            const auto pos = stream.tellg();
-            std::getline(stream, line);
+            continue;
+        }
 
-            auto nextline_stream = std::stringstream {line};
-            std::string nextline_name;
-            nextline_stream >> nextline_name;
-            if (nextline_name == "ELSE") {
-                auto else_circuit = read_tangelo_circuit(n_qubits, stream, 0, n_prefix_lines);
-                circuit.add_if_else_statement(std::move(predicate), std::move(if_circuit), std::move(else_circuit));
-            }
-            else {
-                stream.seekg(pos);
-                circuit.add_if_statement(std::move(predicate), std::move(if_circuit));
+        if (name == "ELSE") {
+            const auto n_elements = circuit.n_circuit_elements();
+            const auto top_element = circuit[n_elements - 1];
+            circuit.pop_back();
+
+            if (!top_element.is_control_flow() || !top_element.get_control_flow().is_if_statement()) {
+                throw std::runtime_error {"ERROR: encountered an 'ELSE' statement, but no previous matching 'IF' statement was found.\n"};
             }
 
+            const auto& if_stmt = top_element.get_control_flow().get_if_statement();
+
+            auto else_circuit = read_tangelo_circuit(n_qubits, stream, 0, impl_ket::CONTROL_FLOW_WHITESPACE_DEFAULT);
+            circuit.add_if_else_statement(if_stmt.predicate(), *if_stmt.circuit(), std::move(else_circuit));
             continue;
         }
 

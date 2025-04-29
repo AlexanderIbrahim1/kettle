@@ -76,22 +76,20 @@ inline auto transpile_to_primitive(
             const auto& gate_info = circuit_element.get_gate();
 
             if (impl_ket::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
-                new_circuit.elements_.push_back(gate_info);
+                new_circuit.elements_.emplace_back(gate_info);
             }
             else if (gate_info.gate == Gate::U) {
-                const auto [target, i_matrix] = impl_ket::unpack_u_gate(gate_info);
-                const auto& unitary = circuit.unitaries_[i_matrix];
-                const auto decomp_gates = decomp_1t(target, unitary, tolerance_sq);
+                const auto [target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
+                const auto decomp_gates = decomp_1t(target, *unitary_ptr, tolerance_sq);
                 for (const auto& decomp_gate : decomp_gates) {
-                    new_circuit.elements_.push_back(decomp_gate);
+                    new_circuit.elements_.emplace_back(decomp_gate);
                 }
             }
             else if (gate_info.gate == Gate::CU) {
-                const auto [control, target, i_matrix] = impl_ket::unpack_cu_gate(gate_info);
-                const auto& unitary = circuit.unitaries_[i_matrix];
-                const auto decomp_gates = decomp_1c_1t(control, target, unitary, tolerance_sq);
+                const auto [control, target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
+                const auto decomp_gates = decomp_1c_1t(control, target, *unitary_ptr, tolerance_sq);
                 for (const auto& decomp_gate : decomp_gates) {
-                    new_circuit.elements_.push_back(decomp_gate);
+                    new_circuit.elements_.emplace_back(decomp_gate);
                 }
             }
         }

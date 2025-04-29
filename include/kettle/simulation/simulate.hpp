@@ -10,6 +10,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
 #include "kettle/simulation/measure.hpp"
 #include "kettle/simulation/multithread_simulate_utils.hpp"
@@ -295,15 +296,13 @@ inline void simulate_loop_body_(
             break;
         }
         case G::U : {
-            const auto matrix_index = unpack_gate_matrix_index(gate_info);
-            const auto& matrix = circuit.unitary_gate(matrix_index);
-            simulate_single_qubit_gate_general_(state, gate_info, circuit.n_qubits(), matrix, single_pair);
+            const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
+            simulate_single_qubit_gate_general_(state, gate_info, circuit.n_qubits(), *unitary_ptr, single_pair);
             break;
         }
         case G::CU : {
-            const auto matrix_index = unpack_gate_matrix_index(gate_info);
-            const auto& matrix = circuit.unitary_gate(matrix_index);
-            simulate_double_qubit_gate_general_(state, gate_info, circuit.n_qubits(), matrix, double_pair);
+            const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
+            simulate_double_qubit_gate_general_(state, gate_info, circuit.n_qubits(), *unitary_ptr, double_pair);
             break;
         }
         case G::M : {
