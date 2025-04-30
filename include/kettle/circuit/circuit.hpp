@@ -76,6 +76,12 @@ public:
         return std::end(elements_);
     }
 
+    [[nodiscard]]
+    constexpr auto circuit_elements() const noexcept -> const std::vector<impl_ket::CircuitElement>&
+    {
+        return elements_;
+    }
+
     void add_h_gate(std::size_t target_index)
     {
         check_qubit_range_(target_index, "qubit", "H");

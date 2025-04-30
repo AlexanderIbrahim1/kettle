@@ -46,9 +46,19 @@ public:
     constexpr ClonePtr(ClonePtr&& other) noexcept = default;
     constexpr ClonePtr& operator=(ClonePtr&& other) noexcept = default;
 
-    auto operator*() const -> T
+    auto operator*() const -> const T&
     {
         return *data_;
+    }
+
+    auto operator*() -> T&
+    {
+        return *data_;
+    }
+
+    constexpr explicit operator bool() const
+    {
+        return data_ != nullptr;
     }
 
     constexpr ~ClonePtr() = default;
