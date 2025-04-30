@@ -18,7 +18,6 @@ namespace impl_ket
 {
 
 inline void simulate_gate_info_(
-    const ket::QuantumCircuit& circuit,
     ket::QuantumState& state,
     const FlatIndexPair& single_pair,
     const FlatIndexPair& double_pair,
@@ -35,85 +34,85 @@ inline void simulate_gate_info_(
 
     switch (gate_info.gate) {
         case G::H : {
-            simulate_single_qubit_gate_<G::H>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::H>(state, gate_info, single_pair);
             break;
         }
         case G::X : {
-            simulate_single_qubit_gate_<G::X>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::X>(state, gate_info, single_pair);
             break;
         }
         case G::Y : {
-            simulate_single_qubit_gate_<G::Y>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::Y>(state, gate_info, single_pair);
             break;
         }
         case G::Z : {
-            simulate_single_qubit_gate_<G::Z>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::Z>(state, gate_info, single_pair);
             break;
         }
         case G::SX : {
-            simulate_single_qubit_gate_<G::SX>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::SX>(state, gate_info, single_pair);
             break;
         }
         case G::RX : {
-            simulate_single_qubit_gate_<G::RX>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::RX>(state, gate_info, single_pair);
             break;
         }
         case G::RY : {
-            simulate_single_qubit_gate_<G::RY>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::RY>(state, gate_info, single_pair);
             break;
         }
         case G::RZ : {
-            simulate_single_qubit_gate_<G::RZ>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::RZ>(state, gate_info, single_pair);
             break;
         }
         case G::P : {
-            simulate_single_qubit_gate_<G::P>(state, gate_info, circuit.n_qubits(), single_pair);
+            simulate_single_qubit_gate_<G::P>(state, gate_info, single_pair);
             break;
         }
         case G::CH : {
-            simulate_double_qubit_gate_<G::CH>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CH>(state, gate_info, double_pair);
             break;
         }
         case G::CX : {
-            simulate_double_qubit_gate_<G::CX>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CX>(state, gate_info, double_pair);
             break;
         }
         case G::CY : {
-            simulate_double_qubit_gate_<G::CY>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CY>(state, gate_info, double_pair);
             break;
         }
         case G::CZ : {
-            simulate_double_qubit_gate_<G::CZ>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CZ>(state, gate_info, double_pair);
             break;
         }
         case G::CSX : {
-            simulate_double_qubit_gate_<G::CSX>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CSX>(state, gate_info, double_pair);
             break;
         }
         case G::CRX : {
-            simulate_double_qubit_gate_<G::CRX>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CRX>(state, gate_info, double_pair);
             break;
         }
         case G::CRY : {
-            simulate_double_qubit_gate_<G::CRY>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CRY>(state, gate_info, double_pair);
             break;
         }
         case G::CRZ : {
-            simulate_double_qubit_gate_<G::CRZ>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CRZ>(state, gate_info, double_pair);
             break;
         }
         case G::CP : {
-            simulate_double_qubit_gate_<G::CP>(state, gate_info, circuit.n_qubits(), double_pair);
+            simulate_double_qubit_gate_<G::CP>(state, gate_info, double_pair);
             break;
         }
         case G::U : {
             const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
-            simulate_single_qubit_gate_general_(state, gate_info, circuit.n_qubits(), *unitary_ptr, single_pair);
+            simulate_single_qubit_gate_general_(state, gate_info, *unitary_ptr, single_pair);
             break;
         }
         case G::CU : {
             const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
-            simulate_double_qubit_gate_general_(state, gate_info, circuit.n_qubits(), *unitary_ptr, double_pair);
+            simulate_double_qubit_gate_general_(state, gate_info, *unitary_ptr, double_pair);
             break;
         }
         case G::M : {
@@ -123,7 +122,7 @@ inline void simulate_gate_info_(
             if (thread_id == MEASURING_THREAD_ID) {
                 [[maybe_unused]]
                 const auto [ignore, bit_index] = unpack_m_gate(gate_info);
-                const auto measured = simulate_measurement_(state, gate_info, circuit.n_qubits(), prng_seed);
+                const auto measured = simulate_measurement_(state, gate_info, prng_seed);
                 c_register.set(bit_index, measured);
             }
             break;
@@ -198,7 +197,6 @@ inline void simulate_loop_body_iterative_(
             const auto& gate_info = element.get_gate();
 
             simulate_gate_info_(
-                circuit,
                 state,
                 single_pair,
                 double_pair,

@@ -15,13 +15,12 @@ namespace impl_ket
 
 inline auto probabilities_of_collapsed_states_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
-    std::size_t n_qubits
+    const ket::GateInfo& info
 ) -> std::tuple<double, double>
 {
     const auto target_index = unpack_single_qubit_gate_index(info);
 
-    auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator = SingleQubitGatePairGenerator {target_index, state.n_qubits()};
     pair_iterator.set_state(0);
 
     auto prob_of_0_states = double {0.0};
@@ -41,13 +40,12 @@ template <int StateToCollapse>
 void collapse_and_renormalize_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
-    std::size_t n_qubits,
     double norm_of_surviving_state
 )
 {
     const auto target_index = unpack_single_qubit_gate_index(info);
 
-    auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator = SingleQubitGatePairGenerator {target_index, state.n_qubits()};
     pair_iterator.set_state(0);
 
     for (std::size_t i {0}; i < pair_iterator.size(); ++i) {
@@ -78,11 +76,10 @@ template <DiscreteDistribution Distribution = std::discrete_distribution<int>>
 auto simulate_measurement_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
-    std::size_t n_qubits,
     std::optional<int> seed = std::nullopt
 ) -> Distribution::result_type
 {
-    const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info, n_qubits);
+    const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info);
 
     auto prng = get_prng_(seed);
     auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
@@ -91,11 +88,11 @@ auto simulate_measurement_(
 
     if (collapsed_state == 0) {
         const auto norm = std::sqrt(1.0 / prob_of_0_states);
-        collapse_and_renormalize_<1>(state, info, n_qubits, norm);
+        collapse_and_renormalize_<1>(state, info, norm);
     }
     else {
         const auto norm = std::sqrt(1.0 / prob_of_1_states);
-        collapse_and_renormalize_<0>(state, info, n_qubits, norm);
+        collapse_and_renormalize_<0>(state, info, norm);
     }
 
     return collapsed_state;
