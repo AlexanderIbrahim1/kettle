@@ -40,6 +40,11 @@ public:
     {}
 
     // NOLINTNEXTLINE(*explicit*)
+    CircuitElement(ket::CircuitLogger logger)
+        : element_ {std::move(logger)}
+    {}
+
+    // NOLINTNEXTLINE(*explicit*)
     CircuitElement(ket::ClassicalRegisterCircuitLogger logger)
         : element_ {std::move(logger)}
     {}

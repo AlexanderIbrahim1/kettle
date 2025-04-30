@@ -199,11 +199,15 @@ inline auto make_controlled_circuit(
 
     auto new_circuit = ket::QuantumCircuit {n_new_qubits};
 
-    // TODO: implement circuit logger functionality
-
     for (const auto& circuit_element : subcircuit) {
         if (circuit_element.is_control_flow()) {
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
+        }
+
+        // TODO: add a unit test for this
+        if (circuit_element.is_circuit_logger()) {
+            new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
+            continue;
         }
 
         const auto& gate_info = circuit_element.get_gate();
@@ -279,9 +283,14 @@ inline auto make_multiplicity_controlled_circuit(
     auto new_circuit = QuantumCircuit {n_new_qubits};
 
     for (const auto& circuit_element : subcircuit) {
-
         if (circuit_element.is_control_flow()) {
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
+        }
+
+        // TODO: add a unit test for this
+        if (circuit_element.is_circuit_logger()) {
+            new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
+            continue;
         }
 
         const auto& gate_info = circuit_element.get_gate();

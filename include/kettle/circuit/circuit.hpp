@@ -522,6 +522,11 @@ public:
         elements_.emplace_back(ClassicalRegisterCircuitLogger {});
     }
 
+    void add_circuit_logger(CircuitLogger circuit_logger)
+    {
+        elements_.emplace_back(std::move(circuit_logger));
+    }
+
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;
     friend void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right);
     friend auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq) -> QuantumCircuit;
