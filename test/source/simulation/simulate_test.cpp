@@ -8,6 +8,7 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
@@ -1103,4 +1104,37 @@ TEST_CASE("Invalid simulation; circuit and state have different numbers of qubit
     auto state = ket::QuantumState {"000"};
 
     REQUIRE_THROWS_AS(ket::simulate(circuit, state), std::runtime_error);
+}
+
+/*
+    Begin in the |00> state, transform to the |10> state, and measure both qubits, guaranteeing
+    that the 0th and 1st classical bits are 1 and 0, respectively.
+*/
+TEST_CASE("simulate and get classical register")
+{
+    SECTION("runs properly")
+    {
+        auto circuit = ket::QuantumCircuit {2};
+        circuit.add_x_gate(0);
+        circuit.add_m_gate({0, 1});
+
+        auto statevector = ket::QuantumState {"00"};
+        auto simulator = ket::StatevectorSimulator {};
+
+        REQUIRE(!simulator.has_been_run());
+
+        simulator.run(circuit, statevector);
+
+        REQUIRE(simulator.has_been_run());
+
+        const auto cregister = simulator.classical_register();
+        REQUIRE(cregister.get(0) == 1);
+        REQUIRE(cregister.get(1) == 0);
+    }
+
+    SECTION("throws if classical register is accessed before simulation is run")
+    {
+        auto simulator = ket::StatevectorSimulator {};
+        REQUIRE_THROWS_AS(simulator.classical_register(), std::runtime_error);
+    }
 }
