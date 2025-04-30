@@ -1,9 +1,7 @@
 #pragma once
 
-#include <barrier>
 #include <optional>
 #include <stdexcept>
-#include <thread>
 #include <vector>
 
 #include "kettle/circuit/classical_register.hpp"
@@ -13,7 +11,6 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
 #include "kettle/simulation/measure.hpp"
-#include "kettle/simulation/multithread_simulate_utils.hpp"
 #include "kettle/simulation/operations.hpp"
 #include "kettle/simulation/simulate_utils.hpp"
 #include "kettle/state/state.hpp"
@@ -169,7 +166,6 @@ inline void simulate_double_qubit_gate_general_(
     }
 }
 
-
 inline void simulate_gate_info_(
     ket::QuantumState& state,
     const FlatIndexPair& single_pair,
@@ -280,7 +276,6 @@ inline void simulate_gate_info_(
     }
 }
 
-
 inline void simulate_loop_body_iterative_(
     const ket::QuantumCircuit& circuit,
     ket::QuantumState& state,
@@ -345,7 +340,7 @@ inline void simulate_loop_body_iterative_(
             }
         }
         else if (element.is_gate()) {
-            const auto& gate_info = element.get_gate();
+            const auto gate_info = element.get_gate();
 
             simulate_gate_info_(
                 state,
@@ -363,7 +358,6 @@ inline void simulate_loop_body_iterative_(
     }
 }
 
-
 inline void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::QuantumState& state)
 {
     if (circuit.n_qubits() != state.n_qubits()) {
@@ -374,23 +368,6 @@ inline void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, co
         throw std::runtime_error {"Cannot simulate a circuit or state with zero qubits."};
     }
 }
-
-// inline void simulate_multithreaded_loop_(
-//     std::barrier<>& sync_point,
-//     const ket::QuantumCircuit& circuit,
-//     ket::QuantumState& state,
-//     const FlatIndexPair& single_pair,
-//     const FlatIndexPair& double_pair,
-//     int thread_id,
-//     std::optional<int> prng_seed,
-//     ket::ClassicalRegister& c_register
-// )
-// {
-//     for (const auto& element : circuit) {
-//         simulate_loop_body_(state, single_pair, double_pair, element, thread_id, prng_seed, c_register);
-//         sync_point.arrive_and_wait();
-//     }
-// }
 
 }  // namespace impl_ket
 
@@ -462,6 +439,25 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state, std::op
     simulator.run(circuit, state, prng_seed);
 }
 
+}  // namespace ket
+
+
+// inline void simulate_multithreaded_loop_(
+//     std::barrier<>& sync_point,
+//     const ket::QuantumCircuit& circuit,
+//     ket::QuantumState& state,
+//     const FlatIndexPair& single_pair,
+//     const FlatIndexPair& double_pair,
+//     int thread_id,
+//     std::optional<int> prng_seed,
+//     ket::ClassicalRegister& c_register
+// )
+// {
+//     for (const auto& element : circuit) {
+//         simulate_loop_body_(state, single_pair, double_pair, element, thread_id, prng_seed, c_register);
+//         sync_point.arrive_and_wait();
+//     }
+// }
 // /*
 //     WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
 //     I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
@@ -514,5 +510,3 @@ inline void simulate(const QuantumCircuit& circuit, QuantumState& state, std::op
 //         thread.join();
 //     }
 // }
-
-}  // namespace ket
