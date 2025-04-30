@@ -291,6 +291,8 @@ inline auto read_tangelo_circuit(
             continue;
         }
 
+        // TODO: implement circuit logger functionality
+
         if (name == "IF") {
             auto predicate = impl_ket::parse_control_flow_predicate_(gatestream);
             

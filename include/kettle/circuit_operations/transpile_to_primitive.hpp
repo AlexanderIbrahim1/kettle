@@ -37,6 +37,8 @@ inline auto transpile_to_primitive(
     const auto decomp_1t = impl_ket::decomp_to_one_target_primitive_gates_;
     const auto decomp_1c_1t = impl_ket::decomp_to_one_control_one_target_primitive_gates_;
 
+    // TODO: implement circuit logger functionality
+
     for (const auto& circuit_element : circuit.elements_) {
         if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();

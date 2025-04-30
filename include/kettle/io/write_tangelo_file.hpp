@@ -131,6 +131,8 @@ inline void write_tangelo_circuit(
 
     const auto whitespace = std::string(n_leading_whitespace, ' ');
 
+    // TODO: implement circuit logger functionality
+
     for (const auto& circuit_element : circuit) {
         if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();

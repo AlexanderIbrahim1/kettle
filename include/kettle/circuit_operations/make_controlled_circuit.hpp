@@ -199,6 +199,8 @@ inline auto make_controlled_circuit(
 
     auto new_circuit = ket::QuantumCircuit {n_new_qubits};
 
+    // TODO: implement circuit logger functionality
+
     for (const auto& circuit_element : subcircuit) {
         if (circuit_element.is_control_flow()) {
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};

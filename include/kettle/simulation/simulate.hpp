@@ -308,6 +308,8 @@ inline void simulate_loop_body_iterative_(
 
         const auto& element = elements.get()[i_ptr];
 
+        // TODO: implement circuit logger functionality
+
         if (element.is_control_flow()) {
             const auto& control_flow = element.get_control_flow();
 
