@@ -37,10 +37,11 @@ inline auto transpile_to_primitive(
     const auto decomp_1t = impl_ket::decomp_to_one_target_primitive_gates_;
     const auto decomp_1c_1t = impl_ket::decomp_to_one_control_one_target_primitive_gates_;
 
-    // TODO: implement circuit logger functionality
-
     for (const auto& circuit_element : circuit.elements_) {
-        if (circuit_element.is_control_flow()) {
+        if (circuit_element.is_circuit_logger()) {
+            new_circuit.elements_.emplace_back(circuit_element);
+        }
+        else if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();
 
             if (control_flow.is_if_statement()) {
@@ -71,10 +72,10 @@ inline auto transpile_to_primitive(
                 new_circuit.elements_.emplace_back(std::move(cfi));
             }
             else {
-                throw std::runtime_error {"DEV ERROR: invalid control flow element found\n"};
+                throw std::runtime_error {"DEV ERROR: invalid control flow element found in `transpile_to_primitive()`\n"};
             }
         }
-        else {
+        else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();
 
             if (impl_ket::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
@@ -94,6 +95,9 @@ inline auto transpile_to_primitive(
                     new_circuit.elements_.emplace_back(decomp_gate);
                 }
             }
+        }
+        else {
+            throw std::runtime_error {"DEV ERROR: invalid circuit element found in `transpile_to_primitve()`\n"};
         }
     }
 

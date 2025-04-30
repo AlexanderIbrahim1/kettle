@@ -119,8 +119,11 @@ inline auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat
 namespace ket
 {
 
-// NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity)
-inline void write_tangelo_circuit(
+/*
+    The underlying helper function for `write_tangelo_circuit()`, that takes an output stream `stream`
+    as an argument instead of the path to the file.
+*/
+inline void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-cognitive-complexity)
     const ket::QuantumCircuit& circuit,
     std::ostream& stream,
     std::size_t n_leading_whitespace = 0
@@ -131,10 +134,11 @@ inline void write_tangelo_circuit(
 
     const auto whitespace = std::string(n_leading_whitespace, ' ');
 
-    // TODO: implement circuit logger functionality
-
     for (const auto& circuit_element : circuit) {
-        if (circuit_element.is_control_flow()) {
+        if (circuit_element.is_circuit_logger()) {
+            continue;
+        }
+        else if (circuit_element.is_control_flow()) {
             const auto& control_flow = circuit_element.get_control_flow();
 
             if (control_flow.is_if_statement()) {
@@ -155,7 +159,8 @@ inline void write_tangelo_circuit(
                 throw std::runtime_error {"DEV ERROR: invalid control flow statement encountered for write\n"};
             }
 
-        } else {
+        }
+        else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();
 
             if (gid::is_one_target_transform_gate(gate_info.gate)) {
@@ -184,6 +189,9 @@ inline void write_tangelo_circuit(
             else {
                 throw std::runtime_error {"DEV ERROR: A gate type with no implemented output has been encountered.\n"};
             }
+        }
+        else {
+            throw std::runtime_error {"DEV ERROR: invalid control flow element found in `write_tangelo_file()`\n"};
         }
     }
 }

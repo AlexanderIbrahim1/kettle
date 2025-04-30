@@ -250,8 +250,11 @@ inline void parse_cu_gate_(ket::QuantumCircuit& circuit, std::stringstream& gate
 namespace ket
 {
 
-// NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity)
-inline auto read_tangelo_circuit(
+/*
+    The underlying helper function for `read_tangelo_circuit()`, that takes an input stream `stream`
+    as an argument instead of the path to the file.
+*/
+inline auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-cognitive-complexity)
     std::size_t n_qubits,
     std::istream& stream,
     std::size_t n_skip_lines,
@@ -290,8 +293,6 @@ inline auto read_tangelo_circuit(
         if (name == "") {
             continue;
         }
-
-        // TODO: implement circuit logger functionality
 
         if (name == "IF") {
             auto predicate = impl_ket::parse_control_flow_predicate_(gatestream);
@@ -369,7 +370,20 @@ inline auto read_tangelo_circuit(
     return circuit;
 }
 
-inline auto read_tangelo_circuit(std::size_t n_qubits, const std::filesystem::path& filepath, std::size_t n_skip_lines) -> QuantumCircuit
+/*
+    Takes a file `filepath` that holds a quantum circuit in the tangelo format, and reconstructs
+    the `QuantumCircuit` instance of `n_qubits` qubits that it represents.
+
+    This function can skip the first `n_skip_lines` lines of the file.
+
+    For the time being, only primitive gates, SWAP gates, and control flow elements can be read.
+    Any circuit elements related to logging are ignored.
+*/
+inline auto read_tangelo_circuit(
+    std::size_t n_qubits,
+    const std::filesystem::path& filepath,
+    std::size_t n_skip_lines
+) -> QuantumCircuit
 {
     auto instream = std::ifstream {filepath};
 

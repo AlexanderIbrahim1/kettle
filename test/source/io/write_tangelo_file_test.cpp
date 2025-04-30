@@ -1,8 +1,10 @@
+#include "kettle/circuit/circuit.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/io/write_tangelo_file.hpp>
+#include <sstream>
 
 
 TEST_CASE("format_one_target_gate_()")
@@ -150,4 +152,24 @@ TEST_CASE("format_m_gate_()")
     const auto actual = impl_ket::format_m_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
+}
+
+TEST_CASE("write_tangelo_file() ignores circuit loggers")
+{
+    auto without_logger = ket::QuantumCircuit {2};
+    without_logger.add_x_gate(0);
+    without_logger.add_h_gate(1);
+
+    auto with_logger = ket::QuantumCircuit {2};
+    with_logger.add_x_gate(0);
+    with_logger.add_classical_register_circuit_logger();
+    with_logger.add_h_gate(1);
+
+    auto without_stream = std::stringstream {};
+    ket::write_tangelo_circuit(without_logger, without_stream);
+
+    auto with_stream = std::stringstream {};
+    ket::write_tangelo_circuit(with_logger, with_stream);
+
+    REQUIRE(without_stream.str() == with_stream.str());
 }
