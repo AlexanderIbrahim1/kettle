@@ -4,7 +4,6 @@
 
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
-#include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 
 /*
@@ -46,6 +45,11 @@ public:
 
     // NOLINTNEXTLINE(*explicit*)
     CircuitElement(ket::ClassicalRegisterCircuitLogger logger)
+        : element_ {std::move(logger)}
+    {}
+
+    // NOLINTNEXTLINE(*explicit*)
+    CircuitElement(ket::StatevectorCircuitLogger logger)
         : element_ {std::move(logger)}
     {}
 

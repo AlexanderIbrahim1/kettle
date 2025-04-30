@@ -7,7 +7,6 @@
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
-#include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -319,6 +318,11 @@ inline auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cogni
                 auto cregister_logger = logger.get_classical_register_circuit_logger();
                 cregister_logger.add_classical_register(cregister);
                 circuit_loggers.emplace_back(std::move(cregister_logger));
+            }
+            else if (logger.is_statevector_circuit_logger()) {
+                auto statevector_logger = logger.get_statevector_circuit_logger();
+                statevector_logger.add_statevector(state);
+                circuit_loggers.emplace_back(std::move(statevector_logger));
             }
             else {
                 throw std::runtime_error {"DEV ERROR: unimplemented circuit logger in `simulate_loop_body_iterative_()`\n"};

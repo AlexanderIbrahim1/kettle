@@ -9,6 +9,7 @@
 
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
+#include "kettle/circuit_loggers/statevector_circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
@@ -520,6 +521,11 @@ public:
     void add_classical_register_circuit_logger()
     {
         elements_.emplace_back(ClassicalRegisterCircuitLogger {});
+    }
+
+    void add_statevector_circuit_logger()
+    {
+        elements_.emplace_back(StatevectorCircuitLogger {});
     }
 
     void add_circuit_logger(CircuitLogger circuit_logger)

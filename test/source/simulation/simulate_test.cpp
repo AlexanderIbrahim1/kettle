@@ -1139,19 +1139,16 @@ TEST_CASE("simulate and get classical register")
     }
 }
 
-/*
-    Begin in the |00> state, transform to the |10> state, and measure both qubits, guaranteeing
-    that the 0th and 1st classical bits are 1 and 0, respectively.
-*/
-TEST_CASE("simulate and get classical register loggers")
+TEST_CASE("simulate and get statevector loggers")
 {
     auto circuit = ket::QuantumCircuit {2};
+    circuit.add_statevector_circuit_logger();
     circuit.add_x_gate(0);
-    circuit.add_classical_register_circuit_logger();  // no measurements made
-    circuit.add_m_gate(0);
-    circuit.add_classical_register_circuit_logger();  // only 0th qubit has been measured, to 1
-    circuit.add_m_gate(1);
-    circuit.add_classical_register_circuit_logger();  // 0th and 1st qubits have been measured, to 1 and 0
+    circuit.add_statevector_circuit_logger();
+    circuit.add_x_gate(0);
+    circuit.add_statevector_circuit_logger();
+    circuit.add_h_gate({0, 1});
+    circuit.add_statevector_circuit_logger();
 
     auto statevector = ket::QuantumState {"00"};
     auto simulator = ket::StatevectorSimulator {};
@@ -1162,17 +1159,21 @@ TEST_CASE("simulate and get classical register loggers")
 
     const auto loggers = simulator.circuit_loggers();
 
-    REQUIRE(loggers.size() == 3);
+    REQUIRE(loggers.size() == 4);
 
-    const auto& logger0 = loggers[0].get_classical_register_circuit_logger();
-    REQUIRE(!logger0.classical_register().is_measured(0));
-    REQUIRE(!logger0.classical_register().is_measured(1));
+    const auto& logger0 = loggers[0].get_statevector_circuit_logger();
+    const auto expected0 = ket::QuantumState {"00"};
+    REQUIRE(ket::almost_eq(logger0.statevector(), expected0));
 
-    const auto& logger1 = loggers[1].get_classical_register_circuit_logger();
-    REQUIRE(logger1.classical_register().get(0) == 1);
-    REQUIRE(!logger1.classical_register().is_measured(1));
+    const auto& logger1 = loggers[1].get_statevector_circuit_logger();
+    const auto expected1 = ket::QuantumState {"10"};
+    REQUIRE(ket::almost_eq(logger1.statevector(), expected1));
 
-    const auto& logger2 = loggers[2].get_classical_register_circuit_logger();
-    REQUIRE(logger2.classical_register().get(0) == 1);
-    REQUIRE(logger2.classical_register().get(1) == 0);
+    const auto& logger2 = loggers[2].get_statevector_circuit_logger();
+    const auto expected2 = ket::QuantumState {"00"};
+    REQUIRE(ket::almost_eq(logger2.statevector(), expected2));
+
+    const auto& logger3 = loggers[3].get_statevector_circuit_logger();
+    const auto expected3 = ket::QuantumState {{ {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0} }};
+    REQUIRE(ket::almost_eq(logger3.statevector(), expected3));
 }
