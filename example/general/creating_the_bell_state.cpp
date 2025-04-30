@@ -11,7 +11,8 @@ auto main() -> int
     auto statevector = ket::QuantumState {"00"};
 
     // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
-    ket::simulate(circuit, statevector);
+    auto simulator = ket::StatevectorSimulator {};
+    simulator.run(circuit, statevector);
 
     // perform measurements on this statevector
     const auto counts = ket::perform_measurements_as_counts(statevector, 1024);
