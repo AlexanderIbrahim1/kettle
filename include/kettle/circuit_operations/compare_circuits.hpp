@@ -72,14 +72,58 @@ inline auto have_matching_indices_(const ket::GateInfo& left_info, const ket::Ga
     throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'have_matching_indices_()'"};
 }
 
+inline auto all_remaining_elements_are_circuit_loggers_(const ket::QuantumCircuit& circuit, std::size_t i_start) -> bool
+{
+    if (i_start >= circuit.n_circuit_elements()) {
+        throw std::runtime_error {"DEV ERROR: cannot check if remaining elements are circuit loggers\n"};
+    }
+
+    for (std::size_t i {i_start}; i < circuit.n_circuit_elements(); ++i) {
+        if (!circuit[i].is_circuit_logger()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 }  // namespace impl_ket
 
 
 namespace ket
 {
 
-// NOLINTNEXTLINE(misc-no-recursion, readability-function-cognitive-complexity)
-inline auto almost_eq(
+/*
+    Checks if two `ket::QuantumCircuit` instances are equal, gate-by-gate.
+
+    If two circuits result in the same propagation, but have the gates in the same order, then
+    this function considers them different. For example, the following `circuit0` and `circuit1`
+    instances are considered different:
+
+        :
+        auto circuit0 = ket::QuantumCircuit {2};
+        circuit0.add_x_gate(0);
+        circuit0.add_x_gate(1);
+        auto circuit1 = ket::QuantumCircuit {2};
+        circuit1.add_x_gate(1);
+        circuit1.add_x_gate(0);
+        :
+
+    However, if one circuit has a primitive gate, and another circuit has a U-gate that performs the
+    same transformation as that primitive gate (to within floating-point precision), then those two
+    gates are considered matching. For example, the following `circuit0` and `circuit1` are considered
+    the same:
+
+        :
+        auto circuit0 = ket::QuantumCircuit {1};
+        circuit0.add_x_gate(0);
+        auto circuit1 = ket::QuantumCircuit {1};
+        circuit1.add_u_gate(ket::x_gate(), 0);
+        :
+    
+    Loggers are ignored entirely
+*/
+inline auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-complexity)
     const QuantumCircuit& left,
     const QuantumCircuit& right,
     double tol_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
@@ -97,16 +141,21 @@ inline auto almost_eq(
     }
 
     // don't bother checking the gates if there aren't the same number on both sides
-    const auto n_left_gates  = static_cast<std::size_t>(std::distance(left.begin(), left.end()));
-    const auto n_right_gates = static_cast<std::size_t>(std::distance(right.begin(), right.end()));
+    auto i_left = std::size_t {0};
+    auto i_right = std::size_t {0};
 
-    if (n_left_gates != n_right_gates) {
-        return false;
-    }
+    while (i_left < left.n_circuit_elements() && i_right < right.n_circuit_elements()) {
+        const auto& left_element = left[i_left];
+        if (left_element.is_circuit_logger()) {
+            ++i_left;
+            continue;
+        }
 
-    for (std::size_t i_gate {0}; i_gate < n_left_gates; ++i_gate) {
-        const auto& left_element = left[i_gate];
-        const auto& right_element = right[i_gate];
+        const auto& right_element = right[i_right];
+        if (right_element.is_circuit_logger()) {
+            ++i_right;
+            continue;
+        }
 
         if (left_element.is_control_flow() && right_element.is_control_flow()) {
             const auto& left_ctrl = left_element.get_control_flow();
@@ -170,6 +219,21 @@ inline auto almost_eq(
             }
         }
         else {
+            return false;
+        }
+
+        ++i_left;
+        ++i_right;
+    }
+
+    if (i_left == left.n_circuit_elements() && i_right < right.n_circuit_elements()) {
+        if (!impl_ket::all_remaining_elements_are_circuit_loggers_(right, i_right)) {
+            return false;
+        }
+    }
+
+    if (i_left < left.n_circuit_elements() && i_right == right.n_circuit_elements()) {
+        if (!impl_ket::all_remaining_elements_are_circuit_loggers_(left, i_left)) {
             return false;
         }
     }

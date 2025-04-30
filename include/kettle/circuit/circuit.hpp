@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
+#include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
@@ -514,6 +515,11 @@ public:
     {
         auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
         add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
+    }
+
+    void add_classical_register_circuit_logger()
+    {
+        elements_.emplace_back(ClassicalRegisterCircuitLogger {});
     }
 
     friend auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit;

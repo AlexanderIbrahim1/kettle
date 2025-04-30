@@ -60,3 +60,64 @@ TEST_CASE("almost_eq() with control flow statements")
         }
     }
 }
+
+TEST_CASE("almost_eq(); circuit loggers do not affect comparison")
+{
+    auto circuit0 = ket::QuantumCircuit {1};
+    auto circuit1 = ket::QuantumCircuit {1};
+
+    SECTION("one circuit logger on left, before gate")
+    {
+        circuit0.add_classical_register_circuit_logger();
+        circuit0.add_x_gate(0);
+
+        circuit1.add_x_gate(0);
+
+        REQUIRE(ket::almost_eq(circuit0, circuit1));
+    }
+
+    SECTION("one circuit logger on left, after gate")
+    {
+        circuit0.add_x_gate(0);
+        circuit0.add_classical_register_circuit_logger();
+
+        circuit1.add_x_gate(0);
+
+        REQUIRE(ket::almost_eq(circuit0, circuit1));
+    }
+
+    SECTION("one circuit logger on right, before gate")
+    {
+        circuit0.add_x_gate(0);
+
+        circuit1.add_classical_register_circuit_logger();
+        circuit1.add_x_gate(0);
+
+        REQUIRE(ket::almost_eq(circuit0, circuit1));
+    }
+
+    SECTION("one circuit logger on right, after gate")
+    {
+        circuit0.add_x_gate(0);
+
+        circuit1.add_x_gate(0);
+        circuit1.add_classical_register_circuit_logger();
+
+        REQUIRE(ket::almost_eq(circuit0, circuit1));
+    }
+
+    SECTION("circuit loggers on both left and right")
+    {
+        circuit1.add_classical_register_circuit_logger();
+        circuit0.add_x_gate(0);
+        circuit1.add_classical_register_circuit_logger();
+        circuit1.add_classical_register_circuit_logger();
+        circuit0.add_h_gate(0);
+
+        circuit1.add_x_gate(0);
+        circuit1.add_h_gate(0);
+        circuit1.add_classical_register_circuit_logger();
+
+        REQUIRE(ket::almost_eq(circuit0, circuit1));
+    }
+}
