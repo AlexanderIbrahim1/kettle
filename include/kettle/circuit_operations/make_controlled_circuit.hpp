@@ -204,7 +204,6 @@ inline auto make_controlled_circuit(
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
         }
 
-        // TODO: add a unit test for this
         if (circuit_element.is_circuit_logger()) {
             new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
             continue;
@@ -287,7 +286,6 @@ inline auto make_multiplicity_controlled_circuit(
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
         }
 
-        // TODO: add a unit test for this
         if (circuit_element.is_circuit_logger()) {
             new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
             continue;
