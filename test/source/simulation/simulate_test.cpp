@@ -1138,3 +1138,41 @@ TEST_CASE("simulate and get classical register")
         REQUIRE_THROWS_AS(simulator.classical_register(), std::runtime_error);
     }
 }
+
+/*
+    Begin in the |00> state, transform to the |10> state, and measure both qubits, guaranteeing
+    that the 0th and 1st classical bits are 1 and 0, respectively.
+*/
+TEST_CASE("simulate and get classical register loggers")
+{
+    auto circuit = ket::QuantumCircuit {2};
+    circuit.add_x_gate(0);
+    circuit.add_classical_register_circuit_logger();  // no measurements made
+    circuit.add_m_gate(0);
+    circuit.add_classical_register_circuit_logger();  // only 0th qubit has been measured, to 1
+    circuit.add_m_gate(1);
+    circuit.add_classical_register_circuit_logger();  // 0th and 1st qubits have been measured, to 1 and 0
+
+    auto statevector = ket::QuantumState {"00"};
+    auto simulator = ket::StatevectorSimulator {};
+
+    simulator.run(circuit, statevector);
+
+    REQUIRE(simulator.has_been_run());
+
+    const auto loggers = simulator.circuit_loggers();
+
+    REQUIRE(loggers.size() == 3);
+
+    const auto& logger0 = loggers[0].get_classical_register_circuit_logger();
+    REQUIRE(!logger0.classical_register().is_measured(0));
+    REQUIRE(!logger0.classical_register().is_measured(1));
+
+    const auto& logger1 = loggers[1].get_classical_register_circuit_logger();
+    REQUIRE(logger1.classical_register().get(0) == 1);
+    REQUIRE(!logger1.classical_register().is_measured(1));
+
+    const auto& logger2 = loggers[2].get_classical_register_circuit_logger();
+    REQUIRE(logger2.classical_register().get(0) == 1);
+    REQUIRE(logger2.classical_register().get(1) == 0);
+}
