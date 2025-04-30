@@ -1,6 +1,4 @@
-#include "kettle/state/state.hpp"
 #include <kettle/kettle.hpp>
-#include <kettle/simulation/statevector_simulator.hpp>
 
 auto main() -> int
 {

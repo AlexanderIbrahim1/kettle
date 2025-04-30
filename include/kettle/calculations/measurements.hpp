@@ -13,8 +13,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"
 #include "kettle/common/prng.hpp"
-// #include "kettle/simulation/simulate.hpp"
-#include "kettle/simulation/statevector_simulator.hpp"
+#include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/marginal.hpp"
 
@@ -250,13 +249,9 @@ inline auto perform_measurements_as_counts_marginal(
 
     auto measurements = std::unordered_map<std::string, std::size_t> {};
 
-    // ADDED
-    auto simulator = ket::StatevectorSimulator {};
-
     for (std::size_t i {0}; i < n_shots; ++i) {
         auto state = original_state;
-        simulator.run(circuit, state);
-        // ket::simulate(circuit, state);
+        ket::simulate(circuit, state);
 
         const auto probabilities_raw = calculate_probabilities_raw(state, noise);
         auto sampler = impl_ket::ProbabilitySampler_ {probabilities_raw, seed};
