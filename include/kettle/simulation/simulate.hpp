@@ -6,6 +6,7 @@
 
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -276,15 +277,15 @@ inline void simulate_gate_info_(
     }
 }
 
-inline void simulate_loop_body_iterative_(
+inline auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-complexity)
     const ket::QuantumCircuit& circuit,
     ket::QuantumState& state,
     const FlatIndexPair& single_pair,
     const FlatIndexPair& double_pair,
     int thread_id,
     std::optional<int> prng_seed,
-    ket::ClassicalRegister& c_register
-)
+    ket::ClassicalRegister& cregister
+) -> std::vector<ket::CircuitLogger>
 {
     using Elements = std::reference_wrapper<const std::vector<impl_ket::CircuitElement>>;
 
@@ -293,6 +294,8 @@ inline void simulate_loop_body_iterative_(
 
     auto instruction_pointers = std::vector<std::size_t> {};
     instruction_pointers.push_back(0);
+
+    auto circuit_loggers = std::vector<ket::CircuitLogger> {};
 
     while (elements_stack.size() != 0) {
         const auto& elements = elements_stack.back();
@@ -308,13 +311,30 @@ inline void simulate_loop_body_iterative_(
 
         const auto& element = elements.get()[i_ptr];
 
-        if (element.is_control_flow()) {
+        if (element.is_circuit_logger()) {
+            const auto& logger = element.get_circuit_logger();
+
+            if (logger.is_classical_register_circuit_logger()) {
+                auto cregister_logger = logger.get_classical_register_circuit_logger();
+                cregister_logger.add_classical_register(cregister);
+                circuit_loggers.emplace_back(std::move(cregister_logger));
+            }
+            else if (logger.is_statevector_circuit_logger()) {
+                auto statevector_logger = logger.get_statevector_circuit_logger();
+                statevector_logger.add_statevector(state);
+                circuit_loggers.emplace_back(std::move(statevector_logger));
+            }
+            else {
+                throw std::runtime_error {"DEV ERROR: unimplemented circuit logger in `simulate_loop_body_iterative_()`\n"};
+            }
+        }
+        else if (element.is_control_flow()) {
             const auto& control_flow = element.get_control_flow();
 
             if (control_flow.is_if_statement()) {
                 const auto& if_stmt = control_flow.get_if_statement();
 
-                if (if_stmt(c_register)) {
+                if (if_stmt(cregister)) {
                     const auto& subcircuit = *if_stmt.circuit();
                     elements_stack.push_back(std::ref(subcircuit.circuit_elements()));
                     instruction_pointers.push_back(0);
@@ -325,7 +345,7 @@ inline void simulate_loop_body_iterative_(
 
                 // NOTE: omitting the return type here causes a dangling reference
                 const auto& subcircuit = [&]() -> const ket::QuantumCircuit& {
-                    if (if_else_stmt(c_register)) {
+                    if (if_else_stmt(cregister)) {
                         return *if_else_stmt.if_circuit();
                     } else {
                         return *if_else_stmt.else_circuit();
@@ -336,7 +356,7 @@ inline void simulate_loop_body_iterative_(
                 instruction_pointers.push_back(0);
             }
             else {
-                throw std::runtime_error {"DEV ERROR: unimplemented control flow function found\n"};
+                throw std::runtime_error {"DEV ERROR: unimplemented control flow in `simulate_loop_body_iterative_()`\n"};
             }
         }
         else if (element.is_gate()) {
@@ -349,13 +369,15 @@ inline void simulate_loop_body_iterative_(
                 gate_info,
                 thread_id,
                 prng_seed,
-                c_register
+                cregister
             );
         }
         else {
-            throw std::runtime_error {"DEV ERROR: unimplemented circuit element found\n"};
+            throw std::runtime_error {"DEV ERROR: unimplemented circuit element in `simulate_loop_body_iterative_()`\n"};
         }
     }
+
+    return circuit_loggers;
 }
 
 inline void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::QuantumState& state)
@@ -395,7 +417,7 @@ public:
         // code, and certain operations are only done on the thread with thread id 0
         const auto thread_id = impl_ket::MEASURING_THREAD_ID;
 
-        impl_ket::simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_);
+        circuit_loggers_ = impl_ket::simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_);
 
         has_been_run_ = true;
     }
@@ -425,11 +447,18 @@ public:
         return *cregister_;
     }
 
+    [[nodiscard]]
+    auto circuit_loggers() const -> const std::vector<CircuitLogger>&
+    {
+        return circuit_loggers_;
+    }
+
 private:
     // there is no default constructor for the ClassicalRegsiter (it wouldn't make sense), and we
     // only find out how many bits are needed after the first simulation; hence why we use a pointer
     impl_ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
     bool has_been_run_ {false};
+    std::vector<CircuitLogger> circuit_loggers_;
 };
 
 

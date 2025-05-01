@@ -111,7 +111,7 @@ private:
 };
 
 
-struct ClassicalControlFlowInstruction
+class ClassicalControlFlowInstruction
 {
 public:
     // NOLINTNEXTLINE(*explicit*)

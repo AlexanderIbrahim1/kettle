@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
@@ -7,6 +8,7 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/gates/toffoli.hpp"
+#include "kettle/circuit_operations/append_circuits.hpp"
 #include "kettle/circuit_operations/make_controlled_circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
 
@@ -439,5 +441,77 @@ TEST_CASE("throwing with make_multiplicity_controlled_circuit()")
     SECTION("throws when not all indices fit onto the new circuit")
     {
         REQUIRE_THROWS_AS(ket::make_multiplicity_controlled_circuit(subcircuit, 3, {0, 1}, {2, 3}), std::runtime_error);
+    }
+}
+
+TEST_CASE("controlled circuits with circuit logger")
+{
+    auto before = ket::QuantumCircuit {2};
+    before.add_x_gate({0, 1});
+
+    auto middle = ket::QuantumCircuit {2};
+    middle.add_classical_register_circuit_logger();
+
+    auto after = ket::QuantumCircuit {2};
+    after.add_h_gate(0);
+    after.add_cx_gate(0, 1);
+
+    const auto is_circuit_logger = [](const auto& element) { return element.is_circuit_logger(); };
+
+    const auto logger_position = [&](const auto& circuit) {
+        const auto position = std::ranges::find_if(circuit, is_circuit_logger);
+        return std::distance(circuit.begin(), position);
+    };
+
+    SECTION("make_controlled_circuit()")
+    {
+        // create the overall circuit with the logger between the parts, THEN make it controlled
+        auto append_then_control = [&]() {
+            auto before_middle = ket::append_circuits(before, middle);
+            auto total = ket::append_circuits(before_middle, after);
+
+            return ket::make_controlled_circuit(total, 3, 0, {1, 2});
+        }();
+
+        // make each of the circuit parts controlled, THEN append them
+        auto control_then_append = [&]() {
+            auto control_before = ket::make_controlled_circuit(before, 3, 0, {1, 2});
+            auto control_middle = ket::make_controlled_circuit(middle, 3, 0, {1, 2});
+            auto control_after = ket::make_controlled_circuit(after, 3, 0, {1, 2});
+
+            auto before_middle = ket::append_circuits(control_before, control_middle);
+            auto total = ket::append_circuits(before_middle, control_after);
+
+            return total;
+        }();
+
+        REQUIRE(ket::almost_eq(append_then_control, control_then_append));
+        REQUIRE(logger_position(append_then_control) == logger_position(control_then_append));
+    }
+
+    SECTION("make_multiplicity_controlled_circuit()")
+    {
+        // create the overall circuit with the logger between the parts, THEN make it controlled
+        auto append_then_control = [&]() {
+            auto before_middle = ket::append_circuits(before, middle);
+            auto total = ket::append_circuits(before_middle, after);
+
+            return ket::make_multiplicity_controlled_circuit(total, 4, {0, 1}, {2, 3});
+        }();
+
+        // make each of the circuit parts controlled, THEN append them
+        auto control_then_append = [&]() {
+            auto control_before = ket::make_multiplicity_controlled_circuit(before, 4, {0, 1}, {2, 3});
+            auto control_middle = ket::make_multiplicity_controlled_circuit(middle, 4, {0, 1}, {2, 3});
+            auto control_after = ket::make_multiplicity_controlled_circuit(after, 4, {0, 1}, {2, 3});
+
+            auto before_middle = ket::append_circuits(control_before, control_middle);
+            auto total = ket::append_circuits(before_middle, control_after);
+
+            return total;
+        }();
+
+        REQUIRE(ket::almost_eq(append_then_control, control_then_append));
+        REQUIRE(logger_position(append_then_control) == logger_position(control_then_append));
     }
 }

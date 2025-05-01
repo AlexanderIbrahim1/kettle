@@ -204,6 +204,11 @@ inline auto make_controlled_circuit(
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
         }
 
+        if (circuit_element.is_circuit_logger()) {
+            new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
+            continue;
+        }
+
         const auto& gate_info = circuit_element.get_gate();
 
         if (gid::is_one_target_transform_gate(gate_info.gate)) {
@@ -277,9 +282,13 @@ inline auto make_multiplicity_controlled_circuit(
     auto new_circuit = QuantumCircuit {n_new_qubits};
 
     for (const auto& circuit_element : subcircuit) {
-
         if (circuit_element.is_control_flow()) {
             throw std::runtime_error {"ERROR: classical control flow statement cannot be made controlled.\n"};
+        }
+
+        if (circuit_element.is_circuit_logger()) {
+            new_circuit.add_circuit_logger(circuit_element.get_circuit_logger());
+            continue;
         }
 
         const auto& gate_info = circuit_element.get_gate();

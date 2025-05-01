@@ -1138,3 +1138,42 @@ TEST_CASE("simulate and get classical register")
         REQUIRE_THROWS_AS(simulator.classical_register(), std::runtime_error);
     }
 }
+
+TEST_CASE("simulate and get statevector loggers")
+{
+    auto circuit = ket::QuantumCircuit {2};
+    circuit.add_statevector_circuit_logger();
+    circuit.add_x_gate(0);
+    circuit.add_statevector_circuit_logger();
+    circuit.add_x_gate(0);
+    circuit.add_statevector_circuit_logger();
+    circuit.add_h_gate({0, 1});
+    circuit.add_statevector_circuit_logger();
+
+    auto statevector = ket::QuantumState {"00"};
+    auto simulator = ket::StatevectorSimulator {};
+
+    simulator.run(circuit, statevector);
+
+    REQUIRE(simulator.has_been_run());
+
+    const auto loggers = simulator.circuit_loggers();
+
+    REQUIRE(loggers.size() == 4);
+
+    const auto& logger0 = loggers[0].get_statevector_circuit_logger();
+    const auto expected0 = ket::QuantumState {"00"};
+    REQUIRE(ket::almost_eq(logger0.statevector(), expected0));
+
+    const auto& logger1 = loggers[1].get_statevector_circuit_logger();
+    const auto expected1 = ket::QuantumState {"10"};
+    REQUIRE(ket::almost_eq(logger1.statevector(), expected1));
+
+    const auto& logger2 = loggers[2].get_statevector_circuit_logger();
+    const auto expected2 = ket::QuantumState {"00"};
+    REQUIRE(ket::almost_eq(logger2.statevector(), expected2));
+
+    const auto& logger3 = loggers[3].get_statevector_circuit_logger();
+    const auto expected3 = ket::QuantumState {{ {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0} }};
+    REQUIRE(ket::almost_eq(logger3.statevector(), expected3));
+}

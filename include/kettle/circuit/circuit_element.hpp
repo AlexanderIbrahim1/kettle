@@ -4,6 +4,7 @@
 
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
+#include "kettle/circuit_loggers/circuit_logger.hpp"
 
 /*
     This header file contains the CircuitElement type, which holds all the different
@@ -37,6 +38,21 @@ public:
         : element_ {std::move(instruction)}
     {}
 
+    // NOLINTNEXTLINE(*explicit*)
+    CircuitElement(ket::CircuitLogger logger)
+        : element_ {std::move(logger)}
+    {}
+
+    // NOLINTNEXTLINE(*explicit*)
+    CircuitElement(ket::ClassicalRegisterCircuitLogger logger)
+        : element_ {std::move(logger)}
+    {}
+
+    // NOLINTNEXTLINE(*explicit*)
+    CircuitElement(ket::StatevectorCircuitLogger logger)
+        : element_ {std::move(logger)}
+    {}
+
     [[nodiscard]]
     constexpr auto is_gate() const -> bool
     {
@@ -47,6 +63,12 @@ public:
     constexpr auto is_control_flow() const -> bool
     {
         return std::holds_alternative<ClassicalControlFlowInstruction>(element_);
+    }
+
+    [[nodiscard]]
+    constexpr auto is_circuit_logger() const -> bool
+    {
+        return std::holds_alternative<ket::CircuitLogger>(element_);
     }
 
     [[nodiscard]]
@@ -61,8 +83,14 @@ public:
         return std::get<ClassicalControlFlowInstruction>(element_);
     }
 
+    [[nodiscard]]
+    constexpr auto get_circuit_logger() const -> const ket::CircuitLogger&
+    {
+        return std::get<ket::CircuitLogger>(element_);
+    }
+
 private:
-    std::variant<ket::GateInfo, ClassicalControlFlowInstruction> element_;
+    std::variant<ket::GateInfo, ClassicalControlFlowInstruction, ket::CircuitLogger> element_;
 };
 
 
