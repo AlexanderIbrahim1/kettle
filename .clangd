@@ -29,3 +29,12 @@ If:
 Diagnostics:
   ClangTidy:
     Remove: [misc-use-anonymous-namespace, misc-use-internal-linkage, bugprone-exception-escape, performance-enum-size, hicpp-signed-bitwise, cert-err58-cpp, cppcoreguidelines-pro-bounds-pointer-arithmetic]
+
+---
+
+# Ignore certain diagnostics for qpe_tangelo_project
+If:
+  PathMatch: qpe_tangelo_project/.*
+Diagnostics:
+  ClangTidy:
+    Remove: [misc-use-anonymous-namespace, misc-use-internal-linkage, bugprone-exception-escape, performance-enum-size, hicpp-signed-bitwise, cert-err58-cpp, cppcoreguidelines-pro-bounds-pointer-arithmetic]
