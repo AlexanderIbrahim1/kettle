@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include <kettle/kettle.hpp>
+#include <kettle/state/project_state.hpp>
 
 /*
     Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.
@@ -78,11 +79,46 @@ auto main(int argc, char** argv) -> int
 
     ket::simulate(circuit, statevector);
 
-    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 12, marginal_qubits);
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 16, marginal_qubits);
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
     }
+
+    const auto max_pair = std::ranges::max_element(
+        counts,
+        [](const auto& left, const auto& right) { return left.second < right.second; }
+    );
+
+    std::cout << max_pair->first << ", " << max_pair->second << "\n";
+
+    const auto max_amplitude_bitstring = ket::lstrip_marginal_bits(max_pair->first);
+    const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(max_amplitude_bitstring);
+    const auto qubit_indices = ket::arange(arguments.n_unitary_qubits, n_total_qubits);
+
+    const auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 0, 1, 0, 1, 1});
+
+    // create the original eigenstate
+    const auto initial_circuit = ket::read_tangelo_circuit(
+        6,
+        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/make_gates/rotors_2_ancilla_9_g_1.00_classical/initial_circuit.dat"},
+        0
+    );
+
+    auto eigenstatevector = ket::QuantumState {6};
+    ket::simulate(initial_circuit, eigenstatevector);
+
+    std::cout << eigenstatevector.n_qubits() << '\n';
+    std::cout << projected.n_qubits() << '\n';
+
+    // calculate the inner product
+    auto inner_product = std::complex<double> {};
+    for (std::size_t i {0}; i < eigenstatevector.n_states(); ++i) {
+        inner_product += (projected[i] * std::conj(eigenstatevector[i]));
+    }
+
+    std::cout << inner_product.real() << ", " << inner_product.imag() << '\n';
+
 
     return 0;
 }

@@ -137,7 +137,7 @@ auto main(int argc, char** argv) -> int
 
     // simulate the initial circuit
     if (args.i_continue == RUN_FROM_START_KEY) {
-        simulate_subcircuit(args.abs_circuits_dirpath / "initial_circuit.dat", statevector, n_total_qubits);
+        // simulate_subcircuit(args.abs_circuits_dirpath / "initial_circuit.dat", statevector, n_total_qubits);
         simulate_subcircuit(args.abs_circuits_dirpath / "qft_circuit.dat", statevector, n_total_qubits);
     }
 
