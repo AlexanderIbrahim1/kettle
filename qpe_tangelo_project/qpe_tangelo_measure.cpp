@@ -65,23 +65,20 @@ auto main(int argc, char** argv) -> int
         catch (const std::exception& e)
         {
             std::cout << e.what() << '\n';
-            std::exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
         }
     }();
 
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
 
-    auto marginal_qubits = std::vector<std::size_t> {};
-    for (std::size_t i {0}; i < arguments.n_ancilla_qubits; ++i) {
-        marginal_qubits.push_back(i);
-    }
+    auto marginal_qubits = ket::arange(0UL, arguments.n_unitary_qubits);
 
     auto statevector = ket::load_statevector(arguments.abs_statevector_filepath);
     auto circuit = ket::QuantumCircuit {n_total_qubits};
 
     ket::simulate(circuit, statevector);
 
-    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1ul << 12, marginal_qubits);
+    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 12, marginal_qubits);
 
     for (const auto& [bitstring, count]: counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";

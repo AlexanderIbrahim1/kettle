@@ -85,7 +85,7 @@ void simulate_unitary(
     int& count
 )
 {
-    auto n_powers = 1ul << i_control;
+    auto n_powers = 1UL << i_control;
     const auto n_total_qubits = args.n_ancilla_qubits + args.n_unitary_qubits;
 
     const auto circuit_filepath = [&]() {
@@ -121,7 +121,7 @@ auto main(int argc, char** argv) -> int
         catch (const std::exception& e)
         {
             std::cout << e.what() << '\n';
-            std::exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
         }
     }();
 

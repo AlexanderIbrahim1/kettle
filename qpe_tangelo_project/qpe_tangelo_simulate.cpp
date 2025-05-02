@@ -55,7 +55,7 @@ auto main(int argc, char** argv) -> int
         catch (const std::exception& e)
         {
             std::cout << e.what() << '\n';
-            std::exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
         }
     }();
 
