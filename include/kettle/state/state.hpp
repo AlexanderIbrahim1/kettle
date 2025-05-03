@@ -227,4 +227,26 @@ inline auto tensor_product(const QuantumState& left, const QuantumState& right) 
     return QuantumState {std::move(new_coefficients)};
 }
 
+inline auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state) -> std::complex<double>
+{
+    if (bra_state.n_states() != ket_state.n_states()) {
+        throw std::runtime_error {"ERROR: cannot calculate inner product between two states of different sizes.\n"};
+    }
+
+    // calculate the inner product
+    auto inner_product = std::complex<double> {};
+    for (std::size_t i {0}; i < bra_state.n_states(); ++i) {
+        inner_product += (std::conj(bra_state[i]) * ket_state[i]);
+    }
+
+    return inner_product;
+}
+
+inline auto inner_product_norm_squared(const QuantumState& left, const QuantumState& right) -> double
+{
+    const auto inner_product_ = inner_product(left, right);
+
+    return std::norm(inner_product_);
+}
+
 }  // namespace ket

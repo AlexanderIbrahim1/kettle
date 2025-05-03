@@ -81,23 +81,6 @@ auto main(int argc, char** argv) -> int
 
     const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 16, marginal_qubits);
 
-    for (const auto& [bitstring, count]: counts) {
-        std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
-    }
-
-    const auto max_pair = std::ranges::max_element(
-        counts,
-        [](const auto& left, const auto& right) { return left.second < right.second; }
-    );
-
-    std::cout << max_pair->first << ", " << max_pair->second << "\n";
-
-    const auto max_amplitude_bitstring = ket::lstrip_marginal_bits(max_pair->first);
-    const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(max_amplitude_bitstring);
-    const auto qubit_indices = ket::arange(arguments.n_unitary_qubits, n_total_qubits);
-
-    const auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 0, 1, 0, 1, 1});
-
     // create the original eigenstate
     const auto initial_circuit = ket::read_tangelo_circuit(
         6,
@@ -108,17 +91,41 @@ auto main(int argc, char** argv) -> int
     auto eigenstatevector = ket::QuantumState {6};
     ket::simulate(initial_circuit, eigenstatevector);
 
-    std::cout << eigenstatevector.n_qubits() << '\n';
-    std::cout << projected.n_qubits() << '\n';
+    const auto qubit_indices = ket::arange(arguments.n_unitary_qubits, n_total_qubits);
 
-    // calculate the inner product
-    auto inner_product = std::complex<double> {};
-    for (std::size_t i {0}; i < eigenstatevector.n_states(); ++i) {
-        inner_product += (projected[i] * std::conj(eigenstatevector[i]));
+    for (const auto& [bitstring, count]: counts) {
+        const auto lstripped_bitstring = ket::lstrip_marginal_bits(bitstring);
+        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(lstripped_bitstring);
+
+        try {
+            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
+
+            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
+
+            std::cout << "(state, count, inner_sq) = (" << bitstring << ", " << count << ", " << inner_product_sq << ")\n";
+        }
+        catch (const std::exception& e) {
+            continue;
+        }
     }
 
-    std::cout << inner_product.real() << ", " << inner_product.imag() << '\n';
+//     const auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 1, 0, 0});
+// 
+//     const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
+// 
+//     std::cout << "inner_product_sq = " << inner_product_sq << '\n';
 
+    // (state, count) = (xxxxxx1110101, 122)
+    // (state, count) = (xxxxxx1110110, 169)
+    // (state, count) = (xxxxxx1110111, 206)
+    // (state, count) = (xxxxxx1111000, 311)
+    // (state, count) = (xxxxxx1111001, 496)
+    // (state, count) = (xxxxxx1111010, 976)
+    // (state, count) = (xxxxxx1111011, 2729)
+    // (state, count) = (xxxxxx1111100, 21403)
+    // (state, count) = (xxxxxx1111101, 31967)
+    // (state, count) = (xxxxxx1111110, 3045)
+    // (state, count) = (xxxxxx1111111, 1140)
 
     return 0;
 }

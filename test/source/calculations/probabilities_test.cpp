@@ -1,7 +1,7 @@
 #include <cmath>
 #include <random>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -96,7 +96,7 @@ TEST_CASE("probabilities")
         struct InputAndOutput
         {
             ket::QuantumState input;
-            std::unordered_map<std::string, double> output;
+            std::map<std::string, double> output;
         };
 
         // clang-format off
@@ -126,7 +126,7 @@ TEST_CASE("probabilities")
         ket::simulate(circuit, state);
 
         const auto actual = ket::calculate_probabilities(state);
-        const auto expected = std::unordered_map<std::string, double> {
+        const auto expected = std::map<std::string, double> {
             {"0", 0.5},
             {"1", 0.5}
         };
@@ -150,7 +150,7 @@ TEST_CASE("probabilities")
             };
 
             const auto actual = ket::calculate_probabilities(state);
-            const auto expected = std::unordered_map<std::string, double> {
+            const auto expected = std::map<std::string, double> {
                 {"0", 1.0},
                 {"1", 0.0}
             };

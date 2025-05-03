@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <optional>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -11,7 +11,7 @@
 
 #include "kettle/simulation/gate_pair_generator.hpp"
 
-using BasisIndexMap = std::unordered_map<std::string, std::size_t>;
+using BasisIndexMap = std::map<std::string, std::size_t>;
 
 struct IndexPair
 {

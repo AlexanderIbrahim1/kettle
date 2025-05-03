@@ -4,7 +4,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "kettle/simulation/gate_pair_generator.hpp"
@@ -161,11 +161,11 @@ constexpr auto calculate_probabilities_raw(const QuantumState& state, const Quan
 }
 
 inline auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise = nullptr)
-    -> std::unordered_map<std::string, double>
+    -> std::map<std::string, double>
 {
     const auto n_states = state.n_states();
     const auto n_qubits = state.n_qubits();
-    auto probabilities = std::unordered_map<std::string, double> {};
+    auto probabilities = std::map<std::string, double> {};
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
     const auto endian = ket::QuantumStateEndian::LITTLE;

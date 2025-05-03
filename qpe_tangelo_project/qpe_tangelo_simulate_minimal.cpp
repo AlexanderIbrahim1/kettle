@@ -1,3 +1,4 @@
+#include "kettle/circuit/circuit.hpp"
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -137,6 +138,11 @@ auto main(int argc, char** argv) -> int
 
     // simulate the initial circuit
     if (args.i_continue == RUN_FROM_START_KEY) {
+        // the |000000> state has much less overlap with the ground state than the uniformly distributed state
+        auto hadamard_circuit = ket::QuantumCircuit {n_total_qubits};
+        hadamard_circuit.add_h_gate(ket::arange(args.n_unitary_qubits));
+        ket::simulate(hadamard_circuit, statevector);
+
         // simulate_subcircuit(args.abs_circuits_dirpath / "initial_circuit.dat", statevector, n_total_qubits);
         simulate_subcircuit(args.abs_circuits_dirpath / "qft_circuit.dat", statevector, n_total_qubits);
     }

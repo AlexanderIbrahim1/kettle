@@ -6,7 +6,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "kettle/calculations/probabilities.hpp"
@@ -84,11 +84,11 @@ namespace ket
 {
 
 inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
-    -> std::unordered_map<std::size_t, std::size_t>
+    -> std::map<std::size_t, std::size_t>
 {
-    auto map = std::unordered_map<std::size_t, std::size_t> {};
+    auto map = std::map<std::size_t, std::size_t> {};
 
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (auto i_state : measurements) {
         ++map[i_state];
     }
@@ -96,11 +96,11 @@ inline auto memory_to_counts(const std::vector<std::size_t>& measurements)
     return map;
 }
 
-inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::unordered_map<std::size_t, double>
+inline auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::map<std::size_t, double>
 {
-    auto map = std::unordered_map<std::size_t, double> {};
+    auto map = std::map<std::size_t, double> {};
 
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (auto i_state : measurements) {
         map[i_state] += 1.0;
     }
@@ -165,12 +165,12 @@ inline auto perform_measurements_as_counts_raw(
     const std::vector<double>& probabilities_raw,
     std::size_t n_shots,
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::size_t, std::size_t>
+) -> std::map<std::size_t, std::size_t>
 {
     auto sampler = impl_ket::ProbabilitySampler_ {probabilities_raw, seed};
-    auto measurements = std::unordered_map<std::size_t, std::size_t> {};
+    auto measurements = std::map<std::size_t, std::size_t> {};
 
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
         const auto i_state = sampler();
         ++measurements[i_state];
@@ -184,7 +184,7 @@ inline auto perform_measurements_as_counts_raw(
     std::size_t n_shots,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::size_t, std::size_t>
+) -> std::map<std::size_t, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     return perform_measurements_as_counts_raw(probabilities_raw, n_shots, seed);
@@ -195,7 +195,7 @@ inline auto perform_measurements_as_counts_marginal(
     std::size_t n_shots,
     const std::vector<std::size_t>& marginal_qubits = {},
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::string, std::size_t>
+) -> std::map<std::string, std::size_t>
 {
     if (!impl_ket::is_power_of_2(probabilities_raw.size())) {
         throw std::runtime_error {"The number of probabilities must be a power of 2.\n"};
@@ -205,12 +205,12 @@ inline auto perform_measurements_as_counts_marginal(
     const auto marginal_bitmask = impl_ket::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
     auto sampler = impl_ket::ProbabilitySampler_ {probabilities_raw, seed};
-    auto measurements = std::unordered_map<std::string, std::size_t> {};
+    auto measurements = std::map<std::string, std::size_t> {};
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
     const auto endian = ket::QuantumStateEndian::LITTLE;
 
-    // REMINDER: if the entry does not exist, `std::unordered_map` will first initialize it to 0
+    // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
         const auto i_state = sampler();
         const auto bitstring = impl_ket::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
@@ -226,7 +226,7 @@ inline auto perform_measurements_as_counts_marginal(
     const std::vector<std::size_t>& marginal_qubits = {},
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::string, std::size_t>
+) -> std::map<std::string, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     return perform_measurements_as_counts_marginal(probabilities_raw, n_shots, marginal_qubits, seed);
@@ -239,7 +239,7 @@ inline auto perform_measurements_as_counts_marginal(
     const std::vector<std::size_t>& marginal_qubits = {},
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::string, std::size_t>
+) -> std::map<std::string, std::size_t>
 {
     const auto n_qubits = circuit.n_qubits();
     const auto marginal_bitmask = impl_ket::build_marginal_bitmask_(marginal_qubits, n_qubits);
@@ -247,7 +247,7 @@ inline auto perform_measurements_as_counts_marginal(
     // the internal layout of the quantum state is little endian, so the probabilities are as well
     const auto endian = ket::QuantumStateEndian::LITTLE;
 
-    auto measurements = std::unordered_map<std::string, std::size_t> {};
+    auto measurements = std::map<std::string, std::size_t> {};
 
     for (std::size_t i {0}; i < n_shots; ++i) {
         auto state = original_state;
@@ -269,7 +269,7 @@ inline auto perform_measurements_as_counts(
     std::size_t n_shots,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
-) -> std::unordered_map<std::string, std::size_t>
+) -> std::map<std::string, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     const auto marginal_qubits = std::vector<std::size_t> {};
