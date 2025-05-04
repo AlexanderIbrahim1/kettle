@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kettle/state/endian.hpp"
 #include <complex>
 #include <filesystem>
 #include <fstream>
@@ -7,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include <kettle/state/bitstring_utils.hpp>
 #include <kettle/state/state.hpp>
 
 namespace impl_ket
@@ -77,11 +79,17 @@ inline void save_statevector(
     QuantumStateEndian endian = QuantumStateEndian::LITTLE
 )
 {
+    using QSE = QuantumStateEndian;
+
     outstream << "ENDIANNESS: " << impl_ket::endian_to_string(endian) << '\n';
     outstream << "NUMBER OF STATES: " << state.n_states() << '\n';
 
     for (std::size_t i {0}; i < state.n_states(); ++i) {
-        outstream << impl_ket::format_complex(state[i]) << '\n';
+        if (endian == QSE::LITTLE) {
+            outstream << impl_ket::format_complex(state[i]) << '\n';
+        } else {
+            outstream << impl_ket::format_complex(state[impl_ket::endian_flip_(i, state.n_qubits())]) << '\n';
+        }
     }
 }
 

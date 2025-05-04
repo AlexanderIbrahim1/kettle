@@ -1,3 +1,5 @@
+#include "kettle/io/statevector.hpp"
+#include "kettle/state/endian.hpp"
 #include <filesystem>
 #include <stdexcept>
 
@@ -79,12 +81,12 @@ auto main(int argc, char** argv) -> int
 
     ket::simulate(circuit, statevector);
 
-    const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 16, marginal_qubits);
+    // const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 20, marginal_qubits);
 
     // create the original eigenstate
     const auto initial_circuit = ket::read_tangelo_circuit(
         6,
-        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/make_gates/rotors_2_ancilla_9_g_1.00_classical/initial_circuit.dat"},
+        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/make_gates/rotors_2_ancilla_7_g_0.55_classical/initial_circuit.dat"},
         0
     );
 
@@ -93,21 +95,65 @@ auto main(int argc, char** argv) -> int
 
     const auto qubit_indices = ket::arange(arguments.n_unitary_qubits, n_total_qubits);
 
-    for (const auto& [bitstring, count]: counts) {
-        const auto lstripped_bitstring = ket::lstrip_marginal_bits(bitstring);
-        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(lstripped_bitstring);
+//    for (std::size_t i_state {0}; i_state < (1UL << arguments.n_ancilla_qubits); ++i_state) {
+//        const auto bitstring = ket::state_index_to_bitstring_big_endian(i_state, arguments.n_ancilla_qubits);
+//        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(bitstring);
+//
+//        const auto prefix = std::string(arguments.n_unitary_qubits, 'x');
+//        const auto entry = prefix + bitstring;
+//
+//        const auto count = [&]() {
+//            if (counts.contains(entry)) {
+//                return counts.at(entry);
+//            } else {
+//                return 0UL;
+//            }
+//        }();
+//
+//        try {
+//            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
+//            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
+//            std::cout << bitstring << ", " << count << ", " << inner_product_sq << '\n';
+//        }
+//        catch (const std::exception& e) {
+//            std::cout << bitstring << ", " << count << ", " << 0.0 << '\n';
+//        }
+//
+//    }
 
-        try {
-            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
+    auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 1, 1, 0});
+    // auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 0, 1, 0, 1, 1});
+    // 111101011
+    // ket::save_statevector(std::cout, projected, ket::QuantumStateEndian::BIG);
+    // ket::save_statevector(std::cout, eigenstatevector, ket::QuantumStateEndian::BIG);
 
-            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
+    const auto reversing_circuit = ket::read_tangelo_circuit(
+        6,
+        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/plot_qpe/inverse_rotors_2_ancilla_7_g_0.55_classical.reverse"},
+        0
+    );
 
-            std::cout << "(state, count, inner_sq) = (" << bitstring << ", " << count << ", " << inner_product_sq << ")\n";
-        }
-        catch (const std::exception& e) {
-            continue;
-        }
-    }
+    // ket::save_statevector(std::cout, eigenstatevector);
+    ket::simulate(reversing_circuit, projected);
+    // ket::simulate(reversing_circuit, eigenstatevector);
+    ket::save_statevector(std::cout, projected, ket::QuantumStateEndian::BIG);
+    // ket::save_statevector(std::cout, eigenstatevector, ket::QuantumStateEndian::BIG);
+
+//    for (const auto& [bitstring, count]: counts) {
+//        const auto lstripped_bitstring = ket::lstrip_marginal_bits(bitstring);
+//        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(lstripped_bitstring);
+//
+//        try {
+//            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
+//
+//            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
+//
+//            std::cout << "(state, count, inner_sq) = (" << bitstring << ", " << count << ", " << inner_product_sq << ")\n";
+//        }
+//        catch (const std::exception& e) {
+//            continue;
+//        }
+//    }
 
 //     const auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 1, 0, 0});
 // 
