@@ -1,12 +1,10 @@
 if(PROJECT_IS_TOP_LEVEL)
   set(
       CMAKE_INSTALL_INCLUDEDIR "include/kettle-${PROJECT_VERSION}"
-      CACHE PATH ""
+      CACHE STRING ""
   )
+  set_property(CACHE CMAKE_INSTALL_INCLUDEDIR PROPERTY TYPE PATH)
 endif()
-
-# Project is configured with no languages, so tell GNUInstallDirs the lib dir
-set(CMAKE_INSTALL_LIBDIR lib CACHE PATH "")
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -15,7 +13,9 @@ include(GNUInstallDirs)
 set(package kettle)
 
 install(
-    DIRECTORY include/
+    DIRECTORY
+    include/
+    "${PROJECT_BINARY_DIR}/export/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT kettle_Development
 )
@@ -23,39 +23,47 @@ install(
 install(
     TARGETS kettle_kettle
     EXPORT kettleTargets
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    RUNTIME #
+    COMPONENT kettle_Runtime
+    LIBRARY #
+    COMPONENT kettle_Runtime
+    NAMELINK_COMPONENT kettle_Development
+    ARCHIVE #
+    COMPONENT kettle_Development
+    INCLUDES #
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
 write_basic_package_version_file(
     "${package}ConfigVersion.cmake"
     COMPATIBILITY SameMajorVersion
-    ARCH_INDEPENDENT
 )
 
 # Allow package maintainers to freely override the path for the configs
 set(
-    kettle_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${package}"
-    CACHE PATH "CMake package config location relative to the install prefix"
+    KETTLE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package}"
+    CACHE STRING "CMake package config location relative to the install prefix"
 )
-mark_as_advanced(kettle_INSTALL_CMAKEDIR)
+set_property(CACHE KETTLE_INSTALL_CMAKEDIR PROPERTY TYPE PATH)
+mark_as_advanced(KETTLE_INSTALL_CMAKEDIR)
 
 install(
     FILES cmake/install-config.cmake
-    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
+    DESTINATION "${KETTLE_INSTALL_CMAKEDIR}"
     RENAME "${package}Config.cmake"
     COMPONENT kettle_Development
 )
 
 install(
     FILES "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
-    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
+    DESTINATION "${KETTLE_INSTALL_CMAKEDIR}"
     COMPONENT kettle_Development
 )
 
 install(
     EXPORT kettleTargets
     NAMESPACE kettle::
-    DESTINATION "${kettle_INSTALL_CMAKEDIR}"
+    DESTINATION "${KETTLE_INSTALL_CMAKEDIR}"
     COMPONENT kettle_Development
 )
 
