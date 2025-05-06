@@ -27,7 +27,7 @@ struct PrimitiveGateInfo
 /*
     Find the angle of the determinant.
 */
-constexpr auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
+inline auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
 {
     const auto det = ket::determinant(matrix);
     return std::atan2(det.imag(), det.real());
