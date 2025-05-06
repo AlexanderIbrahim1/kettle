@@ -5,7 +5,7 @@ include(cmake/prelude.cmake)
 project(
     kettle
     VERSION 0.1.0
-    DESCRIPTION "A reproduction of MicroQiskit, with some changes in implementation."
+    DESCRIPTION "A quantum circuit simulation written in C++20"
     HOMEPAGE_URL "https://example.com/"
     LANGUAGES CXX
 )
@@ -13,7 +13,62 @@ project(
 include(cmake/project-is-top-level.cmake)
 include(cmake/variables.cmake)
 
-add_subdirectory(include) # kettle
+# ---- Declare library ----
+
+add_library(
+    kettle_kettle
+    source/kettle/calculations/probabilities.cpp
+    source/kettle/calculations/measurements.cpp
+)
+add_library(kettle::kettle ALIAS kettle_kettle)
+
+include(GenerateExportHeader)
+generate_export_header(
+    kettle_kettle
+    BASE_NAME kettle
+    EXPORT_FILE_NAME export/kettle/kettle_export.hpp
+    CUSTOM_CONTENT_FROM_VARIABLE pragma_suppress_c4251
+)
+
+if(NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(kettle_kettle PUBLIC KETTLE_STATIC_DEFINE)
+endif()
+
+set_target_properties(
+    kettle_kettle PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN YES
+    VERSION "${PROJECT_VERSION}"
+    SOVERSION "${PROJECT_VERSION_MAJOR}"
+    EXPORT_NAME kettle
+    OUTPUT_NAME kettle
+)
+
+target_include_directories(
+    kettle_kettle
+    ${warning_guard}
+    PUBLIC
+    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+)
+
+# target_include_directories(
+#     kettle_kettle
+#     ${warning_guard}
+#     PUBLIC
+#     "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+# )
+
+target_include_directories(
+    kettle_kettle SYSTEM
+    PUBLIC
+    "\$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>"
+)
+
+target_compile_features(
+    kettle_kettle
+    PUBLIC
+    cxx_std_20
+)
 
 # ---- Install rules ----
 
