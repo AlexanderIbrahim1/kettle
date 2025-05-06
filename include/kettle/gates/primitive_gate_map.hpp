@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "kettle/common/linear_bijective_map.hpp"
+#include "kettle_internal/common/linear_bijective_map.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/circuit.hpp"
 
@@ -10,7 +10,7 @@
 namespace impl_ket
 {
 
-static constexpr auto UNCONTROLLED_TO_CONTROLLED_GATE = LinearBijectiveMap<ket::Gate, ket::Gate, 10> {
+static constexpr auto UNCONTROLLED_TO_CONTROLLED_GATE = ket::internal::LinearBijectiveMap<ket::Gate, ket::Gate, 10> {
     std::pair {ket::Gate::H, ket::Gate::CH},
     std::pair {ket::Gate::X, ket::Gate::CX},
     std::pair {ket::Gate::Y, ket::Gate::CY},
@@ -23,7 +23,7 @@ static constexpr auto UNCONTROLLED_TO_CONTROLLED_GATE = LinearBijectiveMap<ket::
     std::pair {ket::Gate::U, ket::Gate::CU}
 };
 
-static constexpr auto PRIMITIVE_GATES_TO_STRING = LinearBijectiveMap<ket::Gate, std::string, 22>
+static constexpr auto PRIMITIVE_GATES_TO_STRING = ket::internal::LinearBijectiveMap<ket::Gate, std::string, 22>
 {
     std::pair {ket::Gate::H, "H"},
     std::pair {ket::Gate::X, "X"},
@@ -53,7 +53,7 @@ using GateFuncPtr1T1A = void(ket::QuantumCircuit::*)(std::size_t, double);
 using GateFuncPtr1C1T = void(ket::QuantumCircuit::*)(std::size_t, std::size_t);
 using GateFuncPtr1C1T1A = void(ket::QuantumCircuit::*)(std::size_t, std::size_t, double);
 
-static const auto GATE_TO_FUNCTION_1T = LinearBijectiveMap<ket::Gate, GateFuncPtr1T, 5>
+static const auto GATE_TO_FUNCTION_1T = ket::internal::LinearBijectiveMap<ket::Gate, GateFuncPtr1T, 5>
 {
     std::pair {ket::Gate::H, static_cast<GateFuncPtr1T>(&ket::QuantumCircuit::add_h_gate)},
     std::pair {ket::Gate::X, static_cast<GateFuncPtr1T>(&ket::QuantumCircuit::add_x_gate)},
@@ -62,7 +62,7 @@ static const auto GATE_TO_FUNCTION_1T = LinearBijectiveMap<ket::Gate, GateFuncPt
     std::pair {ket::Gate::SX, static_cast<GateFuncPtr1T>(&ket::QuantumCircuit::add_sx_gate)}
 };
 
-static const auto GATE_TO_FUNCTION_1T1A = LinearBijectiveMap<ket::Gate, GateFuncPtr1T1A, 4>
+static const auto GATE_TO_FUNCTION_1T1A = ket::internal::LinearBijectiveMap<ket::Gate, GateFuncPtr1T1A, 4>
 {
     std::pair {ket::Gate::RX, static_cast<GateFuncPtr1T1A>(&ket::QuantumCircuit::add_rx_gate)},
     std::pair {ket::Gate::RY, static_cast<GateFuncPtr1T1A>(&ket::QuantumCircuit::add_ry_gate)},
@@ -70,7 +70,7 @@ static const auto GATE_TO_FUNCTION_1T1A = LinearBijectiveMap<ket::Gate, GateFunc
     std::pair {ket::Gate::P, static_cast<GateFuncPtr1T1A>(&ket::QuantumCircuit::add_p_gate)},
 };
 
-static const auto GATE_TO_FUNCTION_1C1T = LinearBijectiveMap<ket::Gate, GateFuncPtr1C1T, 5>
+static const auto GATE_TO_FUNCTION_1C1T = ket::internal::LinearBijectiveMap<ket::Gate, GateFuncPtr1C1T, 5>
 {
     std::pair {ket::Gate::CH, static_cast<GateFuncPtr1C1T>(&ket::QuantumCircuit::add_ch_gate)},
     std::pair {ket::Gate::CX, static_cast<GateFuncPtr1C1T>(&ket::QuantumCircuit::add_cx_gate)},
@@ -79,7 +79,7 @@ static const auto GATE_TO_FUNCTION_1C1T = LinearBijectiveMap<ket::Gate, GateFunc
     std::pair {ket::Gate::CSX, static_cast<GateFuncPtr1C1T>(&ket::QuantumCircuit::add_csx_gate)}
 };
 
-static const auto GATE_TO_FUNCTION_1C1T1A = LinearBijectiveMap<ket::Gate, GateFuncPtr1C1T1A, 4>
+static const auto GATE_TO_FUNCTION_1C1T1A = ket::internal::LinearBijectiveMap<ket::Gate, GateFuncPtr1C1T1A, 4>
 {
     std::pair {ket::Gate::CRX, static_cast<GateFuncPtr1C1T1A>(&ket::QuantumCircuit::add_crx_gate)},
     std::pair {ket::Gate::CRY, static_cast<GateFuncPtr1C1T1A>(&ket::QuantumCircuit::add_cry_gate)},

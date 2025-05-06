@@ -13,7 +13,7 @@
     with quantum circuits, but C++ doesn't have a convenient way of doing this.
 */
 
-namespace impl_ket
+namespace ket::internal
 {
 
 enum class RightCompare_ : std::uint8_t
@@ -44,7 +44,7 @@ auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capa
     return output;
 }
 
-}  // namespace impl_ket
+}  // namespace ket::internal
 
 
 namespace ket
@@ -58,13 +58,13 @@ namespace ket
 template <std::integral Integer = std::size_t>
 auto arange(Integer value) -> std::vector<Integer>
 {
-    using RC = impl_ket::RightCompare_;
+    using RC = ket::internal::RightCompare_;
 
     if (value <= 0) {
         return {};
     }
 
-    return impl_ket::arange_helper_<Integer, RC::LESS_THAN>(Integer {0}, value, 1, value);
+    return ket::internal::arange_helper_<Integer, RC::LESS_THAN>(Integer {0}, value, 1, value);
 }
 
 /*
@@ -84,7 +84,7 @@ auto arange(Integer value) -> std::vector<Integer>
 template <std::integral Integer = std::size_t>
 auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<Integer>
 {
-    using RC = impl_ket::RightCompare_;
+    using RC = ket::internal::RightCompare_;
 
     if (step == 0) {
         throw std::runtime_error {"The `step` value cannot be 0 in `arange()`"};
@@ -97,7 +97,7 @@ auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<I
             return {};
         } else {
             const auto n_terms = Integer{1} + ((right - left) / abs_step);
-            return impl_ket::arange_helper_<Integer, RC::LESS_THAN>(left, right, step, n_terms);
+            return ket::internal::arange_helper_<Integer, RC::LESS_THAN>(left, right, step, n_terms);
         }
     }
     else {
@@ -105,7 +105,7 @@ auto arange(Integer left, Integer right, std::int64_t step = 1) -> std::vector<I
             return {};
         } else {
             const auto n_terms = Integer{1} + ((left - right) / abs_step);
-            return impl_ket::arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
+            return ket::internal::arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
         }
     }
 }
