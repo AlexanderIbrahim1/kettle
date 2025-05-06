@@ -16,39 +16,6 @@
     It is also possible to add noise to the measurements.
 */
 
-namespace
-{
-
-constexpr void apply_noise_(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
-{
-    auto generator = impl_ket::SingleQubitGatePairGenerator {i_qubit, n_qubits};
-    for (std::size_t i_pair {0}; i_pair < generator.size(); ++i_pair) {
-        const auto [state0_index, state1_index] = generator.next();
-
-        const auto current_prob0 = probabilities[state0_index];
-        const auto current_prob1 = probabilities[state1_index];
-        const auto new_prob0 = ((1.0 - noise) * current_prob0) + (noise * current_prob1);
-        const auto new_prob1 = ((1.0 - noise) * current_prob1) + (noise * current_prob0);
-
-        probabilities[state0_index] = new_prob0;
-        probabilities[state1_index] = new_prob1;
-    }
-}
-
-/*
-    Ensures that the noise parameter lies in [0.0, 1.0]; otherwise, the noise application is invalid.
-*/
-constexpr void check_noise_value_(double value)
-{
-    const auto between_0_and_1 = [](double x) { return 0.0 <= x && x <= 1.0; };
-
-    if (!between_0_and_1(value)) {
-        throw std::runtime_error {"ERROR: Cannot set probability in QuantumNoise object outside of [0, 1]."};
-    }
-}
-
-}  // namespace
-
 namespace ket
 {
 
@@ -60,7 +27,7 @@ QuantumNoise::QuantumNoise(std::size_t n_qubits)
 void QuantumNoise::set(std::size_t index, double noise)
 {
     check_index_(index);
-    check_noise_value_(noise);
+    ket::internal::check_noise_value_(noise);
     noise_[index] = noise;
 }
 
@@ -94,7 +61,7 @@ auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* 
     if (noise != nullptr) {
         for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
             const auto prob_noise = noise->get(i_qubit);
-            apply_noise_(prob_noise, i_qubit, n_qubits, probabilities);
+            ket::internal::apply_noise_(prob_noise, i_qubit, n_qubits, probabilities);
         }
     }
 
@@ -134,3 +101,36 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
 }
 
 }  // namespace ket
+
+namespace ket::internal
+{
+
+void apply_noise_(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
+{
+    auto generator = impl_ket::SingleQubitGatePairGenerator {i_qubit, n_qubits};
+    for (std::size_t i_pair {0}; i_pair < generator.size(); ++i_pair) {
+        const auto [state0_index, state1_index] = generator.next();
+
+        const auto current_prob0 = probabilities[state0_index];
+        const auto current_prob1 = probabilities[state1_index];
+        const auto new_prob0 = ((1.0 - noise) * current_prob0) + (noise * current_prob1);
+        const auto new_prob1 = ((1.0 - noise) * current_prob1) + (noise * current_prob0);
+
+        probabilities[state0_index] = new_prob0;
+        probabilities[state1_index] = new_prob1;
+    }
+}
+
+/*
+    Ensures that the noise parameter lies in [0.0, 1.0]; otherwise, the noise application is invalid.
+*/
+void check_noise_value_(double value)
+{
+    const auto between_0_and_1 = [](double x) { return 0.0 <= x && x <= 1.0; };
+
+    if (!between_0_and_1(value)) {
+        throw std::runtime_error {"ERROR: Cannot set probability in QuantumNoise object outside of [0, 1]."};
+    }
+}
+
+}  // namespace ket::internal

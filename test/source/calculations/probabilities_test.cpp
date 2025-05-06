@@ -10,6 +10,7 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "kettle/calculations/probabilities.hpp"
+#include "kettle/calculations/measurements.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
@@ -19,7 +20,7 @@ static constexpr auto RELATIVE_TOL = 1.0e-6;
 TEST_CASE("cumulative probabilities")
 {
     const auto probabilities = std::vector<double>(4, 0.25);
-    const auto cumulative = impl_ket::calculate_cumulative_sum(probabilities);
+    const auto cumulative = ket::internal::calculate_cumulative_sum_(probabilities);
 
     REQUIRE_THAT(cumulative[0], Catch::Matchers::WithinRel(0.25));
     REQUIRE_THAT(cumulative[1], Catch::Matchers::WithinRel(0.50));

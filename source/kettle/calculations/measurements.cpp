@@ -21,108 +21,6 @@
     This file contains code components to perform measurements of the state.
 */
 
-namespace
-{
-
-constexpr auto CUMULATIVE_END_OFFSET_FRACTION = double {1.0e-4};
-
-/*
-    We want to avoid sampling entries beyond the end of the probability distribution,
-    because this correponds to an index for a computational state that does not exist.
-
-    To prevent this, we need to offset the largest value produced by the random number
-    generator by a small amount, to make sure the largest value is never sampled.
-*/
-constexpr auto cumulative_end_offset_(const std::vector<double>& cumulative_probabilities) -> double
-{
-    // a circuit requires at least 1 qubit, with at least two computational states; thus
-    // there should be at least two entries in the vector of cumulative probabilities
-    const auto size = cumulative_probabilities.size();
-
-    const auto last = cumulative_probabilities[size - 1];
-
-    // find the first probability from the end that is strictly less than the last probability
-    const auto second_last = [&]()
-    {
-        for (std::size_t i {size - 1}; i > 0; --i) {
-            if (cumulative_probabilities[i - 1] < last) {
-                return cumulative_probabilities[i - 1];
-            }
-        }
-
-        return 0.0;
-    }();
-
-    return (last - second_last) * CUMULATIVE_END_OFFSET_FRACTION;
-}
-
-
-constexpr auto calculate_cumulative_sum_(const std::vector<double>& probabilities) -> std::vector<double>
-{
-    auto cumulative = std::vector<double> {};
-    cumulative.reserve(probabilities.size());
-
-    std::partial_sum(probabilities.begin(), probabilities.end(), std::back_inserter(cumulative));
-
-    return cumulative;
-}
-
-class ProbabilitySampler_
-{
-public:
-    explicit ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed = std::nullopt)
-        : cumulative_ {calculate_cumulative_sum_(probabilities)}
-        , prng_ {impl_ket::get_prng_(seed)}
-    {
-        const auto max_prob = cumulative_.back();
-        const auto offset = cumulative_end_offset_(cumulative_);
-        uniform_dist_ = std::uniform_real_distribution<double> {0.0, max_prob - offset};
-    }
-
-    auto operator()() -> std::size_t
-    {
-        const auto prob = uniform_dist_(prng_);
-
-        const auto it_state = std::ranges::lower_bound(cumulative_, prob);
-
-        if (it_state == cumulative_.end()) {
-            throw std::runtime_error {
-                "LOGIC BUG: Ended up with measurement of state past end of cumulative\n"
-                "probability distribution, which shouldn't happen?"};
-        }
-
-        const auto i_state = static_cast<std::size_t>(std::distance(cumulative_.begin(), it_state));
-
-        return i_state;
-    }
-
-private:
-    std::vector<double> cumulative_;
-    std::mt19937 prng_;
-    std::uniform_real_distribution<double> uniform_dist_;
-};
-
-inline auto build_marginal_bitmask_(
-    const std::vector<std::size_t>& marginal_qubits,
-    std::size_t n_qubits
-) -> std::vector<std::uint8_t>
-{
-    const auto is_in_range = [&](auto i) { return i >= n_qubits; };
-    if (std::ranges::any_of(marginal_qubits, is_in_range))
-    {
-        throw std::runtime_error {"ERROR: marginal qubit index out of range."};
-    }
-
-    auto marginal_bitmask = std::vector<std::uint8_t>(n_qubits, 0);
-    for (auto index : marginal_qubits) {
-        marginal_bitmask[index] = 1;
-    }
-
-    return marginal_bitmask;
-}
-
-}  // namespace
-
 namespace ket
 {
 
@@ -180,7 +78,7 @@ auto perform_measurements_as_memory(
     std::optional<int> seed
 ) -> std::vector<std::size_t>
 {
-    auto sampler = ProbabilitySampler_ {probabilities_raw, seed};
+    auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
 
     auto measurements = std::vector<std::size_t> {};
     measurements.reserve(n_shots);
@@ -210,7 +108,7 @@ auto perform_measurements_as_counts_raw(
     std::optional<int> seed
 ) -> std::map<std::size_t, std::size_t>
 {
-    auto sampler = ProbabilitySampler_ {probabilities_raw, seed};
+    auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::map<std::size_t, std::size_t> {};
 
     // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
@@ -245,9 +143,9 @@ auto perform_measurements_as_counts_marginal(
     }
 
     const auto n_qubits = impl_ket::log_2_int(probabilities_raw.size());
-    const auto marginal_bitmask = build_marginal_bitmask_(marginal_qubits, n_qubits);
+    const auto marginal_bitmask = ket::internal::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
-    auto sampler = ProbabilitySampler_ {probabilities_raw, seed};
+    auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::map<std::string, std::size_t> {};
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
@@ -285,7 +183,7 @@ auto perform_measurements_as_counts_marginal(
 ) -> std::map<std::string, std::size_t>
 {
     const auto n_qubits = circuit.n_qubits();
-    const auto marginal_bitmask = build_marginal_bitmask_(marginal_qubits, n_qubits);
+    const auto marginal_bitmask = ket::internal::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
     const auto endian = ket::QuantumStateEndian::LITTLE;
@@ -297,7 +195,7 @@ auto perform_measurements_as_counts_marginal(
         ket::simulate(circuit, state);
 
         const auto probabilities_raw = calculate_probabilities_raw(state, noise);
-        auto sampler = ProbabilitySampler_ {probabilities_raw, seed};
+        auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
 
         const auto i_state = sampler();
         const auto bitstring = impl_ket::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
@@ -320,3 +218,95 @@ auto perform_measurements_as_counts(
 }
 
 }  // namespace ket
+
+
+namespace ket::internal
+{
+
+/*
+    We want to avoid sampling entries beyond the end of the probability distribution,
+    because this correponds to an index for a computational state that does not exist.
+
+    To prevent this, we need to offset the largest value produced by the random number
+    generator by a small amount, to make sure the largest value is never sampled.
+*/
+auto cumulative_end_offset_(const std::vector<double>& cumulative_probabilities) -> double
+{
+    // a circuit requires at least 1 qubit, with at least two computational states; thus
+    // there should be at least two entries in the vector of cumulative probabilities
+    const auto size = cumulative_probabilities.size();
+
+    const auto last = cumulative_probabilities[size - 1];
+
+    // find the first probability from the end that is strictly less than the last probability
+    const auto second_last = [&]()
+    {
+        for (std::size_t i {size - 1}; i > 0; --i) {
+            if (cumulative_probabilities[i - 1] < last) {
+                return cumulative_probabilities[i - 1];
+            }
+        }
+
+        return 0.0;
+    }();
+
+    return (last - second_last) * CUMULATIVE_END_OFFSET_FRACTION;
+}
+
+
+auto calculate_cumulative_sum_(const std::vector<double>& probabilities) -> std::vector<double>
+{
+    auto cumulative = std::vector<double> {};
+    cumulative.reserve(probabilities.size());
+
+    std::partial_sum(probabilities.begin(), probabilities.end(), std::back_inserter(cumulative));
+
+    return cumulative;
+}
+
+auto build_marginal_bitmask_(
+    const std::vector<std::size_t>& marginal_qubits,
+    std::size_t n_qubits
+) -> std::vector<std::uint8_t>
+{
+    const auto is_in_range = [&](auto i) { return i >= n_qubits; };
+    if (std::ranges::any_of(marginal_qubits, is_in_range))
+    {
+        throw std::runtime_error {"ERROR: marginal qubit index out of range."};
+    }
+
+    auto marginal_bitmask = std::vector<std::uint8_t>(n_qubits, 0);
+    for (auto index : marginal_qubits) {
+        marginal_bitmask[index] = 1;
+    }
+
+    return marginal_bitmask;
+}
+
+ProbabilitySampler_::ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed)
+    : cumulative_ {calculate_cumulative_sum_(probabilities)}
+    , prng_ {impl_ket::get_prng_(seed)}
+{
+    const auto max_prob = cumulative_.back();
+    const auto offset = cumulative_end_offset_(cumulative_);
+    uniform_dist_ = std::uniform_real_distribution<double> {0.0, max_prob - offset};
+}
+
+auto ProbabilitySampler_::operator()() -> std::size_t
+{
+    const auto prob = uniform_dist_(prng_);
+
+    const auto it_state = std::ranges::lower_bound(cumulative_, prob);
+
+    if (it_state == cumulative_.end()) {
+        throw std::runtime_error {
+            "LOGIC BUG: Ended up with measurement of state past end of cumulative\n"
+            "probability distribution, which shouldn't happen?"};
+    }
+
+    const auto i_state = static_cast<std::size_t>(std::distance(cumulative_.begin(), it_state));
+
+    return i_state;
+}
+
+}  // namespace ket::internal
