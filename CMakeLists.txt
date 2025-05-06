@@ -21,6 +21,7 @@ add_library(
     source/kettle_internal/calculations/measurements.cpp
     source/kettle_internal/circuit/circuit.cpp
     source/kettle_internal/circuit/control_flow_predicate.cpp
+    source/kettle_internal/common/mathtools.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

@@ -47,7 +47,7 @@ void apply_multiplicity_controlled_u_gate(
     const Matrix2X2& unitary,
     std::size_t target_index,
     const Container& control_indices,
-    double matrix_sqrt_tolerance = impl_ket::MATRIX_2X2_SQRT_TOLERANCE
+    double matrix_sqrt_tolerance = ket::internal::MATRIX_2X2_SQRT_TOLERANCE
 )
 {
     auto stack = std::vector<impl_ket::MCUGateStackFrame_> {};

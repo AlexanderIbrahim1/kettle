@@ -30,7 +30,7 @@ public:
     */
     explicit QuantumState(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
-        , n_states_ {impl_ket::pow_2_int(n_qubits)}
+        , n_states_ {ket::internal::pow_2_int(n_qubits)}
         , coefficients_(n_states_, {0.0, 0.0})
     {
         check_at_least_one_qubit_();
@@ -64,7 +64,7 @@ public:
         QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
     )
         : n_qubits_ {computational_state.size()}
-        , n_states_ {impl_ket::pow_2_int(computational_state.size())}
+        , n_states_ {ket::internal::pow_2_int(computational_state.size())}
         , coefficients_(n_states_, {0.0, 0.0})
     {
         impl_ket::check_bitstring_is_valid_nonmarginal_(computational_state);
@@ -97,7 +97,7 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto at(
+    auto at(
         const std::string& bitstring,
         QuantumStateEndian endian = QuantumStateEndian::LITTLE
     ) const -> const std::complex<double>&
@@ -107,7 +107,7 @@ public:
         return coefficients_[state_index];
     }
 
-    constexpr auto at(
+    auto at(
         const std::string& bitstring,
         QuantumStateEndian endian = QuantumStateEndian::LITTLE
     ) -> std::complex<double>&
@@ -141,7 +141,7 @@ private:
                 "There must be at least 2 coefficients, representing the states for one qubit.\n"};
         }
 
-        if (!impl_ket::is_power_of_2(coefficients_.size())) {
+        if (!ket::internal::is_power_of_2(coefficients_.size())) {
             auto err_msg = std::stringstream {};
             err_msg << "The provided coefficients must have a size equal to a power of 2.\n";
             err_msg << "Found size = " << coefficients_.size();
@@ -157,7 +157,7 @@ private:
         }
 
         const auto expected = 1.0;
-        const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < impl_ket::NORMALIZATION_TOLERANCE;
+        const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < ket::internal::NORMALIZATION_TOLERANCE;
 
         if (!is_normalized) {
             auto err_msg = std::stringstream {};
@@ -196,7 +196,7 @@ private:
 constexpr auto almost_eq(
     const QuantumState& left,
     const QuantumState& right,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     if (left.n_qubits() != right.n_qubits()) {

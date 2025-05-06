@@ -126,7 +126,7 @@ namespace ket
 inline auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-complexity)
     const QuantumCircuit& left,
     const QuantumCircuit& right,
-    double tol_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tol_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool
 {
     namespace comp = impl_ket::compare;

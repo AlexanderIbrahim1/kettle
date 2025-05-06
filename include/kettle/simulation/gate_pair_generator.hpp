@@ -25,14 +25,14 @@ namespace impl_ket
 class SingleQubitGatePairGenerator
 {
 public:
-    constexpr SingleQubitGatePairGenerator(std::size_t target_index, std::size_t n_qubits)
-        : i0_max_ {impl_ket::pow_2_int(target_index)}
-        , i1_max_ {impl_ket::pow_2_int(n_qubits - target_index - 1)}
+    SingleQubitGatePairGenerator(std::size_t target_index, std::size_t n_qubits)
+        : i0_max_ {ket::internal::pow_2_int(target_index)}
+        , i1_max_ {ket::internal::pow_2_int(n_qubits - target_index - 1)}
     {}
 
-    constexpr void set_state(std::size_t i_state) noexcept
+    void set_state(std::size_t i_state) noexcept
     {
-        std::tie(i0_, i1_) = flat_index_to_grid_indices_2d(i_state, i1_max_);
+        std::tie(i0_, i1_) = ket::internal::flat_index_to_grid_indices_2d(i_state, i1_max_);
     }
 
     [[nodiscard]]
@@ -83,18 +83,18 @@ public:
     DoubleQubitGatePairGenerator(std::size_t control_index, std::size_t target_index, std::size_t n_qubits)
         : lower_index_ {std::min({control_index, target_index})}
         , upper_index_ {std::max({control_index, target_index})}
-        , lower_shift_ {impl_ket::pow_2_int(lower_index_ + 1)}
-        , upper_shift_ {impl_ket::pow_2_int(upper_index_ + 1)}
-        , control_shift_ {impl_ket::pow_2_int(control_index)}
-        , target_shift_ {impl_ket::pow_2_int(target_index)}
-        , i0_max_ {impl_ket::pow_2_int(lower_index_)}
-        , i1_max_ {impl_ket::pow_2_int(upper_index_ - lower_index_ - 1)}
-        , i2_max_ {impl_ket::pow_2_int(n_qubits - upper_index_ - 1)}
+        , lower_shift_ {ket::internal::pow_2_int(lower_index_ + 1)}
+        , upper_shift_ {ket::internal::pow_2_int(upper_index_ + 1)}
+        , control_shift_ {ket::internal::pow_2_int(control_index)}
+        , target_shift_ {ket::internal::pow_2_int(target_index)}
+        , i0_max_ {ket::internal::pow_2_int(lower_index_)}
+        , i1_max_ {ket::internal::pow_2_int(upper_index_ - lower_index_ - 1)}
+        , i2_max_ {ket::internal::pow_2_int(n_qubits - upper_index_ - 1)}
     {}
 
-    constexpr void set_state(std::size_t i_state) noexcept
+    void set_state(std::size_t i_state) noexcept
     {
-        std::tie(i0_, i1_, i2_) = flat_index_to_grid_indices_3d(i_state, i1_max_, i2_max_);
+        std::tie(i0_, i1_, i2_) = ket::internal::flat_index_to_grid_indices_3d(i_state, i1_max_, i2_max_);
     }
 
     [[nodiscard]]

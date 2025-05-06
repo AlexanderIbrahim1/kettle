@@ -51,7 +51,7 @@ static constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> s
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 1` of them, with 2 possible states per qubit
-    return impl_ket::pow_2_int(n_qubits - 1);
+    return ket::internal::pow_2_int(n_qubits - 1);
 }
 
 static constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
@@ -61,7 +61,7 @@ static constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> s
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 2` of them, with 2 possible states per qubit
-    return impl_ket::pow_2_int(n_qubits - 2);
+    return ket::internal::pow_2_int(n_qubits - 2);
 }
 
 TEST_CASE("SingleQubitGatePairGenerator with two qubits")

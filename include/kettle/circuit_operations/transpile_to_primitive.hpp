@@ -29,7 +29,7 @@ namespace ket
 // NOLINTNEXTLINE(misc-no-recursion)
 inline auto transpile_to_primitive(
     const QuantumCircuit& circuit,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> QuantumCircuit
 {
     auto new_circuit = QuantumCircuit {circuit.n_qubits(), circuit.n_bits()};

@@ -49,7 +49,7 @@ void apply_forward_fourier_transform(QuantumCircuit& circuit, const Container& c
         auto i_angle_denom = std::size_t {2};
         for (std::size_t i_control_pre {i_target_pre + 1}; i_control_pre < size; ++i_control_pre) {
             const auto i_control = impl_ket::get_container_index(container, i_control_pre);
-            const auto angle = 2.0 * M_PI / static_cast<double>(impl_ket::pow_2_int(i_angle_denom));
+            const auto angle = 2.0 * M_PI / static_cast<double>(ket::internal::pow_2_int(i_angle_denom));
             circuit.add_cp_gate(i_control, i_target, angle);
             ++i_angle_denom;
         }
@@ -75,7 +75,7 @@ void apply_inverse_fourier_transform(QuantumCircuit& circuit, const Container& c
         auto i_angle_denom = size - i_target_pre;
         for (std::size_t i_control_pre : sv::iota(i_target_pre + 1, size) | sv::reverse) {
             const auto i_control = impl_ket::get_container_index(container, i_control_pre);
-            const auto angle = 2.0 * M_PI / static_cast<double>(impl_ket::pow_2_int(i_angle_denom));
+            const auto angle = 2.0 * M_PI / static_cast<double>(ket::internal::pow_2_int(i_angle_denom));
             circuit.add_cp_gate(i_control, i_target, -angle);
             --i_angle_denom;
         }

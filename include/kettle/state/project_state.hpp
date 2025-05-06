@@ -122,7 +122,7 @@ inline auto project_statevector(
     const QuantumState& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements,
-    double minimum_norm_tol = impl_ket::NORMALIZATION_TOLERANCE
+    double minimum_norm_tol = ket::internal::NORMALIZATION_TOLERANCE
 ) -> QuantumState
 {
     if (qubit_indices.size() == statevector.n_qubits()) {

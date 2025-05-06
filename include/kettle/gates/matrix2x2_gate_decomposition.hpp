@@ -42,7 +42,7 @@ constexpr auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
 */
 inline auto decomp_to_single_primitive_gate_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::optional<impl_ket::PrimitiveGateInfo>
 {
     using Info = impl_ket::PrimitiveGateInfo;
@@ -100,7 +100,7 @@ inline auto decomp_to_single_primitive_gate_(
 */
 inline auto decomp_special_unitary_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<impl_ket::PrimitiveGateInfo>
 {
     using Info = impl_ket::PrimitiveGateInfo;
@@ -130,7 +130,7 @@ inline auto decomp_special_unitary_to_primitive_gates_(
 
 inline auto decomp_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<impl_ket::PrimitiveGateInfo>
 {
     const auto primitive = decomp_to_single_primitive_gate_(unitary);
@@ -155,7 +155,7 @@ inline auto decomp_to_primitive_gates_(
 inline auto decomp_to_one_target_primitive_gates_(
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>
 {
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
@@ -177,7 +177,7 @@ inline auto decomp_to_one_control_one_target_primitive_gates_(
     std::size_t control,
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>
 {
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);

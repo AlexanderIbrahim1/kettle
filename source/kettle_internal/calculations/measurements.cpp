@@ -138,11 +138,11 @@ auto perform_measurements_as_counts_marginal(
     std::optional<int> seed
 ) -> std::map<std::string, std::size_t>
 {
-    if (!impl_ket::is_power_of_2(probabilities_raw.size())) {
+    if (!ket::internal::is_power_of_2(probabilities_raw.size())) {
         throw std::runtime_error {"The number of probabilities must be a power of 2.\n"};
     }
 
-    const auto n_qubits = impl_ket::log_2_int(probabilities_raw.size());
+    const auto n_qubits = ket::internal::log_2_int(probabilities_raw.size());
     const auto marginal_bitmask = ket::internal::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
     auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};

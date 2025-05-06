@@ -33,7 +33,7 @@ constexpr auto bitstring_to_state_index_bigendian_(const std::string& bitstring)
 namespace ket
 {
 
-constexpr auto bitstring_to_state_index(
+inline auto bitstring_to_state_index(
     const std::string& bitstring,
     ket::QuantumStateEndian input_endian
 ) -> std::size_t
@@ -52,20 +52,20 @@ constexpr auto bitstring_to_state_index(
     }
 }
 
-constexpr auto state_index_to_dynamic_bitset(
+inline auto state_index_to_dynamic_bitset(
     std::size_t i_state,
     std::size_t n_qubits,
     ket::QuantumStateEndian input_endian
 ) -> std::vector<std::uint8_t>
 {
-    const auto n_states = impl_ket::pow_2_int(n_qubits);
+    const auto n_states = ket::internal::pow_2_int(n_qubits);
     if (i_state >= n_states) {
         throw std::runtime_error {"The state index exceeds the number of possible states."};
     }
 
     auto dyn_bitset = std::vector<std::uint8_t>(n_qubits, 0);
     for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
-        const auto bit_position = impl_ket::pow_2_int(i_qubit);
+        const auto bit_position = ket::internal::pow_2_int(i_qubit);
 
         // I *could* improve performance by making this section inside the loop 'constexpr if', but
         // the performance in this area of the code isn't the bottleneck, and leaving it like this
@@ -81,7 +81,7 @@ constexpr auto state_index_to_dynamic_bitset(
     return dyn_bitset;
 }
 
-constexpr auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits) -> std::string
+inline auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits) -> std::string
 {
     auto bitstring = std::string {};
     bitstring.reserve(bits.size());
@@ -98,7 +98,7 @@ constexpr auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits
     return bitstring;
 }
 
-constexpr auto state_index_to_bitstring(
+inline auto state_index_to_bitstring(
     std::size_t i_state,
     std::size_t n_qubits,
     ket::QuantumStateEndian input_endian
@@ -108,7 +108,7 @@ constexpr auto state_index_to_bitstring(
     return dynamic_bitset_to_bitstring(dyn_bitset);
 }
 
-constexpr auto dynamic_bitset_to_state_index(
+inline auto dynamic_bitset_to_state_index(
     const std::vector<std::uint8_t>& dyn_bitset,
     ket::QuantumStateEndian input_endian
 ) -> std::size_t
@@ -117,7 +117,7 @@ constexpr auto dynamic_bitset_to_state_index(
     return bitstring_to_state_index(bitstring, input_endian);
 }
 
-constexpr auto bitstring_to_dynamic_bitset(
+inline auto bitstring_to_dynamic_bitset(
     const std::string& bitstring
 ) -> std::vector<std::uint8_t>
 {
@@ -138,47 +138,47 @@ constexpr auto bitstring_to_dynamic_bitset(
     return dyn_bitset;
 }
 
-constexpr auto bitstring_to_state_index_little_endian(const std::string& bitstring) -> std::size_t
+inline auto bitstring_to_state_index_little_endian(const std::string& bitstring) -> std::size_t
 {
     return bitstring_to_state_index(bitstring, ket::QuantumStateEndian::LITTLE);
 }
 
-constexpr auto bitstring_to_state_index_big_endian(const std::string& bitstring) -> std::size_t
+inline auto bitstring_to_state_index_big_endian(const std::string& bitstring) -> std::size_t
 {
     return bitstring_to_state_index(bitstring, ket::QuantumStateEndian::BIG);
 }
 
-constexpr auto state_index_to_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
+inline auto state_index_to_bitstring_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     return state_index_to_bitstring(i_state, n_qubits, ket::QuantumStateEndian::LITTLE);
 }
 
-constexpr auto state_index_to_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
+inline auto state_index_to_bitstring_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::string
 {
     return state_index_to_bitstring(i_state, n_qubits, ket::QuantumStateEndian::BIG);
 }
 
-constexpr auto state_index_to_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+inline auto state_index_to_dynamic_bitset_little_endian(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     return state_index_to_dynamic_bitset(i_state, n_qubits, ket::QuantumStateEndian::LITTLE);
 }
 
-constexpr auto state_index_to_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
+inline auto state_index_to_dynamic_bitset_big_endian(std::size_t i_state, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     return state_index_to_dynamic_bitset(i_state, n_qubits, ket::QuantumStateEndian::BIG);
 }
 
-constexpr auto dynamic_bitset_to_state_index_little_endian(const std::vector<std::uint8_t>& dyn_bitset) -> std::size_t
+inline auto dynamic_bitset_to_state_index_little_endian(const std::vector<std::uint8_t>& dyn_bitset) -> std::size_t
 {
     return dynamic_bitset_to_state_index(dyn_bitset, ket::QuantumStateEndian::LITTLE);
 }
 
-constexpr auto dynamic_bitset_to_state_index_big_endian(const std::vector<std::uint8_t>& dyn_bitset) -> std::size_t
+inline auto dynamic_bitset_to_state_index_big_endian(const std::vector<std::uint8_t>& dyn_bitset) -> std::size_t
 {
     return dynamic_bitset_to_state_index(dyn_bitset, ket::QuantumStateEndian::BIG);
 }
 
-constexpr auto binary_fraction_expansion(
+inline auto binary_fraction_expansion(
     const std::string& bitstring,
     QuantumStateEndian endian = QuantumStateEndian::LITTLE
 ) -> double

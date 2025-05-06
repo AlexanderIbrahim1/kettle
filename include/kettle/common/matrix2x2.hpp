@@ -117,7 +117,7 @@ constexpr auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix
 
 inline auto matrix_square_root(
     const Matrix2X2& mat,
-    double matrix_sqrt_tolerance = impl_ket::MATRIX_2X2_SQRT_TOLERANCE
+    double matrix_sqrt_tolerance = ket::internal::MATRIX_2X2_SQRT_TOLERANCE
 ) -> Matrix2X2
 {
     // uses the following: https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix#A_general_formula
@@ -155,10 +155,10 @@ constexpr auto trace(const Matrix2X2& mat) -> std::complex<double>
     return mat.elem00 + mat.elem11;
 }
 
-constexpr auto almost_eq(
+inline auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool
 {
     // clang-format off
