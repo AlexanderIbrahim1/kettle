@@ -442,7 +442,7 @@ TEST_CASE("CircuitElement")
     SECTION("construct with ket::GateInfo")
     {
         const auto ginfo = impl_ket::create_one_target_gate(ket::Gate::X, 0);
-        const auto circuit_element = impl_ket::CircuitElement {ginfo};
+        const auto circuit_element = ket::CircuitElement {ginfo};
 
         REQUIRE(circuit_element.is_gate());
         REQUIRE(!circuit_element.is_control_flow());
@@ -456,12 +456,12 @@ TEST_CASE("CircuitElement")
     {
         auto circuit0 = ket::QuantumCircuit {2};
 
-        auto cfi = impl_ket::ClassicalIfStatement {
+        auto cfi = ket::ClassicalIfStatement {
             ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF},
             std::make_unique<ket::QuantumCircuit>(std::move(circuit0))
         };
 
-        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
+        const auto circuit_element = ket::CircuitElement {std::move(cfi)};
 
         REQUIRE(circuit_element.is_control_flow());
         REQUIRE(!circuit_element.is_gate());
@@ -473,13 +473,13 @@ TEST_CASE("CircuitElement")
         auto circuit0 = ket::QuantumCircuit {2};
         auto circuit1 = ket::QuantumCircuit {2};
 
-        auto cfi = impl_ket::ClassicalIfElseStatement {
+        auto cfi = ket::ClassicalIfElseStatement {
             ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF},
             std::make_unique<ket::QuantumCircuit>(std::move(circuit0)),
             std::make_unique<ket::QuantumCircuit>(std::move(circuit1))
         };
 
-        const auto circuit_element = impl_ket::CircuitElement {std::move(cfi)};
+        const auto circuit_element = ket::CircuitElement {std::move(cfi)};
 
         REQUIRE(circuit_element.is_control_flow());
         REQUIRE(!circuit_element.is_gate());

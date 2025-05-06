@@ -49,7 +49,7 @@ inline auto transpile_to_primitive(
                 const auto& current_subcircuit = *if_stmt.circuit();
                 auto transpiled_subcircuit = transpile_to_primitive(current_subcircuit, tolerance_sq);
 
-                auto cfi = impl_ket::ClassicalIfStatement {
+                auto cfi = ClassicalIfStatement {
                     if_stmt.predicate(),
                     std::make_unique<QuantumCircuit>(std::move(transpiled_subcircuit))
                 };
@@ -63,7 +63,7 @@ inline auto transpile_to_primitive(
                 auto transpiled_if_subcircuit = transpile_to_primitive(if_subcircuit, tolerance_sq);
                 auto transpiled_else_subcircuit = transpile_to_primitive(else_subcircuit, tolerance_sq);
 
-                auto cfi = impl_ket::ClassicalIfElseStatement {
+                auto cfi = ClassicalIfElseStatement {
                     if_else_stmt.predicate(),
                     std::make_unique<QuantumCircuit>(std::move(transpiled_if_subcircuit)),
                     std::make_unique<QuantumCircuit>(std::move(transpiled_else_subcircuit))

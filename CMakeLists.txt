@@ -19,6 +19,8 @@ add_library(
     kettle_kettle
     source/kettle/calculations/probabilities.cpp
     source/kettle/calculations/measurements.cpp
+    source/kettle/circuit/circuit.cpp
+    source/kettle/circuit/control_flow_predicate.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

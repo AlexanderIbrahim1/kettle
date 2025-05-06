@@ -71,6 +71,11 @@ using QubitIndicesAndAnglesIList = std::initializer_list<std::pair<std::size_t, 
 using ControlAndTargetIndicesIList = std::initializer_list<std::pair<std::size_t, std::size_t>>;
 using QubitAndBitIndicesIList = std::initializer_list<std::pair<std::size_t, std::size_t>>;
 using ControlAndTargetIndicesAndAnglesIList = std::initializer_list<std::tuple<std::size_t, std::size_t, double>>;
+using QubitIndicesVector = std::vector<std::size_t>;
+using QubitIndicesAndAnglesVector = std::vector<std::pair<std::size_t, double>>;
+using ControlAndTargetIndicesVector = std::vector<std::pair<std::size_t, std::size_t>>;
+using QubitAndBitIndicesVector = std::vector<std::pair<std::size_t, std::size_t>>;
+using ControlAndTargetIndicesAndAnglesVector = std::vector<std::tuple<std::size_t, std::size_t, double>>;
 
 template <Iterable Container>
 auto get_container_index(const Container& container, std::size_t index) -> std::size_t

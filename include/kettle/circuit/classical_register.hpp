@@ -14,7 +14,7 @@ namespace ket
 class ClassicalRegister
 {
 public:
-    explicit ClassicalRegister(std::size_t n_bits)
+    explicit constexpr ClassicalRegister(std::size_t n_bits)
         : measured_bits_ (n_bits, std::nullopt)
     {}
 

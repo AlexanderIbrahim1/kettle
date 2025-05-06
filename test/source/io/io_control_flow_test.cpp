@@ -63,7 +63,7 @@ TEST_CASE("format classical control flow statements")
 
     SECTION("if statement")
     {
-        const auto if_stmt = impl_ket::ClassicalIfStatement {
+        const auto if_stmt = ket::ClassicalIfStatement {
             predicate,
             std::make_unique<ket::QuantumCircuit>(if_subcirc)
         };
@@ -76,7 +76,7 @@ TEST_CASE("format classical control flow statements")
 
     SECTION("if else statement")
     {
-        const auto if_else_stmt = impl_ket::ClassicalIfElseStatement {
+        const auto if_else_stmt = ket::ClassicalIfElseStatement {
             predicate,
             std::make_unique<ket::QuantumCircuit>(if_subcirc),
             std::make_unique<ket::QuantumCircuit>(else_subcirc)

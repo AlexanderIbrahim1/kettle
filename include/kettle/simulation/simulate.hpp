@@ -287,7 +287,7 @@ inline auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cogni
     ket::ClassicalRegister& cregister
 ) -> std::vector<ket::CircuitLogger>
 {
-    using Elements = std::reference_wrapper<const std::vector<impl_ket::CircuitElement>>;
+    using Elements = std::reference_wrapper<const std::vector<ket::CircuitElement>>;
 
     auto elements_stack = std::vector<Elements> {};
     elements_stack.push_back(std::ref(circuit.circuit_elements()));

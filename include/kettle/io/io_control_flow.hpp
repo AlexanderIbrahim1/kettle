@@ -57,14 +57,14 @@ inline auto format_control_flow_predicate_(const ket::ControlFlowPredicate& pred
 }
 
 inline auto format_classical_if_statement_header_(
-    const ClassicalIfStatement& stmt
+    const ket::ClassicalIfStatement& stmt
 ) -> std::string
 {
     return std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
 }
 
 inline auto format_classical_if_else_statement_header_(
-    const ClassicalIfElseStatement& stmt
+    const ket::ClassicalIfElseStatement& stmt
 ) -> std::tuple<std::string, std::string>
 {
     const auto if_part = std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
