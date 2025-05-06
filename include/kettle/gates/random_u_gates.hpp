@@ -5,7 +5,7 @@
 #include <random>
 
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/common/prng.hpp"
+#include "kettle_internal/common/prng.hpp"
 
 
 namespace ket
@@ -50,7 +50,7 @@ inline auto generate_random_unitary2x2(std::mt19937& prng) -> ket::Matrix2X2
 */
 inline auto generate_random_unitary2x2(int seed) -> ket::Matrix2X2
 {
-    auto prng = impl_ket::get_prng_(seed);
+    auto prng = ket::internal::get_prng_(seed);
     return generate_random_unitary2x2(prng);
 }
 
@@ -68,7 +68,7 @@ inline auto generate_random_unitary2x2() -> ket::Matrix2X2
     //
     // I guess an instance of `std::mt19937` gets picked up as `std::optional<int>`???
     // the point is this is why there are two separate functions
-    auto prng = impl_ket::get_prng_(std::nullopt);
+    auto prng = ket::internal::get_prng_(std::nullopt);
     return generate_random_unitary2x2(prng);
 }
 

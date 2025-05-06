@@ -8,7 +8,7 @@
 #include <random>
 #include <vector>
 
-#include "kettle/common/prng.hpp"
+#include "kettle_internal/common/prng.hpp"
 #include "kettle/state/state.hpp"
 
 
@@ -66,7 +66,7 @@ inline auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> Q
 */
 inline auto generate_random_state(std::size_t n_qubits, int seed) -> QuantumState
 {
-    auto prng = impl_ket::get_prng_(seed);
+    auto prng = ket::internal::get_prng_(seed);
     return generate_random_state(n_qubits, prng);
 }
 
@@ -81,7 +81,7 @@ inline auto generate_random_state(std::size_t n_qubits) -> QuantumState
     //
     // I guess an instance of `std::mt19937` gets picked up as `std::optional<int>`???
     // the point is this is why there are two separate functions
-    auto prng = impl_ket::get_prng_(std::nullopt);
+    auto prng = ket::internal::get_prng_(std::nullopt);
     return generate_random_state(n_qubits, prng);
 }
 

@@ -23,6 +23,7 @@ add_library(
     source/kettle_internal/circuit/control_flow_predicate.cpp
     source/kettle_internal/common/mathtools.cpp
     source/kettle_internal/common/matrix2x2.cpp
+    source/kettle_internal/common/prng.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

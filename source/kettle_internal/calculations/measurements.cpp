@@ -10,7 +10,7 @@
 #include "kettle/calculations/probabilities.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"
-#include "kettle/common/prng.hpp"
+#include "kettle_internal/common/prng.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/marginal.hpp"
@@ -285,7 +285,7 @@ auto build_marginal_bitmask_(
 
 ProbabilitySampler_::ProbabilitySampler_(const std::vector<double>& probabilities, std::optional<int> seed)
     : cumulative_ {calculate_cumulative_sum_(probabilities)}
-    , prng_ {impl_ket::get_prng_(seed)}
+    , prng_ {ket::internal::get_prng_(seed)}
 {
     const auto max_prob = cumulative_.back();
     const auto offset = cumulative_end_offset_(cumulative_);

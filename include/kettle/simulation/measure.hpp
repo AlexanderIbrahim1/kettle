@@ -4,7 +4,7 @@
 #include <optional>
 #include <random>
 
-#include "kettle/common/prng.hpp"
+#include "kettle_internal/common/prng.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/state.hpp"
@@ -72,7 +72,7 @@ void collapse_and_renormalize_(
     threads for the multithreaded implementation are spawned before entering the simulation
     loop.
 */
-template <DiscreteDistribution Distribution = std::discrete_distribution<int>>
+template <ket::internal::DiscreteDistribution Distribution = std::discrete_distribution<int>>
 auto simulate_measurement_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
@@ -81,7 +81,7 @@ auto simulate_measurement_(
 {
     const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info);
 
-    auto prng = get_prng_(seed);
+    auto prng = ket::internal::get_prng_(seed);
     auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
 
     const auto collapsed_state = coin_flipper(prng);
