@@ -7,7 +7,6 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/common/print.hpp>
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/state/state.hpp>
 #include <kettle/simulation/simulate.hpp>
@@ -117,7 +116,7 @@ TEST_CASE("simulate_measurement_()")
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq(state, testcase.expected));
     }
 
     SECTION("3 qubits")
@@ -184,7 +183,7 @@ TEST_CASE("simulate_measurement_()")
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq(state, testcase.expected));
     }
 
     SECTION("random")
@@ -244,7 +243,7 @@ TEST_CASE("simulate_measurement_()")
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(ket::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
 
         SECTION("3 qubits")
@@ -308,7 +307,7 @@ TEST_CASE("simulate_measurement_()")
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(ket::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
     }
 }

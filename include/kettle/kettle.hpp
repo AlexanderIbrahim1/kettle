@@ -13,7 +13,6 @@
 #include <kettle/common/arange.hpp>
 #include <kettle/common/mathtools.hpp>
 #include <kettle/common/matrix2x2.hpp>
-#include <kettle/common/print.hpp>
 #include <kettle/gates/common_u_gates.hpp>
 #include <kettle/gates/fourier.hpp>
 #include <kettle/gates/multiplicity_controlled_u_gate.hpp>

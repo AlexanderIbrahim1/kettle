@@ -24,6 +24,7 @@ add_library(
     source/kettle_internal/common/mathtools.cpp
     source/kettle_internal/common/matrix2x2.cpp
     source/kettle_internal/common/prng.cpp
+    source/kettle_internal/common/state_test_utils.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 
