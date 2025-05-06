@@ -7,7 +7,7 @@
 #include <tuple>
 
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/common/clone_ptr.hpp"
+#include "kettle_internal/common/clone_ptr.hpp"
 
 namespace ket
 {
@@ -60,7 +60,7 @@ struct GateInfo
     std::size_t arg0;
     std::size_t arg1;
     double arg2;
-    impl_ket::ClonePtr<Matrix2X2> unitary_ptr;
+    ket::internal::ClonePtr<Matrix2X2> unitary_ptr;
 };
 
 }  // namespace ket
@@ -131,7 +131,7 @@ namespace impl_ket
 */
 constexpr static auto DUMMY_ARG1 = std::size_t {0};
 constexpr static auto DUMMY_ARG2 = double {0.0};
-const static auto DUMMY_ARG3 = ClonePtr<ket::Matrix2X2> {nullptr};
+const static auto DUMMY_ARG3 = ket::internal::ClonePtr<ket::Matrix2X2> {nullptr};
 
 /*
     Create a single-qubit gate with no parameters.
@@ -216,7 +216,7 @@ inline auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& in
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.
 */
-inline auto create_u_gate(std::size_t target_index, impl_ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
+inline auto create_u_gate(std::size_t target_index, ket::internal::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
     return {.gate=ket::Gate::U, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary)};
 }
@@ -224,7 +224,7 @@ inline auto create_u_gate(std::size_t target_index, impl_ket::ClonePtr<ket::Matr
 /*
     Returns the `{target_qubit, unitary_ptr}` of a U-gate.
 */
-inline auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const impl_ket::ClonePtr<ket::Matrix2X2>&>
+inline auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::internal::ClonePtr<ket::Matrix2X2>&>
 {
     return {info.arg0, info.unitary_ptr};  // target index, unitary_ptr
 }
@@ -233,7 +233,7 @@ inline auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, 
     Create a CU-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`,
     controlled by the qubit at index `control_index`.
 */
-inline auto create_cu_gate(std::size_t control_index, std::size_t target_index, impl_ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
+inline auto create_cu_gate(std::size_t control_index, std::size_t target_index, ket::internal::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
     return {.gate=ket::Gate::CU, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary)};
 }
@@ -241,7 +241,7 @@ inline auto create_cu_gate(std::size_t control_index, std::size_t target_index, 
 /*
     Returns the `{control_qubit, target_qubit, unitary_ptr}` of a CU-gate.
 */
-inline auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const impl_ket::ClonePtr<ket::Matrix2X2>&>
+inline auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const ket::internal::ClonePtr<ket::Matrix2X2>&>
 {
     return {info.arg0, info.arg1, info.unitary_ptr};  // control index, target index, unitary_ptr
 }
@@ -289,7 +289,7 @@ inline auto unpack_gate_angle(const ket::GateInfo& info) -> double
 /*
     Returns the `unitary_ptr` of a U-gate or CU-gate.
 */
-inline auto unpack_unitary_matrix(const ket::GateInfo& info) -> const impl_ket::ClonePtr<ket::Matrix2X2>&
+inline auto unpack_unitary_matrix(const ket::GateInfo& info) -> const ket::internal::ClonePtr<ket::Matrix2X2>&
 {
     return info.unitary_ptr;  // unitary_ptr
 }

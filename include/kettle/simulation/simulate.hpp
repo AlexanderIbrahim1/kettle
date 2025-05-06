@@ -411,7 +411,7 @@ public:
         const auto n_double_gate_pairs = im::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
         const auto double_pair = im::FlatIndexPair {.i_lower=0, .i_upper=n_double_gate_pairs};
 
-        cregister_ = im::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
+        cregister_ = ket::internal::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 
         // the `simulate_loop_body_()` function is used by both the single-threaded and multi-threaded
         // code, and certain operations are only done on the thread with thread id 0
@@ -456,7 +456,7 @@ public:
 private:
     // there is no default constructor for the ClassicalRegsiter (it wouldn't make sense), and we
     // only find out how many bits are needed after the first simulation; hence why we use a pointer
-    impl_ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
+    ket::internal::ClonePtr<ClassicalRegister> cregister_ {nullptr};
     bool has_been_run_ {false};
     std::vector<CircuitLogger> circuit_loggers_;
 };
