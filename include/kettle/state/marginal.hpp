@@ -28,7 +28,7 @@ inline auto state_index_to_bitstring_marginal_(
     bitstring.reserve(dyn_bitset.size());
     for (std::size_t i_bit {0}; i_bit < dyn_bitset.size(); ++i_bit) {
         if (marginal_bitmask[i_bit] == 1) {
-            bitstring.push_back(MARGINALIZED_QUBIT);
+            bitstring.push_back(ket::internal::MARGINALIZED_QUBIT);
         }
         else if (dyn_bitset[i_bit] == 0) {
             bitstring.push_back('0');
@@ -63,7 +63,7 @@ inline auto are_all_marginal_bits_on_side_(const std::string& marginal_bitstring
     }
 
     for (auto bitchar : bitstring) {
-        if (bitchar == MARGINALIZED_QUBIT) {
+        if (bitchar == ket::internal::MARGINALIZED_QUBIT) {
             flag_marginal_already_found = true;
             continue;
         }
@@ -93,7 +93,7 @@ inline auto rstrip_marginal_bits(const std::string& marginal_bitstring) -> std::
         throw std::runtime_error {err_msg.str()};
     }
 
-    const auto it = std::find(marginal_bitstring.begin(), marginal_bitstring.end(), impl_ket::MARGINALIZED_QUBIT);
+    const auto it = std::find(marginal_bitstring.begin(), marginal_bitstring.end(), ket::internal::MARGINALIZED_QUBIT);
 
     return std::string {marginal_bitstring.begin(), it};
 }
@@ -110,7 +110,7 @@ inline auto lstrip_marginal_bits(const std::string& marginal_bitstring) -> std::
     const auto it = std::find_if_not(
         marginal_bitstring.begin(),
         marginal_bitstring.end(),
-        [](auto bitchar) { return bitchar == impl_ket::MARGINALIZED_QUBIT; }
+        [](auto bitchar) { return bitchar == ket::internal::MARGINALIZED_QUBIT; }
     );
 
     return std::string {it, marginal_bitstring.end()};

@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/utils.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -15,7 +15,7 @@
 namespace impl_ket
 {
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_all_indices_are_unique_(const Container& container)
 {
     auto seen = std::unordered_set<std::size_t> {};
@@ -28,10 +28,10 @@ void check_all_indices_are_unique_(const Container& container)
     }
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_valid_number_of_mapped_indices_(const Container& container, const ket::QuantumCircuit& circuit)
 {
-    const auto size = impl_ket::get_container_size(container);
+    const auto size = ket::internal::get_container_size(container);
 
     if (size != circuit.n_qubits()) {
         throw std::runtime_error {
@@ -40,7 +40,7 @@ void check_valid_number_of_mapped_indices_(const Container& container, const ket
     }
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std::size_t control_qubit)
 {
     const auto is_control_qubit = [&](std::size_t i) { return i == control_qubit; };
@@ -51,7 +51,7 @@ void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std:
     }
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_no_overlap_between_control_qubits_and_mapped_qubits_(const Container& mapped_qubits, const Container& control_qubits)
 {
     auto control_qubit_set = std::unordered_set<std::size_t> {control_qubits.begin(), control_qubits.end()};
@@ -63,11 +63,11 @@ void check_no_overlap_between_control_qubits_and_mapped_qubits_(const Container&
     }
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_new_indices_fit_onto_new_circuit_(const Container& container, std::size_t control_qubit, std::size_t n_qubits_on_new_circuit)
 {
     // the additional '1' comes from the control qubit
-    const auto n_minimum_new_indices = impl_ket::get_container_size(container) + 1;
+    const auto n_minimum_new_indices = ket::internal::get_container_size(container) + 1;
     if (n_minimum_new_indices > n_qubits_on_new_circuit) {
         throw std::runtime_error {"The mapped qubits will not fit onto the new circuit"};
     }
@@ -83,11 +83,11 @@ void check_new_indices_fit_onto_new_circuit_(const Container& container, std::si
     }
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, const Container& control_qubits, std::size_t n_qubits_on_new_circuit)
 {
-    const auto n_mapped_indices = impl_ket::get_container_size(mapped_qubits);
-    const auto n_control_indices = impl_ket::get_container_size(control_qubits);
+    const auto n_mapped_indices = ket::internal::get_container_size(mapped_qubits);
+    const auto n_control_indices = ket::internal::get_container_size(control_qubits);
     const auto n_minimum_new_indices = n_mapped_indices + n_control_indices;
 
     if (n_minimum_new_indices > n_qubits_on_new_circuit) {
@@ -181,7 +181,7 @@ inline void make_one_target_one_angle_gate_controlled(
 namespace ket
 {
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <QubitIndices Container = QubitIndicesIList>
 inline auto make_controlled_circuit(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
@@ -213,38 +213,38 @@ inline auto make_controlled_circuit(
 
         if (gid::is_one_target_transform_gate(gate_info.gate)) {
             const auto original_target = impl_ket::unpack_one_target_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             impl_ket::make_one_target_gate_controlled(new_circuit, gate_info.gate, control, new_target);
         }
         else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate))
         {
             const auto [original_target, angle] = impl_ket::unpack_one_target_one_angle_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             impl_ket::make_one_target_one_angle_gate_controlled(new_circuit, gate_info.gate, control, new_target, angle);
         }
         else if (gid::is_one_control_one_target_transform_gate(gate_info.gate)) {
             const auto [original_control, original_target] = impl_ket::unpack_one_control_one_target_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = non_angle_gate(gate_info.gate);
             apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
         }
         else if (gid::is_one_control_one_target_one_angle_transform_gate(gate_info.gate)) {
             const auto [original_control, original_target, angle] = impl_ket::unpack_one_control_one_target_one_angle_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = angle_gate(gate_info.gate, angle);
             apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
         }
         else if (gate_info.gate == Gate::U) {
             const auto [original_target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             new_circuit.add_cu_gate(*unitary_ptr, control, new_target);
         }
         else if (gate_info.gate == Gate::CU) {
             const auto [original_control, original_target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             apply_doubly_controlled_gate(new_circuit, *unitary_ptr, {control, new_control}, new_target);
         }
         else if (gate_info.gate == Gate::M) {
@@ -258,7 +258,7 @@ inline auto make_controlled_circuit(
     return new_circuit;
 }
 
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <QubitIndices Container = QubitIndicesIList>
 inline auto make_multiplicity_controlled_circuit(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
@@ -266,8 +266,8 @@ inline auto make_multiplicity_controlled_circuit(
     const Container& mapped_qubits
 ) -> ket::QuantumCircuit
 {
-    if (impl_ket::get_container_size(control_qubits) == 1) {
-        const auto control = impl_ket::get_container_index(control_qubits, 0);
+    if (ket::internal::get_container_size(control_qubits) == 1) {
+        const auto control = ket::internal::get_container_index(control_qubits, 0);
         make_controlled_circuit(subcircuit, n_new_qubits, control, mapped_qubits);
     }
 
@@ -295,43 +295,43 @@ inline auto make_multiplicity_controlled_circuit(
 
         if (gid::is_one_target_transform_gate(gate_info.gate)) {
             const auto original_target = impl_ket::unpack_one_target_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = non_angle_gate(gate_info.gate);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, control_qubits);
         }
         else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate))
         {
             const auto [original_target, angle] = impl_ket::unpack_one_target_one_angle_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = angle_gate(gate_info.gate, angle);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, control_qubits);
         }
         else if (gid::is_one_control_one_target_transform_gate(gate_info.gate)) {
             const auto [original_control, original_target] = impl_ket::unpack_one_control_one_target_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto new_controls = impl_ket::extend_container_to_vector(control_qubits, {new_control});
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
+            const auto new_controls = ket::internal::extend_container_to_vector(control_qubits, {new_control});
             const auto matrix = non_angle_gate(gate_info.gate);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, new_controls);
         }
         else if (gid::is_one_control_one_target_one_angle_transform_gate(gate_info.gate)) {
             const auto [original_control, original_target, angle] = impl_ket::unpack_one_control_one_target_one_angle_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto new_controls = impl_ket::extend_container_to_vector(control_qubits, {new_control});
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
+            const auto new_controls = ket::internal::extend_container_to_vector(control_qubits, {new_control});
             const auto matrix = angle_gate(gate_info.gate, angle);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, new_controls);
         }
         else if (gate_info.gate == Gate::U) {
             const auto [original_target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, control_qubits);
         }
         else if (gate_info.gate == Gate::CU) {
             const auto [original_control, original_target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
-            const auto new_control = impl_ket::get_container_index(mapped_qubits, original_control);
-            const auto new_target = impl_ket::get_container_index(mapped_qubits, original_target);
-            const auto new_controls = impl_ket::extend_container_to_vector(control_qubits, {new_control});
+            const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
+            const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
+            const auto new_controls = ket::internal::extend_container_to_vector(control_qubits, {new_control});
             apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, new_controls);
         }
         else if (gate_info.gate == Gate::M) {

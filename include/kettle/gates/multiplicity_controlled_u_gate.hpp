@@ -41,7 +41,7 @@ namespace ket
     The target qubit undergoes the transformation only if all the control qubits are set;
     in other words, this is an AND-style multiplicity controlled gate.
 */
-template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+template <QubitIndices Container = QubitIndicesIList>
 void apply_multiplicity_controlled_u_gate(
     QuantumCircuit& circuit,
     const Matrix2X2& unitary,

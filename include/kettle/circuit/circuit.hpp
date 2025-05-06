@@ -79,102 +79,102 @@ public:
     /*
         Add an H gate that acts on each qubit whose indices are specified in `indices`.
     */
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_h_gate(const Container& indices);
 
     void add_x_gate(std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_x_gate(const Container& indices);
 
     void add_y_gate(std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_y_gate(const Container& indices);
 
     void add_z_gate(std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_z_gate(const Container& indices);
 
     void add_sx_gate(std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_sx_gate(const Container& indices);
 
     void add_rx_gate(std::size_t target_index, double angle);
 
-    template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
+    template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);
 
     void add_ry_gate(std::size_t target_index, double angle);
 
-    template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
+    template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_ry_gate(const Container& pairs);
 
     void add_rz_gate(std::size_t target_index, double angle);
 
-    template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
+    template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rz_gate(const Container& pairs);
 
     void add_p_gate(std::size_t target_index, double angle);
 
-    template <impl_ket::QubitIndicesAndAngles Container = impl_ket::QubitIndicesAndAnglesIList>
+    template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_p_gate(const Container& pairs);
 
     void add_ch_gate(std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_ch_gate(const Container& pairs);
 
     void add_cx_gate(std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cx_gate(const Container& pairs);
 
     void add_cy_gate(std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cy_gate(const Container& pairs);
 
     void add_cz_gate(std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cz_gate(const Container& pairs);
 
     void add_csx_gate(std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_csx_gate(const Container& pairs);
 
     void add_crx_gate(std::size_t control_index, std::size_t target_index, double angle);
 
-    template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
+    template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crx_gate(const Container& tuples);
 
     void add_cry_gate(std::size_t control_index, std::size_t target_index, double angle);
 
-    template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
+    template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cry_gate(const Container& tuples);
 
     void add_crz_gate(std::size_t control_index, std::size_t target_index, double angle);
 
-    template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
+    template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crz_gate(const Container& tuples);
 
     void add_cp_gate(std::size_t control_index, std::size_t target_index, double angle);
 
-    template <impl_ket::ControlAndTargetIndicesAndAngles Container = impl_ket::ControlAndTargetIndicesAndAnglesIList>
+    template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cp_gate(const Container& tuples);
 
     void add_u_gate(const Matrix2X2& gate, std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_u_gate(const Matrix2X2& gate, const Container& indices);
 
     void add_cu_gate(const Matrix2X2& gate, std::size_t control_index, std::size_t target_index);
 
-    template <impl_ket::ControlAndTargetIndices Container = impl_ket::ControlAndTargetIndicesIList>
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cu_gate(const Matrix2X2& gate, const Container& pairs);
 
     /*
@@ -183,12 +183,12 @@ public:
     */
     void add_m_gate(std::size_t target_index);
 
-    template <impl_ket::QubitIndices Container = impl_ket::QubitIndicesIList>
+    template <QubitIndices Container = QubitIndicesIList>
     void add_m_gate(const Container& indices);
 
     void add_m_gate(std::size_t target_index, std::size_t bit_index);
 
-    template <impl_ket::QubitAndBitIndices Container = impl_ket::QubitAndBitIndicesIList>
+    template <QubitAndBitIndices Container = QubitAndBitIndicesIList>
     void add_m_gate(const Container& pairs);
 
     /*

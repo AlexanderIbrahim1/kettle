@@ -8,6 +8,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
@@ -71,7 +72,7 @@ void simulate_single_qubit_gate_(
             apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(impl_ket::always_false<void>::value, "Invalid single qubit gate");
+            static_assert(ket::internal::always_false<void>::value, "Invalid single qubit gate");
         }
     }
 }
@@ -144,7 +145,7 @@ void simulate_double_qubit_gate_(
             apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(impl_ket::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
+            static_assert(ket::internal::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
         }
     }
 }

@@ -5,13 +5,10 @@
 #include <utility>
 #include <vector>
 
-namespace impl_ket
+namespace ket
 {
 
-template <typename T>
-struct always_false : std::false_type
-{};
-
+// TODO: simplify the other concepts with the Iterable concept
 template <typename Container>
 concept Iterable = requires(Container container)
 {
@@ -77,43 +74,4 @@ using ControlAndTargetIndicesVector = std::vector<std::pair<std::size_t, std::si
 using QubitAndBitIndicesVector = std::vector<std::pair<std::size_t, std::size_t>>;
 using ControlAndTargetIndicesAndAnglesVector = std::vector<std::tuple<std::size_t, std::size_t, double>>;
 
-template <Iterable Container>
-auto get_container_index(const Container& container, std::size_t index) -> std::size_t
-{
-    // std::initializer_list<T> doesn't support indexing, for some reason???
-    if constexpr (std::is_same_v<Container, std::initializer_list<std::size_t>>) {
-        return *(container.begin() + index);
-    }
-    else {
-        return container[index];
-    }
-}
-
-template <Iterable Container>
-auto get_container_size(const Container& container) -> std::size_t
-{
-    return static_cast<std::size_t>(std::distance(container.begin(), container.end()));
-}
-
-template <QubitIndices Container0 = QubitIndicesIList, QubitIndices Container1 = QubitIndicesIList>
-auto extend_container_to_vector(const Container0& container0, const Container1& container1) -> std::vector<std::size_t>
-{
-    const auto new_size = get_container_size(container0) + get_container_size(container1);
-
-    auto new_container = std::vector<std::size_t> {};
-    new_container.reserve(new_size);
-
-    for (auto elem : container0) {
-        new_container.push_back(elem);
-    }
-
-    for (auto elem : container1) {
-        new_container.push_back(elem);
-    }
-    
-    return new_container;
-}
-
-static constexpr auto MARGINALIZED_QUBIT = char {'x'};
-
-}  // namespace impl_ket
+}  // namespace ket

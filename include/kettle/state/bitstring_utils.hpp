@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "kettle/common/utils.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 
 namespace impl_ket
 {
@@ -26,7 +26,7 @@ constexpr auto endian_flip_(std::size_t value, std::size_t n_relevant_bits) -> s
 constexpr auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
 {
     const auto is_bitstring_char = [](char bitchar) {
-        return bitchar == '0' || bitchar == '1' || bitchar == impl_ket::MARGINALIZED_QUBIT;
+        return bitchar == '0' || bitchar == '1' || bitchar == ket::internal::MARGINALIZED_QUBIT;
     };
 
     return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);

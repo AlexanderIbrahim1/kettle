@@ -5,7 +5,7 @@
 #include <random>
 
 #include "kettle_internal/common/prng.hpp"
-#include "kettle/common/utils.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
@@ -60,7 +60,7 @@ void collapse_and_renormalize_(
             state[state1_index] = {0.0, 0.0};
         }
         else {
-            static_assert(always_false<void>::value, "Invalid integer provided for state collapse.");
+            static_assert(ket::internal::always_false<void>::value, "Invalid integer provided for state collapse.");
         }
     }
 }
