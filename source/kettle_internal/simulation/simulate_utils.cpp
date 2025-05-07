@@ -1,7 +1,7 @@
-#pragma once
-
 #include <cstddef>
 #include <stdexcept>
+
+#include "kettle_internal/simulation/simulate_utils.hpp"
 
 /*
     This header file contains code to help perform the quantum circuit simulations,
@@ -9,18 +9,10 @@
 */
 
 
-namespace impl_ket
+namespace ket::internal
 {
 
-struct FlatIndexPair
-{
-    std::size_t i_lower;
-    std::size_t i_upper;
-
-    constexpr auto operator<=>(const FlatIndexPair&) const noexcept = default;
-};
-
-constexpr auto number_of_single_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
+auto number_of_single_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
 {
     if (n_qubits == 0) {
         throw std::runtime_error {
@@ -31,7 +23,7 @@ constexpr auto number_of_single_qubit_gate_pairs_(std::size_t n_qubits) -> std::
     return 1UL << (n_qubits - 1);
 }
 
-constexpr auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
+auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
 {
     // the case where `n_qubits == 1` does not make sense for double qubit gate simulations;
     //   - the calculation for the number of double gates is invalid
@@ -53,4 +45,4 @@ constexpr auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::
 }
 
 
-}  // namespace impl_ket
+}  // namespace ket::internal

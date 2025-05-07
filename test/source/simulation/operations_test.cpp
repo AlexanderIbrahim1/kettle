@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "kettle/simulation/operations.hpp"
+#include "kettle_internal/simulation/operations.hpp"
 #include "kettle/state/state.hpp"
 
 constexpr static auto ABS_TOL = double {1.0e-6};
@@ -25,7 +25,7 @@ TEST_CASE("Swap states operation")
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    impl_ket::apply_x_gate(quantum_state, 0, 1);
+    ket::internal::apply_x_gate(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -43,7 +43,7 @@ TEST_CASE("Superpose states operation")
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    impl_ket::apply_h_gate(quantum_state, 0, 1);
+    ket::internal::apply_h_gate(quantum_state, 0, 1);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -61,7 +61,7 @@ TEST_CASE("Turn states operation")
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
-    impl_ket::apply_rx_gate(quantum_state, 0, 1, M_PI);
+    ket::internal::apply_rx_gate(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];
@@ -79,7 +79,7 @@ TEST_CASE("Phase turn states operation")
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
-    impl_ket::apply_rz_gate(quantum_state, 0, 1, M_PI);
+    ket::internal::apply_rz_gate(quantum_state, 0, 1, M_PI);
 
     const auto& coeff_0 = quantum_state[0];
     const auto& coeff_1 = quantum_state[1];

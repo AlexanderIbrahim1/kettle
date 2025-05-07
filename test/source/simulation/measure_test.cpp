@@ -10,9 +10,9 @@
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/state/state.hpp>
 #include <kettle/simulation/simulate.hpp>
-#include <kettle/simulation/measure.hpp>
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include <kettle_internal/simulation/measure.hpp>
 
 namespace cre = ket::internal::create;
 
@@ -66,10 +66,10 @@ static void simulate_measurement_wrapper(
     const auto n_qubits = state.n_qubits();
 
     if (measured_state == 0) {
-        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
+        ket::internal::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
     }
     else if (measured_state == 1) {
-        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
+        ket::internal::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
     }
     else {
         throw std::runtime_error {"Invalid measured state provided to the test case.\n"};

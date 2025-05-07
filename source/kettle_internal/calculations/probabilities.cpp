@@ -3,11 +3,11 @@
 #include <map>
 #include <vector>
 
-#include "kettle/simulation/gate_pair_generator.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle/calculations/probabilities.hpp"
+#include "kettle_internal/simulation/gate_pair_generator.hpp"
 
 /*
     This file contains code components to calculate the probabilities of each of
@@ -107,7 +107,7 @@ namespace ket::internal
 
 void apply_noise_(double noise, std::size_t i_qubit, std::size_t n_qubits, std::vector<double>& probabilities)
 {
-    auto generator = impl_ket::SingleQubitGatePairGenerator {i_qubit, n_qubits};
+    auto generator = ket::internal::SingleQubitGatePairGenerator {i_qubit, n_qubits};
     for (std::size_t i_pair {0}; i_pair < generator.size(); ++i_pair) {
         const auto [state0_index, state1_index] = generator.next();
 

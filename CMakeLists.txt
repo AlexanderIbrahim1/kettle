@@ -47,6 +47,11 @@ add_library(
     source/kettle_internal/io/read_tangelo_file.cpp
     source/kettle_internal/io/statevector.cpp
     source/kettle_internal/io/write_tangelo_file.cpp
+    source/kettle_internal/simulation/measure.cpp
+    source/kettle_internal/simulation/multithread_simulate_utils.cpp
+    source/kettle_internal/simulation/operations.cpp
+    source/kettle_internal/simulation/simulate_utils.cpp
+    source/kettle_internal/simulation/simulate.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

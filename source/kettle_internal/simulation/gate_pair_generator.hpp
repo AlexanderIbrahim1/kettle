@@ -6,7 +6,7 @@
 
 #include "kettle/common/mathtools.hpp"
 
-namespace impl_ket
+namespace ket::internal
 {
 
 /*
@@ -137,4 +137,4 @@ private:
     std::size_t i2_ {0};
 };
 
-}  // namespace impl_ket
+}  // namespace ket::internal
