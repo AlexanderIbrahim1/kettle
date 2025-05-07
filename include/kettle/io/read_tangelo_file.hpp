@@ -8,12 +8,12 @@
 #include <string>
 
 #include <kettle/gates/primitive_gate.hpp>
-#include <kettle/gates/primitive_gate_map.hpp>
 #include <kettle/gates/swap.hpp>
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/io/io_control_flow.hpp>
 
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
 
 /*
 This script parses the file of gates produced by the tangelo code.
@@ -80,7 +80,7 @@ inline void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit,
     stream >> target_qubit; // target qubit
     stream >> dummy_ch;     // ']'
 
-    const auto func = GATE_TO_FUNCTION_1T.at(gate);
+    const auto func = ket::internal::GATE_TO_FUNCTION_1T.at(gate);
     (circuit.*func)(target_qubit);
 }
 
@@ -102,7 +102,7 @@ inline void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircu
     stream >> control_qubit; // control qubit
     stream >> dummy_ch;     // ']'
 
-    const auto func = GATE_TO_FUNCTION_1C1T.at(gate);
+    const auto func = ket::internal::GATE_TO_FUNCTION_1C1T.at(gate);
     (circuit.*func)(control_qubit, target_qubit);
 }
 
@@ -122,7 +122,7 @@ inline void parse_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit
     stream >> dummy_str;    // ':'
     stream >> angle;        // angle
 
-    const auto func = GATE_TO_FUNCTION_1T1A.at(gate);
+    const auto func = ket::internal::GATE_TO_FUNCTION_1T1A.at(gate);
     (circuit.*func)(target_qubit, angle);
 }
 
@@ -148,7 +148,7 @@ inline void parse_one_control_one_target_one_angle_gate_(ket::Gate gate, ket::Qu
     stream >> dummy_str;    // ':'
     stream >> angle;        // angle
 
-    const auto func = GATE_TO_FUNCTION_1C1T1A.at(gate);
+    const auto func = ket::internal::GATE_TO_FUNCTION_1C1T1A.at(gate);
     (circuit.*func)(control_qubit, target_qubit, angle);
 }
 
@@ -332,7 +332,7 @@ inline auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-func
         // attempt to parse the gate
         const auto gate = [&]() {
             try {
-                return impl_ket::PRIMITIVE_GATES_TO_STRING.at_reverse(local_name);
+                return ket::internal::PRIMITIVE_GATES_TO_STRING.at_reverse(local_name);
             }
             catch (const std::runtime_error& e) {
                 auto err_msg = std::stringstream {};

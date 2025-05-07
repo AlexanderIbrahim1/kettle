@@ -29,6 +29,7 @@ add_library(
     source/kettle_internal/gates/primitive_gate/gate_compare.cpp
     source/kettle_internal/gates/primitive_gate/gate_create.cpp
     source/kettle_internal/gates/primitive_gate/gate_id.cpp
+    source/kettle_internal/gates/primitive_gate_map.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

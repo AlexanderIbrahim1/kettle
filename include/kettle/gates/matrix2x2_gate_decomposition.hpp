@@ -7,10 +7,10 @@
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/gates/primitive_gate_map.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
 
 /*
     This header file contains functions for decomposing a general 2x2 unitary matrix
@@ -190,7 +190,7 @@ inline auto decomp_to_one_control_one_target_primitive_gates_(
 
     auto output = std::vector<ket::GateInfo> {};
     for (const auto& primitive : primitives) {
-        const auto ctrl_gate = UNCONTROLLED_TO_CONTROLLED_GATE.at(primitive.gate);
+        const auto ctrl_gate = ket::internal::UNCONTROLLED_TO_CONTROLLED_GATE.at(primitive.gate);
 
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
