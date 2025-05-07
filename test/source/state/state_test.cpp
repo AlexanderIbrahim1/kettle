@@ -479,7 +479,7 @@ TEST_CASE("state_as_bitstring")
 
 TEST_CASE("are_all_marginal_bits_on_side_")
 {
-    using MBS = impl_ket::MarginalBitsSide;
+    using MBS = ket::internal::MarginalBitsSide;
 
     struct TestInfo
     {
@@ -509,7 +509,7 @@ TEST_CASE("are_all_marginal_bits_on_side_")
             TestInfo {"00x1", false}
         );
 
-        REQUIRE(impl_ket::are_all_marginal_bits_on_side_<MBS::LEFT>(info.input) == info.expected);
+        REQUIRE(ket::internal::are_all_marginal_bits_on_side_<MBS::LEFT>(info.input) == info.expected);
     }
 
     SECTION("right side")
@@ -534,7 +534,7 @@ TEST_CASE("are_all_marginal_bits_on_side_")
             TestInfo {"00x1", false}
         );
 
-        REQUIRE(impl_ket::are_all_marginal_bits_on_side_<MBS::RIGHT>(info.input) == info.expected);
+        REQUIRE(ket::internal::are_all_marginal_bits_on_side_<MBS::RIGHT>(info.input) == info.expected);
     }
 }
 

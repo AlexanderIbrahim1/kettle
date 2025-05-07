@@ -154,7 +154,7 @@ auto perform_measurements_as_counts_marginal(
     // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
         const auto i_state = sampler();
-        const auto bitstring = impl_ket::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
+        const auto bitstring = ket::internal::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
         ++measurements[bitstring];
     }
 
@@ -198,7 +198,7 @@ auto perform_measurements_as_counts_marginal(
         auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
 
         const auto i_state = sampler();
-        const auto bitstring = impl_ket::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
+        const auto bitstring = ket::internal::state_index_to_bitstring_marginal_(i_state, marginal_bitmask, endian);
         ++measurements[bitstring];
     }
 

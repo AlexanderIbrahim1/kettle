@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "kettle/state/bitstring_utils.hpp"
+#include "kettle_internal/state/bitstring_utils.hpp"
 
 TEST_CASE("big endian and little endian flips")
 {
@@ -18,7 +18,7 @@ TEST_CASE("big endian and little endian flips")
         const auto pair =
             GENERATE(InputAndOutput {0, 0}, InputAndOutput {1, 2}, InputAndOutput {2, 1}, InputAndOutput {3, 3});
 
-        const auto output = impl_ket::endian_flip_(pair.input, n_bits);
+        const auto output = ket::internal::endian_flip_(pair.input, n_bits);
         REQUIRE(output == pair.output);
     }
 
@@ -37,7 +37,7 @@ TEST_CASE("big endian and little endian flips")
             InputAndOutput {7, 7}
         );
 
-        const auto output = impl_ket::endian_flip_(pair.input, n_bits);
+        const auto output = ket::internal::endian_flip_(pair.input, n_bits);
         REQUIRE(output == pair.output);
     }
 
@@ -69,7 +69,7 @@ TEST_CASE("big endian and little endian flips")
             InputAndOutput {15, 15}
         );
 
-        const auto output = impl_ket::endian_flip_(pair.input, n_bits);
+        const auto output = ket::internal::endian_flip_(pair.input, n_bits);
         REQUIRE(output == pair.output);
     }
 }

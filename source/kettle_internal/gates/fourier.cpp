@@ -1,11 +1,13 @@
-#include "kettle/gates/fourier.hpp"
 #include <iterator>
 #include <ranges>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"
 #include "kettle/common/utils.hpp"
+#include "kettle/gates/fourier.hpp"
 #include "kettle/gates/swap.hpp"
+
+#include "kettle_internal/common/utils_internal.hpp"
 
 namespace
 {

@@ -52,6 +52,12 @@ add_library(
     source/kettle_internal/simulation/operations.cpp
     source/kettle_internal/simulation/simulate_utils.cpp
     source/kettle_internal/simulation/simulate.cpp
+    source/kettle_internal/state/bitstring_utils.cpp
+    source/kettle_internal/state/marginal.cpp
+    source/kettle_internal/state/project_state.cpp
+    source/kettle_internal/state/qubit_state_conversion.cpp
+    source/kettle_internal/state/random.cpp
+    source/kettle_internal/state/state.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 

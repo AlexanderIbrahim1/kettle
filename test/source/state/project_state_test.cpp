@@ -50,7 +50,7 @@ TEST_CASE("is_index_set()")
         TestCase {1, 3, true}
     );
 
-    const auto actual = impl_ket::is_index_set_(testcase.index, testcase.value);
+    const auto actual = ket::internal::is_index_set_(testcase.index, testcase.value);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -67,7 +67,7 @@ TEST_CASE("QubitStateChecker_")
     {
         SECTION("qubit at state 0 is 0")
         {
-            const auto checker = impl_ket::QubitStateChecker_ {{0}, {0}};
+            const auto checker = ket::internal::QubitStateChecker_ {{0}, {0}};
 
             const auto testcase = GENERATE(
                 TestCase {0, true},   // 00
@@ -81,7 +81,7 @@ TEST_CASE("QubitStateChecker_")
 
         SECTION("qubit at state 0 is 1")
         {
-            const auto checker = impl_ket::QubitStateChecker_ {{0}, {1}};
+            const auto checker = ket::internal::QubitStateChecker_ {{0}, {1}};
 
             const auto testcase = GENERATE(
                 TestCase {0, false},  // 00
@@ -98,7 +98,7 @@ TEST_CASE("QubitStateChecker_")
     {
         SECTION("qubits at states {0, 2} are {0, 0}")
         {
-            const auto checker = impl_ket::QubitStateChecker_ {{0, 2}, {0, 0}};
+            const auto checker = ket::internal::QubitStateChecker_ {{0, 2}, {0, 0}};
 
             const auto testcase = GENERATE(
                 TestCase {0, true},   // 000
@@ -116,7 +116,7 @@ TEST_CASE("QubitStateChecker_")
 
         SECTION("qubits at states {0, 1} are {1, 0}")
         {
-            const auto checker = impl_ket::QubitStateChecker_ {{0, 1}, {1, 0}};
+            const auto checker = ket::internal::QubitStateChecker_ {{0, 1}, {1, 0}};
 
             const auto testcase = GENERATE(
                 TestCase {0, false},  // 000

@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "kettle/state/bitstring_utils.hpp"
 #include "kettle/state/state.hpp"
-
 #include "kettle/io/statevector.hpp"
+
+#include "kettle_internal/state/bitstring_utils.hpp"
 
 namespace
 {
@@ -87,7 +87,7 @@ void save_statevector(
         if (endian == QSE::LITTLE) {
             outstream << format_complex_(state[i]) << '\n';
         } else {
-            outstream << format_complex_(state[impl_ket::endian_flip_(i, state.n_qubits())]) << '\n';
+            outstream << format_complex_(state[ket::internal::endian_flip_(i, state.n_qubits())]) << '\n';
         }
     }
 }
