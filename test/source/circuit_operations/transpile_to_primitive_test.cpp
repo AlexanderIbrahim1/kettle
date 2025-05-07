@@ -18,7 +18,7 @@ namespace gid = ket::internal::gate_id;
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
 */
-static constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
+static auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
 {
     auto output = ket::i_gate();
 
@@ -185,19 +185,19 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
     SECTION("2 qubit circuit, qubit 0 is measured, qubit 1 is dependent")
     {
         const auto if_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})}
-//            Matrices {make_matrix({{G::H}, {G::X}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
+            Matrices {make_matrix({{G::H}})},
+            Matrices {make_matrix({{G::H}, {G::X}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
         );
 
         const auto else_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})}
-//            Matrices {make_matrix({{G::H}, {G::X}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
+            Matrices {make_matrix({{G::H}})},
+            Matrices {make_matrix({{G::H}, {G::X}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
         );
 
         const auto init_bitstring = std::string {GENERATE("00", "10", "01", "11")};
