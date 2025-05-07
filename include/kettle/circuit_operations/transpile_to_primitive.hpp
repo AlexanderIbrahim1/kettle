@@ -3,9 +3,9 @@
 #include <stdexcept>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
+#include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
@@ -30,8 +30,8 @@ inline auto transpile_to_primitive(
 
     auto new_circuit = QuantumCircuit {circuit.n_qubits(), circuit.n_bits()};
 
-    const auto decomp_1t = impl_ket::decomp_to_one_target_primitive_gates_;
-    const auto decomp_1c_1t = impl_ket::decomp_to_one_control_one_target_primitive_gates_;
+    const auto decomp_1t = ket::internal::decomp_to_one_target_primitive_gates_;
+    const auto decomp_1c_1t = ket::internal::decomp_to_one_control_one_target_primitive_gates_;
 
     for (const auto& circuit_element : circuit.elements_) {
         if (circuit_element.is_circuit_logger()) {

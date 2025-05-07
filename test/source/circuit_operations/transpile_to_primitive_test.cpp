@@ -7,9 +7,11 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/transpile_to_primitive.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
 
 using G = ket::Gate;
 using Matrices = std::vector<ket::Matrix2X2>;
@@ -18,7 +20,7 @@ namespace gid = ket::internal::gate_id;
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
 */
-static auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
+static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg_infos) -> ket::Matrix2X2
 {
     auto output = ket::i_gate();
 

@@ -32,6 +32,7 @@ add_library(
     source/kettle_internal/gates/primitive_gate/gate_create.cpp
     source/kettle_internal/gates/primitive_gate/gate_id.cpp
     source/kettle_internal/gates/primitive_gate_map.cpp
+    source/kettle_internal/gates/matrix2x2_gate_decomposition.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 
