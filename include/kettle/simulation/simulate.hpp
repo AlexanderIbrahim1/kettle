@@ -71,8 +71,6 @@ void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<
 //     std::optional<int> prng_seed = std::nullopt
 // )
 // {
-//     namespace im = impl_ket;
-// 
 //     if (n_threads == 0) {
 //         throw std::runtime_error {"Cannot perform simulation with 0 threads.\n"};
 //     }
