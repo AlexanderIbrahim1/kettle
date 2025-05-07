@@ -33,6 +33,10 @@ add_library(
     source/kettle_internal/gates/primitive_gate/gate_id.cpp
     source/kettle_internal/gates/primitive_gate_map.cpp
     source/kettle_internal/gates/matrix2x2_gate_decomposition.cpp
+    source/kettle_internal/gates/multiplicity_controlled_u_gate.cpp
+    source/kettle_internal/gates/random_u_gates.cpp
+    source/kettle_internal/gates/swap.cpp
+    source/kettle_internal/gates/toffoli.cpp
 )
 add_library(kettle::kettle ALIAS kettle_kettle)
 
