@@ -89,8 +89,6 @@ target_include_directories(
     ${warning_guard}
     PUBLIC
     "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-    PUBLIC
-    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
 )
 
 target_include_directories(
@@ -116,6 +114,14 @@ endif()
 if(PROJECT_IS_TOP_LEVEL)
   option(BUILD_EXAMPLES "Build examples tree." "${kettle_BUILD_EXAMPLES}")
   if(BUILD_EXAMPLES)
+
+    target_include_directories(
+        kettle_kettle
+        ${warning_guard}
+        PUBLIC
+        "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+    )
+
     add_subdirectory(example)
   endif()
 endif()
