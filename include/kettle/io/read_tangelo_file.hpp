@@ -13,6 +13,8 @@
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/io/io_control_flow.hpp>
 
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+
 /*
 This script parses the file of gates produced by the tangelo code.
 
@@ -261,7 +263,7 @@ inline auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-func
     std::optional<std::size_t> line_starts_with_spaces = std::nullopt
 ) -> QuantumCircuit
 {
-    namespace gid = impl_ket::gate_id;
+    namespace gid = ket::internal::gate_id;
     using G = ket::Gate;
 
     auto circuit = ket::QuantumCircuit {n_qubits};

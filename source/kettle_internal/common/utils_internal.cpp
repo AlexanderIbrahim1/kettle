@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <iterator>
-#include <utility>
 #include <vector>
 
 #include "kettle/common/utils.hpp"

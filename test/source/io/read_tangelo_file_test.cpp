@@ -10,6 +10,13 @@
 #include <kettle/io/read_tangelo_file.hpp>
 #include <kettle/io/write_tangelo_file.hpp>
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+
+using G = ket::Gate;
+namespace cre = ket::internal::create;
+namespace comp = ket::internal::compare;
+
 
 static auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
 {
@@ -19,9 +26,6 @@ static auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_
 
 TEST_CASE("read_tangelo_file()")
 {
-    using G = ket::Gate;
-    namespace comp = impl_ket::compare;
-
     SECTION("single h gate")
     {
         auto stream = std::stringstream {
@@ -29,7 +33,7 @@ TEST_CASE("read_tangelo_file()")
         };
 
         const auto actual = ket::read_tangelo_circuit(9, stream, 0);
-        const auto expected = impl_ket::create_one_target_gate(G::H, 4);
+        const auto expected = cre::create_one_target_gate(G::H, 4);
 
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(comp::is_1t_gate_equal(actual[0].get_gate(), expected));
@@ -48,10 +52,10 @@ TEST_CASE("read_tangelo_file()")
 
         const auto actual = ket::read_tangelo_circuit(9, stream, 2);
 
-        const auto expected0 = impl_ket::create_one_target_gate(G::H, 4);
-        const auto expected1 = impl_ket::create_one_target_one_angle_gate(G::RX, 5, 1.5707963267948966);
-        const auto expected2 = impl_ket::create_one_control_one_target_gate(G::CX, 2, 4);
-        const auto expected3 = impl_ket::create_one_target_one_angle_gate(G::RZ, 5, 12.533816585267923);
+        const auto expected0 = cre::create_one_target_gate(G::H, 4);
+        const auto expected1 = cre::create_one_target_one_angle_gate(G::RX, 5, 1.5707963267948966);
+        const auto expected2 = cre::create_one_control_one_target_gate(G::CX, 2, 4);
+        const auto expected3 = cre::create_one_target_one_angle_gate(G::RZ, 5, 12.533816585267923);
 
         REQUIRE(number_of_elements(actual) == 4);
         REQUIRE(comp::is_1t_gate_equal(actual[0].get_gate(), expected0));
@@ -76,9 +80,9 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(gate1.gate == ket::Gate::CX);
         REQUIRE(gate2.gate == ket::Gate::CX);
 
-        const auto [q_left_0, q_right_0] = impl_ket::unpack_one_control_one_target_gate(gate0);
-        const auto [q_left_1, q_right_1] = impl_ket::unpack_one_control_one_target_gate(gate1);
-        const auto [q_left_2, q_right_2] = impl_ket::unpack_one_control_one_target_gate(gate2);
+        const auto [q_left_0, q_right_0] = cre::unpack_one_control_one_target_gate(gate0);
+        const auto [q_left_1, q_right_1] = cre::unpack_one_control_one_target_gate(gate1);
+        const auto [q_left_2, q_right_2] = cre::unpack_one_control_one_target_gate(gate2);
 
         REQUIRE(q_left_0 == q_right_1);
         REQUIRE(q_right_1 == q_left_2);
@@ -93,7 +97,7 @@ TEST_CASE("read_tangelo_file()")
         };
 
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
-        const auto expected0 = impl_ket::create_one_target_one_angle_gate(G::P, 11, -1.3474016644659843);
+        const auto expected0 = cre::create_one_target_one_angle_gate(G::P, 11, -1.3474016644659843);
 
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(comp::is_1t1a_gate_equal(actual[0].get_gate(), expected0));
@@ -108,8 +112,8 @@ TEST_CASE("read_tangelo_file()")
             std::function<std::tuple<std::size_t, std::size_t, double>(ket::GateInfo)> unpack_func;
         };
 
-        const auto unpack = impl_ket::unpack_one_control_one_target_one_angle_gate;
-        const auto create = impl_ket::create_one_control_one_target_one_angle_gate;
+        const auto unpack = cre::unpack_one_control_one_target_one_angle_gate;
+        const auto create = cre::create_one_control_one_target_one_angle_gate;
 
         auto testcase = GENERATE_REF(
             TestCase {
@@ -147,7 +151,7 @@ TEST_CASE("read_tangelo_file()")
     {
         auto stream = std::stringstream {"M         target : [1]   bit : [4]\n"};
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
-        const auto expected = impl_ket::create_m_gate(1, 4);
+        const auto expected = cre::create_m_gate(1, 4);
 
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(comp::is_m_gate_equal(actual[0].get_gate(), expected));
@@ -166,7 +170,7 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(gate.gate == ket::Gate::U);
 
-        const auto [target, unitary_ptr] = impl_ket::unpack_u_gate(gate);
+        const auto [target, unitary_ptr] = cre::unpack_u_gate(gate);
         
         const auto expected_matrix = ket::Matrix2X2 {
             .elem00={1.234, -4.321},
@@ -192,7 +196,7 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(number_of_elements(actual) == 1);
         REQUIRE(gate.gate == ket::Gate::CU);
 
-        const auto [control, target, unitary_ptr] = impl_ket::unpack_cu_gate(gate);
+        const auto [control, target, unitary_ptr] = cre::unpack_cu_gate(gate);
         
         const auto expected_matrix = ket::Matrix2X2 {
             .elem00={1.234, -4.321},

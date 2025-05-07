@@ -9,17 +9,21 @@
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
+
 namespace impl_ket
 {
 
 inline auto non_u_gate_to_u_gate(const ket::GateInfo& info) -> ket::Matrix2X2
 {
-    if (impl_ket::gate_id::is_non_angle_transform_gate(info.gate)) {
+    if (ket::internal::gate_id::is_non_angle_transform_gate(info.gate)) {
         return ket::non_angle_gate(info.gate);
     }
 
-    if (impl_ket::gate_id::is_angle_transform_gate(info.gate)) {
-        const auto angle = impl_ket::unpack_gate_angle(info);
+    if (ket::internal::gate_id::is_angle_transform_gate(info.gate)) {
+        const auto angle = ket::internal::create::unpack_gate_angle(info);
         return ket::angle_gate(info.gate, angle);
     }
 
@@ -36,16 +40,16 @@ inline auto as_u_gate(const ket::GateInfo& info) -> ket::GateInfo
 
     auto unitary = ket::internal::ClonePtr<ket::Matrix2X2> {non_u_gate_to_u_gate(info)};
 
-    if (gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
-        const auto target = impl_ket::unpack_single_qubit_gate_index(info);
-        const auto u_gate_info = impl_ket::create_u_gate(target, std::move(unitary));
+    if (ket::internal::gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
+        const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
+        const auto u_gate_info = ket::internal::create::create_u_gate(target, std::move(unitary));
 
         return u_gate_info;
     }
 
-    if (gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
-        const auto [control, target] = impl_ket::unpack_double_qubit_gate_indices(info);
-        const auto u_gate_info = impl_ket::create_cu_gate(control, target, std::move(unitary));
+    if (ket::internal::gate_id::is_double_qubit_transform_gate(info.gate) && info.gate != G::CU) {
+        const auto [control, target] = ket::internal::create::unpack_double_qubit_gate_indices(info);
+        const auto u_gate_info = ket::internal::create::create_cu_gate(control, target, std::move(unitary));
 
         return u_gate_info;
     }
@@ -60,12 +64,12 @@ inline auto have_matching_indices_(const ket::GateInfo& left_info, const ket::Ga
     }
 
     if (left_info.gate == ket::Gate::U) {
-        const auto unpack = impl_ket::unpack_single_qubit_gate_index;
+        const auto unpack = ket::internal::create::unpack_single_qubit_gate_index;
         return unpack(left_info) == unpack(right_info);
     }
 
     if (left_info.gate == ket::Gate::CU) {
-        const auto unpack = impl_ket::unpack_double_qubit_gate_indices;
+        const auto unpack = ket::internal::create::unpack_double_qubit_gate_indices;
         return unpack(left_info) == unpack(right_info);
     }
 
@@ -129,7 +133,7 @@ inline auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognit
     double tol_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool
 {
-    namespace comp = impl_ket::compare;
+    namespace comp = ket::internal::compare;
 
     // begin with the fastest checks first (qubits, bits, and bitmask values)
     if (left.n_qubits() != right.n_qubits()) {

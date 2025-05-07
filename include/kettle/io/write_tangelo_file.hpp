@@ -14,6 +14,9 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/io/io_control_flow.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
 /*
 This script writes the gates of a `QuantumCircuit` instance into a tangelo-like format file
 
@@ -53,7 +56,7 @@ inline auto format_matrix2x2_(const ket::Matrix2X2& mat) -> std::string
 inline auto format_one_target_gate_(const ket::GateInfo& info) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto target = unpack_single_qubit_gate_index(info);
+    const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
 
     return std::format("{:<10}target : [{}]\n", gate_name, target);
 }
@@ -61,7 +64,7 @@ inline auto format_one_target_gate_(const ket::GateInfo& info) -> std::string
 inline auto format_one_control_one_target_gate_(const ket::GateInfo& info) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto [control, target] = unpack_double_qubit_gate_indices(info);
+    const auto [control, target] = ket::internal::create::unpack_double_qubit_gate_indices(info);
 
     return std::format("{:<10}target : [{}]   control : [{}]\n", gate_name, target, control);
 }
@@ -69,7 +72,7 @@ inline auto format_one_control_one_target_gate_(const ket::GateInfo& info) -> st
 inline auto format_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto [target, angle] = unpack_one_target_one_angle_gate(info);
+    const auto [target, angle] = ket::internal::create::unpack_one_target_one_angle_gate(info);
 
     return std::format("{:<10}target : [{}]   parameter : {:.16f}\n", gate_name, target, angle);
 }
@@ -77,7 +80,7 @@ inline auto format_one_target_one_angle_gate_(const ket::GateInfo& info) -> std:
 inline auto format_one_control_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto [control, target, angle] = unpack_one_control_one_target_one_angle_gate(info);
+    const auto [control, target, angle] = ket::internal::create::unpack_one_control_one_target_one_angle_gate(info);
 
     return std::format("{:<10}target : [{}]   control : [{}]   parameter : {:.16f}\n", gate_name, target, control, angle);
 }
@@ -85,7 +88,7 @@ inline auto format_one_control_one_target_one_angle_gate_(const ket::GateInfo& i
 inline auto format_m_gate_(const ket::GateInfo& info) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto [qubit, bit] = unpack_m_gate(info);
+    const auto [qubit, bit] = ket::internal::create::unpack_m_gate(info);
 
     return std::format("{:<10}target : [{}]   bit : [{}]\n", gate_name, qubit, bit);
 }
@@ -93,7 +96,7 @@ inline auto format_m_gate_(const ket::GateInfo& info) -> std::string
 inline auto format_u_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto target = unpack_single_qubit_gate_index(info);
+    const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
 
     auto output = std::stringstream {};
     output << std::format("{:<10}target : [{}]\n", gate_name, target);
@@ -105,7 +108,7 @@ inline auto format_u_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat)
 inline auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
 {
     const auto gate_name = PRIMITIVE_GATES_TO_STRING.at(info.gate);
-    const auto [control, target] = unpack_double_qubit_gate_indices(info);
+    const auto [control, target] = ket::internal::create::unpack_double_qubit_gate_indices(info);
 
     auto output = std::stringstream {};
     output << std::format("{:<10}target : [{}]   control : [{}]\n", gate_name, target, control);
@@ -129,7 +132,7 @@ inline void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-fun
     std::size_t n_leading_whitespace = 0
 )
 {
-    namespace gid = impl_ket::gate_id;
+    namespace gid = ket::internal::gate_id;
     using G = ket::Gate;
 
     const auto whitespace = std::string(n_leading_whitespace, ' ');
@@ -179,11 +182,11 @@ inline void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-fun
                 stream << whitespace << impl_ket::format_m_gate_(gate_info);
             }
             else if (gate_info.gate == G::U) {
-                const auto& unitary_ptr = impl_ket::unpack_unitary_matrix(gate_info);
+                const auto& unitary_ptr = ket::internal::create::unpack_unitary_matrix(gate_info);
                 stream << whitespace << impl_ket::format_u_gate_(gate_info, *unitary_ptr);
             }
             else if (gate_info.gate == G::CU) {
-                const auto& unitary_ptr = impl_ket::unpack_unitary_matrix(gate_info);
+                const auto& unitary_ptr = ket::internal::create::unpack_unitary_matrix(gate_info);
                 stream << whitespace << impl_ket::format_cu_gate_(gate_info, *unitary_ptr);
             }
             else {

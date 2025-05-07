@@ -10,6 +10,8 @@
 #include "kettle/state/state.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
 namespace impl_ket
 {
 
@@ -18,7 +20,7 @@ inline auto probabilities_of_collapsed_states_(
     const ket::GateInfo& info
 ) -> std::tuple<double, double>
 {
-    const auto target_index = unpack_single_qubit_gate_index(info);
+    const auto target_index = ket::internal::create::unpack_single_qubit_gate_index(info);
 
     auto pair_iterator = SingleQubitGatePairGenerator {target_index, state.n_qubits()};
     pair_iterator.set_state(0);
@@ -43,7 +45,7 @@ void collapse_and_renormalize_(
     double norm_of_surviving_state
 )
 {
-    const auto target_index = unpack_single_qubit_gate_index(info);
+    const auto target_index = ket::internal::create::unpack_single_qubit_gate_index(info);
 
     auto pair_iterator = SingleQubitGatePairGenerator {target_index, state.n_qubits()};
     pair_iterator.set_state(0);

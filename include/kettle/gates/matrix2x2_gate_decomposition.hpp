@@ -10,6 +10,8 @@
 #include "kettle/gates/primitive_gate_map.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
 /*
     This header file contains functions for decomposing a general 2x2 unitary matrix
     to a product of primitive 2x2 quantum gates.
@@ -158,15 +160,17 @@ inline auto decomp_to_one_target_primitive_gates_(
     double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>
 {
+    namespace cre = ket::internal::create;
+
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
 
     auto output = std::vector<ket::GateInfo> {};
     for (const auto& primitive : primitives) {
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
-            output.emplace_back(create_one_target_one_angle_gate(primitive.gate, target, angle));
+            output.emplace_back(cre::create_one_target_one_angle_gate(primitive.gate, target, angle));
         } else {
-            output.emplace_back(create_one_target_gate(primitive.gate, target));
+            output.emplace_back(cre::create_one_target_gate(primitive.gate, target));
         }
     }
 
@@ -180,6 +184,8 @@ inline auto decomp_to_one_control_one_target_primitive_gates_(
     double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>
 {
+    namespace cre = ket::internal::create;
+
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
 
     auto output = std::vector<ket::GateInfo> {};
@@ -188,9 +194,9 @@ inline auto decomp_to_one_control_one_target_primitive_gates_(
 
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
-            output.emplace_back(create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
+            output.emplace_back(cre::create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
         } else {
-            output.emplace_back(create_one_control_one_target_gate(ctrl_gate, control, target));
+            output.emplace_back(cre::create_one_control_one_target_gate(ctrl_gate, control, target));
         }
     }
 

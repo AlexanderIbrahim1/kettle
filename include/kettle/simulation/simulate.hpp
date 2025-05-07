@@ -9,13 +9,14 @@
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle_internal/common/utils_internal.hpp"
-#include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/gate_pair_generator.hpp"
 #include "kettle/simulation/measure.hpp"
 #include "kettle/simulation/operations.hpp"
 #include "kettle/simulation/simulate_utils.hpp"
 #include "kettle/state/state.hpp"
+
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
 namespace impl_ket
 {
@@ -29,9 +30,10 @@ void simulate_single_qubit_gate_(
     const FlatIndexPair& pair
 )
 {
+    namespace cre = ket::internal::create;
     using Gate = ket::Gate;
 
-    const auto target_index = unpack_single_qubit_gate_index(info);
+    const auto target_index = cre::unpack_single_qubit_gate_index(info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
@@ -56,19 +58,19 @@ void simulate_single_qubit_gate_(
             apply_sx_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::RX) {
-            [[maybe_unused]] const auto [ignore, theta] = unpack_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::RY) {
-            [[maybe_unused]] const auto [ignore, theta] = unpack_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
             apply_ry_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::RZ) {
-            [[maybe_unused]] const auto [ignore, theta] = unpack_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
             apply_rz_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::P) {
-            [[maybe_unused]] const auto [ignore, theta] = unpack_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
             apply_p_gate(state, state1_index, theta);
         }
         else {
@@ -84,7 +86,7 @@ inline void simulate_single_qubit_gate_general_(
     const FlatIndexPair& pair
 )
 {
-    const auto target_index = unpack_single_qubit_gate_index(info);
+    const auto target_index = ket::internal::create::unpack_single_qubit_gate_index(info);
     const auto n_qubits = state.n_qubits();
     auto pair_iterator = SingleQubitGatePairGenerator {target_index, n_qubits};
     pair_iterator.set_state(pair.i_lower);
@@ -102,9 +104,10 @@ void simulate_double_qubit_gate_(
     const FlatIndexPair& pair
 )
 {
+    namespace cre = ket::internal::create;
     using Gate = ket::Gate;
 
-    const auto [control_index, target_index] = unpack_double_qubit_gate_indices(info);
+    const auto [control_index, target_index] = cre::unpack_double_qubit_gate_indices(info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
@@ -129,19 +132,19 @@ void simulate_double_qubit_gate_(
             apply_sx_gate(state, state0_index, state1_index);
         }
         else if constexpr (GateType == Gate::CRX) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
             apply_rx_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CRY) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
             apply_ry_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CRZ) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
             apply_rz_gate(state, state0_index, state1_index, theta);
         }
         else if constexpr (GateType == Gate::CP) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = unpack_one_control_one_target_one_angle_gate(info);
+            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
             apply_p_gate(state, state1_index, theta);
         }
         else {
@@ -157,7 +160,7 @@ inline void simulate_double_qubit_gate_general_(
     const FlatIndexPair& pair
 )
 {
-    const auto [control_index, target_index] = unpack_double_qubit_gate_indices(info);
+    const auto [control_index, target_index] = ket::internal::create::unpack_double_qubit_gate_indices(info);
     const auto n_qubits = state.n_qubits();
     auto pair_iterator = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     pair_iterator.set_state(pair.i_lower);
@@ -178,6 +181,7 @@ inline void simulate_gate_info_(
     ket::ClassicalRegister& c_register
 )
 {
+    namespace cre = ket::internal::create;
     using G = ket::Gate;
 
     switch (gate_info.gate) {
@@ -254,12 +258,12 @@ inline void simulate_gate_info_(
             break;
         }
         case G::U : {
-            const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
+            const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
             simulate_single_qubit_gate_general_(state, gate_info, *unitary_ptr, single_pair);
             break;
         }
         case G::CU : {
-            const auto& unitary_ptr = unpack_unitary_matrix(gate_info);
+            const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
             simulate_double_qubit_gate_general_(state, gate_info, *unitary_ptr, double_pair);
             break;
         }
@@ -269,7 +273,7 @@ inline void simulate_gate_info_(
             // a single-threaded operation
             if (thread_id == MEASURING_THREAD_ID) {
                 [[maybe_unused]]
-                const auto [ignore, bit_index] = unpack_m_gate(gate_info);
+                const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
                 const auto measured = simulate_measurement_(state, gate_info, prng_seed);
                 c_register.set(bit_index, measured);
             }

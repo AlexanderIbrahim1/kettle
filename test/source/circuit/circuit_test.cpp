@@ -8,12 +8,16 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
+
+using G = ket::Gate;
+namespace cre = ket::internal::create;
+namespace comp = ket::internal::compare;
+
 
 TEST_CASE("add multiple X gates")
 {
-    using G = ket::Gate;
-    namespace comp = impl_ket::compare;
-
     auto circuit = ket::QuantumCircuit {3};
 
     const auto number_of_elements = [](const ket::QuantumCircuit& circ)
@@ -26,7 +30,7 @@ TEST_CASE("add multiple X gates")
         const auto indices = std::vector<std::size_t> {1};
         circuit.add_x_gate(indices);
 
-        const auto expected0 = impl_ket::create_one_target_gate(G::X, 1);
+        const auto expected0 = cre::create_one_target_gate(G::X, 1);
 
         REQUIRE(number_of_elements(circuit) == 1);
         REQUIRE(comp::is_1t_gate_equal(circuit[0].get_gate(), expected0));
@@ -37,8 +41,8 @@ TEST_CASE("add multiple X gates")
         const auto indices = std::vector<std::size_t> {0, 2};
         circuit.add_x_gate(indices);
 
-        const auto expected0 = impl_ket::create_one_target_gate(G::X, 0);
-        const auto expected1 = impl_ket::create_one_target_gate(G::X, 2);
+        const auto expected0 = cre::create_one_target_gate(G::X, 0);
+        const auto expected1 = cre::create_one_target_gate(G::X, 2);
 
         REQUIRE(number_of_elements(circuit) == 2);
         REQUIRE(comp::is_1t_gate_equal(circuit[0].get_gate(), expected0));
@@ -50,9 +54,9 @@ TEST_CASE("add multiple X gates")
         const auto indices = std::vector<std::size_t> {0, 1, 2};
         circuit.add_x_gate(indices);
 
-        const auto expected0 = impl_ket::create_one_target_gate(G::X, 0);
-        const auto expected1 = impl_ket::create_one_target_gate(G::X, 1);
-        const auto expected2 = impl_ket::create_one_target_gate(G::X, 2);
+        const auto expected0 = cre::create_one_target_gate(G::X, 0);
+        const auto expected1 = cre::create_one_target_gate(G::X, 1);
+        const auto expected2 = cre::create_one_target_gate(G::X, 2);
 
         REQUIRE(number_of_elements(circuit) == 3);
         REQUIRE(comp::is_1t_gate_equal(circuit[0].get_gate(), expected0));
@@ -64,9 +68,9 @@ TEST_CASE("add multiple X gates")
     {
         circuit.add_x_gate({0, 1, 2});
 
-        const auto expected0 = impl_ket::create_one_target_gate(G::X, 0);
-        const auto expected1 = impl_ket::create_one_target_gate(G::X, 1);
-        const auto expected2 = impl_ket::create_one_target_gate(G::X, 2);
+        const auto expected0 = cre::create_one_target_gate(G::X, 0);
+        const auto expected1 = cre::create_one_target_gate(G::X, 1);
+        const auto expected2 = cre::create_one_target_gate(G::X, 2);
 
         REQUIRE(number_of_elements(circuit) == 3);
         REQUIRE(comp::is_1t_gate_equal(circuit[0].get_gate(), expected0));
@@ -77,9 +81,6 @@ TEST_CASE("add multiple X gates")
 
 TEST_CASE("add multiple RX gates")
 {
-    using G = ket::Gate;
-    namespace comp = impl_ket::compare;
-
     auto circuit = ket::QuantumCircuit {3};
 
     const auto number_of_elements = [](const ket::QuantumCircuit& circ)
@@ -89,9 +90,9 @@ TEST_CASE("add multiple RX gates")
     {
         circuit.add_rx_gate({{0, 0.25}, {1, 0.5}, {2, 0.75}});
 
-        const auto expected0 = impl_ket::create_one_target_one_angle_gate(G::RX, 0, 0.25);
-        const auto expected1 = impl_ket::create_one_target_one_angle_gate(G::RX, 1, 0.50);
-        const auto expected2 = impl_ket::create_one_target_one_angle_gate(G::RX, 2, 0.75);
+        const auto expected0 = cre::create_one_target_one_angle_gate(G::RX, 0, 0.25);
+        const auto expected1 = cre::create_one_target_one_angle_gate(G::RX, 1, 0.50);
+        const auto expected2 = cre::create_one_target_one_angle_gate(G::RX, 2, 0.75);
 
         REQUIRE(number_of_elements(circuit) == 3);
         REQUIRE(comp::is_1t1a_gate_equal(circuit[0].get_gate(), expected0));
@@ -102,9 +103,6 @@ TEST_CASE("add multiple RX gates")
 
 TEST_CASE("add multiple CX gates")
 {
-    using G = ket::Gate;
-    namespace comp = impl_ket::compare;
-
     auto circuit = ket::QuantumCircuit {3};
 
     const auto number_of_elements = [](const ket::QuantumCircuit& circ)
@@ -114,9 +112,9 @@ TEST_CASE("add multiple CX gates")
     {
         circuit.add_cx_gate({{0, 1}, {1, 2}, {2, 0}});
 
-        const auto expected0 = impl_ket::create_one_control_one_target_gate(G::CX, 0, 1);
-        const auto expected1 = impl_ket::create_one_control_one_target_gate(G::CX, 1, 2);
-        const auto expected2 = impl_ket::create_one_control_one_target_gate(G::CX, 2, 0);
+        const auto expected0 = cre::create_one_control_one_target_gate(G::CX, 0, 1);
+        const auto expected1 = cre::create_one_control_one_target_gate(G::CX, 1, 2);
+        const auto expected2 = cre::create_one_control_one_target_gate(G::CX, 2, 0);
 
         REQUIRE(number_of_elements(circuit) == 3);
         REQUIRE(comp::is_1c1t_gate_equal(circuit[0].get_gate(), expected0));
@@ -127,9 +125,6 @@ TEST_CASE("add multiple CX gates")
 
 TEST_CASE("add multiple CRX gates")
 {
-    using G = ket::Gate;
-    namespace comp = impl_ket::compare;
-
     auto circuit = ket::QuantumCircuit {3};
 
     const auto number_of_elements = [](const ket::QuantumCircuit& circ)
@@ -139,9 +134,9 @@ TEST_CASE("add multiple CRX gates")
     {
         circuit.add_crx_gate({{0, 1, 0.25}, {1, 2, 0.5}, {2, 0, 0.75}});
 
-        const auto expected0 = impl_ket::create_one_control_one_target_one_angle_gate(G::CRX, 0, 1, 0.25);
-        const auto expected1 = impl_ket::create_one_control_one_target_one_angle_gate(G::CRX, 1, 2, 0.50);
-        const auto expected2 = impl_ket::create_one_control_one_target_one_angle_gate(G::CRX, 2, 0, 0.75);
+        const auto expected0 = cre::create_one_control_one_target_one_angle_gate(G::CRX, 0, 1, 0.25);
+        const auto expected1 = cre::create_one_control_one_target_one_angle_gate(G::CRX, 1, 2, 0.50);
+        const auto expected2 = cre::create_one_control_one_target_one_angle_gate(G::CRX, 2, 0, 0.75);
 
         REQUIRE(number_of_elements(circuit) == 3);
         REQUIRE(comp::is_1c1t1a_gate_equal(circuit[0].get_gate(), expected0));
@@ -441,7 +436,7 @@ TEST_CASE("CircuitElement")
 {
     SECTION("construct with ket::GateInfo")
     {
-        const auto ginfo = impl_ket::create_one_target_gate(ket::Gate::X, 0);
+        const auto ginfo = cre::create_one_target_gate(ket::Gate::X, 0);
         const auto circuit_element = ket::CircuitElement {ginfo};
 
         REQUIRE(circuit_element.is_gate());
@@ -449,7 +444,7 @@ TEST_CASE("CircuitElement")
 
         const auto& gate_from_circuit_element = circuit_element.get_gate();
         REQUIRE(gate_from_circuit_element.gate == ginfo.gate);
-        REQUIRE(impl_ket::unpack_single_qubit_gate_index(gate_from_circuit_element) == 0);
+        REQUIRE(cre::unpack_single_qubit_gate_index(gate_from_circuit_element) == 0);
     }
 
     SECTION("construct with ClassicalIfStatement")

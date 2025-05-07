@@ -12,6 +12,10 @@
 #include "kettle/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+namespace cre = ket::internal::create;
+
 
 /*
     A primitive way of putting the minimum image of the angle within [0, 2pi);
@@ -125,10 +129,10 @@ TEST_CASE("decompose to primtive gates; general")
         circuit0.add_u_gate(unitary, 0);
 
         // construct a circuit from the decomposed gates
-        const auto [target0, angle_g0] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[0]);
-        const auto [target1, angle_g1] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[1]);
-        const auto [target2, angle_g2] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[2]);
-        const auto [target3, angle_g3] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[3]);
+        const auto [target0, angle_g0] = cre::unpack_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [target1, angle_g1] = cre::unpack_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [target2, angle_g2] = cre::unpack_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [target3, angle_g3] = cre::unpack_one_target_one_angle_gate(decomp_gates[3]);
 
         auto circuit1 = ket::QuantumCircuit {1};
         circuit1.add_rz_gate(target0, angle_g0);
@@ -164,10 +168,10 @@ TEST_CASE("decompose to primtive gates; general")
         circuit0.add_cu_gate(unitary, control, target);
 
         // construct a circuit from the decomposed gates
-        const auto [control0, target0, angle_g0] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[0]);
-        const auto [control1, target1, angle_g1] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[1]);
-        const auto [control2, target2, angle_g2] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[2]);
-        const auto [control3, target3, angle_g3] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[3]);
+        const auto [control0, target0, angle_g0] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [control1, target1, angle_g1] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [control2, target2, angle_g2] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [control3, target3, angle_g3] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[3]);
 
         auto circuit1 = ket::QuantumCircuit {2};
         circuit1.add_crz_gate(control0, target0, angle_g0);

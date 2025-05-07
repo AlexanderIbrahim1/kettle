@@ -6,6 +6,10 @@
 #include <kettle/io/write_tangelo_file.hpp>
 #include <sstream>
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+namespace cre = ket::internal::create;
+
 
 TEST_CASE("format_one_target_gate_()")
 {
@@ -26,7 +30,7 @@ TEST_CASE("format_one_target_gate_()")
         TestCase {G::SX, 0, "SX        target : [0]\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_target_gate(testcase.gate, testcase.target);
+    const auto gate_info = cre::create_one_target_gate(testcase.gate, testcase.target);
     const auto actual = impl_ket::format_one_target_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
@@ -52,7 +56,7 @@ TEST_CASE("format_one_control_one_target_gate_()")
         TestCase {G::CSX, 0, 3, "CSX       target : [0]   control : [3]\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_control_one_target_gate(
+    const auto gate_info = cre::create_one_control_one_target_gate(
         testcase.gate,
         testcase.control,
         testcase.target
@@ -85,7 +89,7 @@ TEST_CASE("format_one_target_one_angle_gate_()")
         TestCase {G::P,  0, -value, "P         target : [0]   parameter : -1.1234567812345677\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_target_one_angle_gate(
+    const auto gate_info = cre::create_one_target_one_angle_gate(
         testcase.gate,
         testcase.target,
         testcase.angle
@@ -119,7 +123,7 @@ TEST_CASE("format_one_control_one_target_one_angle_gate_()")
         TestCase {G::CP,  0, 1, -value, "CP        target : [0]   control : [1]   parameter : -1.1234567812345677\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_control_one_target_one_angle_gate(
+    const auto gate_info = cre::create_one_control_one_target_one_angle_gate(
         testcase.gate,
         testcase.control,
         testcase.target,
@@ -148,7 +152,7 @@ TEST_CASE("format_m_gate_()")
         TestCase {G::CRY, 2, 2, "M         target : [2]   bit : [2]\n"}
     );
 
-    const auto gate_info = impl_ket::create_m_gate(testcase.qubit, testcase.bit);
+    const auto gate_info = cre::create_m_gate(testcase.qubit, testcase.bit);
     const auto actual = impl_ket::format_m_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);

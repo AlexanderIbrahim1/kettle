@@ -6,22 +6,15 @@
 #include "kettle/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
 /*
     This header file contains the `transpile_to_primitive()` function, which takes an
     existing `QuantumCircuit` instance that may contain matrices that use unitary 2x2
     matrices as gates, and creates a new `QuantumCircuit` instance composed of only
     primitive gates.
 */
-
-namespace impl_ket
-{
-
-constexpr auto is_primitive_gate(ket::Gate gate) -> bool
-{
-    return gate_id::is_non_angle_transform_gate(gate) || gate_id::is_angle_transform_gate(gate);
-}
-
-}  // namespace impl_ket
 
 namespace ket
 {
@@ -32,6 +25,9 @@ inline auto transpile_to_primitive(
     double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> QuantumCircuit
 {
+    namespace gid = ket::internal::gate_id;
+    namespace cre = ket::internal::create;
+
     auto new_circuit = QuantumCircuit {circuit.n_qubits(), circuit.n_bits()};
 
     const auto decomp_1t = impl_ket::decomp_to_one_target_primitive_gates_;
@@ -78,18 +74,18 @@ inline auto transpile_to_primitive(
         else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();
 
-            if (impl_ket::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
+            if (gid::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
                 new_circuit.elements_.emplace_back(gate_info);
             }
             else if (gate_info.gate == Gate::U) {
-                const auto [target, unitary_ptr] = impl_ket::unpack_u_gate(gate_info);
+                const auto [target, unitary_ptr] = cre::unpack_u_gate(gate_info);
                 const auto decomp_gates = decomp_1t(target, *unitary_ptr, tolerance_sq);
                 for (const auto& decomp_gate : decomp_gates) {
                     new_circuit.elements_.emplace_back(decomp_gate);
                 }
             }
             else if (gate_info.gate == Gate::CU) {
-                const auto [control, target, unitary_ptr] = impl_ket::unpack_cu_gate(gate_info);
+                const auto [control, target, unitary_ptr] = cre::unpack_cu_gate(gate_info);
                 const auto decomp_gates = decomp_1c_1t(control, target, *unitary_ptr, tolerance_sq);
                 for (const auto& decomp_gate : decomp_gates) {
                     new_circuit.elements_.emplace_back(decomp_gate);

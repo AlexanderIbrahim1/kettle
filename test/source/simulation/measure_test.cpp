@@ -12,6 +12,10 @@
 #include <kettle/simulation/simulate.hpp>
 #include <kettle/simulation/measure.hpp>
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+namespace cre = ket::internal::create;
+
 
 template <int Output>
 struct RiggedDiscreteDistribution
@@ -107,7 +111,7 @@ TEST_CASE("simulate_measurement_()")
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
         auto state = ket::QuantumState {"00"};
         auto circuit = ket::QuantumCircuit {2};
@@ -173,7 +177,7 @@ TEST_CASE("simulate_measurement_()")
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
         auto state = ket::QuantumState {"000"};
         auto circuit = ket::QuantumCircuit {3};
@@ -236,7 +240,7 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
             auto state = ket::QuantumState {testcase.initial_amplitudes};
             auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
@@ -300,7 +304,7 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
             auto state = ket::QuantumState {testcase.initial_amplitudes};
             auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
