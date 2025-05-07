@@ -27,6 +27,7 @@ add_library(
     source/kettle_internal/common/state_test_utils.cpp
     source/kettle_internal/common/utils_internal.cpp
     source/kettle_internal/gates/common_u_gates.cpp
+    source/kettle_internal/gates/fourier.cpp
     source/kettle_internal/gates/primitive_gate/gate_compare.cpp
     source/kettle_internal/gates/primitive_gate/gate_create.cpp
     source/kettle_internal/gates/primitive_gate/gate_id.cpp
