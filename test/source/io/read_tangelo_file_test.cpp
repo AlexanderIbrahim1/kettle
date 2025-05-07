@@ -11,6 +11,7 @@
 #include <kettle/io/write_tangelo_file.hpp>
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 
 
 using G = ket::Gate;

@@ -21,6 +21,11 @@ add_library(
     source/kettle_internal/calculations/measurements.cpp
     source/kettle_internal/circuit/circuit.cpp
     source/kettle_internal/circuit/control_flow_predicate.cpp
+    source/kettle_internal/circuit_operations/append_circuits.cpp
+    source/kettle_internal/circuit_operations/compare_circuits.cpp
+    source/kettle_internal/circuit_operations/make_binary_controlled_circuit.cpp
+    source/kettle_internal/circuit_operations/make_controlled_circuit.cpp
+    source/kettle_internal/circuit_operations/transpile_to_primitive.cpp
     source/kettle_internal/common/mathtools.cpp
     source/kettle_internal/common/matrix2x2.cpp
     source/kettle_internal/common/prng.cpp
