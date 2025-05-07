@@ -27,6 +27,7 @@
 #include <kettle/simulation/simulate.hpp>
 #include <kettle/state/endian.hpp>
 #include <kettle/state/marginal.hpp>
+#include <kettle/state/project_state.hpp>
 #include <kettle/state/qubit_state_conversion.hpp>
 #include <kettle/state/random.hpp>
 #include <kettle/state/state.hpp>

@@ -1,23 +1,14 @@
-#pragma once
-
-#include <concepts>
 #include <cstddef>
 #include <sstream>
 #include <tuple>
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
-#include "kettle/circuit/control_flow.hpp"
 
-/*
-    This header file contains code for writing out and parsing the control flow
-    predicate statements
-*/
+#include "kettle_internal/io/io_control_flow.hpp"
 
-namespace impl_ket
+namespace ket::internal::format
 {
-
-static constexpr auto CONTROL_FLOW_WHITESPACE_DEFAULT = std::size_t {4};
 
 template <std::integral Integer>
 auto format_csv_integers_(const std::vector<Integer>& integers) -> std::string
@@ -38,8 +29,10 @@ auto format_csv_integers_(const std::vector<Integer>& integers) -> std::string
 
     return output.str();
 }
+template auto format_csv_integers_<int>(const std::vector<int>& integers) -> std::string;
+template auto format_csv_integers_<std::size_t>(const std::vector<std::size_t>& integers) -> std::string;
 
-inline auto format_control_flow_predicate_(const ket::ControlFlowPredicate& predicate) -> std::string
+auto format_control_flow_predicate_(const ket::ControlFlowPredicate& predicate) -> std::string
 {
     auto output = std::stringstream {};
     output << "BITS";
@@ -56,42 +49,29 @@ inline auto format_control_flow_predicate_(const ket::ControlFlowPredicate& pred
     return output.str();
 }
 
-inline auto format_classical_if_statement_header_(
-    const ket::ClassicalIfStatement& stmt
+auto format_classical_if_statement_header_(
+    const ket::ControlFlowPredicate& predicate
 ) -> std::string
 {
-    return std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
+    return std::string {"IF "} + format_control_flow_predicate_(predicate);
 }
 
-inline auto format_classical_if_else_statement_header_(
-    const ket::ClassicalIfElseStatement& stmt
+auto format_classical_if_else_statement_header_(
+    const ket::ControlFlowPredicate& predicate
 ) -> std::tuple<std::string, std::string>
 {
-    const auto if_part = std::string {"IF "} + format_control_flow_predicate_(stmt.predicate());
+    const auto if_part = std::string {"IF "} + format_control_flow_predicate_(predicate);
     const auto else_part = std::string {"ELSE"};
 
     return {if_part, else_part};
 }
 
-/*
-    Discard characters from the stream until a certain delimiter is found; that
-    delimited remains within the stream.
-*/
-inline void discard_until_char_(std::stringstream& stream, char delimiter)
+}  // namespace ket::internal::format
+
+
+namespace ket::internal::parse
 {
-    char ch {};
-    while (stream.peek() != EOF && stream.peek() != delimiter) {
-        stream.get(ch);
-    }
-}
 
-/*
-    Parse the csv of integers within a pair of square brackets into a vector.
-
-    For example:
-      - "[0, 3]" parses into std::vector {0, 3}
-      - "[]" parses into std::vector {}
-*/
 template <std::integral Integer>
 auto parse_csv_in_brackets_(std::stringstream& stream) -> std::vector<Integer>
 {
@@ -116,11 +96,10 @@ auto parse_csv_in_brackets_(std::stringstream& stream) -> std::vector<Integer>
 
     return output;
 }
+template auto parse_csv_in_brackets_<int>(std::stringstream& stream) -> std::vector<int>;
+template auto parse_csv_in_brackets_<std::size_t>(std::stringstream& stream) -> std::vector<std::size_t>;
 
-/*
-    Parse the comparison sign to determine what kind of if statement is being used.
-*/
-inline auto parse_comparison_sign_(std::stringstream& stream) -> ket::ControlFlowBooleanKind
+auto parse_comparison_sign_(std::stringstream& stream) -> ket::ControlFlowBooleanKind
 {
     std::string str;
     stream >> str;
@@ -136,16 +115,15 @@ inline auto parse_comparison_sign_(std::stringstream& stream) -> ket::ControlFlo
     }
 }
 
-/*
-    Parse the portion of a control flow statement that contains the 'BITS' keyword,
-    the classical registers to check, and the expected bit values.
+void discard_until_char_(std::stringstream& stream, char delimiter)
+{
+    char ch {};
+    while (stream.peek() != EOF && stream.peek() != delimiter) {
+        stream.get(ch);
+    }
+}
 
-    For example, "BITS[0, 3] == [1, 0]" should parse into a ControlFlowPredicate where:
-      - the bit indices to check are {0, 3}
-      - the corresponding expected bits are {1, 0}
-      - the kind of predicate is IF (for ==) and IF_NOT (for !=)
-*/
-inline auto parse_control_flow_predicate_(std::stringstream& stream) -> ket::ControlFlowPredicate
+auto parse_control_flow_predicate_(std::stringstream& stream) -> ket::ControlFlowPredicate
 {
     // remove the BITS
     discard_until_char_(stream, '[');
@@ -160,4 +138,4 @@ inline auto parse_control_flow_predicate_(std::stringstream& stream) -> ket::Con
     return ket::ControlFlowPredicate {std::move(bit_indices_to_check), std::move(expected_bits), control_kind};
 }
 
-}  // namespace impl_ket
+}  // namespace ket::internal::parse

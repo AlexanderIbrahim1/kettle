@@ -1,10 +1,7 @@
-#include "kettle/io/statevector.hpp"
-#include "kettle/state/endian.hpp"
 #include <filesystem>
 #include <stdexcept>
 
 #include <kettle/kettle.hpp>
-#include <kettle/state/project_state.hpp>
 
 /*
     Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.

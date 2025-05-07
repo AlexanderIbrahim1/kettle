@@ -31,7 +31,7 @@ TEST_CASE("format_one_target_gate_()")
     );
 
     const auto gate_info = cre::create_one_target_gate(testcase.gate, testcase.target);
-    const auto actual = impl_ket::format_one_target_gate_(gate_info);
+    const auto actual = ket::internal::format_one_target_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -62,7 +62,7 @@ TEST_CASE("format_one_control_one_target_gate_()")
         testcase.target
     );
 
-    const auto actual = impl_ket::format_one_control_one_target_gate_(gate_info);
+    const auto actual = ket::internal::format_one_control_one_target_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -95,7 +95,7 @@ TEST_CASE("format_one_target_one_angle_gate_()")
         testcase.angle
     );
 
-    const auto actual = impl_ket::format_one_target_one_angle_gate_(gate_info);
+    const auto actual = ket::internal::format_one_target_one_angle_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -130,7 +130,7 @@ TEST_CASE("format_one_control_one_target_one_angle_gate_()")
         testcase.angle
     );
 
-    const auto actual = impl_ket::format_one_control_one_target_one_angle_gate_(gate_info);
+    const auto actual = ket::internal::format_one_control_one_target_one_angle_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -153,7 +153,7 @@ TEST_CASE("format_m_gate_()")
     );
 
     const auto gate_info = cre::create_m_gate(testcase.qubit, testcase.bit);
-    const auto actual = impl_ket::format_m_gate_(gate_info);
+    const auto actual = ket::internal::format_m_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
