@@ -93,14 +93,14 @@ TEST_CASE("arange() with three arguments")
         REQUIRE_THAT(actual, Catch::Matchers::Equals(testcase.expected));
     }
 
-    SECTION("with unsigned int")
+    SECTION("with std::size_t")
     {
         struct TestCase
         {
-            unsigned left;
-            unsigned right;
+            std::size_t left;
+            std::size_t right;
             std::int64_t step;
-            std::vector<unsigned> expected;
+            std::vector<std::size_t> expected;
         };
 
         const auto testcase = GENERATE(

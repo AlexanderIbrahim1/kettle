@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "kettle/common/mathtools.hpp"
-#include "kettle_internal/state/bitstring_utils.hpp"
 #include "kettle/state/endian.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
+#include "kettle_internal/common/mathtools_internal.hpp"
+#include "kettle_internal/state/bitstring_utils.hpp"
 namespace
 {
 

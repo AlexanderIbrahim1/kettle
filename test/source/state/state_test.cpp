@@ -11,6 +11,7 @@
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/state/marginal.hpp"
+#include "kettle_internal/state/marginal_internal.hpp"
 
 TEST_CASE("QuantumState endian representation")
 {

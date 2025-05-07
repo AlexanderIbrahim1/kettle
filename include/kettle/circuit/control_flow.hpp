@@ -5,7 +5,7 @@
 
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/control_flow_predicate.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
+#include "kettle/common/clone_ptr.hpp"
 
 
 namespace ket
@@ -15,9 +15,6 @@ class QuantumCircuit;
 
 }  // namespace ket
 
-
-namespace ket::internal
-{
 
 /*
     A class that holds a single predicate and a single pointer to a circuit that
@@ -45,7 +42,7 @@ public:
     }
 
     [[nodiscard]]
-    auto circuit() const -> const ket::internal::ClonePtr<ket::QuantumCircuit>&
+    auto circuit() const -> const ket::ClonePtr<ket::QuantumCircuit>&
     {
         return circuit_;
     }
@@ -58,16 +55,14 @@ public:
 
 private:
     ket::ControlFlowPredicate control_flow_predicate_;
-    ket::internal::ClonePtr<ket::QuantumCircuit> circuit_;
+    ket::ClonePtr<ket::QuantumCircuit> circuit_;
 };
-
-}  // namespace ket::internal
 
 
 namespace ket
 {
 
-class ClassicalIfStatement : public ket::internal::ClassicalOneBranchBooleanStatement
+class ClassicalIfStatement : public ClassicalOneBranchBooleanStatement
 {
 public:
     using ClassicalOneBranchBooleanStatement::ClassicalOneBranchBooleanStatement;
@@ -93,13 +88,13 @@ public:
     }
 
     [[nodiscard]]
-    auto if_circuit() const -> const ket::internal::ClonePtr<ket::QuantumCircuit>&
+    auto if_circuit() const -> const ket::ClonePtr<ket::QuantumCircuit>&
     {
         return if_circuit_;
     }
 
     [[nodiscard]]
-    auto else_circuit() const -> const ket::internal::ClonePtr<ket::QuantumCircuit>&
+    auto else_circuit() const -> const ket::ClonePtr<ket::QuantumCircuit>&
     {
         return else_circuit_;
     }
@@ -112,8 +107,8 @@ public:
 
 private:
     ket::ControlFlowPredicate control_flow_predicate_;
-    ket::internal::ClonePtr<ket::QuantumCircuit> if_circuit_;
-    ket::internal::ClonePtr<ket::QuantumCircuit> else_circuit_;
+    ket::ClonePtr<ket::QuantumCircuit> if_circuit_;
+    ket::ClonePtr<ket::QuantumCircuit> else_circuit_;
 };
 
 

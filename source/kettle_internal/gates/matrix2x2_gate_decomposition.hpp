@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/common/tolerance.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
 /*
@@ -35,7 +36,7 @@ auto determinant_angle_(const ket::Matrix2X2& matrix) -> double;
 */
 auto decomp_to_single_primitive_gate_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::optional<PrimitiveGateInfo_>;
 
 /*
@@ -47,25 +48,25 @@ auto decomp_to_single_primitive_gate_(
 */
 auto decomp_special_unitary_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<PrimitiveGateInfo_>;
 
 auto decomp_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<PrimitiveGateInfo_>;
 
 auto decomp_to_one_target_primitive_gates_(
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>;
 
 auto decomp_to_one_control_one_target_primitive_gates_(
     std::size_t control,
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> std::vector<ket::GateInfo>;
 
 }  // namespace ket::internal

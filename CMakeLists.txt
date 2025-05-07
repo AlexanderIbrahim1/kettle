@@ -26,6 +26,7 @@ add_library(
     source/kettle_internal/circuit_operations/make_binary_controlled_circuit.cpp
     source/kettle_internal/circuit_operations/make_controlled_circuit.cpp
     source/kettle_internal/circuit_operations/transpile_to_primitive.cpp
+    source/kettle_internal/common/arange.cpp
     source/kettle_internal/common/mathtools.cpp
     source/kettle_internal/common/matrix2x2.cpp
     source/kettle_internal/common/prng.cpp

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "kettle/common/tolerance.hpp"
 #include "kettle/state/state.hpp"
 
 
@@ -24,7 +25,7 @@ auto almost_eq_with_print_(
     const ket::QuantumState& left,
     const ket::QuantumState& right,
     PrintAlmostEq_ print_state = PrintAlmostEq_::PRINT,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;
 
 }  // namespace ket::internal

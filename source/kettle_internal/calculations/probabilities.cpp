@@ -7,6 +7,8 @@
 #include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle/calculations/probabilities.hpp"
+
+#include "kettle_internal/calculations/probabilities_internal.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 
 /*

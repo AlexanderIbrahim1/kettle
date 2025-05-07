@@ -3,7 +3,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
@@ -37,7 +37,7 @@ auto as_u_gate_(const ket::GateInfo& info) -> ket::GateInfo
         return info;
     }
 
-    auto unitary = ket::internal::ClonePtr<ket::Matrix2X2> {non_u_gate_to_u_gate_(info)};
+    auto unitary = ket::ClonePtr<ket::Matrix2X2> {non_u_gate_to_u_gate_(info)};
 
     if (ket::internal::gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
         const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);

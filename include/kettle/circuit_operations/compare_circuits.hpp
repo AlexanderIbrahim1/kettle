@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/common/tolerance.hpp"
 
 
 namespace ket
@@ -41,7 +42,7 @@ namespace ket
 auto almost_eq(
     const QuantumCircuit& left,
     const QuantumCircuit& right,
-    double tol_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tol_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool;
 
 }  // namespace ket

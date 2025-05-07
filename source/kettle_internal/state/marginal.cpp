@@ -11,6 +11,7 @@
 #include "kettle/state/marginal.hpp"
 
 #include "kettle_internal/common/utils_internal.hpp"
+#include "kettle_internal/state/marginal_internal.hpp"
 
 namespace ket::internal
 {

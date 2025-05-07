@@ -1,12 +1,12 @@
-#include "kettle/circuit/circuit.hpp"
+#include <sstream>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/gates/primitive_gate.hpp>
-#include <kettle/io/write_tangelo_file.hpp>
-#include <sstream>
-
+#include "kettle/gates/primitive_gate.hpp"
+#include "kettle/io/write_tangelo_file.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/io/write_tangelo_file_internal.hpp"
 
 namespace cre = ket::internal::create;
 

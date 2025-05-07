@@ -12,6 +12,7 @@
 #include "kettle/state/state.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
+#include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/state/bitstring_utils.hpp"
 
 namespace ket
@@ -85,7 +86,7 @@ void QuantumState::check_normalization_of_coefficients_() const
     }
 
     const auto expected = 1.0;
-    const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < ket::internal::NORMALIZATION_TOLERANCE;
+    const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < ket::NORMALIZATION_TOLERANCE;
 
     if (!is_normalized) {
         auto err_msg = std::stringstream {};

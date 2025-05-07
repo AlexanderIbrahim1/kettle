@@ -15,6 +15,7 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
 #include "kettle_internal/io/io_control_flow.hpp"
+#include "kettle_internal/io/write_tangelo_file_internal.hpp"
 
 
 namespace ket::internal

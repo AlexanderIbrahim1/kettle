@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kettle/common/mathtools.hpp"
+#include "kettle/common/tolerance.hpp"
 
 /*
     This header file contains the `transpile_to_primitive()` function, which takes an
@@ -16,7 +16,7 @@ class QuantumCircuit;
 
 auto transpile_to_primitive(
     const QuantumCircuit& circuit,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> QuantumCircuit;
 
 }  // namespace ket

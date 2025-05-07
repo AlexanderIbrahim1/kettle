@@ -6,6 +6,7 @@
 
 #include "kettle/state/state.hpp"
 #include "kettle/state/project_state.hpp"
+#include "kettle_internal/state/project_state_internal.hpp"
 
 
 namespace ket::internal

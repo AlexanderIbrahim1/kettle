@@ -434,7 +434,7 @@ void StatevectorSimulator::run(const QuantumCircuit& circuit, QuantumState& stat
     const auto n_double_gate_pairs = ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
     const auto double_pair = ki::FlatIndexPair {.i_lower=0, .i_upper=n_double_gate_pairs};
 
-    cregister_ = ket::internal::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
+    cregister_ = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 
     // the `simulate_loop_body_()` function is used by both the single-threaded and multi-threaded
     // code, and certain operations are only done on the thread with thread id 0

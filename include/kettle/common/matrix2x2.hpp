@@ -3,7 +3,7 @@
 #include <cmath>
 #include <complex>
 
-#include "kettle/common/mathtools.hpp"
+#include "kettle/common/tolerance.hpp"
 
 
 namespace ket
@@ -36,7 +36,7 @@ auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix2X2;
 
 auto matrix_square_root(
     const Matrix2X2& mat,
-    double matrix_sqrt_tolerance = ket::internal::MATRIX_2X2_SQRT_TOLERANCE
+    double matrix_sqrt_tolerance = ket::MATRIX_2X2_SQRT_TOLERANCE
 ) -> Matrix2X2;
 
 auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2;
@@ -48,7 +48,7 @@ auto trace(const Matrix2X2& mat) -> std::complex<double>;
 auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;
 
 }  // namespace ket

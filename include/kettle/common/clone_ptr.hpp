@@ -15,7 +15,7 @@
         dependencies)
 */
 
-namespace ket::internal
+namespace ket
 {
 
 template <typename T>
@@ -67,4 +67,4 @@ private:
     std::unique_ptr<T> data_;
 };
 
-}  // namespace ket::internal
+}  // namespace ket

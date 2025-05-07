@@ -4,8 +4,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/state/state.hpp>
-#include <kettle/state/project_state.hpp>
+#include "kettle/state/state.hpp"
+#include "kettle/state/project_state.hpp"
+#include "kettle_internal/state/project_state_internal.hpp"
 
 
 static constexpr auto get_normalized_amplitudes(const std::vector<int>& values) -> std::vector<std::complex<double>>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "kettle/state/state.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
+#include "kettle/common/clone_ptr.hpp"
 
 namespace ket
 {
@@ -11,7 +11,7 @@ class StatevectorCircuitLogger
 public:
     void add_statevector(QuantumState statevector)
     {
-        statevector_ = ket::internal::ClonePtr<QuantumState> {std::move(statevector)};
+        statevector_ = ket::ClonePtr<QuantumState> {std::move(statevector)};
     }
 
     [[nodiscard]]
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    ket::internal::ClonePtr<QuantumState> statevector_ {nullptr};
+    ket::ClonePtr<QuantumState> statevector_ {nullptr};
 };
 
 }  // namespace ket

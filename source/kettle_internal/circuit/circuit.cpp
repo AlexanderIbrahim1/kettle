@@ -7,7 +7,7 @@
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
 #include "kettle/circuit_loggers/statevector_circuit_logger.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -331,7 +331,7 @@ template void QuantumCircuit::add_cp_gate<ControlAndTargetIndicesAndAnglesIList>
 void QuantumCircuit::add_u_gate(const Matrix2X2& gate, std::size_t target_index)
 {
     check_qubit_range_(target_index, "qubit", "U");
-    elements_.emplace_back(create::create_u_gate(target_index, ket::internal::ClonePtr<Matrix2X2> {gate}));
+    elements_.emplace_back(create::create_u_gate(target_index, ket::ClonePtr<Matrix2X2> {gate}));
 }
 
 template <QubitIndices Container>
@@ -350,7 +350,7 @@ void QuantumCircuit::add_cu_gate(const Matrix2X2& gate, std::size_t control_inde
     check_qubit_range_(control_index, "control qubit", "CU");
     check_qubit_range_(target_index, "target qubit", "CU");
 
-    elements_.emplace_back(create::create_cu_gate(control_index, target_index, ket::internal::ClonePtr<Matrix2X2> {gate}));
+    elements_.emplace_back(create::create_cu_gate(control_index, target_index, ket::ClonePtr<Matrix2X2> {gate}));
 }
 
 template <ControlAndTargetIndices Container>

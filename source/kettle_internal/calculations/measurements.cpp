@@ -9,13 +9,15 @@
 
 #include "kettle/calculations/probabilities.hpp"
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/mathtools.hpp"
 #include "kettle_internal/common/prng.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
-#include "kettle/state/marginal.hpp"
+#include "kettle_internal/state/marginal_internal.hpp"
 
 #include "kettle/calculations/measurements.hpp"
+
+#include "kettle_internal/calculations/measurements_internal.hpp"
+#include "kettle_internal/common/mathtools_internal.hpp"
 
 /*
     This file contains code components to perform measurements of the state.

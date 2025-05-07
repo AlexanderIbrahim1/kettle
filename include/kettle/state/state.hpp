@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "kettle/common/mathtools.hpp"
+#include "kettle/common/tolerance.hpp"
 #include "kettle/state/endian.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
@@ -108,7 +108,7 @@ private:
 auto almost_eq(
     const QuantumState& left,
     const QuantumState& right,
-    double tolerance_sq = ket::internal::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;
 
 auto tensor_product(const QuantumState& left, const QuantumState& right) -> QuantumState;

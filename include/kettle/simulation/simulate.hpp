@@ -6,6 +6,7 @@
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/state/state.hpp"
 
 
@@ -31,7 +32,7 @@ public:
 private:
     // there is no default constructor for the ClassicalRegsiter (it wouldn't make sense), and we
     // only find out how many bits are needed after the first simulation; hence why we use a pointer
-    ket::internal::ClonePtr<ClassicalRegister> cregister_ {nullptr};
+    ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
     bool has_been_run_ {false};
     std::vector<CircuitLogger> circuit_loggers_;
 };

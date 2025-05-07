@@ -2,6 +2,7 @@
 #include <cstddef>
 
 #include "kettle/common/mathtools.hpp"
+#include "kettle_internal/common/mathtools_internal.hpp"
 
 namespace ket::internal
 {

@@ -10,10 +10,11 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "kettle/calculations/probabilities.hpp"
-#include "kettle/calculations/measurements.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
+
+#include "kettle_internal/calculations/measurements_internal.hpp"
 
 static constexpr auto RELATIVE_TOL = 1.0e-6;
 

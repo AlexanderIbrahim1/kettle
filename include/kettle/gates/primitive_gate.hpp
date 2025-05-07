@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
+#include "kettle/common/clone_ptr.hpp"
 
 namespace ket
 {
@@ -58,7 +58,7 @@ struct GateInfo
     std::size_t arg0;
     std::size_t arg1;
     double arg2;
-    ket::internal::ClonePtr<Matrix2X2> unitary_ptr;
+    ket::ClonePtr<Matrix2X2> unitary_ptr;
 };
 
 }  // namespace ket

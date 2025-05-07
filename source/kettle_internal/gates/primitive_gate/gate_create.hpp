@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <tuple>
 
+#include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle_internal/common/clone_ptr.hpp"
 
 #include "kettle/gates/primitive_gate.hpp"
 
@@ -56,23 +56,23 @@ auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> 
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.
 */
-auto create_u_gate(std::size_t target_index, ket::internal::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo;
+auto create_u_gate(std::size_t target_index, ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo;
 
 /*
     Returns the `{target_qubit, unitary_ptr}` of a U-gate.
 */
-auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::internal::ClonePtr<ket::Matrix2X2>&>;
+auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::ClonePtr<ket::Matrix2X2>&>;
 
 /*
     Create a CU-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`,
     controlled by the qubit at index `control_index`.
 */
-auto create_cu_gate(std::size_t control_index, std::size_t target_index, ket::internal::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo;
+auto create_cu_gate(std::size_t control_index, std::size_t target_index, ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo;
 
 /*
     Returns the `{control_qubit, target_qubit, unitary_ptr}` of a CU-gate.
 */
-auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const ket::internal::ClonePtr<ket::Matrix2X2>&>;
+auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::Matrix2X2>&>;
 
 /*
     Create an M-gate, which measures the qubit at `qubit_index`, and stores the result at `bit_index`.
@@ -102,6 +102,6 @@ auto unpack_gate_angle(const ket::GateInfo& info) -> double;
 /*
     Returns the `unitary_ptr` of a U-gate or CU-gate.
 */
-auto unpack_unitary_matrix(const ket::GateInfo& info) -> const ket::internal::ClonePtr<ket::Matrix2X2>&;
+auto unpack_unitary_matrix(const ket::GateInfo& info) -> const ket::ClonePtr<ket::Matrix2X2>&;
 
 }  // namespace ket::internal::create

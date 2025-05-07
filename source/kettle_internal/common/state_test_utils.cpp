@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle_internal/common/state_test_utils.hpp"
 

@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "kettle/common/mathtools.hpp"
+#include "kettle_internal/common/mathtools_internal.hpp"
 
 TEST_CASE("flat_index_to_grid_indices_2d")
 {
