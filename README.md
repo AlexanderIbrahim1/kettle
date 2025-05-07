@@ -1,7 +1,7 @@
 # kettle
 
-Kettle is a C++20 header-only library for simulating quantum circuits.
-No external dependencies are needed, although Catch2 is used for unit testing.
+Kettle is a C++20 library for simulating quantum circuits.
+No external dependencies are needed, although Catch2 is used for unit testing in the `dev` build.
 
 Some of the main features:
   - create a quantum circuit (`ket::QuantumCircuit`) and add a variety of gates
