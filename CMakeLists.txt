@@ -121,7 +121,21 @@ if(PROJECT_IS_TOP_LEVEL)
             "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
         )
         add_subdirectory(example)
+    else()
+        target_include_directories(
+            kettle_kettle
+            ${warning_guard}
+            PRIVATE
+            "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+        )
     endif()
+else()
+    target_include_directories(
+        kettle_kettle
+        ${warning_guard}
+        PRIVATE
+        "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+    )
 endif()
 
 # ---- QPE Tangelo Project ----
