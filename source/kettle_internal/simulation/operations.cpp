@@ -1,20 +1,16 @@
-#pragma once
-
 #include <cmath>
 #include <complex>
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/state/state.hpp"
 
-/*
-    This header file contains the common operations performed on two states in the
-    QuantumState object.
-*/
+#include "kettle_internal/simulation/operations.hpp"
 
-namespace impl_ket
+
+namespace ket::internal
 {
 
-constexpr void apply_h_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+void apply_h_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -28,12 +24,12 @@ constexpr void apply_h_gate(ket::QuantumState& state, std::size_t i0, std::size_
     state[i1] = std::complex<double> {real_sub, imag_sub};
 }
 
-constexpr void apply_x_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+void apply_x_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     std::swap(state[i0], state[i1]);
 }
 
-constexpr void apply_y_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+void apply_y_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -47,12 +43,12 @@ constexpr void apply_y_gate(ket::QuantumState& state, std::size_t i0, std::size_
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_z_gate(ket::QuantumState& state, std::size_t i1)
+void apply_z_gate(ket::QuantumState& state, std::size_t i1)
 {
     state[i1] *= -1.0;
 }
 
-constexpr void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -69,7 +65,7 @@ constexpr void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -83,7 +79,7 @@ constexpr void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_ry_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+void apply_ry_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -100,7 +96,7 @@ constexpr void apply_ry_gate(ket::QuantumState& state, std::size_t i0, std::size
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_rz_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
+void apply_rz_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -117,7 +113,7 @@ constexpr void apply_rz_gate(ket::QuantumState& state, std::size_t i0, std::size
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_p_gate(ket::QuantumState& state, std::size_t i1, double theta)
+void apply_p_gate(ket::QuantumState& state, std::size_t i1, double theta)
 {
     const auto& state1 = state[i1];
 
@@ -130,12 +126,7 @@ constexpr void apply_p_gate(ket::QuantumState& state, std::size_t i1, double the
     state[i1] = std::complex<double> {real1, imag1};
 }
 
-constexpr void apply_u_gate(
-    ket::QuantumState& state,
-    std::size_t i0,
-    std::size_t i1,
-    const ket::Matrix2X2& mat
-)
+void apply_u_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, const ket::Matrix2X2& mat)
 {
     const auto& state0 = state[i0];
     const auto& state1 = state[i1];
@@ -147,4 +138,4 @@ constexpr void apply_u_gate(
     state[i1] = new_state1;
 }
 
-}  // namespace impl_ket
+}  // namespace ket::internal

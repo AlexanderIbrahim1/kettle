@@ -7,13 +7,20 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/transpile_to_primitive.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
+
+using G = ket::Gate;
+using Matrices = std::vector<ket::Matrix2X2>;
+namespace gid = ket::internal::gate_id;
 
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
 */
-static constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>& pg_infos) -> ket::Matrix2X2
+static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg_infos) -> ket::Matrix2X2
 {
     auto output = ket::i_gate();
 
@@ -68,8 +75,6 @@ static constexpr auto make_matrix(const std::vector<impl_ket::PrimitiveGateInfo>
 
 TEST_CASE("transpile_to_primitive()")
 {
-    using G = ket::Gate;
-    using Matrices = std::vector<ket::Matrix2X2>;
 
     SECTION("1 qubit circuit, one gate")
     {
@@ -107,8 +112,8 @@ TEST_CASE("transpile_to_primitive()")
         for (const auto& circuit_element : transpiled) {
             const auto& gate = circuit_element.get_gate();
 
-            REQUIRE(impl_ket::gate_id::is_single_qubit_transform_gate(gate.gate));
-            REQUIRE(gate.gate != ket::Gate::U);
+            REQUIRE(gid::is_single_qubit_transform_gate(gate.gate));
+            REQUIRE(gate.gate != G::U);
         }
 
         REQUIRE(ket::almost_eq(state0, state1));
@@ -117,9 +122,6 @@ TEST_CASE("transpile_to_primitive()")
 
 TEST_CASE("transpile_to_primitive() with control flow if_statement()")
 {
-    using G = ket::Gate;
-    using Matrices = std::vector<ket::Matrix2X2>;
-
     SECTION("2 qubit circuit, qubit 0 is measured, qubit 1 is dependent")
     {
         const auto unitaries = GENERATE_COPY(
@@ -172,8 +174,8 @@ TEST_CASE("transpile_to_primitive() with control flow if_statement()")
             REQUIRE(element.is_gate());
             const auto& gate = element.get_gate();
 
-            REQUIRE(impl_ket::gate_id::is_single_qubit_transform_gate(gate.gate));
-            REQUIRE(gate.gate != ket::Gate::U);
+            REQUIRE(gid::is_single_qubit_transform_gate(gate.gate));
+            REQUIRE(gate.gate != G::U);
         }
 
         REQUIRE(ket::almost_eq(state0, state1));
@@ -182,25 +184,22 @@ TEST_CASE("transpile_to_primitive() with control flow if_statement()")
 
 TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
 {
-    using G = ket::Gate;
-    using Matrices = std::vector<ket::Matrix2X2>;
-
     SECTION("2 qubit circuit, qubit 0 is measured, qubit 1 is dependent")
     {
         const auto if_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})}
-//            Matrices {make_matrix({{G::H}, {G::X}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
+            Matrices {make_matrix({{G::H}})},
+            Matrices {make_matrix({{G::H}, {G::X}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
         );
 
         const auto else_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})}
-//            Matrices {make_matrix({{G::H}, {G::X}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
-//            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
+            Matrices {make_matrix({{G::H}})},
+            Matrices {make_matrix({{G::H}, {G::X}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
+            Matrices {make_matrix({{G::H}, {G::X}, {G::RX, 1.2345}, {G::RZ, -2.341}})}
         );
 
         const auto init_bitstring = std::string {GENERATE("00", "10", "01", "11")};
@@ -252,8 +251,8 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
             REQUIRE(element.is_gate());
             const auto& gate = element.get_gate();
 
-            REQUIRE(impl_ket::gate_id::is_single_qubit_transform_gate(gate.gate));
-            REQUIRE(gate.gate != ket::Gate::U);
+            REQUIRE(gid::is_single_qubit_transform_gate(gate.gate));
+            REQUIRE(gate.gate != G::U);
         }
 
         const auto& transpiled_else_subcircuit = *if_else_stmt.else_circuit();
@@ -261,8 +260,8 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
             REQUIRE(element.is_gate());
             const auto& gate = element.get_gate();
 
-            REQUIRE(impl_ket::gate_id::is_single_qubit_transform_gate(gate.gate));
-            REQUIRE(gate.gate != ket::Gate::U);
+            REQUIRE(gid::is_single_qubit_transform_gate(gate.gate));
+            REQUIRE(gate.gate != G::U);
         }
 
         REQUIRE(ket::almost_eq(state0, state1));

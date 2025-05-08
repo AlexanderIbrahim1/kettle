@@ -9,8 +9,12 @@
 #include "kettle/state/random.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
-#include "kettle/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle/gates/primitive_gate.hpp"
+
+#include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+namespace cre = ket::internal::create;
 
 
 /*
@@ -32,7 +36,7 @@ static constexpr auto between_0_and_period(double x, double period) -> double {
 
 TEST_CASE("decomp_to_single_primitive_gate_()")
 {
-    using Info = impl_ket::PrimitiveGateInfo;
+    using Info = ket::internal::PrimitiveGateInfo_;
 
     struct TestCase
     {
@@ -52,7 +56,7 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
                 TestCase {ket::sx_gate(), Info {ket::Gate::SX, {}}}
             );
 
-            const auto output = impl_ket::decomp_to_single_primitive_gate_(testcase.input);
+            const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
 
             REQUIRE(output.has_value());
             REQUIRE(output->gate == testcase.expected->gate);
@@ -61,9 +65,9 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
 
         SECTION("unsuccessful decomposition")
         {
-            auto testcase = TestCase {ket::h_gate() * ket::rx_gate(1.2345), std::nullopt};
+            auto testcase = TestCase {.input=ket::h_gate() * ket::rx_gate(1.2345), .expected=std::nullopt};
 
-            const auto output = impl_ket::decomp_to_single_primitive_gate_(testcase.input);
+            const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
             REQUIRE(!output.has_value());
         }
     }
@@ -81,7 +85,7 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
             TestCase {ket::p_gate(angle), Info {ket::Gate::P, angle}}
         );
 
-        const auto output = impl_ket::decomp_to_single_primitive_gate_(testcase.input);
+        const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
 
         REQUIRE(output.has_value());
         REQUIRE(output->gate == testcase.expected->gate);
@@ -111,7 +115,7 @@ TEST_CASE("decompose to primtive gates; general")
     SECTION("one target gates")
     {
         const auto target = std::size_t {0};
-        const auto decomp_gates = impl_ket::decomp_to_one_target_primitive_gates_(target, unitary);
+        const auto decomp_gates = ket::internal::decomp_to_one_target_primitive_gates_(target, unitary);
 
         // make sure the expect gates come out
         REQUIRE(decomp_gates.size() == 4);
@@ -125,10 +129,10 @@ TEST_CASE("decompose to primtive gates; general")
         circuit0.add_u_gate(unitary, 0);
 
         // construct a circuit from the decomposed gates
-        const auto [target0, angle_g0] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[0]);
-        const auto [target1, angle_g1] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[1]);
-        const auto [target2, angle_g2] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[2]);
-        const auto [target3, angle_g3] = impl_ket::unpack_one_target_one_angle_gate(decomp_gates[3]);
+        const auto [target0, angle_g0] = cre::unpack_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [target1, angle_g1] = cre::unpack_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [target2, angle_g2] = cre::unpack_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [target3, angle_g3] = cre::unpack_one_target_one_angle_gate(decomp_gates[3]);
 
         auto circuit1 = ket::QuantumCircuit {1};
         circuit1.add_rz_gate(target0, angle_g0);
@@ -150,7 +154,7 @@ TEST_CASE("decompose to primtive gates; general")
     {
         const auto target = std::size_t {0};
         const auto control = std::size_t {1};
-        const auto decomp_gates = impl_ket::decomp_to_one_control_one_target_primitive_gates_(control, target, unitary);
+        const auto decomp_gates = ket::internal::decomp_to_one_control_one_target_primitive_gates_(control, target, unitary);
 
         // make sure the expect gates come out
         REQUIRE(decomp_gates.size() == 4);
@@ -164,10 +168,10 @@ TEST_CASE("decompose to primtive gates; general")
         circuit0.add_cu_gate(unitary, control, target);
 
         // construct a circuit from the decomposed gates
-        const auto [control0, target0, angle_g0] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[0]);
-        const auto [control1, target1, angle_g1] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[1]);
-        const auto [control2, target2, angle_g2] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[2]);
-        const auto [control3, target3, angle_g3] = impl_ket::unpack_one_control_one_target_one_angle_gate(decomp_gates[3]);
+        const auto [control0, target0, angle_g0] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[0]);
+        const auto [control1, target1, angle_g1] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[1]);
+        const auto [control2, target2, angle_g2] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[2]);
+        const auto [control3, target3, angle_g3] = cre::unpack_one_control_one_target_one_angle_gate(decomp_gates[3]);
 
         auto circuit1 = ket::QuantumCircuit {2};
         circuit1.add_crz_gate(control0, target0, angle_g0);

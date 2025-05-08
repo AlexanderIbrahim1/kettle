@@ -7,7 +7,6 @@
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/state/state.hpp>
 #include <kettle/simulation/simulate.hpp>
-#include <kettle/simulation/measure.hpp>
 
 
 TEST_CASE("add_if_statement()")

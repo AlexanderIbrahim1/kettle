@@ -13,7 +13,7 @@
 */
 
 
-namespace impl_ket
+namespace ket
 {
 
 /*
@@ -24,7 +24,7 @@ struct CircuitElement
 {
 public:
     // NOLINTNEXTLINE(*-explicit-*)
-    CircuitElement(const ket::GateInfo& ginfo)
+    CircuitElement(const GateInfo& ginfo)
         : element_ {ginfo}
     {}
 
@@ -39,24 +39,24 @@ public:
     {}
 
     // NOLINTNEXTLINE(*explicit*)
-    CircuitElement(ket::CircuitLogger logger)
+    CircuitElement(CircuitLogger logger)
         : element_ {std::move(logger)}
     {}
 
     // NOLINTNEXTLINE(*explicit*)
-    CircuitElement(ket::ClassicalRegisterCircuitLogger logger)
+    CircuitElement(ClassicalRegisterCircuitLogger logger)
         : element_ {std::move(logger)}
     {}
 
     // NOLINTNEXTLINE(*explicit*)
-    CircuitElement(ket::StatevectorCircuitLogger logger)
+    CircuitElement(StatevectorCircuitLogger logger)
         : element_ {std::move(logger)}
     {}
 
     [[nodiscard]]
     constexpr auto is_gate() const -> bool
     {
-        return std::holds_alternative<ket::GateInfo>(element_);
+        return std::holds_alternative<GateInfo>(element_);
     }
 
     [[nodiscard]]
@@ -68,13 +68,13 @@ public:
     [[nodiscard]]
     constexpr auto is_circuit_logger() const -> bool
     {
-        return std::holds_alternative<ket::CircuitLogger>(element_);
+        return std::holds_alternative<CircuitLogger>(element_);
     }
 
     [[nodiscard]]
-    constexpr auto get_gate() const -> const ket::GateInfo&
+    constexpr auto get_gate() const -> const GateInfo&
     {
-        return std::get<ket::GateInfo>(element_);
+        return std::get<GateInfo>(element_);
     }
 
     [[nodiscard]]
@@ -84,14 +84,13 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto get_circuit_logger() const -> const ket::CircuitLogger&
+    constexpr auto get_circuit_logger() const -> const CircuitLogger&
     {
-        return std::get<ket::CircuitLogger>(element_);
+        return std::get<CircuitLogger>(element_);
     }
 
 private:
-    std::variant<ket::GateInfo, ClassicalControlFlowInstruction, ket::CircuitLogger> element_;
+    std::variant<GateInfo, ClassicalControlFlowInstruction, CircuitLogger> element_;
 };
 
-
-}  // namespace impl_ket
+}  // namespace ket

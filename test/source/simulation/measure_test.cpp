@@ -7,11 +7,14 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/common/print.hpp>
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/state/state.hpp>
 #include <kettle/simulation/simulate.hpp>
-#include <kettle/simulation/measure.hpp>
+
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include <kettle_internal/simulation/measure.hpp>
+
+namespace cre = ket::internal::create;
 
 
 template <int Output>
@@ -63,10 +66,10 @@ static void simulate_measurement_wrapper(
     const auto n_qubits = state.n_qubits();
 
     if (measured_state == 0) {
-        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
+        ket::internal::simulate_measurement_<RiggedDiscreteDistribution<0>>(state, info, n_qubits);
     }
     else if (measured_state == 1) {
-        impl_ket::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
+        ket::internal::simulate_measurement_<RiggedDiscreteDistribution<1>>(state, info, n_qubits);
     }
     else {
         throw std::runtime_error {"Invalid measured state provided to the test case.\n"};
@@ -108,7 +111,7 @@ TEST_CASE("simulate_measurement_()")
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
         auto state = ket::QuantumState {"00"};
         auto circuit = ket::QuantumCircuit {2};
@@ -117,7 +120,7 @@ TEST_CASE("simulate_measurement_()")
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq(state, testcase.expected));
     }
 
     SECTION("3 qubits")
@@ -174,7 +177,7 @@ TEST_CASE("simulate_measurement_()")
         );
 
         // the measured bit doesn't matter for now
-        const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+        const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
         auto state = ket::QuantumState {"000"};
         auto circuit = ket::QuantumCircuit {3};
@@ -184,7 +187,7 @@ TEST_CASE("simulate_measurement_()")
 
         simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-        REQUIRE(ket::almost_eq_with_print(state, testcase.expected));
+        REQUIRE(ket::almost_eq(state, testcase.expected));
     }
 
     SECTION("random")
@@ -237,14 +240,14 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
             auto state = ket::QuantumState {testcase.initial_amplitudes};
             auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(ket::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
 
         SECTION("3 qubits")
@@ -301,14 +304,14 @@ TEST_CASE("simulate_measurement_()")
             normalize(testcase.expected_amplitudes);
 
             // the measured bit doesn't matter for now
-            const auto info = impl_ket::create_m_gate(testcase.measured_qubit, 0);
+            const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
             auto state = ket::QuantumState {testcase.initial_amplitudes};
             auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
-            REQUIRE(ket::almost_eq_with_print(state, expected_state));
+            REQUIRE(ket::almost_eq(state, expected_state));
         }
     }
 }

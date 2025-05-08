@@ -11,7 +11,7 @@ class StatevectorCircuitLogger
 public:
     void add_statevector(QuantumState statevector)
     {
-        statevector_ = impl_ket::ClonePtr<QuantumState> {std::move(statevector)};
+        statevector_ = ket::ClonePtr<QuantumState> {std::move(statevector)};
     }
 
     [[nodiscard]]
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    impl_ket::ClonePtr<QuantumState> statevector_ {nullptr};
+    ket::ClonePtr<QuantumState> statevector_ {nullptr};
 };
 
 }  // namespace ket

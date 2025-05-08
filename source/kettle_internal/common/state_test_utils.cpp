@@ -1,17 +1,17 @@
-#pragma once
-
 #include <complex>
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/state/state.hpp"
+#include "kettle_internal/common/state_test_utils.hpp"
 
 
-namespace impl_ket
+namespace ket::internal
 {
 
-inline void print_state_(const ket::QuantumState& state)
+void print_state_(const ket::QuantumState& state)
 {
     // for the time being, fix this as being little-endian
     const auto endian = ket::QuantumStateEndian::LITTLE;
@@ -22,8 +22,7 @@ inline void print_state_(const ket::QuantumState& state)
     }
 }
 
-inline auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_right_qubits)
--> std::string
+auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::size_t n_right_qubits) -> std::string
 {
     auto err_msg = std::stringstream {};
     err_msg << "FALSE: ALMOST_EQ_WITH_PRINT()\n";
@@ -34,10 +33,7 @@ inline auto ae_err_msg_diff_number_of_qubits_(std::size_t n_left_qubits, std::si
     return err_msg.str();
 }
 
-inline auto ae_err_msg_diff_states_(
-    const ket::QuantumState& left,
-    const ket::QuantumState& right
-) -> std::string
+auto ae_err_msg_diff_states_(const ket::QuantumState& left, const ket::QuantumState& right) -> std::string
 {
     auto err_msg = std::stringstream {};
     err_msg << "FALSE: ALMOST_EQ_WITH_PRINT()\n";
@@ -52,43 +48,26 @@ inline auto ae_err_msg_diff_states_(
     return err_msg.str();
 }
 
-}  // namespace impl_ket
-
-
-namespace ket
-{
-
-inline void print_state(const QuantumState& state)
-{
-    impl_ket::print_state_(state);
-}
-
-enum PrintAlmostEq : std::uint8_t
-{
-    PRINT,
-    NOPRINT
-};
-
-constexpr auto almost_eq_with_print(
-    const QuantumState& left,
-    const QuantumState& right,
-    PrintAlmostEq print_state = PrintAlmostEq::PRINT,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+auto almost_eq_with_print_(
+    const ket::QuantumState& left,
+    const ket::QuantumState& right,
+    PrintAlmostEq_ print_state,
+    double tolerance_sq
 ) noexcept -> bool
 {
-    using PAE = PrintAlmostEq;
+    using PAE = PrintAlmostEq_;
 
     if (left.n_qubits() != right.n_qubits()) {
         if (print_state == PAE::PRINT) {
-            std::cout << impl_ket::ae_err_msg_diff_number_of_qubits_(left.n_qubits(), right.n_qubits());
+            std::cout << ae_err_msg_diff_number_of_qubits_(left.n_qubits(), right.n_qubits());
         }
         return false;
     }
 
     for (std::size_t i {0}; i < left.n_states(); ++i) {
-        if (!almost_eq(left[i], right[i], tolerance_sq)) {
+        if (!ket::almost_eq(left[i], right[i], tolerance_sq)) {
             if (print_state == PAE::PRINT) {
-                std::cout << impl_ket::ae_err_msg_diff_states_(left, right);
+                std::cout << ae_err_msg_diff_states_(left, right);
             }
             return false;
         }
@@ -98,4 +77,4 @@ constexpr auto almost_eq_with_print(
 }
 
 
-}  // namespace ket
+}  // namespace ket::internal

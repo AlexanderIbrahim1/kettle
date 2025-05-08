@@ -1,10 +1,14 @@
-#include "kettle/circuit/circuit.hpp"
+#include <sstream>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <kettle/gates/primitive_gate.hpp>
-#include <kettle/io/write_tangelo_file.hpp>
-#include <sstream>
+#include "kettle/gates/primitive_gate.hpp"
+#include "kettle/io/write_tangelo_file.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/io/write_tangelo_file_internal.hpp"
+
+namespace cre = ket::internal::create;
 
 
 TEST_CASE("format_one_target_gate_()")
@@ -26,8 +30,8 @@ TEST_CASE("format_one_target_gate_()")
         TestCase {G::SX, 0, "SX        target : [0]\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_target_gate(testcase.gate, testcase.target);
-    const auto actual = impl_ket::format_one_target_gate_(gate_info);
+    const auto gate_info = cre::create_one_target_gate(testcase.gate, testcase.target);
+    const auto actual = ket::internal::format_one_target_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -52,13 +56,13 @@ TEST_CASE("format_one_control_one_target_gate_()")
         TestCase {G::CSX, 0, 3, "CSX       target : [0]   control : [3]\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_control_one_target_gate(
+    const auto gate_info = cre::create_one_control_one_target_gate(
         testcase.gate,
         testcase.control,
         testcase.target
     );
 
-    const auto actual = impl_ket::format_one_control_one_target_gate_(gate_info);
+    const auto actual = ket::internal::format_one_control_one_target_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -85,13 +89,13 @@ TEST_CASE("format_one_target_one_angle_gate_()")
         TestCase {G::P,  0, -value, "P         target : [0]   parameter : -1.1234567812345677\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_target_one_angle_gate(
+    const auto gate_info = cre::create_one_target_one_angle_gate(
         testcase.gate,
         testcase.target,
         testcase.angle
     );
 
-    const auto actual = impl_ket::format_one_target_one_angle_gate_(gate_info);
+    const auto actual = ket::internal::format_one_target_one_angle_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -119,14 +123,14 @@ TEST_CASE("format_one_control_one_target_one_angle_gate_()")
         TestCase {G::CP,  0, 1, -value, "CP        target : [0]   control : [1]   parameter : -1.1234567812345677\n"}
     );
 
-    const auto gate_info = impl_ket::create_one_control_one_target_one_angle_gate(
+    const auto gate_info = cre::create_one_control_one_target_one_angle_gate(
         testcase.gate,
         testcase.control,
         testcase.target,
         testcase.angle
     );
 
-    const auto actual = impl_ket::format_one_control_one_target_one_angle_gate_(gate_info);
+    const auto actual = ket::internal::format_one_control_one_target_one_angle_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }
@@ -148,8 +152,8 @@ TEST_CASE("format_m_gate_()")
         TestCase {G::CRY, 2, 2, "M         target : [2]   bit : [2]\n"}
     );
 
-    const auto gate_info = impl_ket::create_m_gate(testcase.qubit, testcase.bit);
-    const auto actual = impl_ket::format_m_gate_(gate_info);
+    const auto gate_info = cre::create_m_gate(testcase.qubit, testcase.bit);
+    const auto actual = ket::internal::format_m_gate_(gate_info);
 
     REQUIRE(actual == testcase.expected);
 }

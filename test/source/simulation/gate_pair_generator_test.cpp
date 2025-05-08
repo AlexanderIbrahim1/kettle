@@ -9,7 +9,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_range_equals.hpp>
 
-#include "kettle/simulation/gate_pair_generator.hpp"
+#include "kettle_internal/simulation/gate_pair_generator.hpp"
 
 using BasisIndexMap = std::map<std::string, std::size_t>;
 
@@ -45,23 +45,23 @@ static auto get_generated_index_pairs(
     return index_pairs;
 }
 
-static constexpr auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::size_t
+static auto num_pairs_for_single_qubit_gate(std::size_t n_qubits) -> std::size_t
 {
     // The number of yielded pairs is always 2^(n_qubits - 1):
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 1` of them, with 2 possible states per qubit
-    return impl_ket::pow_2_int(n_qubits - 1);
+    return ket::internal::pow_2_int(n_qubits - 1);
 }
 
-static constexpr auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
+static auto num_pairs_for_double_qubit_gate(std::size_t n_qubits) -> std::size_t
 {
     // The number of yielded pairs is always 2^(n_qubits - 2):
     // - the qubit at `control_index` is fixed for the pair (always set to 1)
     // - the qubit at `target_index` is fixed for the pair (one must be set to 0, the other to 1)
     // - the remaining qubits can be in either state
     //   - and there are `n_qubits - 2` of them, with 2 possible states per qubit
-    return impl_ket::pow_2_int(n_qubits - 2);
+    return ket::internal::pow_2_int(n_qubits - 2);
 }
 
 TEST_CASE("SingleQubitGatePairGenerator with two qubits")
@@ -78,40 +78,40 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = impl_ket::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("00"), coeff_map.at("10")},
-             IndexPair {coeff_map.at("01"), coeff_map.at("11")}
+            IndexPair {.index0=coeff_map.at("00"), .index1=coeff_map.at("10")},
+             IndexPair {.index0=coeff_map.at("01"), .index1=coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = impl_ket::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("00"), coeff_map.at("01")},
-             IndexPair {coeff_map.at("10"), coeff_map.at("11")}
+            IndexPair {.index0=coeff_map.at("00"), .index1=coeff_map.at("01")},
+             IndexPair {.index0=coeff_map.at("10"), .index1=coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
@@ -135,66 +135,66 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = impl_ket::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("000"), coeff_map.at("100")},
-            IndexPair {coeff_map.at("010"), coeff_map.at("110")},
-            IndexPair {coeff_map.at("001"), coeff_map.at("101")},
-            IndexPair {coeff_map.at("011"), coeff_map.at("111")}
+            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("100")},
+            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("110")},
+            IndexPair {.index0=coeff_map.at("001"), .index1=coeff_map.at("101")},
+            IndexPair {.index0=coeff_map.at("011"), .index1=coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = impl_ket::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("000"), coeff_map.at("010")},
-            IndexPair {coeff_map.at("100"), coeff_map.at("110")},
-            IndexPair {coeff_map.at("001"), coeff_map.at("011")},
-            IndexPair {coeff_map.at("101"), coeff_map.at("111")}
+            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("010")},
+            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("110")},
+            IndexPair {.index0=coeff_map.at("001"), .index1=coeff_map.at("011")},
+            IndexPair {.index0=coeff_map.at("101"), .index1=coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("loop over qubit at index 2")
     {
-        auto generator = impl_ket::SingleQubitGatePairGenerator {2, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("000"), coeff_map.at("001")},
-            IndexPair {coeff_map.at("100"), coeff_map.at("101")},
-            IndexPair {coeff_map.at("010"), coeff_map.at("011")},
-            IndexPair {coeff_map.at("110"), coeff_map.at("111")}
+            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("001")},
+            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("101")},
+            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("011")},
+            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
@@ -214,38 +214,38 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("control is 0, target is 1")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("10"), coeff_map.at("11")}
+            IndexPair {.index0=coeff_map.at("10"), .index1=coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("control is 1, target is 0")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("01"), coeff_map.at("11")}
+            IndexPair {.index0=coeff_map.at("01"), .index1=coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
@@ -269,80 +269,80 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("100"), coeff_map.at("110")},
-            IndexPair {coeff_map.at("101"), coeff_map.at("111")},
+            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("110")},
+            IndexPair {.index0=coeff_map.at("101"), .index1=coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("(control, target) = (1, 0)")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 0, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("010"), coeff_map.at("110")},
-            IndexPair {coeff_map.at("011"), coeff_map.at("111")},
+            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("110")},
+            IndexPair {.index0=coeff_map.at("011"), .index1=coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("(control, target) = (0, 2)")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 2, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("100"), coeff_map.at("101")},
-            IndexPair {coeff_map.at("110"), coeff_map.at("111")},
+            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("101")},
+            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
 
     SECTION("(control, target) = (1, 2)")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {1, 2, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 2, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("010"), coeff_map.at("011")},
-            IndexPair {coeff_map.at("110"), coeff_map.at("111")},
+            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("011")},
+            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
@@ -376,22 +376,22 @@ TEST_CASE("DoubleQubitGatePairGenerator with four qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = impl_ket::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {coeff_map.at("1000"), coeff_map.at("1100")},
-            IndexPair {coeff_map.at("1010"), coeff_map.at("1110")},
-            IndexPair {coeff_map.at("1001"), coeff_map.at("1101")},
-            IndexPair {coeff_map.at("1011"), coeff_map.at("1111")},
+            IndexPair {.index0=coeff_map.at("1000"), .index1=coeff_map.at("1100")},
+            IndexPair {.index0=coeff_map.at("1010"), .index1=coeff_map.at("1110")},
+            IndexPair {.index0=coeff_map.at("1001"), .index1=coeff_map.at("1101")},
+            IndexPair {.index0=coeff_map.at("1011"), .index1=coeff_map.at("1111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
 
         // there isn't really a guaranteed ordered, AFAIK
-        std::sort(expected.begin(), expected.end());
-        std::sort(actual.begin(), actual.end());
+        std::ranges::sort(expected);
+        std::ranges::sort(actual);
 
         REQUIRE(expected == actual);
     }
@@ -403,7 +403,7 @@ TEST_CASE("SingleQubitGatePairGenerator set_state()")
     const auto n_qubits = std::size_t {5};
 
     // create all the index pairs generated by the generator
-    auto full_generator = impl_ket::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto full_generator = ket::internal::SingleQubitGatePairGenerator {target_index, n_qubits};
     const auto full_output = get_generated_index_pairs(full_generator, full_generator.size());
 
     // create all the index pairs between two flat indices
@@ -421,7 +421,7 @@ TEST_CASE("SingleQubitGatePairGenerator set_state()")
         TestCase {9, 13}
     );
 
-    auto partial_generator = impl_ket::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto partial_generator = ket::internal::SingleQubitGatePairGenerator {target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 
@@ -441,7 +441,7 @@ TEST_CASE("DoubleQubitGatePairGenerator set_state()")
     const auto n_qubits = std::size_t {6};
 
     // create all the index pairs generated by the generator
-    auto full_generator = impl_ket::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto full_generator = ket::internal::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     const auto full_output = get_generated_index_pairs(full_generator, full_generator.size());
 
     // create all the index pairs between two flat indices
@@ -459,7 +459,7 @@ TEST_CASE("DoubleQubitGatePairGenerator set_state()")
         TestCase {9, 13}
     );
 
-    auto partial_generator = impl_ket::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto partial_generator = ket::internal::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 

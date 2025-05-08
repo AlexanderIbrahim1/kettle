@@ -14,7 +14,7 @@
       - I can avoid the hassle of creating a hash for whatever key I want to use
 */
 
-namespace impl_ket
+namespace ket::internal
 {
 
 template <typename Key, typename Value, std::size_t Size>
@@ -49,4 +49,4 @@ struct LinearBijectiveMap
     }
 };
 
-}  // namespace impl_ket
+}  // namespace ket::internal

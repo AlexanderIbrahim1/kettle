@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -87,7 +88,7 @@ TEST_CASE("multiplicity-controlled X gate test")
     {
         struct TestInfo
         {
-            std::array<std::size_t, 3> control_qubits;
+            std::vector<std::size_t> control_qubits;
             std::size_t target_qubit;
             std::string input_bitstring;
             std::string expected_output_bitstring;

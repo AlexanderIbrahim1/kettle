@@ -1,5 +1,3 @@
-#pragma once
-
 #include <algorithm>
 #include <cmath>
 #include <optional>
@@ -7,45 +5,33 @@
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/gates/primitive_gate_map.hpp"
 #include "kettle/gates/common_u_gates.hpp"
+
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
+
+#include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
 
 /*
     This header file contains functions for decomposing a general 2x2 unitary matrix
     to a product of primitive 2x2 quantum gates.
 */
 
-namespace impl_ket
+namespace ket::internal
 {
 
-struct PrimitiveGateInfo
-{
-    ket::Gate gate;
-    std::optional<double> parameter = std::nullopt;
-};
-
-/*
-    Find the angle of the determinant.
-*/
-constexpr auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
+auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
 {
     const auto det = ket::determinant(matrix);
     return std::atan2(det.imag(), det.real());
 }
 
-/*
-    Decompose a 2x2 unitary matrix into one of several primitive 1-qubit unitary gates.
-
-    This function attempts to construct unparameterized gates before paramterized gates. For
-    example, if the matrix [1, 0; 0 -1] is passed as an input, this function will attempt
-    to decompose it as a Z gate instead of an RZ gate with an angle of (-M_PI/2).
-*/
-inline auto decomp_to_single_primitive_gate_(
+auto decomp_to_single_primitive_gate_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::optional<impl_ket::PrimitiveGateInfo>
+    double tolerance_sq
+) -> std::optional<PrimitiveGateInfo_>
 {
-    using Info = impl_ket::PrimitiveGateInfo;
+    using Info = PrimitiveGateInfo_;
     // NOTES:
     // - the H, X, Y, and Z gates take no arguments, and so we can check them directly
     // - the RX, RY, RZ gates all share the feature that the angle can be recovered
@@ -91,27 +77,18 @@ inline auto decomp_to_single_primitive_gate_(
     return std::nullopt;
 }
 
-/*
-    The implementation of this decomposition is taken directly from the following file:
-        https://github.com/fedimser/quantum_decomp/blob/master/quantum_decomp/src/decompose_2x2.py
-    
-    The author of the repository if fedimser.
-    The repo is published under the MIT license.
-*/
-inline auto decomp_special_unitary_to_primitive_gates_(
+auto decomp_special_unitary_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<impl_ket::PrimitiveGateInfo>
+    double tolerance_sq
+) -> std::vector<PrimitiveGateInfo_>
 {
-    using Info = impl_ket::PrimitiveGateInfo;
-
     const auto abs00 = std::clamp(std::abs(unitary.elem00), 0.0, 1.0);
 
     const auto theta = -std::acos(abs00);
     const auto lambda = -std::atan2(unitary.elem00.imag(), unitary.elem00.real());
     const auto mu = -std::atan2(unitary.elem01.imag(), unitary.elem01.real());
 
-    auto output = std::vector<Info> {};
+    auto output = std::vector<PrimitiveGateInfo_> {};
 
     if (std::fabs(lambda - mu) > tolerance_sq) {
         output.emplace_back(ket::Gate::RZ, lambda - mu);
@@ -128,10 +105,10 @@ inline auto decomp_special_unitary_to_primitive_gates_(
     return output;
 }
 
-inline auto decomp_to_primitive_gates_(
+auto decomp_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<impl_ket::PrimitiveGateInfo>
+    double tolerance_sq
+) -> std::vector<PrimitiveGateInfo_>
 {
     const auto primitive = decomp_to_single_primitive_gate_(unitary);
     if (primitive) {
@@ -152,49 +129,53 @@ inline auto decomp_to_primitive_gates_(
     }
 }
 
-inline auto decomp_to_one_target_primitive_gates_(
+auto decomp_to_one_target_primitive_gates_(
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq
 ) -> std::vector<ket::GateInfo>
 {
+    namespace cre = ket::internal::create;
+
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
 
     auto output = std::vector<ket::GateInfo> {};
     for (const auto& primitive : primitives) {
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
-            output.emplace_back(create_one_target_one_angle_gate(primitive.gate, target, angle));
+            output.emplace_back(cre::create_one_target_one_angle_gate(primitive.gate, target, angle));
         } else {
-            output.emplace_back(create_one_target_gate(primitive.gate, target));
+            output.emplace_back(cre::create_one_target_gate(primitive.gate, target));
         }
     }
 
     return output;
 }
 
-inline auto decomp_to_one_control_one_target_primitive_gates_(
+auto decomp_to_one_control_one_target_primitive_gates_(
     std::size_t control,
     std::size_t target,
     const ket::Matrix2X2& unitary,
-    double tolerance_sq = impl_ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+    double tolerance_sq
 ) -> std::vector<ket::GateInfo>
 {
+    namespace cre = ket::internal::create;
+
     const auto primitives = decomp_to_primitive_gates_(unitary, tolerance_sq);
 
     auto output = std::vector<ket::GateInfo> {};
     for (const auto& primitive : primitives) {
-        const auto ctrl_gate = UNCONTROLLED_TO_CONTROLLED_GATE.at(primitive.gate);
+        const auto ctrl_gate = ket::internal::UNCONTROLLED_TO_CONTROLLED_GATE.at(primitive.gate);
 
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
-            output.emplace_back(create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
+            output.emplace_back(cre::create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
         } else {
-            output.emplace_back(create_one_control_one_target_gate(ctrl_gate, control, target));
+            output.emplace_back(cre::create_one_control_one_target_gate(ctrl_gate, control, target));
         }
     }
 
     return output;
 }
 
-}  // namespace impl_ket
+}  // namespace ket::internal

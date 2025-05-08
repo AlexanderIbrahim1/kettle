@@ -8,7 +8,11 @@
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/circuit/control_flow.hpp>
 #include <kettle/circuit/control_flow_predicate.hpp>
-#include <kettle/io/io_control_flow.hpp>
+
+#include <kettle_internal/io/io_control_flow.hpp>
+
+namespace io_fmt = ket::internal::format;
+namespace io_par = ket::internal::parse;
 
 
 TEST_CASE("format_csv_integers_()")
@@ -26,7 +30,7 @@ TEST_CASE("format_csv_integers_()")
         TestCase {{0, 3, 1}, "[0, 3, 1]"}
     );
 
-    REQUIRE(impl_ket::format_csv_integers_(testcase.input) == testcase.expected);
+    REQUIRE(io_fmt::format_csv_integers_(testcase.input) == testcase.expected);
 }
 
 TEST_CASE("format_control_flow_predicate_()")
@@ -48,7 +52,7 @@ TEST_CASE("format_control_flow_predicate_()")
         TestCase {Predicate { {0, 3, 1}, {0, 0, 1}, Kind::IF}, "BITS[0, 3, 1] == [0, 0, 1]"}
     );
 
-    REQUIRE(impl_ket::format_control_flow_predicate_(testcase.input) == testcase.expected);
+    REQUIRE(io_fmt::format_control_flow_predicate_(testcase.input) == testcase.expected);
 }
 
 TEST_CASE("format classical control flow statements")
@@ -63,27 +67,27 @@ TEST_CASE("format classical control flow statements")
 
     SECTION("if statement")
     {
-        const auto if_stmt = impl_ket::ClassicalIfStatement {
+        const auto if_stmt = ket::ClassicalIfStatement {
             predicate,
             std::make_unique<ket::QuantumCircuit>(if_subcirc)
         };
 
         const auto expected = std::string {"IF BITS[0, 3] == [1, 0]"};
-        const auto actual = impl_ket::format_classical_if_statement_header_(if_stmt);
+        const auto actual = io_fmt::format_classical_if_statement_header_(if_stmt.predicate());
 
         REQUIRE(expected == actual);
     }
 
     SECTION("if else statement")
     {
-        const auto if_else_stmt = impl_ket::ClassicalIfElseStatement {
+        const auto if_else_stmt = ket::ClassicalIfElseStatement {
             predicate,
             std::make_unique<ket::QuantumCircuit>(if_subcirc),
             std::make_unique<ket::QuantumCircuit>(else_subcirc)
         };
         const auto expected0 = std::string {"IF BITS[0, 3] == [1, 0]"};
         const auto expected1 = std::string {"ELSE"};
-        const auto [actual0, actual1] = impl_ket::format_classical_if_else_statement_header_(if_else_stmt);
+        const auto [actual0, actual1] = io_fmt::format_classical_if_else_statement_header_(if_else_stmt.predicate());
 
         REQUIRE(expected0 == actual0);
         REQUIRE(expected1 == actual1);
@@ -107,7 +111,7 @@ TEST_CASE("parse_csv_in_backets_()")
 
     auto stream = std::stringstream {testcase.input};
 
-    REQUIRE_THAT(impl_ket::parse_csv_in_brackets_<int>(stream), Catch::Matchers::Equals(testcase.expected));
+    REQUIRE_THAT(io_par::parse_csv_in_brackets_<int>(stream), Catch::Matchers::Equals(testcase.expected));
 }
 
 TEST_CASE("parse_control_flow_predicate_()")
@@ -131,5 +135,5 @@ TEST_CASE("parse_control_flow_predicate_()")
 
     auto stream = std::stringstream {testcase.input};
 
-    REQUIRE(impl_ket::parse_control_flow_predicate_(stream) == testcase.expected);
+    REQUIRE(io_par::parse_control_flow_predicate_(stream) == testcase.expected);
 }

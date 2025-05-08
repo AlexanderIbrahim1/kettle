@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "kettle/common/mathtools.hpp"
+#include "kettle_internal/common/mathtools_internal.hpp"
 
 TEST_CASE("flat_index_to_grid_indices_2d")
 {
@@ -23,7 +23,7 @@ TEST_CASE("flat_index_to_grid_indices_2d")
     );
 
     const auto flat_index = grid_indices_to_flat_index(testcase);
-    const auto [i0_actual, i1_actual] = impl_ket::flat_index_to_grid_indices_2d(flat_index, testcase.size1);
+    const auto [i0_actual, i1_actual] = ket::internal::flat_index_to_grid_indices_2d(flat_index, testcase.size1);
 
     REQUIRE(i0_actual == testcase.i0);
     REQUIRE(i1_actual == testcase.i1);
@@ -51,7 +51,7 @@ TEST_CASE("flat_index_to_grid_indices_3d")
     );
 
     const auto flat_index = grid_indices_to_flat_index(testcase);
-    const auto [i0_actual, i1_actual, i2_actual] = impl_ket::flat_index_to_grid_indices_3d(flat_index, testcase.size1, testcase.size2);
+    const auto [i0_actual, i1_actual, i2_actual] = ket::internal::flat_index_to_grid_indices_3d(flat_index, testcase.size1, testcase.size2);
 
     REQUIRE(i0_actual == testcase.i0);
     REQUIRE(i1_actual == testcase.i1);

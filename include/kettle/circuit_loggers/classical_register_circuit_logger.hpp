@@ -11,7 +11,7 @@ class ClassicalRegisterCircuitLogger
 public:
     void add_classical_register(ClassicalRegister cregister)
     {
-        cregister_ = impl_ket::ClonePtr<ClassicalRegister> {std::move(cregister)};
+        cregister_ = ket::ClonePtr<ClassicalRegister> {std::move(cregister)};
     }
 
     [[nodiscard]]
@@ -27,7 +27,7 @@ public:
 private:
     // there is no default constructor for the ClassicalRegsiter (it wouldn't make sense), and we
     // only find out how many bits are needed after the first simulation; hence why we use a pointer
-    impl_ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
+    ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
 };
 
 }  // namespace ket

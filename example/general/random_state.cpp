@@ -1,3 +1,4 @@
+#include "kettle/io/statevector.hpp"
 #include <complex>
 #include <iostream>
 
@@ -7,7 +8,7 @@
 auto main() -> int
 {
     auto state = ket::generate_random_state(2);
-    ket::print_state(state);
+    ket::save_statevector(std::cout, state);
 
     auto norm_squared = double {0.0};
     for (std::size_t i {0}; i < state.n_states(); ++i) {
