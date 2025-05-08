@@ -24,11 +24,11 @@ QubitStateChecker_::QubitStateChecker_(
     : qubit_indices_ {std::move(qubit_indices)}
     , expected_measurements_ {std::move(expected_measurements)}
 {
-    if (!std::ranges::all_of(expected_measurements, [](std::uint8_t x) {return x == 0 || x == 1; })) {
+    if (!std::ranges::all_of(expected_measurements_, [](std::uint8_t x) {return x == 0 || x == 1; })) {
         throw std::runtime_error {"ERROR: all expected measurements must be 0 or 1.\n"};
     }
 
-    if (qubit_indices.size() != expected_measurements.size()) {
+    if (qubit_indices_.size() != expected_measurements_.size()) {
         throw std::runtime_error {"ERROR: mismatch in number of qubit indices and number of expected measurements.\n"};
     }
 }
