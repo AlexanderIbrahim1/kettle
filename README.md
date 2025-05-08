@@ -19,8 +19,7 @@ Other features:
   - transpiling a circuit with `U` and `CU` gates into more primitive gates
   - create non-primitive gates (quantum fourier transform, swaps, toffoli, etc.)
 
-Here's an example where we create one of the Bell states, and perform measurements on it
-
+Here's an example where we create one of the Bell states, and perform measurements on it:
 ```cpp
 #include <kettle/kettle.hpp>
 
@@ -62,12 +61,11 @@ Currently, only noiseless statevector simulations are supported.
 This project is still a work-in-progress, and the API is subject to further changes
 as the project develops.
 
-## Building
-
-This project uses cmake presets for building.
+## Building as the top level project
+This project uses CMake presets for building.
 So far it has only been built and tested on Ubuntu 23.04.
 
-To build examples and unit tests (requires `FetchContent`-related functions to work with cmake):
+To build examples and unit tests as the top-level project (requires `FetchContent`-related functions to work with CMake):
 ```sh
 cmake --preset=dev
 cmake --build --preset=dev
@@ -83,6 +81,31 @@ For example:
 cmake --preset=release
 cmake --build --preset=release
 ```
+
+## Integration via CMake
+This project can be integrated into another project using CMake's `FetchContent`.
+
+Add the following to your `CMakeLists.txt`:
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+    kettle
+    GIT_REPOSITORY git@github.com:AlexanderIbrahim1/kettle.git
+    GIT_TAG main
+)
+
+FetchContent_MakeAvailable(kettle)  # kettle::kettle
+```
+
+Then link it to your executable:
+```cmake
+add_executable(my_executable main.cpp)
+target_link_libraries(my_executable PRIVATE kettle::kettle)
+```
+
+The contents of `kettle` will be made available by including the `<kettle/kettle.hpp>` header,
+within the `ket::` namespace.
 
 ## Contributing
 
