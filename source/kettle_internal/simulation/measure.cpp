@@ -1,6 +1,6 @@
 #include <cstddef>
+#include <type_traits>
 
-#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -10,6 +10,14 @@
 
 namespace ket::internal
 {
+
+/*
+    Helper struct for the static_assert(), to see what int instance is passed that causes
+    the template instantiation to fail.
+*/
+template <int StateToCollapse>
+struct state_collapse_always_false : std::false_type
+{};
 
 auto probabilities_of_collapsed_states_(
     ket::QuantumState& state,
@@ -58,7 +66,7 @@ void collapse_and_renormalize_(
             state[state1_index] = {0.0, 0.0};
         }
         else {
-            static_assert(ket::internal::always_false<void>::value, "Invalid integer provided for state collapse.");
+            static_assert(state_collapse_always_false<StateToCollapse>::value, "Invalid integer provided for state collapse.");
         }
     }
 }

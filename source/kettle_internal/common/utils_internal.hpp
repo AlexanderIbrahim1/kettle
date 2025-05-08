@@ -8,10 +8,6 @@
 namespace ket::internal
 {
 
-template <typename T>
-struct always_false : std::false_type
-{};
-
 template <ket::QubitIndices Container>
 auto get_container_index(const Container& container, std::size_t index) -> std::size_t;
 

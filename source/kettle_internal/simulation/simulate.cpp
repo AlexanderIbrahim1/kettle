@@ -1,12 +1,12 @@
 #include <optional>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -23,6 +23,14 @@ namespace ki = ket::internal;
 
 namespace
 {
+
+/*
+    Helper struct for the static_assert(), to see what ket::Gate instance is passed that causes
+    the template instantiation to fail.
+*/
+template <ket::Gate GateType>
+struct gate_always_false : std::false_type
+{};
 
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
@@ -77,7 +85,7 @@ void simulate_single_qubit_gate_(
             ki::apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(ki::always_false<void>::value, "Invalid single qubit gate");
+            static_assert(gate_always_false<GateType>::value, "Invalid single qubit gate");
         }
     }
 }
@@ -160,7 +168,7 @@ void simulate_double_qubit_gate_(
             ki::apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(ki::always_false<void>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
+            static_assert(gate_always_false<GateType>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
         }
     }
 }
