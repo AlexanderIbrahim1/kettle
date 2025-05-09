@@ -28,6 +28,22 @@ concept DiscreteDistribution = requires(T t, std::mt19937& prng)
     { t(prng) } -> std::integral;
 };
 
+/*
+    A concept to mimic 'std::uniform_int_distribution'; namely, the type must produces random
+    integers on the interval '[​0​, n)', where the probability of each individual integer 'i' is
+    equal.
+
+    This concept is useful for unit testing, where we might want to create rigged distributions
+    to produce certain outcomes.
+*/
+template <typename T>
+concept UniformIntDistribution = requires(T t, std::mt19937& prng)
+{
+    typename T::result_type;
+    T {0, 1};
+    { t(prng) } -> std::integral;
+};
+
 auto get_prng_(std::optional<int> seed) -> std::mt19937;
 
 }  // namespace ket::internal
