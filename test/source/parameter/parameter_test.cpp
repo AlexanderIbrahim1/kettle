@@ -5,7 +5,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "kettle_internal/parameter/parameter.hpp"
+#include "kettle/parameter/parameter.hpp"
+#include "kettle_internal/parameter/parameter_internal.hpp"
 
 
 template <std::uint8_t Output>
@@ -26,7 +27,7 @@ public:
 
 TEST_CASE("create parameter")
 {
-    const auto id = ket::create_parameter_id();
+    const auto id = ket::internal::create_parameter_id();
     const auto param = ket::Parameter {"theta", id};
 
     REQUIRE(param.name() == "theta");
@@ -38,7 +39,7 @@ TEST_CASE("create_parameter_id_helper()")
 {
     SECTION("returns all 0")
     {
-        const auto id = ket::create_parameter_id_helper<RiggedUniformIntDistribution<0>>();
+        const auto id = ket::internal::create_parameter_id_helper<RiggedUniformIntDistribution<0>>();
 
         auto expected = ket::ParameterID {};
         std::ranges::fill(expected, 0);
@@ -48,7 +49,7 @@ TEST_CASE("create_parameter_id_helper()")
 
     SECTION("returns all 10")
     {
-        const auto id = ket::create_parameter_id_helper<RiggedUniformIntDistribution<10>>();
+        const auto id = ket::internal::create_parameter_id_helper<RiggedUniformIntDistribution<10>>();
 
         auto expected = ket::ParameterID {};
         std::ranges::fill(expected, 10);

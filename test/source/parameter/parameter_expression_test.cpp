@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "kettle_internal/parameter/parameter.hpp"
+#include "kettle/parameter/parameter.hpp"
 #include "kettle_internal/parameter/parameter_expression.hpp"
 
 

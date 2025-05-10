@@ -5,7 +5,7 @@
 #include <variant>
 
 #include "kettle/common/clone_ptr.hpp"
-#include "kettle_internal/parameter/parameter.hpp"
+#include "kettle/parameter/parameter.hpp"
 
 namespace ket
 {
