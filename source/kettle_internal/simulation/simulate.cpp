@@ -35,7 +35,7 @@ struct gate_always_false : std::false_type
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
 template <ket::Gate GateType>
-void simulate_single_qubit_gate_(
+void simulate_one_target_gate_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
@@ -68,38 +68,52 @@ void simulate_single_qubit_gate_(
         else if constexpr (GateType == Gate::SX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::RX) {
-            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
-            ki::apply_rx_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::RY) {
-            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
-            ki::apply_ry_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::RZ) {
-            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
-            ki::apply_rz_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::P) {
-            [[maybe_unused]] const auto [ignore, theta] = cre::unpack_one_target_one_angle_gate(info);
-            ki::apply_p_gate(state, state1_index, theta);
-        }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid single qubit gate");
+            static_assert(gate_always_false<GateType>::value, "Invalid one target gate.");
         }
     }
 }
-// template void simulate_single_qubit_gate_<ket::Gate::H>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::X>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::Y>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::Z>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::SX>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::RX>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::RY>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::RZ>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_single_qubit_gate_<ket::Gate::P>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
 
-void simulate_single_qubit_gate_general_(
+
+template <ket::Gate GateType>
+void simulate_one_target_one_angle_gate_(
+    ket::QuantumState& state,
+    const ket::GateInfo& info,
+    const ki::FlatIndexPair& pair
+)
+{
+    namespace cre = ki::create;
+    using Gate = ket::Gate;
+
+    const auto [target_index, theta] = cre::unpack_one_target_one_angle_gate(info);
+    const auto n_qubits = state.n_qubits();
+
+    auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+    pair_iterator.set_state(pair.i_lower);
+
+    for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
+        const auto [state0_index, state1_index] = pair_iterator.next();
+
+        if constexpr (GateType == Gate::RX) {
+            ki::apply_rx_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::RY) {
+            ki::apply_ry_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::RZ) {
+            ki::apply_rz_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::P) {
+            ki::apply_p_gate(state, state1_index, theta);
+        }
+        else {
+            static_assert(gate_always_false<GateType>::value, "Invalid one target one angle gate.");
+        }
+    }
+}
+
+
+void simulate_u_gate_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
@@ -117,8 +131,9 @@ void simulate_single_qubit_gate_general_(
     }
 }
 
+
 template <ket::Gate GateType>
-void simulate_double_qubit_gate_(
+void simulate_one_control_one_target_gate_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
@@ -151,38 +166,52 @@ void simulate_double_qubit_gate_(
         else if constexpr (GateType == Gate::CSX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::CRX) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
-            ki::apply_rx_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::CRY) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
-            ki::apply_ry_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::CRZ) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
-            ki::apply_rz_gate(state, state0_index, state1_index, theta);
-        }
-        else if constexpr (GateType == Gate::CP) {
-            [[maybe_unused]] const auto [ignore0, ignore1, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
-            ki::apply_p_gate(state, state1_index, theta);
-        }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid double qubit gate: must be one of {CX, CRX}");
+            static_assert(gate_always_false<GateType>::value, "Invalid one control one target gate.");
         }
     }
 }
-// template void simulate_double_qubit_gate_<ket::Gate::CH>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CX>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CY>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CZ>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CSX>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CRX>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CRY>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CRZ>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
-// template void simulate_double_qubit_gate_<ket::Gate::CP>(ket::QuantumState&, const ket::GateInfo&, const ki::FlatIndexPair&);
 
-void simulate_double_qubit_gate_general_(
+
+template <ket::Gate GateType>
+void simulate_one_control_one_target_one_angle_gate_(
+    ket::QuantumState& state,
+    const ket::GateInfo& info,
+    const ki::FlatIndexPair& pair
+)
+{
+    namespace cre = ki::create;
+    using Gate = ket::Gate;
+
+    const auto [control_index, target_index, theta] = cre::unpack_one_control_one_target_one_angle_gate(info);
+    const auto n_qubits = state.n_qubits();
+
+    auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    pair_iterator.set_state(pair.i_lower);
+
+    for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
+        [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
+
+        if constexpr (GateType == Gate::CRX) {
+            ki::apply_rx_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CRY) {
+            ki::apply_ry_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CRZ) {
+            ki::apply_rz_gate(state, state0_index, state1_index, theta);
+        }
+        else if constexpr (GateType == Gate::CP) {
+            ki::apply_p_gate(state, state1_index, theta);
+        }
+        else {
+            static_assert(gate_always_false<GateType>::value, "Invalid one control one target one angle gate.");
+        }
+    }
+}
+
+
+void simulate_cu_gate_(
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
@@ -200,6 +229,7 @@ void simulate_double_qubit_gate_general_(
     }
 }
 
+
 void simulate_gate_info_(
     ket::QuantumState& state,
     const ki::FlatIndexPair& single_pair,
@@ -215,85 +245,85 @@ void simulate_gate_info_(
 
     switch (gate_info.gate) {
         case G::H : {
-            simulate_single_qubit_gate_<G::H>(state, gate_info, single_pair);
+            simulate_one_target_gate_<G::H>(state, gate_info, single_pair);
             break;
         }
         case G::X : {
-            simulate_single_qubit_gate_<G::X>(state, gate_info, single_pair);
+            simulate_one_target_gate_<G::X>(state, gate_info, single_pair);
             break;
         }
         case G::Y : {
-            simulate_single_qubit_gate_<G::Y>(state, gate_info, single_pair);
+            simulate_one_target_gate_<G::Y>(state, gate_info, single_pair);
             break;
         }
         case G::Z : {
-            simulate_single_qubit_gate_<G::Z>(state, gate_info, single_pair);
+            simulate_one_target_gate_<G::Z>(state, gate_info, single_pair);
             break;
         }
         case G::SX : {
-            simulate_single_qubit_gate_<G::SX>(state, gate_info, single_pair);
+            simulate_one_target_gate_<G::SX>(state, gate_info, single_pair);
             break;
         }
         case G::RX : {
-            simulate_single_qubit_gate_<G::RX>(state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RX>(state, gate_info, single_pair);
             break;
         }
         case G::RY : {
-            simulate_single_qubit_gate_<G::RY>(state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RY>(state, gate_info, single_pair);
             break;
         }
         case G::RZ : {
-            simulate_single_qubit_gate_<G::RZ>(state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RZ>(state, gate_info, single_pair);
             break;
         }
         case G::P : {
-            simulate_single_qubit_gate_<G::P>(state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::P>(state, gate_info, single_pair);
             break;
         }
         case G::CH : {
-            simulate_double_qubit_gate_<G::CH>(state, gate_info, double_pair);
+            simulate_one_control_one_target_gate_<G::CH>(state, gate_info, double_pair);
             break;
         }
         case G::CX : {
-            simulate_double_qubit_gate_<G::CX>(state, gate_info, double_pair);
+            simulate_one_control_one_target_gate_<G::CX>(state, gate_info, double_pair);
             break;
         }
         case G::CY : {
-            simulate_double_qubit_gate_<G::CY>(state, gate_info, double_pair);
+            simulate_one_control_one_target_gate_<G::CY>(state, gate_info, double_pair);
             break;
         }
         case G::CZ : {
-            simulate_double_qubit_gate_<G::CZ>(state, gate_info, double_pair);
+            simulate_one_control_one_target_gate_<G::CZ>(state, gate_info, double_pair);
             break;
         }
         case G::CSX : {
-            simulate_double_qubit_gate_<G::CSX>(state, gate_info, double_pair);
+            simulate_one_control_one_target_gate_<G::CSX>(state, gate_info, double_pair);
             break;
         }
         case G::CRX : {
-            simulate_double_qubit_gate_<G::CRX>(state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRX>(state, gate_info, double_pair);
             break;
         }
         case G::CRY : {
-            simulate_double_qubit_gate_<G::CRY>(state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRY>(state, gate_info, double_pair);
             break;
         }
         case G::CRZ : {
-            simulate_double_qubit_gate_<G::CRZ>(state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRZ>(state, gate_info, double_pair);
             break;
         }
         case G::CP : {
-            simulate_double_qubit_gate_<G::CP>(state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CP>(state, gate_info, double_pair);
             break;
         }
         case G::U : {
             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
-            simulate_single_qubit_gate_general_(state, gate_info, *unitary_ptr, single_pair);
+            simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair);
             break;
         }
         case G::CU : {
             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
-            simulate_double_qubit_gate_general_(state, gate_info, *unitary_ptr, double_pair);
+            simulate_cu_gate_(state, gate_info, *unitary_ptr, double_pair);
             break;
         }
         case G::M : {
