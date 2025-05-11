@@ -6,6 +6,7 @@
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/clone_ptr.hpp"
+#include "kettle/parameter/parameter_expression.hpp"
 
 namespace ket
 {
@@ -59,6 +60,7 @@ struct GateInfo
     std::size_t arg1;
     double arg2;
     ket::ClonePtr<Matrix2X2> unitary_ptr;
+    ket::ClonePtr<ket::param::ParameterExpression> param_expression_ptr;
 };
 
 }  // namespace ket
