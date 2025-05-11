@@ -7,7 +7,7 @@
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/parameter/parameter.hpp"
 
-namespace ket
+namespace ket::param
 {
 
 struct LiteralExpression;
@@ -53,10 +53,10 @@ struct Evaluator
     {
         switch (expr.operation)
         {
-            case ket::ParameterOperation::ADD : {
+            case ParameterOperation::ADD : {
                 return evaluate(*expr.left, param_map) + evaluate(*expr.right, param_map);
             }
-            case ket::ParameterOperation::MUL : {
+            case ParameterOperation::MUL : {
                 return evaluate(*expr.left, param_map) * evaluate(*expr.right, param_map);
             }
             default : {
@@ -73,4 +73,4 @@ struct Evaluator
 };
 
 
-}  // namespace ket
+}  // namespace ket::param

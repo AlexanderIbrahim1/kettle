@@ -5,107 +5,109 @@
 #include "kettle_internal/parameter/parameter_expression.hpp"
 
 
+namespace kp = ket::param;
+
 TEST_CASE("EvaluateExpression")
 {
-    const auto dummy_map = ket::Map {};
-    const auto dummy_map_variant = ket::MapVariant {std::reference_wrapper {dummy_map}};
+    const auto dummy_map = kp::Map {};
+    const auto dummy_map_variant = kp::MapVariant {std::reference_wrapper {dummy_map}};
 
     SECTION("a single literal")
     {
-        const auto expr = ket::LiteralExpression {1.5};
+        const auto expr = kp::LiteralExpression {1.5};
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
     SECTION("a single parameter")
     {
-        const auto parameter = ket::Parameter {"theta"};
-        const auto map = ket::Map { {parameter.id(), 1.5} };
-        const auto map_variant = ket::MapVariant {std::reference_wrapper {map}};
+        const auto parameter = kp::Parameter {"theta"};
+        const auto map = kp::Map { {parameter.id(), 1.5} };
+        const auto map_variant = kp::MapVariant {std::reference_wrapper {map}};
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(parameter, map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
     SECTION("addition between two literals")
     {
-        const auto expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::ADD,
-            .left=ket::ClonePtr {ket::Expression {ket::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {ket::Expression {ket::LiteralExpression {0.4}}}
+        const auto expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::ADD,
+            .left=ket::ClonePtr {kp::Expression {kp::LiteralExpression {1.1}}},
+            .right=ket::ClonePtr {kp::Expression {kp::LiteralExpression {0.4}}}
         };
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
     SECTION("addition between literal and parameter")
     {
-        const auto parameter = ket::Parameter {"theta"};
-        const auto map = ket::Map { {parameter.id(), 1.5} };
-        const auto map_variant = ket::MapVariant {std::reference_wrapper {map}};
+        const auto parameter = kp::Parameter {"theta"};
+        const auto map = kp::Map { {parameter.id(), 1.5} };
+        const auto map_variant = kp::MapVariant {std::reference_wrapper {map}};
 
-        const auto expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::ADD,
-            .left=ket::ClonePtr {ket::Expression {ket::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {ket::Expression {parameter}}
+        const auto expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::ADD,
+            .left=ket::ClonePtr {kp::Expression {kp::LiteralExpression {1.1}}},
+            .right=ket::ClonePtr {kp::Expression {parameter}}
         };
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel(2.6));
     }
 
     SECTION("addition between two parameters")
     {
-        const auto theta = ket::Parameter {"theta"};
-        const auto phi = ket::Parameter {"phi"};
-        const auto map = ket::Map { {theta.id(), 1.5}, {phi.id(), -0.4} };
-        const auto map_variant = ket::MapVariant {std::reference_wrapper {map}};
+        const auto theta = kp::Parameter {"theta"};
+        const auto phi = kp::Parameter {"phi"};
+        const auto map = kp::Map { {theta.id(), 1.5}, {phi.id(), -0.4} };
+        const auto map_variant = kp::MapVariant {std::reference_wrapper {map}};
 
-        const auto expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::ADD,
-            .left=ket::ClonePtr {ket::Expression {theta}},
-            .right=ket::ClonePtr {ket::Expression {phi}}
+        const auto expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::ADD,
+            .left=ket::ClonePtr {kp::Expression {theta}},
+            .right=ket::ClonePtr {kp::Expression {phi}}
         };
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel(1.1));
     }
 
     SECTION("multiplication between two literals")
     {
-        const auto expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::MUL,
-            .left=ket::ClonePtr {ket::Expression {ket::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {ket::Expression {ket::LiteralExpression {0.5}}}
+        const auto expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::MUL,
+            .left=ket::ClonePtr {kp::Expression {kp::LiteralExpression {1.1}}},
+            .right=ket::ClonePtr {kp::Expression {kp::LiteralExpression {0.5}}}
         };
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(0.55));
     }
 
     SECTION("multiply parameter and literal, then add literal")
     {
-        const auto theta = ket::Parameter {"theta"};
-        const auto map = ket::Map { {theta.id(), 1.5} };
-        const auto map_variant = ket::MapVariant {std::reference_wrapper {map}};
+        const auto theta = kp::Parameter {"theta"};
+        const auto map = kp::Map { {theta.id(), 1.5} };
+        const auto map_variant = kp::MapVariant {std::reference_wrapper {map}};
 
-        const auto left_expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::MUL,
-            .left=ket::ClonePtr {ket::Expression {theta}},
-            .right=ket::ClonePtr {ket::Expression {ket::LiteralExpression {0.5}}}
+        const auto left_expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::MUL,
+            .left=ket::ClonePtr {kp::Expression {theta}},
+            .right=ket::ClonePtr {kp::Expression {kp::LiteralExpression {0.5}}}
         };
 
-        const auto right_expr = ket::LiteralExpression {2.2};
+        const auto right_expr = kp::LiteralExpression {2.2};
 
-        const auto expr = ket::BinaryExpression {
-            .operation=ket::ParameterOperation::ADD,
-            .left=ket::ClonePtr {ket::Expression{left_expr}},
-            .right=ket::ClonePtr {ket::Expression{right_expr}}
+        const auto expr = kp::BinaryExpression {
+            .operation=kp::ParameterOperation::ADD,
+            .left=ket::ClonePtr {kp::Expression{left_expr}},
+            .right=ket::ClonePtr {kp::Expression{right_expr}}
         };
 
-        const auto evaluator = ket::Evaluator {};
+        const auto evaluator = kp::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel((1.5 * 0.5) + 2.2));
     }
 }

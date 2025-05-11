@@ -9,6 +9,7 @@
 #include "kettle/common/utils.hpp"
 #include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/circuit_element.hpp"
+// #include "kettle/parameter/parameter.hpp"
 
 
 namespace ket
@@ -103,6 +104,10 @@ public:
     void add_sx_gate(const Container& indices);
 
     void add_rx_gate(std::size_t target_index, double angle);
+
+//    void add_rx_gate(std::size_t target_index, parameterized key);
+//
+//    void add_rx_gate(std::size_t target_index, Parameter parameter);
 
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);

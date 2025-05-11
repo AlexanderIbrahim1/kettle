@@ -9,6 +9,10 @@
 #include "kettle_internal/parameter/parameter_internal.hpp"
 
 
+namespace kp = ket::param;
+namespace kpi = ket::param::internal;
+
+
 template <std::uint8_t Output>
 struct RiggedUniformIntDistribution
 {
@@ -27,8 +31,8 @@ public:
 
 TEST_CASE("create parameter")
 {
-    const auto id = ket::internal::create_parameter_id();
-    const auto param = ket::Parameter {"theta", id};
+    const auto id = kpi::create_parameter_id();
+    const auto param = kp::Parameter {"theta", id};
 
     REQUIRE(param.name() == "theta");
     REQUIRE(param.id() == id);
@@ -39,9 +43,9 @@ TEST_CASE("create_parameter_id_helper()")
 {
     SECTION("returns all 0")
     {
-        const auto id = ket::internal::create_parameter_id_helper<RiggedUniformIntDistribution<0>>();
+        const auto id = kpi::create_parameter_id_helper<RiggedUniformIntDistribution<0>>();
 
-        auto expected = ket::ParameterID {};
+        auto expected = kp::ParameterID {};
         std::ranges::fill(expected, 0);
 
         REQUIRE(id == expected);
@@ -49,9 +53,9 @@ TEST_CASE("create_parameter_id_helper()")
 
     SECTION("returns all 10")
     {
-        const auto id = ket::internal::create_parameter_id_helper<RiggedUniformIntDistribution<10>>();
+        const auto id = kpi::create_parameter_id_helper<RiggedUniformIntDistribution<10>>();
 
-        auto expected = ket::ParameterID {};
+        auto expected = kp::ParameterID {};
         std::ranges::fill(expected, 10);
 
         REQUIRE(id == expected);

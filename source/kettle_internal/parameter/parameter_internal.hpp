@@ -8,7 +8,7 @@
 #include "kettle_internal/common/prng.hpp"
 
 
-namespace ket::internal
+namespace ket::param::internal
 {
 
 template <ket::internal::UniformIntDistribution Distribution = std::uniform_int_distribution<std::uint8_t>>
@@ -28,4 +28,4 @@ auto create_parameter_id_helper(std::optional<int> seed = std::nullopt) -> Param
 
 auto create_parameter_id(std::optional<int> seed = std::nullopt) -> ParameterID;
 
-}  // namespace ket::internal
+}  // namespace ket::param::internal

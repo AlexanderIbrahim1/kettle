@@ -5,8 +5,18 @@
 #include <string>
 
 
-namespace ket
+namespace ket::param
 {
+
+/*
+    A tag type passed to member functions of `QuantumCircuit` that create parameterized
+    gates (RX, RY, CRX, etc.). Passing this tag indicates that the gate should be parameterized,
+    and that a new `Parameter` instance is created.
+*/
+struct parameterized
+{
+    explicit parameterized() = default;
+};
 
 constexpr inline auto PARAMETER_ID_SIZE = std::size_t {16};
 
@@ -38,4 +48,4 @@ private:
     ParameterID id_;
 };
 
-}  // namespace ket
+}  // namespace ket::param
