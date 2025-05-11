@@ -2,10 +2,12 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/parameter/parameter.hpp"
-#include "kettle_internal/parameter/parameter_expression.hpp"
+#include "kettle/parameter/parameter_expression.hpp"
+#include "kettle_internal/parameter/parameter_expression_internal.hpp"
 
 
 namespace kp = ket::param;
+namespace kpi = ket::param::internal;
 
 TEST_CASE("EvaluateExpression")
 {
@@ -16,7 +18,7 @@ TEST_CASE("EvaluateExpression")
     {
         const auto expr = kp::LiteralExpression {1.5};
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
@@ -26,7 +28,7 @@ TEST_CASE("EvaluateExpression")
         const auto map = kp::Map { {parameter.id(), 1.5} };
         const auto map_variant = kp::MapVariant {std::reference_wrapper {map}};
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(parameter, map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
@@ -38,7 +40,7 @@ TEST_CASE("EvaluateExpression")
             .right=ket::ClonePtr {kp::Expression {kp::LiteralExpression {0.4}}}
         };
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(1.5));
     }
 
@@ -54,7 +56,7 @@ TEST_CASE("EvaluateExpression")
             .right=ket::ClonePtr {kp::Expression {parameter}}
         };
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel(2.6));
     }
 
@@ -71,7 +73,7 @@ TEST_CASE("EvaluateExpression")
             .right=ket::ClonePtr {kp::Expression {phi}}
         };
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel(1.1));
     }
 
@@ -83,7 +85,7 @@ TEST_CASE("EvaluateExpression")
             .right=ket::ClonePtr {kp::Expression {kp::LiteralExpression {0.5}}}
         };
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, dummy_map_variant), Catch::Matchers::WithinRel(0.55));
     }
 
@@ -107,7 +109,7 @@ TEST_CASE("EvaluateExpression")
             .right=ket::ClonePtr {kp::Expression{right_expr}}
         };
 
-        const auto evaluator = kp::Evaluator {};
+        const auto evaluator = kpi::Evaluator {};
         REQUIRE_THAT(evaluator.evaluate(expr, map_variant), Catch::Matchers::WithinRel((1.5 * 0.5) + 2.2));
     }
 }
