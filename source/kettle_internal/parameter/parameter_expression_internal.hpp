@@ -1,10 +1,15 @@
 #pragma once
 
+#include <map>
+
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/parameter/parameter_expression.hpp"
 
 namespace ket::param::internal
 {
+
+using Map = std::map<ParameterID, double>;
+using MapVariant = std::variant<std::reference_wrapper<const Map>>;
 
 struct Evaluator
 {
@@ -15,7 +20,7 @@ struct Evaluator
     auto operator()(const BinaryExpression& expr, const MapVariant& param_map) const -> double;
 
     [[nodiscard]]
-    auto evaluate(const Expression& expr, const MapVariant& param_map) const -> double;
+    auto evaluate(const ParameterExpression& expr, const MapVariant& param_map) const -> double;
 };
 
 

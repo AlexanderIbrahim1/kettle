@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <variant>
 
 #include "kettle/common/clone_ptr.hpp"
@@ -9,19 +8,16 @@
 namespace ket::param
 {
 
-struct LiteralExpression;
-struct BinaryExpression;
-
-using Expression = std::variant<Parameter, LiteralExpression, BinaryExpression>;
-using ExpressionHandle = ClonePtr<Expression>;
-using Map = std::map<ParameterID, double>;
-using MapVariant = std::variant<std::reference_wrapper<const Map>>;
-
-enum class ParameterOperation : std::uint8_t
+enum class BinaryOperation : std::uint8_t
 {
     ADD,
     MUL
 };
+
+struct LiteralExpression;
+struct BinaryExpression;
+
+using ParameterExpression = std::variant<Parameter, LiteralExpression, BinaryExpression>;
 
 struct LiteralExpression
 {
@@ -30,9 +26,9 @@ struct LiteralExpression
 
 struct BinaryExpression
 {
-    ParameterOperation operation;
-    ExpressionHandle left;
-    ExpressionHandle right;
+    BinaryOperation operation;
+    ClonePtr<ParameterExpression> left;
+    ClonePtr<ParameterExpression> right;
 };
 
 }  // namespace ket::param

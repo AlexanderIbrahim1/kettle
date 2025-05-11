@@ -1,4 +1,3 @@
-#include <map>
 #include <stdexcept>
 #include <variant>
 
@@ -24,10 +23,10 @@ auto Evaluator::operator()(const BinaryExpression& expr, const MapVariant& param
 {
     switch (expr.operation)
     {
-        case ParameterOperation::ADD : {
+        case BinaryOperation::ADD : {
             return evaluate(*expr.left, param_map) + evaluate(*expr.right, param_map);
         }
-        case ParameterOperation::MUL : {
+        case BinaryOperation::MUL : {
             return evaluate(*expr.left, param_map) * evaluate(*expr.right, param_map);
         }
         default : {
@@ -37,7 +36,7 @@ auto Evaluator::operator()(const BinaryExpression& expr, const MapVariant& param
 }
 
 [[nodiscard]]
-auto Evaluator::evaluate(const Expression& expr, const MapVariant& param_map) const -> double
+auto Evaluator::evaluate(const ParameterExpression& expr, const MapVariant& param_map) const -> double
 {
     return std::visit(*this, expr, param_map);
 }
