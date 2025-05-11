@@ -6,6 +6,7 @@
 
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/parameter/parameter_expression.hpp"
 
 #include "kettle/gates/primitive_gate.hpp"
 
@@ -32,6 +33,16 @@ auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t target_index, 
     Returns the `{target_qubit, angle}` of a single-qubit gate with an angle parameter.
 */
 auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, double>;
+
+/*
+    Create a single-qubit gate with a parameterized angle.
+*/
+auto create_one_target_one_parameter_gate(ket::Gate gate, std::size_t target_index, ket::param::ParameterExpression param_expression) -> ket::GateInfo;
+
+/*
+    Returns the `{target_qubit, param_expression_ptr}` of a single-qubit gate with an angle parameter.
+*/
+auto unpack_one_target_one_parameter_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
 
 /*
     Create a controlled gate with no parameters.
