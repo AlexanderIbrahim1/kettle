@@ -21,6 +21,16 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
 
+// TODO: certain groups of gates share a lot of similar code:
+//   - H, X, Y, Z, SX
+//   - CH, CX, CY, CZ, CSX
+//   - RX, RY, RZ, P
+//   - CRX, CRY, CRZ, CP
+// + the only differences seem to be:
+//   - which `Gate::???` is used, and which gate name is used
+//   - which gate string name is used for the error message
+//     - and I think this one can be found from the primitive gate map on its own!
+
 namespace
 {
 
@@ -155,14 +165,32 @@ auto QuantumCircuit::add_rx_gate(
     auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
     auto id = parameter.id();
 
-    parameter_values_[parameter.id()] = initial_angle;
     ++parameter_count_;
+    parameter_values_[id] = initial_angle;
+    parameter_data_[id] = ParameterData {.count=parameter_count_, .name=parameter.name()};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 
     elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
 
     return id;
+}
+
+// TODO: add unit test for this
+void QuantumCircuit::add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id)
+{
+    check_qubit_range_(target_index, "qubit", "RX");
+
+    if (!parameter_values_.contains(id)) {
+        throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
+    }
+
+    const auto& data = parameter_data_.at(id);
+
+    auto parameter = ket::param::Parameter {data.name, id};
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
 }
 
 template <QubitIndicesAndAngles Container>

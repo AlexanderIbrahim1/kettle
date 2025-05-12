@@ -16,6 +16,12 @@
 namespace ket
 {
 
+struct ParameterData
+{
+    std::size_t count;
+    std::string name;
+};
+
 class QuantumCircuit
 {
 public:
@@ -119,6 +125,8 @@ public:
     void add_rx_gate(std::size_t target_index, double angle);
 
     auto add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+
+    void add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id);
 
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);
@@ -273,6 +281,7 @@ private:
     std::size_t n_bits_;
     std::vector<CircuitElement> elements_;
     std::unordered_map<ket::param::ParameterID, double, param::ParameterIdHash> parameter_values_;
+    std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash> parameter_data_;
     std::size_t parameter_count_ {0};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const;
