@@ -35,4 +35,15 @@ Parameter::Parameter(std::string name)
     , id_ {ket::param::internal::create_parameter_id()}
 {}
 
+auto ParameterIdHash::operator()(const ParameterID& id) const noexcept -> std::size_t
+{
+    auto output = std::size_t {0};
+
+    for (const auto byte : id) {
+        output = (output * 31) ^ byte;
+    }
+
+    return output;
+}
+
 }  // namespace ket::param

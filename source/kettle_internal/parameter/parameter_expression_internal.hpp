@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/parameter/parameter_expression.hpp"
@@ -8,7 +8,7 @@
 namespace ket::param::internal
 {
 
-using Map = std::map<ParameterID, double>;
+using Map = std::unordered_map<ParameterID, double, ParameterIdHash>;
 using MapVariant = std::variant<std::reference_wrapper<const Map>>;
 
 struct Evaluator

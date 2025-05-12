@@ -64,6 +64,17 @@ auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t co
 */
 auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, double>;
 
+auto create_one_control_one_target_one_parameter_gate(
+    ket::Gate gate,
+    std::size_t control_index,
+    std::size_t target_index,
+    ket::param::ParameterExpression param_expression
+) -> ket::GateInfo;
+
+auto unpack_one_control_one_target_one_parameter_gate(
+    const ket::GateInfo& info
+) -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
+
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.
 */

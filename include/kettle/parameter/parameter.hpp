@@ -48,4 +48,9 @@ private:
     ParameterID id_;
 };
 
+struct ParameterIdHash
+{
+    auto operator()(const ParameterID& id) const noexcept -> std::size_t;
+};
+
 }  // namespace ket::param

@@ -11,6 +11,7 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 
+// TODO: get rid of the comments here, and update the comments in the corresponding header file
 
 namespace ket::internal::create
 {
@@ -133,6 +134,33 @@ auto unpack_one_control_one_target_one_angle_gate(const ket::GateInfo& info) -> 
 {
     return {info.arg0, info.arg1, info.arg2};  // control index, target index, angle
 }
+
+auto create_one_control_one_target_one_parameter_gate(
+    ket::Gate gate,
+    std::size_t control_index,
+    std::size_t target_index,
+    ket::param::ParameterExpression param_expression
+) -> ket::GateInfo
+{
+    if (!gate_id::is_one_control_one_target_one_angle_transform_gate(gate)) {
+        throw std::runtime_error {"DEV ERROR: invalid one-control-one-target-one-angle gate provided.\n"};
+    }
+
+    return {
+        .gate=gate,
+        .arg0=control_index,
+        .arg1=target_index,
+        .arg2=DUMMY_ARG2,
+        .unitary_ptr=DUMMY_ARG3,
+        .param_expression_ptr=ket::ClonePtr {std::move(param_expression)}
+    };
+}
+
+auto unpack_one_control_one_target_one_parameter_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>
+{
+    return {info.arg0, info.arg1, info.param_expression_ptr};  // control index, target index, param_expression_ptr
+}
+
 
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.

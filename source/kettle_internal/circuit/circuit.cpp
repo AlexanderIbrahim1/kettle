@@ -2,8 +2,10 @@
 #include <memory>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
+#include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
 #include "kettle/circuit_loggers/statevector_circuit_logger.hpp"
@@ -11,11 +13,27 @@
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/circuit/control_flow.hpp"
+#include "kettle/parameter/parameter.hpp"
+#include "kettle/parameter/parameter_expression.hpp"
 
 #include "kettle/circuit/circuit.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+
+
+namespace
+{
+
+auto default_parameter_name_(std::size_t param_number) -> std::string
+{
+    auto output = std::stringstream {};
+    output << "theta" << param_number;
+
+    return output.str();
+}
+
+}  // namespace
+
 
 namespace ket
 {
@@ -115,6 +133,19 @@ void QuantumCircuit::add_rx_gate(std::size_t target_index, double angle)
 {
     check_qubit_range_(target_index, "qubit", "RX");
     elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::RX, target_index, angle));
+}
+
+void QuantumCircuit::add_rx_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+{
+    check_qubit_range_(target_index, "qubit", "RX");
+
+    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
+    parameter_values_[parameter.id()] = initial_angle;
+    ++parameter_count_;
+
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
 }
 
 template <QubitIndicesAndAngles Container>

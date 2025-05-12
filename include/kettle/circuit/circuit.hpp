@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iterator>
+#include <unordered_map>
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
@@ -9,7 +10,7 @@
 #include "kettle/common/utils.hpp"
 #include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/circuit_element.hpp"
-// #include "kettle/parameter/parameter.hpp"
+#include "kettle/parameter/parameter.hpp"
 
 
 namespace ket
@@ -18,12 +19,12 @@ namespace ket
 class QuantumCircuit
 {
 public:
-    explicit constexpr QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
+    explicit QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_bits}
     {}
 
-    explicit constexpr QuantumCircuit(std::size_t n_qubits)
+    explicit QuantumCircuit(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_qubits}
     {}
@@ -72,6 +73,12 @@ public:
         return elements_;
     }
 
+    [[nodiscard]]
+    constexpr auto parameter_values_map() const noexcept -> const std::unordered_map<ket::param::ParameterID, double, param::ParameterIdHash>&
+    {
+        return parameter_values_;
+    }
+
     /*
         Add an H gate that acts on the qubit at `target_index`.
     */
@@ -105,9 +112,7 @@ public:
 
     void add_rx_gate(std::size_t target_index, double angle);
 
-//    void add_rx_gate(std::size_t target_index, parameterized key);
-//
-//    void add_rx_gate(std::size_t target_index, Parameter parameter);
+    void add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key);
 
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);
@@ -261,6 +266,8 @@ private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
     std::vector<CircuitElement> elements_;
+    std::unordered_map<ket::param::ParameterID, double, param::ParameterIdHash> parameter_values_;
+    std::size_t parameter_count_ {0};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const;
 
