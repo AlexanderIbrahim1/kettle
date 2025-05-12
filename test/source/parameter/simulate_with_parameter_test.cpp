@@ -102,3 +102,29 @@ TEST_CASE("throw if no parameter id found")
         REQUIRE_THROWS_AS(circuit.set_parameter_value(param.id(), 1.2345), std::out_of_range);
     }
 }
+
+
+TEST_CASE("simulate with two identical parameters")
+{
+    const auto angle = 1.2345 * M_PI;
+
+    // create a circuit with two RX gates with a fixed angle, and propagate a statevector through it
+    auto circuit0 = ket::QuantumCircuit {1};
+    circuit0.add_rx_gate(0, angle);
+    circuit0.add_rx_gate(0, angle);
+
+    auto statevector0 = ket::QuantumState {"0"};
+    ket::simulate(circuit0, statevector0);
+
+    // create a circuit with two RX gates with a parameterized angle, and propagate a statevector through it
+    auto circuit1 = ket::QuantumCircuit {1};
+    const auto id = circuit1.add_rx_gate(0, angle, ket::param::parameterized {});
+    circuit1.add_rx_gate(0, id);
+
+    auto statevector1 = ket::QuantumState {"0"};
+    ket::simulate(circuit1, statevector1);
+
+    REQUIRE(ket::almost_eq(statevector0, statevector1));
+    REQUIRE(circuit1.parameter_values_map().size() == 1);
+    REQUIRE(circuit1.parameter_data_map().at(id).count == 2);
+}

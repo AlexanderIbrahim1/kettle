@@ -85,6 +85,12 @@ public:
         return parameter_values_;
     }
 
+    [[nodiscard]]
+    constexpr auto parameter_data_map() const noexcept -> const std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash>&
+    {
+        return parameter_data_;
+    }
+
     /*
         Takes the `id` of a parameter that is already present in the `QuantumCircuit`, and sets
         its value to `angle`.

@@ -596,7 +596,7 @@ auto QuantumCircuit::add_one_target_one_parameter_gate_new_(
 
     ++parameter_count_;
     parameter_values_[id] = initial_angle;
-    parameter_data_[id] = ParameterData {.count=parameter_count_, .name=parameter.name()};
+    parameter_data_[id] = ParameterData {.count=1, .name=parameter.name()};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 
@@ -618,10 +618,11 @@ void QuantumCircuit::add_one_target_one_parameter_gate_existing_(
         throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
     }
 
-    const auto& data = parameter_data_.at(id);
+    auto& data = parameter_data_.at(id);
 
     auto parameter = ket::param::Parameter {data.name, id};
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
+    ++data.count;
 
     elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
 }
