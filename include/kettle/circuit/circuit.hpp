@@ -7,6 +7,7 @@
 
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/common/tolerance.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/circuit_element.hpp"
@@ -132,6 +133,9 @@ public:
 
     auto add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
 
+    // TODO: add member function that allows you to add an ID without an existing value attached to it
+    // - this will be needed for parameterized subcircuits
+    // - because the angle will be held in the parent circuit!
     void add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id);
 
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
@@ -227,7 +231,11 @@ public:
         This function takes a custom `ControlFlowPredicate` instance, and if it evaluates to `true`
         for the current classical register, then `subcircuit` executed.
     */
-    void add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit);
+    void add_if_statement(
+        ControlFlowPredicate predicate,
+        QuantumCircuit circuit,
+        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     /*
         Add a classical if statement to the `QuantumCircuit`.
@@ -235,7 +243,11 @@ public:
         This statement reads the value of the measured classical bit in the classical register
         given by `bit_index`, and if it is set to `1`, executes `subcircuit`.
     */
-    void add_if_statement(std::size_t bit_index, QuantumCircuit subcircuit);
+    void add_if_statement(
+        std::size_t bit_index,
+        QuantumCircuit subcircuit//,
+//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     /*
         Add a classical if statement to the `QuantumCircuit`.
@@ -243,7 +255,11 @@ public:
         This statement reads the value of the measured classical bit in the classical register
         given by `bit_index`, and if it is set to `0`, executes `subcircuit`.
     */
-    void add_if_not_statement(std::size_t bit_index, QuantumCircuit subcircuit);
+    void add_if_not_statement(
+        std::size_t bit_index,
+        QuantumCircuit subcircuit//,
+//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     /*
         Add a classical if-else statement to the `QuantumCircuit`.
@@ -252,7 +268,12 @@ public:
         for the current classical register, then `if_subcircuit` is executed, and if it evaluates
         to `false`, then `else_subcircuit` is executed.
     */
-    void add_if_else_statement(ControlFlowPredicate predicate, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit);
+    void add_if_else_statement(
+        ControlFlowPredicate predicate,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit//,
+//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     /*
         Add a classical if-else statement to the `QuantumCircuit`.
@@ -261,7 +282,12 @@ public:
         given by `bit_index`; if the classical bit is `1`, then `if_subcircuit` is executed, and
         if the classical bit is `0`, then `else_subcircuit` is executed.
     */
-    void add_if_else_statement(std::size_t bit_index, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit);
+    void add_if_else_statement(
+        std::size_t bit_index,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit//,
+//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     /*
         Add a classical if-else statement to the `QuantumCircuit`.
@@ -270,7 +296,12 @@ public:
         given by `bit_index`; if the classical bit is `0`, then `if_subcircuit` is executed, and
         if the classical bit is `1`, then `else_subcircuit` is executed.
     */
-    void add_if_not_else_statement(std::size_t bit_index, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit);
+    void add_if_not_else_statement(
+        std::size_t bit_index,
+        QuantumCircuit if_subcircuit,
+        QuantumCircuit else_subcircuit//,
+//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+    );
 
     void add_classical_register_circuit_logger();
 
@@ -311,6 +342,8 @@ private:
         Gate gate,
         const ket::param::ParameterID& id
     );
+
+    void merge_subcircuit_parameters_(const QuantumCircuit& subcircuit, double tolerance);
 };
 
 }  // namespace ket

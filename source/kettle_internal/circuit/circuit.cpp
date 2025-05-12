@@ -422,11 +422,17 @@ void QuantumCircuit::add_m_gate(const Container& pairs)
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesVector>(const QubitAndBitIndicesVector& indices);
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesIList>(const QubitAndBitIndicesIList& indices);
 
-void QuantumCircuit::add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit)
+void QuantumCircuit::add_if_statement(
+    ControlFlowPredicate predicate,
+    QuantumCircuit circuit,
+    double tolerance
+)
 {
     for (auto bit_index : predicate.bit_indices_to_check()) {
         check_bit_range_(bit_index);
     }
+
+    merge_subcircuit_parameters_(circuit, tolerance);
 
     auto cfi = ClassicalIfStatement {
         std::move(predicate),
@@ -625,6 +631,43 @@ void QuantumCircuit::add_one_target_one_parameter_gate_existing_(
     ++data.count;
 
     elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+}
+
+void QuantumCircuit::merge_subcircuit_parameters_(
+    const QuantumCircuit& subcircuit,
+    double tolerance
+)
+{
+    // TODO: currently if the names of the parameters do not match, then no exception is thrown,
+    // and the name of the parent circuit takes precedence;
+    // 
+    // maybe this behaviour should change in the future?
+    for (const auto& sub_id_angle_pair : subcircuit.parameter_values_)
+    {
+        [[maybe_unused]]
+        auto [insert_it, is_inserted] = parameter_values_.insert(sub_id_angle_pair);
+
+        if (!is_inserted) {
+            if (std::fabs(insert_it->second - sub_id_angle_pair.second) > tolerance) {
+                throw std::runtime_error {
+                    "ERROR: found same parameter in if-statement subcircuit with different value!\n"
+                };
+            }
+
+            const auto& id = sub_id_angle_pair.first;
+            const auto count_in_sub = subcircuit.parameter_data_.at(id).count;
+            parameter_data_.at(id).count += count_in_sub;
+        }
+        else {
+            const auto& id = sub_id_angle_pair.first;
+            if (parameter_data_.contains(id)) {
+                throw std::runtime_error {
+                    "ERROR: found same parameter in if-statement subcircuit with different value!\n"
+                };
+            }
+            parameter_data_[id] = subcircuit.parameter_data_.at(id);
+        }
+    }
 }
 
 }  // namespace ket

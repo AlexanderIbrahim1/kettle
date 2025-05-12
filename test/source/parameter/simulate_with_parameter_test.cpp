@@ -7,6 +7,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
@@ -127,4 +128,27 @@ TEST_CASE("simulate with two identical parameters")
     REQUIRE(ket::almost_eq(statevector0, statevector1));
     REQUIRE(circuit1.parameter_values_map().size() == 1);
     REQUIRE(circuit1.parameter_data_map().at(id).count == 2);
+}
+
+
+TEST_CASE("parameters of control flow subcircuits")
+{
+    const auto angle = 1.2345 * M_PI;
+
+    auto circuit = ket::QuantumCircuit {2};
+    const auto param_id0 = circuit.add_rx_gate(0, angle, ket::param::parameterized {});
+    circuit.add_m_gate(0);
+
+    auto subcircuit = ket::QuantumCircuit {2};
+    const auto param_id1 = subcircuit.add_rx_gate(1, angle, ket::param::parameterized {});
+
+    circuit.add_if_statement(
+        ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
+        std::move(subcircuit)
+    );
+
+    REQUIRE(circuit.parameter_values_map().contains(param_id0));
+    REQUIRE(circuit.parameter_data_map().contains(param_id0));
+    REQUIRE(circuit.parameter_values_map().contains(param_id1));
+    REQUIRE(circuit.parameter_data_map().contains(param_id1));
 }
