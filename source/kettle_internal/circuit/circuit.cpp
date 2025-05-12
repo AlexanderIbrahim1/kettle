@@ -19,17 +19,17 @@
 #include "kettle/circuit/circuit.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
 
-
-// TODO: certain groups of gates share a lot of similar code:
-//   - H, X, Y, Z, SX
-//   - CH, CX, CY, CZ, CSX
-//   - RX, RY, RZ, P
-//   - CRX, CRY, CRZ, CP
-// + the only differences seem to be:
-//   - which `Gate::???` is used, and which gate name is used
-//   - which gate string name is used for the error message
-//     - and I think this one can be found from the primitive gate map on its own!
+// NOTE:
+// - there is the potential for a lot of code reduction here
+//   - for example, all the `add_h_gate()` and `add_x_gate()` member functions only
+//     differ by the function name and the `Gate::???` value used in the function
+// - I've tried to find a nicer modern C++ way to reduce the amount of code
+// - but it looks like macros would reduce the amount of code the most
+//
+// - however, I'm very hesitant to use macros
+//   - I'll tolerate the code duplication for now
 
 namespace
 {
@@ -70,8 +70,7 @@ void QuantumCircuit::pop_back()
 
 void QuantumCircuit::add_h_gate(std::size_t target_index)
 {
-    check_qubit_range_(target_index, "qubit", "H");
-    elements_.emplace_back(create::create_one_target_gate(Gate::H, target_index));
+    add_one_target_gate_(target_index, Gate::H);
 }
 
 template <QubitIndices Container>
@@ -86,8 +85,7 @@ template void QuantumCircuit::add_h_gate<QubitIndicesIList>(const QubitIndicesIL
 
 void QuantumCircuit::add_x_gate(std::size_t target_index)
 {
-    check_qubit_range_(target_index, "qubit", "X");
-    elements_.emplace_back(create::create_one_target_gate(Gate::X, target_index));
+    add_one_target_gate_(target_index, Gate::X);
 }
 
 template <QubitIndices Container>
@@ -102,8 +100,7 @@ template void QuantumCircuit::add_x_gate<QubitIndicesIList>(const QubitIndicesIL
 
 void QuantumCircuit::add_y_gate(std::size_t target_index)
 {
-    check_qubit_range_(target_index, "qubit", "Y");
-    elements_.emplace_back(create::create_one_target_gate(Gate::Y, target_index));
+    add_one_target_gate_(target_index, Gate::Y);
 }
 
 template <QubitIndices Container>
@@ -118,8 +115,7 @@ template void QuantumCircuit::add_y_gate<QubitIndicesIList>(const QubitIndicesIL
 
 void QuantumCircuit::add_z_gate(std::size_t target_index)
 {
-    check_qubit_range_(target_index, "qubit", "Z");
-    elements_.emplace_back(create::create_one_target_gate(Gate::Z, target_index));
+    add_one_target_gate_(target_index, Gate::Z);
 }
 
 template <QubitIndices Container>
@@ -134,8 +130,7 @@ template void QuantumCircuit::add_z_gate<QubitIndicesIList>(const QubitIndicesIL
 
 void QuantumCircuit::add_sx_gate(std::size_t target_index)
 {
-    check_qubit_range_(target_index, "qubit", "SX");
-    elements_.emplace_back(create::create_one_target_gate(Gate::SX, target_index));
+    add_one_target_gate_(target_index, Gate::SX);
 }
 
 template <QubitIndices Container>
@@ -150,8 +145,7 @@ template void QuantumCircuit::add_sx_gate<QubitIndicesIList>(const QubitIndicesI
 
 void QuantumCircuit::add_rx_gate(std::size_t target_index, double angle)
 {
-    check_qubit_range_(target_index, "qubit", "RX");
-    elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::RX, target_index, angle));
+    add_one_target_one_angle_gate_(target_index, angle, Gate::RX);
 }
 
 auto QuantumCircuit::add_rx_gate(
@@ -160,37 +154,13 @@ auto QuantumCircuit::add_rx_gate(
     [[maybe_unused]] ket::param::parameterized key
 ) -> ket::param::ParameterID
 {
-    check_qubit_range_(target_index, "qubit", "RX");
-
-    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
-    auto id = parameter.id();
-
-    ++parameter_count_;
-    parameter_values_[id] = initial_angle;
-    parameter_data_[id] = ParameterData {.count=parameter_count_, .name=parameter.name()};
-
-    auto expression = ket::param::ParameterExpression {std::move(parameter)};
-
-    elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
-
-    return id;
+    return add_one_target_one_parameter_gate_new_(target_index, initial_angle, Gate::RX, key);
 }
 
 // TODO: add unit test for this
 void QuantumCircuit::add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id)
 {
-    check_qubit_range_(target_index, "qubit", "RX");
-
-    if (!parameter_values_.contains(id)) {
-        throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
-    }
-
-    const auto& data = parameter_data_.at(id);
-
-    auto parameter = ket::param::Parameter {data.name, id};
-    auto expression = ket::param::ParameterExpression {std::move(parameter)};
-
-    elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
+    add_one_target_one_parameter_gate_existing_(target_index, Gate::RX, id);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -205,8 +175,7 @@ template void QuantumCircuit::add_rx_gate<QubitIndicesAndAnglesIList>(const Qubi
 
 void QuantumCircuit::add_ry_gate(std::size_t target_index, double angle)
 {
-    check_qubit_range_(target_index, "qubit", "RY");
-    elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::RY, target_index, angle));
+    add_one_target_one_angle_gate_(target_index, angle, Gate::RY);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -221,8 +190,7 @@ template void QuantumCircuit::add_ry_gate<QubitIndicesAndAnglesIList>(const Qubi
 
 void QuantumCircuit::add_rz_gate(std::size_t target_index, double angle)
 {
-    check_qubit_range_(target_index, "qubit", "RZ");
-    elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::RZ, target_index, angle));
+    add_one_target_one_angle_gate_(target_index, angle, Gate::RZ);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -237,8 +205,7 @@ template void QuantumCircuit::add_rz_gate<QubitIndicesAndAnglesIList>(const Qubi
 
 void QuantumCircuit::add_p_gate(std::size_t target_index, double angle)
 {
-    check_qubit_range_(target_index, "qubit", "P");
-    elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::P, target_index, angle));
+    add_one_target_one_angle_gate_(target_index, angle, Gate::P);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -253,9 +220,7 @@ template void QuantumCircuit::add_p_gate<QubitIndicesAndAnglesIList>(const Qubit
 
 void QuantumCircuit::add_ch_gate(std::size_t control_index, std::size_t target_index)
 {
-    check_qubit_range_(control_index, "control qubit", "CH");
-    check_qubit_range_(target_index, "target qubit", "CH");
-    elements_.emplace_back(create::create_one_control_one_target_gate(Gate::CH, control_index, target_index));
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CH);
 }
 
 template <ControlAndTargetIndices Container>
@@ -270,9 +235,7 @@ template void QuantumCircuit::add_ch_gate<ControlAndTargetIndicesIList>(const Co
 
 void QuantumCircuit::add_cx_gate(std::size_t control_index, std::size_t target_index)
 {
-    check_qubit_range_(control_index, "control qubit", "CX");
-    check_qubit_range_(target_index, "target qubit", "CX");
-    elements_.emplace_back(create::create_one_control_one_target_gate(Gate::CX, control_index, target_index));
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CX);
 }
 
 template <ControlAndTargetIndices Container>
@@ -287,9 +250,7 @@ template void QuantumCircuit::add_cx_gate<ControlAndTargetIndicesIList>(const Co
 
 void QuantumCircuit::add_cy_gate(std::size_t control_index, std::size_t target_index)
 {
-    check_qubit_range_(control_index, "control qubit", "CY");
-    check_qubit_range_(target_index, "target qubit", "CY");
-    elements_.emplace_back(create::create_one_control_one_target_gate(Gate::CY, control_index, target_index));
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CY);
 }
 
 template <ControlAndTargetIndices Container>
@@ -304,9 +265,7 @@ template void QuantumCircuit::add_cy_gate<ControlAndTargetIndicesIList>(const Co
 
 void QuantumCircuit::add_cz_gate(std::size_t control_index, std::size_t target_index)
 {
-    check_qubit_range_(control_index, "control qubit", "CZ");
-    check_qubit_range_(target_index, "target qubit", "CZ");
-    elements_.emplace_back(create::create_one_control_one_target_gate(Gate::CZ, control_index, target_index));
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CZ);
 }
 
 template <ControlAndTargetIndices Container>
@@ -321,9 +280,7 @@ template void QuantumCircuit::add_cz_gate<ControlAndTargetIndicesIList>(const Co
 
 void QuantumCircuit::add_csx_gate(std::size_t control_index, std::size_t target_index)
 {
-    check_qubit_range_(control_index, "control qubit", "CSX");
-    check_qubit_range_(target_index, "target qubit", "CSX");
-    elements_.emplace_back(create::create_one_control_one_target_gate(Gate::CSX, control_index, target_index));
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CSX);
 }
 
 template <ControlAndTargetIndices Container>
@@ -338,9 +295,7 @@ template void QuantumCircuit::add_csx_gate<ControlAndTargetIndicesIList>(const C
 
 void QuantumCircuit::add_crx_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
-    check_qubit_range_(control_index, "control qubit", "CRX");
-    check_qubit_range_(target_index, "target qubit", "CRX");
-    elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(Gate::CRX, control_index, target_index, angle));
+    add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRX);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -355,9 +310,7 @@ template void QuantumCircuit::add_crx_gate<ControlAndTargetIndicesAndAnglesIList
 
 void QuantumCircuit::add_cry_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
-    check_qubit_range_(control_index, "control qubit", "CRY");
-    check_qubit_range_(target_index, "target qubit", "CRY");
-    elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(Gate::CRY, control_index, target_index, angle));
+    add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRY);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -372,9 +325,7 @@ template void QuantumCircuit::add_cry_gate<ControlAndTargetIndicesAndAnglesIList
 
 void QuantumCircuit::add_crz_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
-    check_qubit_range_(control_index, "control qubit", "CRZ");
-    check_qubit_range_(target_index, "target qubit", "CRZ");
-    elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(Gate::CRZ, control_index, target_index, angle));
+    add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRZ);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -389,9 +340,7 @@ template void QuantumCircuit::add_crz_gate<ControlAndTargetIndicesAndAnglesIList
 
 void QuantumCircuit::add_cp_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
-    check_qubit_range_(control_index, "control qubit", "CP");
-    check_qubit_range_(target_index, "target qubit", "CP");
-    elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(Gate::CP, control_index, target_index, angle));
+    add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CP);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -584,6 +533,97 @@ void QuantumCircuit::check_bit_range_(std::size_t bit_index) const
 
         throw std::runtime_error {err_msg.str()};
     }
+}
+
+void QuantumCircuit::add_one_target_gate_(
+    std::size_t target_index,
+    ket::Gate gate
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(target_index, "qubit", gate_name);
+    elements_.emplace_back(create::create_one_target_gate(gate, target_index));
+}
+
+void QuantumCircuit::add_one_target_one_angle_gate_(
+    std::size_t target_index,
+    double angle,
+    ket::Gate gate
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(target_index, "qubit", gate_name);
+    elements_.emplace_back(create::create_one_target_one_angle_gate(gate, target_index, angle));
+}
+
+void QuantumCircuit::add_one_control_one_target_gate_(
+    std::size_t control_index,
+    std::size_t target_index,
+    ket::Gate gate
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(control_index, "control qubit", gate_name);
+    check_qubit_range_(target_index, "target qubit", gate_name);
+    elements_.emplace_back(create::create_one_control_one_target_gate(gate, control_index, target_index));
+}
+
+void QuantumCircuit::add_one_control_one_target_one_angle_gate_(
+    std::size_t control_index,
+    std::size_t target_index,
+    double angle,
+    ket::Gate gate
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(control_index, "control qubit", gate_name);
+    check_qubit_range_(target_index, "target qubit", gate_name);
+    elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(gate, control_index, target_index, angle));
+}
+
+auto QuantumCircuit::add_one_target_one_parameter_gate_new_(
+    std::size_t target_index,
+    double initial_angle,
+    Gate gate,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(target_index, "qubit", gate_name);
+
+    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
+    auto id = parameter.id();
+
+    ++parameter_count_;
+    parameter_values_[id] = initial_angle;
+    parameter_data_[id] = ParameterData {.count=parameter_count_, .name=parameter.name()};
+
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+
+    return id;
+}
+
+void QuantumCircuit::add_one_target_one_parameter_gate_existing_(
+    std::size_t target_index,
+    Gate gate,
+    const ket::param::ParameterID& id
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(target_index, "qubit", gate_name);
+
+    if (!parameter_values_.contains(id)) {
+        throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
+    }
+
+    const auto& data = parameter_data_.at(id);
+
+    auto parameter = ket::param::Parameter {data.name, id};
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
 }
 
 }  // namespace ket

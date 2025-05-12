@@ -287,6 +287,24 @@ private:
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const;
 
     void check_bit_range_(std::size_t bit_index) const;
+
+    void add_one_target_gate_(std::size_t target_index, ket::Gate gate);
+    void add_one_target_one_angle_gate_(std::size_t target_index, double angle, ket::Gate gate);
+    void add_one_control_one_target_gate_(std::size_t control_index, std::size_t target_index, ket::Gate gate);
+    void add_one_control_one_target_one_angle_gate_(std::size_t control_index, std::size_t target_index, double angle, ket::Gate gate);
+
+    auto add_one_target_one_parameter_gate_new_(
+        std::size_t target_index,
+        double initial_angle,
+        Gate gate,
+        [[maybe_unused]] param::parameterized key
+    ) -> ket::param::ParameterID;
+
+    void add_one_target_one_parameter_gate_existing_(
+        std::size_t target_index,
+        Gate gate,
+        const ket::param::ParameterID& id
+    );
 };
 
 }  // namespace ket
