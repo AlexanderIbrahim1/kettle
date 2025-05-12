@@ -40,6 +40,15 @@ namespace ket
 
 namespace create = ket::internal::create;
 
+void QuantumCircuit::set_parameter_value(const ket::param::ParameterID& id, double angle)
+{
+    if (!parameter_values_.contains(id)) {
+        throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
+    }
+
+    parameter_values_[id] = angle;
+}
+
 void QuantumCircuit::pop_back()
 {
     if (elements_.size() == 0) {
@@ -135,17 +144,25 @@ void QuantumCircuit::add_rx_gate(std::size_t target_index, double angle)
     elements_.emplace_back(create::create_one_target_one_angle_gate(Gate::RX, target_index, angle));
 }
 
-void QuantumCircuit::add_rx_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+auto QuantumCircuit::add_rx_gate(
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
 {
     check_qubit_range_(target_index, "qubit", "RX");
 
     auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
+    auto id = parameter.id();
+
     parameter_values_[parameter.id()] = initial_angle;
     ++parameter_count_;
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 
     elements_.emplace_back(create::create_one_target_one_parameter_gate(Gate::RX, target_index, expression));
+
+    return id;
 }
 
 template <QubitIndicesAndAngles Container>

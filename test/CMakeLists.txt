@@ -87,6 +87,7 @@ add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_
 
 add_test_target(TARGET parameter_test SOURCES "source/parameter/parameter_test.cpp")
 add_test_target(TARGET parameter_expression_test SOURCES "source/parameter/parameter_expression_test.cpp")
+add_test_target(TARGET simulate_with_parameter_test SOURCES "source/parameter/simulate_with_parameter_test.cpp")
 
 add_test_target(TARGET control_flow_test SOURCES "source/simulation/control_flow_test.cpp")
 add_test_target(TARGET gate_pair_generator_test SOURCES "source/simulation/gate_pair_generator_test.cpp")

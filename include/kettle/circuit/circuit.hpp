@@ -80,6 +80,12 @@ public:
     }
 
     /*
+        Takes the `id` of a parameter that is already present in the `QuantumCircuit`, and sets
+        its value to `angle`.
+    */
+    void set_parameter_value(const ket::param::ParameterID& id, double angle);
+
+    /*
         Add an H gate that acts on the qubit at `target_index`.
     */
     void add_h_gate(std::size_t target_index);
@@ -112,7 +118,7 @@ public:
 
     void add_rx_gate(std::size_t target_index, double angle);
 
-    void add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key);
+    auto add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
 
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);
