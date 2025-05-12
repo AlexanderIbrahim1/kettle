@@ -36,13 +36,13 @@ struct gate_always_false : std::false_type
 
 
 auto unpack_target_and_angle(
-    const ket::QuantumCircuit& circuit,
+    const kpi::MapVariant& parameter_values_map,
     const ket::GateInfo& info
 ) -> std::tuple<std::size_t, double>
 {
     if (info.param_expression_ptr) {
         auto [target_qubit, param_expression_ptr] = ki::create::unpack_one_target_one_parameter_gate(info);
-        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, circuit.parameter_values_map());
+        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, parameter_values_map);
 
         return {target_qubit, angle};
     } else {
@@ -52,13 +52,13 @@ auto unpack_target_and_angle(
 
 
 auto unpack_control_target_and_angle(
-    const ket::QuantumCircuit& circuit,
+    const kpi::MapVariant& parameter_values_map,
     const ket::GateInfo& info
 ) -> std::tuple<std::size_t, std::size_t, double>
 {
     if (info.param_expression_ptr) {
         auto [control_qubit, target_qubit, param_expression_ptr] = ki::create::unpack_one_control_one_target_one_parameter_gate(info);
-        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, circuit.parameter_values_map());
+        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, parameter_values_map);
 
         return {control_qubit, target_qubit, angle};
     } else {
@@ -112,7 +112,7 @@ void simulate_one_target_gate_(
 
 template <ket::Gate GateType>
 void simulate_one_target_one_angle_gate_(
-    const ket::QuantumCircuit& circuit,
+    const kpi::MapVariant& parameter_values_map,
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
@@ -120,7 +120,7 @@ void simulate_one_target_one_angle_gate_(
 {
     using Gate = ket::Gate;
 
-    const auto [target_index, theta] = unpack_target_and_angle(circuit, info);
+    const auto [target_index, theta] = unpack_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
@@ -210,7 +210,7 @@ void simulate_one_control_one_target_gate_(
 
 template <ket::Gate GateType>
 void simulate_one_control_one_target_one_angle_gate_(
-    const ket::QuantumCircuit& circuit,
+    const kpi::MapVariant& parameter_values_map,
     ket::QuantumState& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
@@ -218,7 +218,7 @@ void simulate_one_control_one_target_one_angle_gate_(
 {
     using Gate = ket::Gate;
 
-    const auto [control_index, target_index, theta] = unpack_control_target_and_angle(circuit, info);
+    const auto [control_index, target_index, theta] = unpack_control_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
@@ -266,7 +266,7 @@ void simulate_cu_gate_(
 
 
 void simulate_gate_info_(
-    const ket::QuantumCircuit& circuit,
+    const kpi::MapVariant& parameter_values_map,
     ket::QuantumState& state,
     const ki::FlatIndexPair& single_pair,
     const ki::FlatIndexPair& double_pair,
@@ -301,19 +301,19 @@ void simulate_gate_info_(
             break;
         }
         case G::RX : {
-            simulate_one_target_one_angle_gate_<G::RX>(circuit, state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RX>(parameter_values_map, state, gate_info, single_pair);
             break;
         }
         case G::RY : {
-            simulate_one_target_one_angle_gate_<G::RY>(circuit, state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RY>(parameter_values_map, state, gate_info, single_pair);
             break;
         }
         case G::RZ : {
-            simulate_one_target_one_angle_gate_<G::RZ>(circuit, state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::RZ>(parameter_values_map, state, gate_info, single_pair);
             break;
         }
         case G::P : {
-            simulate_one_target_one_angle_gate_<G::P>(circuit, state, gate_info, single_pair);
+            simulate_one_target_one_angle_gate_<G::P>(parameter_values_map, state, gate_info, single_pair);
             break;
         }
         case G::CH : {
@@ -337,19 +337,19 @@ void simulate_gate_info_(
             break;
         }
         case G::CRX : {
-            simulate_one_control_one_target_one_angle_gate_<G::CRX>(circuit, state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRX>(parameter_values_map, state, gate_info, double_pair);
             break;
         }
         case G::CRY : {
-            simulate_one_control_one_target_one_angle_gate_<G::CRY>(circuit, state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRY>(parameter_values_map, state, gate_info, double_pair);
             break;
         }
         case G::CRZ : {
-            simulate_one_control_one_target_one_angle_gate_<G::CRZ>(circuit, state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CRZ>(parameter_values_map, state, gate_info, double_pair);
             break;
         }
         case G::CP : {
-            simulate_one_control_one_target_one_angle_gate_<G::CP>(circuit, state, gate_info, double_pair);
+            simulate_one_control_one_target_one_angle_gate_<G::CP>(parameter_values_map, state, gate_info, double_pair);
             break;
         }
         case G::U : {
@@ -396,6 +396,8 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
     instruction_pointers.push_back(0);
 
     auto circuit_loggers = std::vector<ket::CircuitLogger> {};
+
+    const auto& parameter_values_map = circuit.parameter_values_map();
 
     while (elements_stack.size() != 0) {
         const auto& elements = elements_stack.back();
@@ -463,7 +465,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
             const auto gate_info = element.get_gate();
 
             simulate_gate_info_(
-                circuit,
+                parameter_values_map,
                 state,
                 single_pair,
                 double_pair,
