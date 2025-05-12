@@ -442,6 +442,7 @@ void QuantumCircuit::add_if_statement(
     elements_.emplace_back(std::move(cfi));
 }
 
+// TODO: account for parameterization here
 void QuantumCircuit::add_if_statement(
     std::size_t bit_index,
     QuantumCircuit subcircuit
@@ -451,6 +452,7 @@ void QuantumCircuit::add_if_statement(
     add_if_statement(std::move(predicate), std::move(subcircuit));
 }
 
+// TODO: account for parameterization here
 void QuantumCircuit::add_if_not_statement(
     std::size_t bit_index,
     QuantumCircuit subcircuit
@@ -460,6 +462,7 @@ void QuantumCircuit::add_if_not_statement(
     add_if_statement(std::move(predicate), std::move(subcircuit));
 }
 
+// TODO: account for parameterization here
 void QuantumCircuit::add_if_else_statement(
     ControlFlowPredicate predicate,
     QuantumCircuit if_subcircuit,
@@ -479,6 +482,7 @@ void QuantumCircuit::add_if_else_statement(
     elements_.emplace_back(std::move(cfi));
 }
 
+// TODO: account for parameterization here
 void QuantumCircuit::add_if_else_statement(
     std::size_t bit_index,
     QuantumCircuit if_subcircuit,
@@ -489,6 +493,7 @@ void QuantumCircuit::add_if_else_statement(
     add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
 }
 
+// TODO: account for parameterization here
 void QuantumCircuit::add_if_not_else_statement(
     std::size_t bit_index,
     QuantumCircuit if_subcircuit,
