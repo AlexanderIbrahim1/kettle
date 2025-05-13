@@ -100,112 +100,98 @@ public:
         Add an H gate that acts on the qubit at `target_index`.
     */
     void add_h_gate(std::size_t target_index);
-
-    /*
-        Add an H gate that acts on each qubit whose indices are specified in `indices`.
-    */
     template <QubitIndices Container = QubitIndicesIList>
     void add_h_gate(const Container& indices);
 
     void add_x_gate(std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_x_gate(const Container& indices);
 
     void add_y_gate(std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_y_gate(const Container& indices);
 
     void add_z_gate(std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_z_gate(const Container& indices);
 
     void add_sx_gate(std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_sx_gate(const Container& indices);
 
     void add_rx_gate(std::size_t target_index, double angle);
-
     auto add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
-
-    // TODO: add member function that allows you to add an ID without an existing value attached to it
-    // - this will be needed for parameterized subcircuits
-    // - because the angle will be held in the parent circuit!
     void add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id);
-
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rx_gate(const Container& pairs);
 
     void add_ry_gate(std::size_t target_index, double angle);
-
+    auto add_ry_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_ry_gate(std::size_t target_index, const ket::param::ParameterID& id);
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_ry_gate(const Container& pairs);
 
     void add_rz_gate(std::size_t target_index, double angle);
-
+    auto add_rz_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_rz_gate(std::size_t target_index, const ket::param::ParameterID& id);
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_rz_gate(const Container& pairs);
 
     void add_p_gate(std::size_t target_index, double angle);
-
+    auto add_p_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_p_gate(std::size_t target_index, const ket::param::ParameterID& id);
     template <QubitIndicesAndAngles Container = QubitIndicesAndAnglesIList>
     void add_p_gate(const Container& pairs);
 
     void add_ch_gate(std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_ch_gate(const Container& pairs);
 
     void add_cx_gate(std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cx_gate(const Container& pairs);
 
     void add_cy_gate(std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cy_gate(const Container& pairs);
 
     void add_cz_gate(std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cz_gate(const Container& pairs);
 
     void add_csx_gate(std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_csx_gate(const Container& pairs);
 
     void add_crx_gate(std::size_t control_index, std::size_t target_index, double angle);
-
+    auto add_crx_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_crx_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crx_gate(const Container& tuples);
 
     void add_cry_gate(std::size_t control_index, std::size_t target_index, double angle);
-
+    auto add_cry_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_cry_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cry_gate(const Container& tuples);
 
     void add_crz_gate(std::size_t control_index, std::size_t target_index, double angle);
-
+    auto add_crz_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_crz_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crz_gate(const Container& tuples);
 
     void add_cp_gate(std::size_t control_index, std::size_t target_index, double angle);
-
+    auto add_cp_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    void add_cp_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cp_gate(const Container& tuples);
 
     void add_u_gate(const Matrix2X2& gate, std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_u_gate(const Matrix2X2& gate, const Container& indices);
 
     void add_cu_gate(const Matrix2X2& gate, std::size_t control_index, std::size_t target_index);
-
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cu_gate(const Matrix2X2& gate, const Container& pairs);
 
@@ -214,12 +200,10 @@ public:
         index as the qubit's index.
     */
     void add_m_gate(std::size_t target_index);
-
     template <QubitIndices Container = QubitIndicesIList>
     void add_m_gate(const Container& indices);
 
     void add_m_gate(std::size_t target_index, std::size_t bit_index);
-
     template <QubitAndBitIndices Container = QubitAndBitIndicesIList>
     void add_m_gate(const Container& pairs);
 
@@ -340,9 +324,28 @@ private:
         const ket::param::ParameterID& id
     );
 
+    auto add_one_control_one_target_one_parameter_gate_with_angle_(
+        std::size_t control_index,
+        std::size_t target_index,
+        double initial_angle,
+        Gate gate,
+        [[maybe_unused]] ket::param::parameterized key
+    ) -> ket::param::ParameterID;
+
+    void add_one_control_one_target_one_parameter_gate_without_angle_(
+        std::size_t control_index,
+        std::size_t target_index,
+        Gate gate,
+        const ket::param::ParameterID& id
+    );
+
     void merge_subcircuit_parameters_(const QuantumCircuit& subcircuit, double tolerance);
 
-    auto create_new_default_parameter_() -> ket::param::Parameter;
+    auto update_existing_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression;
+    auto create_uninitialized_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression;
+    auto create_initialized_parameter_data_(
+        double value
+    ) -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>;
 };
 
 }  // namespace ket

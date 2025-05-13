@@ -157,7 +157,6 @@ auto QuantumCircuit::add_rx_gate(
     return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RX, key);
 }
 
-// TODO: add unit test for this
 void QuantumCircuit::add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id)
 {
     add_one_target_one_parameter_gate_without_angle_(target_index, Gate::RX, id);
@@ -178,6 +177,20 @@ void QuantumCircuit::add_ry_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::RY);
 }
 
+auto QuantumCircuit::add_ry_gate(
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RY, key);
+}
+
+void QuantumCircuit::add_ry_gate(std::size_t target_index, const ket::param::ParameterID& id)
+{
+    add_one_target_one_parameter_gate_without_angle_(target_index, Gate::RY, id);
+}
+
 template <QubitIndicesAndAngles Container>
 void QuantumCircuit::add_ry_gate(const Container& pairs)
 {
@@ -193,6 +206,20 @@ void QuantumCircuit::add_rz_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::RZ);
 }
 
+auto QuantumCircuit::add_rz_gate(
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RZ, key);
+}
+
+void QuantumCircuit::add_rz_gate(std::size_t target_index, const ket::param::ParameterID& id)
+{
+    add_one_target_one_parameter_gate_without_angle_(target_index, Gate::RZ, id);
+}
+
 template <QubitIndicesAndAngles Container>
 void QuantumCircuit::add_rz_gate(const Container& pairs)
 {
@@ -206,6 +233,20 @@ template void QuantumCircuit::add_rz_gate<QubitIndicesAndAnglesIList>(const Qubi
 void QuantumCircuit::add_p_gate(std::size_t target_index, double angle)
 {
     add_one_target_one_angle_gate_(target_index, angle, Gate::P);
+}
+
+auto QuantumCircuit::add_p_gate(
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::P, key);
+}
+
+void QuantumCircuit::add_p_gate(std::size_t target_index, const ket::param::ParameterID& id)
+{
+    add_one_target_one_parameter_gate_without_angle_(target_index, Gate::P, id);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -298,6 +339,25 @@ void QuantumCircuit::add_crx_gate(std::size_t control_index, std::size_t target_
     add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRX);
 }
 
+auto QuantumCircuit::add_crx_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRX, key);
+}
+
+void QuantumCircuit::add_crx_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    const ket::param::ParameterID& id
+)
+{
+    add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRX, id);
+}
+
 template <ControlAndTargetIndicesAndAngles Container>
 void QuantumCircuit::add_crx_gate(const Container& tuples)
 {
@@ -311,6 +371,25 @@ template void QuantumCircuit::add_crx_gate<ControlAndTargetIndicesAndAnglesIList
 void QuantumCircuit::add_cry_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
     add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRY);
+}
+
+auto QuantumCircuit::add_cry_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRY, key);
+}
+
+void QuantumCircuit::add_cry_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    const ket::param::ParameterID& id
+)
+{
+    add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRY, id);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -328,6 +407,25 @@ void QuantumCircuit::add_crz_gate(std::size_t control_index, std::size_t target_
     add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CRZ);
 }
 
+auto QuantumCircuit::add_crz_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRZ, key);
+}
+
+void QuantumCircuit::add_crz_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    const ket::param::ParameterID& id
+)
+{
+    add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRZ, id);
+}
+
 template <ControlAndTargetIndicesAndAngles Container>
 void QuantumCircuit::add_crz_gate(const Container& tuples)
 {
@@ -341,6 +439,25 @@ template void QuantumCircuit::add_crz_gate<ControlAndTargetIndicesAndAnglesIList
 void QuantumCircuit::add_cp_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
     add_one_control_one_target_one_angle_gate_(control_index, target_index, angle, Gate::CP);
+}
+
+auto QuantumCircuit::add_cp_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    double initial_angle,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CP, key);
+}
+
+void QuantumCircuit::add_cp_gate(
+    std::size_t control_index,
+    std::size_t target_index,
+    const ket::param::ParameterID& id
+)
+{
+    add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CP, id);
 }
 
 template <ControlAndTargetIndicesAndAngles Container>
@@ -602,13 +719,8 @@ auto QuantumCircuit::add_one_target_one_parameter_gate_with_angle_(
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
 
-    auto parameter = create_new_default_parameter_();
-    auto id = parameter.id();
-
-    parameter_data_[id] = ParameterData {.value=initial_angle, .name=parameter.name(), .count=1};
-
-    auto expression = ket::param::ParameterExpression {std::move(parameter)};
-    elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+    auto [expression, id] = create_initialized_parameter_data_(initial_angle);
+    elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, std::move(expression)));
 
     return id;
 }
@@ -625,26 +737,60 @@ void QuantumCircuit::add_one_target_one_parameter_gate_without_angle_(
     if (parameter_data_.contains(id)) {
         // if the parameter is already present;
         // no need to change its value; just update the count and create the new gate
-        auto& data = parameter_data_.at(id);
-        ++data.count;
-
-        auto parameter = ket::param::Parameter {data.name, id};
-
-        auto expression = ket::param::ParameterExpression {std::move(parameter)};
-        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+        auto expression = update_existing_parameter_data_(id);
+        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, std::move(expression)));
     }
     else {
         // if the parameter is not here;
         // create a new entry, with an empty value
-        auto name = default_parameter_name_(parameter_count_++);
-        auto parameter = ket::param::Parameter {name, id};
-
-        parameter_data_[id] = ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
-
-        auto expression = ket::param::ParameterExpression {std::move(parameter)};
-        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+        auto expression = create_uninitialized_parameter_data_(id);
+        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, std::move(expression)));
     }
 }
+
+auto QuantumCircuit::add_one_control_one_target_one_parameter_gate_with_angle_(
+    std::size_t control_index,
+    std::size_t target_index,
+    double initial_angle,
+    Gate gate,
+    [[maybe_unused]] ket::param::parameterized key
+) -> ket::param::ParameterID
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(control_index, "control qubit", gate_name);
+    check_qubit_range_(target_index, "target qubit", gate_name);
+
+    auto [expression, id] = create_initialized_parameter_data_(initial_angle);
+    elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+
+    return id;
+}
+
+void QuantumCircuit::add_one_control_one_target_one_parameter_gate_without_angle_(
+    std::size_t control_index,
+    std::size_t target_index,
+    Gate gate,
+    const ket::param::ParameterID& id
+)
+{
+    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    check_qubit_range_(control_index, "control qubit", gate_name);
+    check_qubit_range_(target_index, "target qubit", gate_name);
+
+    if (parameter_data_.contains(id)) {
+        // if the parameter is already present;
+        // no need to change its value; just update the count and create the new gate
+        auto expression = update_existing_parameter_data_(id);
+        elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+    }
+    else {
+        // if the parameter is not here;
+        // create a new entry, with an empty value
+        auto expression = create_uninitialized_parameter_data_(id);
+        elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+    }
+}
+
 
 void QuantumCircuit::merge_subcircuit_parameters_(
     const QuantumCircuit& subcircuit,
@@ -686,12 +832,41 @@ void QuantumCircuit::merge_subcircuit_parameters_(
     }
 }
 
-auto QuantumCircuit::create_new_default_parameter_() -> ket::param::Parameter
+auto QuantumCircuit::update_existing_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression
 {
-    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
-    ++parameter_count_;
+    auto& data = parameter_data_.at(id);
+    ++data.count;
 
-    return parameter;
+    auto parameter = ket::param::Parameter {data.name, id};
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    return expression;
+}
+
+auto QuantumCircuit::create_uninitialized_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression
+{
+    auto name = default_parameter_name_(parameter_count_++);
+    auto parameter = ket::param::Parameter {name, id};
+
+    parameter_data_[id] = ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
+
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    return expression;
+}
+
+auto QuantumCircuit::create_initialized_parameter_data_(
+    double value
+) -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>
+{
+    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_++)};
+    auto id = parameter.id();
+
+    parameter_data_[id] = ParameterData {.value=value, .name=parameter.name(), .count=1};
+
+    auto expression = ket::param::ParameterExpression {std::move(parameter)};
+
+    return {expression, id};
 }
 
 }  // namespace ket
