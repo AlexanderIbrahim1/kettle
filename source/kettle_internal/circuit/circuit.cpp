@@ -52,11 +52,11 @@ namespace create = ket::internal::create;
 
 void QuantumCircuit::set_parameter_value(const ket::param::ParameterID& id, double angle)
 {
-    if (!parameter_values_.contains(id)) {
+    if (!parameter_data_.contains(id)) {
         throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
     }
 
-    parameter_values_[id] = angle;
+    parameter_data_[id].value = angle;
 }
 
 void QuantumCircuit::pop_back()
@@ -154,13 +154,13 @@ auto QuantumCircuit::add_rx_gate(
     [[maybe_unused]] ket::param::parameterized key
 ) -> ket::param::ParameterID
 {
-    return add_one_target_one_parameter_gate_new_(target_index, initial_angle, Gate::RX, key);
+    return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RX, key);
 }
 
 // TODO: add unit test for this
 void QuantumCircuit::add_rx_gate(std::size_t target_index, const ket::param::ParameterID& id)
 {
-    add_one_target_one_parameter_gate_existing_(target_index, Gate::RX, id);
+    add_one_target_one_parameter_gate_without_angle_(target_index, Gate::RX, id);
 }
 
 template <QubitIndicesAndAngles Container>
@@ -592,7 +592,7 @@ void QuantumCircuit::add_one_control_one_target_one_angle_gate_(
     elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(gate, control_index, target_index, angle));
 }
 
-auto QuantumCircuit::add_one_target_one_parameter_gate_new_(
+auto QuantumCircuit::add_one_target_one_parameter_gate_with_angle_(
     std::size_t target_index,
     double initial_angle,
     Gate gate,
@@ -602,21 +602,18 @@ auto QuantumCircuit::add_one_target_one_parameter_gate_new_(
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
 
-    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
+    auto parameter = create_new_default_parameter_();
     auto id = parameter.id();
 
-    ++parameter_count_;
-    parameter_values_[id] = initial_angle;
-    parameter_data_[id] = ParameterData {.count=1, .name=parameter.name()};
+    parameter_data_[id] = ParameterData {.value=initial_angle, .name=parameter.name(), .count=1};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
-
     elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
 
     return id;
 }
 
-void QuantumCircuit::add_one_target_one_parameter_gate_existing_(
+void QuantumCircuit::add_one_target_one_parameter_gate_without_angle_(
     std::size_t target_index,
     Gate gate,
     const ket::param::ParameterID& id
@@ -625,17 +622,27 @@ void QuantumCircuit::add_one_target_one_parameter_gate_existing_(
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
 
-    if (!parameter_values_.contains(id)) {
-        throw std::out_of_range {"ERROR: no parameter found with the provided id.\n"};
+    if (parameter_data_.contains(id)) {
+        // if the parameter is already present;
+        // no need to change its value; just update the count and create the new gate
+        auto& data = parameter_data_.at(id);
+        ++data.count;
+
+        auto parameter = ket::param::Parameter {data.name, id};
+
+        auto expression = ket::param::ParameterExpression {std::move(parameter)};
+        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
     }
+    else {
+        // if the parameter is not here;
+        // create a new entry, with an empty value
+        auto parameter = create_new_default_parameter_();
 
-    auto& data = parameter_data_.at(id);
+        parameter_data_[id] = ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
 
-    auto parameter = ket::param::Parameter {data.name, id};
-    auto expression = ket::param::ParameterExpression {std::move(parameter)};
-    ++data.count;
-
-    elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+        auto expression = ket::param::ParameterExpression {std::move(parameter)};
+        elements_.emplace_back(create::create_one_target_one_parameter_gate(gate, target_index, expression));
+    }
 }
 
 void QuantumCircuit::merge_subcircuit_parameters_(
@@ -645,34 +652,45 @@ void QuantumCircuit::merge_subcircuit_parameters_(
 {
     // TODO: currently if the names of the parameters do not match, then no exception is thrown,
     // and the name of the parent circuit takes precedence;
-    // 
     // maybe this behaviour should change in the future?
-    for (const auto& sub_id_angle_pair : subcircuit.parameter_values_)
+    for (const auto& [id, sub_data]: subcircuit.parameter_data_)
     {
         [[maybe_unused]]
-        auto [insert_it, is_inserted] = parameter_values_.insert(sub_id_angle_pair);
+        auto [insert_it, is_inserted] = parameter_data_.insert({id, sub_data});
 
-        if (!is_inserted) {
-            if (std::fabs(insert_it->second - sub_id_angle_pair.second) > tolerance) {
+        if (is_inserted) {
+            continue;
+        }
+
+        auto& curr_data = parameter_data_.at(id);
+        curr_data.count += sub_data.count;
+
+        if (curr_data.value == std::nullopt && sub_data.value != std::nullopt)
+        {
+            curr_data.value = sub_data.value;
+            continue;
+        }
+
+        if (curr_data.value != std::nullopt && sub_data.value != std::nullopt)
+        {
+            if (std::fabs(curr_data.value.value() - sub_data.value.value()) > tolerance) {
                 throw std::runtime_error {
-                    "ERROR: found same parameter in if-statement subcircuit with different value!\n"
+                    "ERROR: found two parameter instances with same id but different non-optional values\n"
                 };
             }
-
-            const auto& id = sub_id_angle_pair.first;
-            const auto count_in_sub = subcircuit.parameter_data_.at(id).count;
-            parameter_data_.at(id).count += count_in_sub;
+            continue;
         }
-        else {
-            const auto& id = sub_id_angle_pair.first;
-            if (parameter_data_.contains(id)) {
-                throw std::runtime_error {
-                    "ERROR: found same parameter in if-statement subcircuit with different value!\n"
-                };
-            }
-            parameter_data_[id] = subcircuit.parameter_data_.at(id);
-        }
+        // if both values are nullopt, or only the other is nullopt, then nothing in the current value
+        // needs to be checked or modified
     }
+}
+
+auto QuantumCircuit::create_new_default_parameter_() -> ket::param::Parameter
+{
+    auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_)};
+    ++parameter_count_;
+
+    return parameter;
 }
 
 }  // namespace ket

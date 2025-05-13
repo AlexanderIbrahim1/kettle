@@ -56,7 +56,7 @@ TEST_CASE("simulate single RX gate with different angles")
     ket::simulate(circuit, statevector);
 
     REQUIRE(ket::almost_eq(statevector, expected_output_state));
-    REQUIRE_THAT(circuit.parameter_values_map().at(id), Catch::Matchers::WithinRel(input_angle));
+    REQUIRE_THAT(circuit.parameter_data_map().at(id).value.value(), Catch::Matchers::WithinRel(input_angle));
 }
 
 
@@ -126,7 +126,7 @@ TEST_CASE("simulate with two identical parameters")
     ket::simulate(circuit1, statevector1);
 
     REQUIRE(ket::almost_eq(statevector0, statevector1));
-    REQUIRE(circuit1.parameter_values_map().size() == 1);
+    REQUIRE(circuit1.parameter_data_map().size() == 1);
     REQUIRE(circuit1.parameter_data_map().at(id).count == 2);
 }
 
@@ -147,8 +147,6 @@ TEST_CASE("parameters of control flow subcircuits")
         std::move(subcircuit)
     );
 
-    REQUIRE(circuit.parameter_values_map().contains(param_id0));
     REQUIRE(circuit.parameter_data_map().contains(param_id0));
-    REQUIRE(circuit.parameter_values_map().contains(param_id1));
     REQUIRE(circuit.parameter_data_map().contains(param_id1));
 }

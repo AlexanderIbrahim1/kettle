@@ -21,7 +21,10 @@
 
 
 namespace ki = ket::internal;
+namespace kp = ket::param;
 namespace kpi = ket::param::internal;
+
+using ParameterDataMap = std::unordered_map<kp::ParameterID, ket::ParameterData, kp::ParameterIdHash>;
 
 namespace
 {
@@ -64,6 +67,24 @@ auto unpack_control_target_and_angle(
     } else {
         return ki::create::unpack_one_control_one_target_one_angle_gate(info);
     }
+}
+
+
+auto create_parameter_values_map(
+    const std::unordered_map<kp::ParameterID, ket::ParameterData, kp::ParameterIdHash>& param_data_map
+) -> std::unordered_map<kp::ParameterID, double, kp::ParameterIdHash>
+{
+    auto output = std::unordered_map<kp::ParameterID, double, kp::ParameterIdHash> {};
+
+    for (const auto& [id, data]: param_data_map) {
+        if (data.value == std::nullopt) {
+            throw std::runtime_error {"ERROR: cannot perform simulation with an uninitialized parameter value.\n"};
+        }
+
+        output[id] = data.value.value();
+    }
+
+    return output;
 }
 
 
@@ -397,7 +418,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
 
     auto circuit_loggers = std::vector<ket::CircuitLogger> {};
 
-    const auto& parameter_values_map = circuit.parameter_values_map();
+    const auto& parameter_values_map = create_parameter_values_map(circuit.parameter_data_map());
 
     while (elements_stack.size() != 0) {
         const auto& elements = elements_stack.back();

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iterator>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -19,13 +20,16 @@ namespace ket
 
 struct ParameterData
 {
-    std::size_t count;
+    std::optional<double> value;
     std::string name;
+    std::size_t count;
 };
 
 class QuantumCircuit
 {
 public:
+    using ParameterDataMap = std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash>;
+
     explicit QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_bits}
@@ -81,13 +85,7 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto parameter_values_map() const noexcept -> const std::unordered_map<ket::param::ParameterID, double, param::ParameterIdHash>&
-    {
-        return parameter_values_;
-    }
-
-    [[nodiscard]]
-    constexpr auto parameter_data_map() const noexcept -> const std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash>&
+    constexpr auto parameter_data_map() const noexcept -> const ParameterDataMap&
     {
         return parameter_data_;
     }
@@ -317,8 +315,7 @@ private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
     std::vector<CircuitElement> elements_;
-    std::unordered_map<ket::param::ParameterID, double, param::ParameterIdHash> parameter_values_;
-    std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash> parameter_data_;
+    ParameterDataMap parameter_data_;
     std::size_t parameter_count_ {0};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const;
@@ -330,20 +327,22 @@ private:
     void add_one_control_one_target_gate_(std::size_t control_index, std::size_t target_index, ket::Gate gate);
     void add_one_control_one_target_one_angle_gate_(std::size_t control_index, std::size_t target_index, double angle, ket::Gate gate);
 
-    auto add_one_target_one_parameter_gate_new_(
+    auto add_one_target_one_parameter_gate_with_angle_(
         std::size_t target_index,
         double initial_angle,
         Gate gate,
         [[maybe_unused]] param::parameterized key
     ) -> ket::param::ParameterID;
 
-    void add_one_target_one_parameter_gate_existing_(
+    void add_one_target_one_parameter_gate_without_angle_(
         std::size_t target_index,
         Gate gate,
         const ket::param::ParameterID& id
     );
 
     void merge_subcircuit_parameters_(const QuantumCircuit& subcircuit, double tolerance);
+
+    auto create_new_default_parameter_() -> ket::param::Parameter;
 };
 
 }  // namespace ket
