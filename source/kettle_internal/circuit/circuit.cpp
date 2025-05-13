@@ -636,7 +636,8 @@ void QuantumCircuit::add_one_target_one_parameter_gate_without_angle_(
     else {
         // if the parameter is not here;
         // create a new entry, with an empty value
-        auto parameter = create_new_default_parameter_();
+        auto name = default_parameter_name_(parameter_count_++);
+        auto parameter = ket::param::Parameter {name, id};
 
         parameter_data_[id] = ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
 

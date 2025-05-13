@@ -10,8 +10,13 @@ namespace ket::param::internal
 
 auto Evaluator::operator()(const Parameter& expr, const MapVariant& param_map) const -> double
 {
-    const auto& params = std::get<std::reference_wrapper<const Map>>(param_map);
-    return params.get().at(expr.id());
+    const auto& params = std::get<std::reference_wrapper<const Map>>(param_map).get();
+
+    if (!params.contains(expr.id())) {
+        throw std::runtime_error {"DEV ERROR: unable to find parameter during expression evaluation.\n"};
+    }
+
+    return params.at(expr.id());
 }
 
 auto Evaluator::operator()(const LiteralExpression& expr, [[maybe_unused]] const MapVariant& param_map) const -> double

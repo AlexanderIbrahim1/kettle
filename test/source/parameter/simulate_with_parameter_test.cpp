@@ -139,14 +139,47 @@ TEST_CASE("parameters of control flow subcircuits")
     const auto param_id0 = circuit.add_rx_gate(0, angle, ket::param::parameterized {});
     circuit.add_m_gate(0);
 
-    auto subcircuit = ket::QuantumCircuit {2};
-    const auto param_id1 = subcircuit.add_rx_gate(1, angle, ket::param::parameterized {});
+    SECTION("add new parameter")
+    {
+        auto subcircuit = ket::QuantumCircuit {2};
+        const auto param_id1 = subcircuit.add_rx_gate(1, angle, ket::param::parameterized {});
 
-    circuit.add_if_statement(
-        ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
-        std::move(subcircuit)
-    );
+        circuit.add_if_statement(
+            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
+            std::move(subcircuit)
+        );
 
-    REQUIRE(circuit.parameter_data_map().contains(param_id0));
-    REQUIRE(circuit.parameter_data_map().contains(param_id1));
+        REQUIRE(circuit.parameter_data_map().contains(param_id0));
+        REQUIRE(circuit.parameter_data_map().contains(param_id1));
+    }
+
+    SECTION("add existing parameter to subcircuit, with no provided parameter")
+    {
+        auto subcircuit = ket::QuantumCircuit {2};
+        subcircuit.add_rx_gate(1, param_id0);
+
+        circuit.add_if_statement(
+            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
+            std::move(subcircuit)
+        );
+
+        REQUIRE(circuit.parameter_data_map().contains(param_id0));
+
+        auto statevector = ket::QuantumState {"00"};
+        REQUIRE_NOTHROW(ket::simulate(circuit, statevector));
+    }
+
+    SECTION("throw before simulation if parameter id is given that doesn't correspond to an exist parameter")
+    {
+        auto subcircuit = ket::QuantumCircuit {2};
+        subcircuit.add_rx_gate(1, ket::param::ParameterID {});
+
+        circuit.add_if_statement(
+            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
+            std::move(subcircuit)
+        );
+
+        auto statevector = ket::QuantumState {"00"};
+        REQUIRE_THROWS_AS(ket::simulate(circuit, statevector), std::runtime_error);
+    }
 }
