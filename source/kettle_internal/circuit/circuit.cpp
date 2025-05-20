@@ -128,6 +128,21 @@ void QuantumCircuit::add_z_gate(const Container& indices)
 template void QuantumCircuit::add_z_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
 template void QuantumCircuit::add_z_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
 
+void QuantumCircuit::add_s_gate(std::size_t target_index)
+{
+    add_one_target_gate_(target_index, Gate::S);
+}
+
+template <QubitIndices Container>
+void QuantumCircuit::add_s_gate(const Container& indices)
+{
+    for (auto index : indices) {
+        add_s_gate(index);
+    }
+}
+template void QuantumCircuit::add_s_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
+template void QuantumCircuit::add_s_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
+
 void QuantumCircuit::add_sx_gate(std::size_t target_index)
 {
     add_one_target_gate_(target_index, Gate::SX);
@@ -318,6 +333,21 @@ void QuantumCircuit::add_cz_gate(const Container& pairs)
 }
 template void QuantumCircuit::add_cz_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
 template void QuantumCircuit::add_cz_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
+
+void QuantumCircuit::add_cs_gate(std::size_t control_index, std::size_t target_index)
+{
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CS);
+}
+
+template <ControlAndTargetIndices Container>
+void QuantumCircuit::add_cs_gate(const Container& pairs)
+{
+    for (auto pair : pairs) {
+        add_cs_gate(pair.first, pair.second);
+    }
+}
+template void QuantumCircuit::add_cs_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
+template void QuantumCircuit::add_cs_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
 
 void QuantumCircuit::add_csx_gate(std::size_t control_index, std::size_t target_index)
 {

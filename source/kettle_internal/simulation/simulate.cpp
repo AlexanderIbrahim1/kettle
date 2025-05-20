@@ -121,6 +121,9 @@ void simulate_one_target_gate_(
         else if constexpr (GateType == Gate::Z) {
             ki::apply_z_gate(state, state1_index);
         }
+        else if constexpr (GateType == Gate::S) {
+            ki::apply_s_gate(state, state1_index);
+        }
         else if constexpr (GateType == Gate::SX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
         }
@@ -218,6 +221,9 @@ void simulate_one_control_one_target_gate_(
         }
         else if constexpr (GateType == Gate::CZ) {
             ki::apply_z_gate(state, state1_index);
+        }
+        else if constexpr (GateType == Gate::CS) {
+            ki::apply_s_gate(state, state1_index);
         }
         else if constexpr (GateType == Gate::CSX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
@@ -317,6 +323,10 @@ void simulate_gate_info_(
             simulate_one_target_gate_<G::Z>(state, gate_info, single_pair);
             break;
         }
+        case G::S : {
+            simulate_one_target_gate_<G::S>(state, gate_info, single_pair);
+            break;
+        }
         case G::SX : {
             simulate_one_target_gate_<G::SX>(state, gate_info, single_pair);
             break;
@@ -351,6 +361,10 @@ void simulate_gate_info_(
         }
         case G::CZ : {
             simulate_one_control_one_target_gate_<G::CZ>(state, gate_info, double_pair);
+            break;
+        }
+        case G::CS : {
+            simulate_one_control_one_target_gate_<G::CS>(state, gate_info, double_pair);
             break;
         }
         case G::CSX : {

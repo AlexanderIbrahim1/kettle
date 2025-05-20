@@ -7,7 +7,7 @@ namespace ket::internal::gate_id
 auto is_one_target_transform_gate(ket::Gate gate) -> bool
 {
     using G = ket::Gate;
-    return gate == G::H || gate == G::X || gate == G::Y || gate == G::Z || gate == G::SX;
+    return gate == G::H || gate == G::X || gate == G::Y || gate == G::Z || gate == G::S || gate == G::SX;
 }
 
 auto is_one_target_one_angle_transform_gate(ket::Gate gate) -> bool
@@ -19,7 +19,7 @@ auto is_one_target_one_angle_transform_gate(ket::Gate gate) -> bool
 auto is_one_control_one_target_transform_gate(ket::Gate gate) -> bool
 {
     using G = ket::Gate;
-    return gate == G::CH || gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CSX;
+    return gate == G::CH || gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CS || gate == G::CSX;
 }
 
 auto is_one_control_one_target_one_angle_transform_gate(ket::Gate gate) -> bool

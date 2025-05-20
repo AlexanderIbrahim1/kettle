@@ -48,6 +48,12 @@ void apply_z_gate(ket::QuantumState& state, std::size_t i1)
     state[i1] *= -1.0;
 }
 
+void apply_s_gate(ket::QuantumState& state, std::size_t i1)
+{
+    const auto state1 = state[i1];
+    state[i1] = {-state1.imag(), state1.real()};
+}
+
 void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];

@@ -119,6 +119,10 @@ void make_one_target_gate_controlled(
             circuit.add_cz_gate(control, target);
             break;
         }
+        case G::S : {
+            circuit.add_cs_gate(control, target);
+            break;
+        }
         case G::SX : {
             circuit.add_csx_gate(control, target);
             break;

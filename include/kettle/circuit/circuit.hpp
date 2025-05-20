@@ -115,6 +115,10 @@ public:
     template <QubitIndices Container = QubitIndicesIList>
     void add_z_gate(const Container& indices);
 
+    void add_s_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_s_gate(const Container& indices);
+
     void add_sx_gate(std::size_t target_index);
     template <QubitIndices Container = QubitIndicesIList>
     void add_sx_gate(const Container& indices);
@@ -158,6 +162,10 @@ public:
     void add_cz_gate(std::size_t control_index, std::size_t target_index);
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cz_gate(const Container& pairs);
+
+    void add_cs_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_cs_gate(const Container& pairs);
 
     void add_csx_gate(std::size_t control_index, std::size_t target_index);
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>

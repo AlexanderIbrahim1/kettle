@@ -56,6 +56,16 @@ auto z_gate() noexcept -> Matrix2X2
     };
 }
 
+auto s_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={0.0, 1.0}
+    };
+}
+
 auto rx_gate(double angle) noexcept -> Matrix2X2
 {
     const auto cost = std::cos(angle / 2.0);
@@ -131,6 +141,9 @@ auto non_angle_gate(Gate gate) -> Matrix2X2
     }
     else if (gate == Gate::Z || gate == Gate::CZ) {
         return z_gate();
+    }
+    else if (gate == Gate::S || gate == Gate::CS) {
+        return s_gate();
     }
     else if (gate == Gate::SX || gate == Gate::CSX) {
         return sx_gate();

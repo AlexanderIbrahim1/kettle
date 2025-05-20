@@ -49,6 +49,9 @@ auto decomp_to_single_primitive_gate_(
     else if (almost_eq(unitary, ket::z_gate(), tolerance_sq)) {
         return Info {ket::Gate::Z, {}};
     }
+    else if (almost_eq(unitary, ket::s_gate(), tolerance_sq)) {
+        return Info {ket::Gate::S, {}};
+    }
     if (almost_eq(unitary, ket::sx_gate(), tolerance_sq)) {
         return Info {ket::Gate::SX, {}};
     }
