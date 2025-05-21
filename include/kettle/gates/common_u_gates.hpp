@@ -16,6 +16,18 @@ auto y_gate() noexcept -> Matrix2X2;
 
 auto z_gate() noexcept -> Matrix2X2;
 
+auto s_gate() noexcept -> Matrix2X2;
+
+auto sdag_gate() noexcept -> Matrix2X2;
+
+auto t_gate() noexcept -> Matrix2X2;
+
+auto tdag_gate() noexcept -> Matrix2X2;
+
+auto sx_gate() noexcept -> Matrix2X2;
+
+auto sxdag_gate() noexcept -> Matrix2X2;
+
 auto rx_gate(double angle) noexcept -> Matrix2X2;
 
 auto ry_gate(double angle) noexcept -> Matrix2X2;
@@ -23,8 +35,6 @@ auto ry_gate(double angle) noexcept -> Matrix2X2;
 auto rz_gate(double angle) noexcept -> Matrix2X2;
 
 auto p_gate(double angle) noexcept -> Matrix2X2;
-
-auto sx_gate() noexcept -> Matrix2X2;
 
 auto non_angle_gate(Gate gate) -> Matrix2X2;
 

@@ -12,6 +12,7 @@
 
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
 
 
 namespace
@@ -91,7 +92,7 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
     }
 }
 
-// TODO: replace this with the primitive gate map `GATE_TO_FUNCTION_1T`
+
 void make_one_target_gate_controlled(
     ket::QuantumCircuit& circuit,
     ket::Gate gate,
@@ -99,38 +100,12 @@ void make_one_target_gate_controlled(
     std::size_t target
 )
 {
-    using G = ket::Gate;
-
-    switch (gate)
-    {
-        case G::H : {
-            circuit.add_ch_gate(control, target);
-            break;
-        }
-        case G::X : {
-            circuit.add_cx_gate(control, target);
-            break;
-        }
-        case G::Y : {
-            circuit.add_cy_gate(control, target);
-            break;
-        }
-        case G::Z : {
-            circuit.add_cz_gate(control, target);
-            break;
-        }
-        case G::SX : {
-            circuit.add_csx_gate(control, target);
-            break;
-        }
-        default : {
-            throw std::runtime_error {"DEV ERROR: impossible branch\n"};
-        }
-    }
+    const auto controlled_gate = ket::internal::UNCONTROLLED_TO_CONTROLLED_GATE.at(gate);
+    const auto controlled_gate_operation = ket::internal::GATE_TO_FUNCTION_1C1T.at(controlled_gate);
+    (circuit.*controlled_gate_operation)(control, target);
 }
 
 
-// TODO: replace this with the primitive gate map `GATE_TO_FUNCTION_1T1A`
 void make_one_target_one_angle_gate_controlled(
     ket::QuantumCircuit& circuit,
     ket::Gate gate,
@@ -139,30 +114,9 @@ void make_one_target_one_angle_gate_controlled(
     double angle
 )
 {
-    using G = ket::Gate;
-
-    switch (gate)
-    {
-        case G::RX : {
-            circuit.add_crx_gate(control, target, angle);
-            break;
-        }
-        case G::RY : {
-            circuit.add_cry_gate(control, target, angle);
-            break;
-        }
-        case G::RZ : {
-            circuit.add_crz_gate(control, target, angle);
-            break;
-        }
-        case G::P : {
-            circuit.add_cp_gate(control, target, angle);
-            break;
-        }
-        default : {
-            throw std::runtime_error {"DEV ERROR: impossible branch\n"};
-        }
-    }
+    const auto controlled_gate = ket::internal::UNCONTROLLED_TO_CONTROLLED_GATE.at(gate);
+    const auto controlled_gate_operation = ket::internal::GATE_TO_FUNCTION_1C1T1A.at(controlled_gate);
+    (circuit.*controlled_gate_operation)(control, target, angle);
 }
 
 }  // namespace

@@ -48,6 +48,66 @@ void apply_z_gate(ket::QuantumState& state, std::size_t i1)
     state[i1] *= -1.0;
 }
 
+void apply_s_gate(ket::QuantumState& state, std::size_t i1)
+{
+    const auto state1 = state[i1];
+    state[i1] = {-state1.imag(), state1.real()};
+}
+
+void apply_sdag_gate(ket::QuantumState& state, std::size_t i1)
+{
+    const auto state1 = state[i1];
+    state[i1] = {state1.imag(), -state1.real()};
+}
+
+void apply_t_gate(ket::QuantumState& state, std::size_t i1)
+{
+    const auto state1 = state[i1];
+
+    const auto real1 = M_SQRT1_2 * (state1.real() - state1.imag());
+    const auto imag1 = M_SQRT1_2 * (state1.real() + state1.imag());
+
+    state[i1] = {real1, imag1};
+}
+
+void apply_tdag_gate(ket::QuantumState& state, std::size_t i1)
+{
+    const auto state1 = state[i1];
+
+    const auto real1 = M_SQRT1_2 * (state1.real() + state1.imag());
+    const auto imag1 = - M_SQRT1_2 * (state1.real() - state1.imag());
+
+    state[i1] = {real1, imag1};
+}
+
+void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
+    const auto real1 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag1 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
+
+    state[i0] = std::complex<double> {real0, imag0};
+    state[i1] = std::complex<double> {real1, imag1};
+}
+
+void apply_sxdag_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
+{
+    const auto& state0 = state[i0];
+    const auto& state1 = state[i1];
+
+    const auto real0 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag0 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
+    const auto real1 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag1 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
+
+    state[i0] = std::complex<double> {real0, imag0};
+    state[i1] = std::complex<double> {real1, imag1};
+}
+
 void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta)
 {
     const auto& state0 = state[i0];
@@ -60,20 +120,6 @@ void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, dou
     const auto imag0 = (state0.imag() * cost) - (state1.real() * sint);
     const auto real1 = (state1.real() * cost) + (state0.imag() * sint);
     const auto imag1 = (state1.imag() * cost) - (state0.real() * sint);
-
-    state[i0] = std::complex<double> {real0, imag0};
-    state[i1] = std::complex<double> {real1, imag1};
-}
-
-void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1)
-{
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
-
-    const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
-    const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
-    const auto real1 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
-    const auto imag1 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};

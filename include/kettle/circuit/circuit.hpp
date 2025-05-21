@@ -115,9 +115,29 @@ public:
     template <QubitIndices Container = QubitIndicesIList>
     void add_z_gate(const Container& indices);
 
+    void add_s_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_s_gate(const Container& indices);
+
+    void add_sdag_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_sdag_gate(const Container& indices);
+
+    void add_t_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_t_gate(const Container& indices);
+
+    void add_tdag_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_tdag_gate(const Container& indices);
+
     void add_sx_gate(std::size_t target_index);
     template <QubitIndices Container = QubitIndicesIList>
     void add_sx_gate(const Container& indices);
+
+    void add_sxdag_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_sxdag_gate(const Container& indices);
 
     void add_rx_gate(std::size_t target_index, double angle);
     auto add_rx_gate(std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
@@ -159,9 +179,29 @@ public:
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_cz_gate(const Container& pairs);
 
+    void add_cs_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_cs_gate(const Container& pairs);
+
+    void add_csdag_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_csdag_gate(const Container& pairs);
+
+    void add_ct_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_ct_gate(const Container& pairs);
+
+    void add_ctdag_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_ctdag_gate(const Container& pairs);
+
     void add_csx_gate(std::size_t control_index, std::size_t target_index);
     template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
     void add_csx_gate(const Container& pairs);
+
+    void add_csxdag_gate(std::size_t control_index, std::size_t target_index);
+    template <ControlAndTargetIndices Container = ControlAndTargetIndicesIList>
+    void add_csxdag_gate(const Container& pairs);
 
     void add_crx_gate(std::size_t control_index, std::size_t target_index, double angle);
     auto add_crx_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;

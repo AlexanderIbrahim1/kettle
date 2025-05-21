@@ -53,6 +53,7 @@ static auto simulate_single_qubit_with_ugate(
     return state;
 }
 
+// TODO: simplify this function with one of the primitive gate maps
 static auto simulate_single_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t>>& gates_and_angles,
@@ -76,8 +77,23 @@ static auto simulate_single_qubit_with_builtin(
         else if (gate_id == "Z") {
             circuit.add_z_gate(target_index);
         }
+        else if (gate_id == "S") {
+            circuit.add_s_gate(target_index);
+        }
+        else if (gate_id == "SDAG") {
+            circuit.add_sdag_gate(target_index);
+        }
+        else if (gate_id == "T") {
+            circuit.add_t_gate(target_index);
+        }
+        else if (gate_id == "TDAG") {
+            circuit.add_tdag_gate(target_index);
+        }
         else if (gate_id == "SX") {
             circuit.add_sx_gate(target_index);
+        }
+        else if (gate_id == "SXDAG") {
+            circuit.add_sxdag_gate(target_index);
         }
         else if (gate_id == "RX") {
             circuit.add_rx_gate(target_index, angle);
@@ -111,6 +127,7 @@ static auto simulate_double_qubit_with_ugate(
     return state;
 }
 
+// TODO: simplify this function with one of the primitive gate maps
 static auto simulate_double_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t, std::size_t>>& gates_and_angles,
@@ -134,8 +151,23 @@ static auto simulate_double_qubit_with_builtin(
         else if (gate_id == "CZ") {
             circuit.add_cz_gate(control_index, target_index);
         }
+        else if (gate_id == "CS") {
+            circuit.add_cs_gate(control_index, target_index);
+        }
+        else if (gate_id == "CSDAG") {
+            circuit.add_csdag_gate(control_index, target_index);
+        }
+        else if (gate_id == "CT") {
+            circuit.add_ct_gate(control_index, target_index);
+        }
+        else if (gate_id == "CTDAG") {
+            circuit.add_ctdag_gate(control_index, target_index);
+        }
         else if (gate_id == "CSX") {
             circuit.add_csx_gate(control_index, target_index);
+        }
+        else if (gate_id == "CSXDAG") {
+            circuit.add_csxdag_gate(control_index, target_index);
         }
         else if (gate_id == "CRX") {
             circuit.add_crx_gate(control_index, target_index, angle);
@@ -854,6 +886,7 @@ TEST_CASE("simulate CP gate")
     }
 }
 
+// TODO: simplify these unit test with a generator
 TEST_CASE("simulate U gate")
 {
     // clang-format off
@@ -913,10 +946,50 @@ TEST_CASE("simulate U gate")
         REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
 
+    SECTION("S gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::s_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"S", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
+    SECTION("SDAG gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::sdag_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SDAG", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
+    SECTION("T gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::t_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"T", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
+    SECTION("TDAG gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::tdag_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"TDAG", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
     SECTION("SX gate mimic")
     {
         const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::sx_gate(), 0}}, n_qubits);
         const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SX", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
+    SECTION("SXDAG gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::sxdag_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"SXDAG", 0.0, 0}}, n_qubits);
 
         REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
@@ -996,10 +1069,50 @@ TEST_CASE("simulate CU gate")
             REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
 
+        SECTION("CS gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::s_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CS", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CSDAG gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::sdag_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSDAG", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CT gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::t_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CT", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CTDAG gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::tdag_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CTDAG", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
         SECTION("CSX gate mimic")
         {
             const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::sx_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSX", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CSXDAG gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::sxdag_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CSXDAG", 0.0, control_qubit, target_qubit}}, n_qubits);
 
             REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }
