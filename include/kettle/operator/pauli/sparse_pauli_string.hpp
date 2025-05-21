@@ -45,6 +45,12 @@ public:
     }
 
     [[nodiscard]]
+    constexpr auto n_qubits() const noexcept -> std::size_t
+    {
+        return n_qubits_;
+    }
+
+    [[nodiscard]]
     constexpr auto terms() const noexcept -> const std::vector<std::pair<std::size_t, PauliTerm>>&
     {
         return pauli_terms_;
