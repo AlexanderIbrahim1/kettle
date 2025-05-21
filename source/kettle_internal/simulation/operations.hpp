@@ -21,11 +21,17 @@ void apply_z_gate(ket::QuantumState& state, std::size_t i1);
 
 void apply_s_gate(ket::QuantumState& state, std::size_t i1);
 
+void apply_sdag_gate(ket::QuantumState& state, std::size_t i1);
+
 void apply_t_gate(ket::QuantumState& state, std::size_t i1);
 
-void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta);
+void apply_tdag_gate(ket::QuantumState& state, std::size_t i1);
 
 void apply_sx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1);
+
+void apply_sxdag_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1);
+
+void apply_rx_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta);
 
 void apply_ry_gate(ket::QuantumState& state, std::size_t i0, std::size_t i1, double theta);
 

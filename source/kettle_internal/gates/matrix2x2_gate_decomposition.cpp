@@ -52,11 +52,20 @@ auto decomp_to_single_primitive_gate_(
     else if (almost_eq(unitary, ket::s_gate(), tolerance_sq)) {
         return Info {ket::Gate::S, {}};
     }
+    else if (almost_eq(unitary, ket::sdag_gate(), tolerance_sq)) {
+        return Info {ket::Gate::SDAG, {}};
+    }
     else if (almost_eq(unitary, ket::t_gate(), tolerance_sq)) {
         return Info {ket::Gate::T, {}};
     }
+    else if (almost_eq(unitary, ket::tdag_gate(), tolerance_sq)) {
+        return Info {ket::Gate::TDAG, {}};
+    }
     if (almost_eq(unitary, ket::sx_gate(), tolerance_sq)) {
         return Info {ket::Gate::SX, {}};
+    }
+    if (almost_eq(unitary, ket::sxdag_gate(), tolerance_sq)) {
+        return Info {ket::Gate::SXDAG, {}};
     }
     else {
         const auto real_11 = std::clamp(unitary.elem11.real(), -1.0, 1.0);

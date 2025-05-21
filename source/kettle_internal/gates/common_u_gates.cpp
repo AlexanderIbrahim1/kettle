@@ -67,6 +67,16 @@ auto s_gate() noexcept -> Matrix2X2
     };
 }
 
+auto sdag_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={0.0, -1.0}
+    };
+}
+
 auto t_gate() noexcept -> Matrix2X2
 {
     return {
@@ -74,6 +84,36 @@ auto t_gate() noexcept -> Matrix2X2
         .elem01={0.0, 0.0},
         .elem10={0.0, 0.0},
         .elem11={M_SQRT1_2, M_SQRT1_2}
+    };
+}
+
+auto tdag_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={M_SQRT1_2, -M_SQRT1_2}
+    };
+}
+
+auto sx_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={0.5, 0.5},
+        .elem01={0.5, -0.5},
+        .elem10={0.5, -0.5},
+        .elem11={0.5, 0.5}
+    };
+}
+
+auto sxdag_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={0.5, -0.5},
+        .elem01={0.5, 0.5},
+        .elem10={0.5, 0.5},
+        .elem11={0.5, -0.5}
     };
 }
 
@@ -129,16 +169,6 @@ auto p_gate(double angle) noexcept -> Matrix2X2
     };
 }
 
-auto sx_gate() noexcept -> Matrix2X2
-{
-    return {
-        .elem00={0.5, 0.5 },
-        .elem01={0.5, -0.5},
-        .elem10={0.5, -0.5},
-        .elem11={0.5, 0.5 }
-    };
-}
-
 auto non_angle_gate(Gate gate) -> Matrix2X2
 {
     if (gate == Gate::H || gate == Gate::CH) {
@@ -156,11 +186,20 @@ auto non_angle_gate(Gate gate) -> Matrix2X2
     else if (gate == Gate::S || gate == Gate::CS) {
         return s_gate();
     }
+    else if (gate == Gate::SDAG || gate == Gate::CSDAG) {
+        return sdag_gate();
+    }
     else if (gate == Gate::T || gate == Gate::CT) {
         return t_gate();
     }
+    else if (gate == Gate::TDAG || gate == Gate::CTDAG) {
+        return tdag_gate();
+    }
     else if (gate == Gate::SX || gate == Gate::CSX) {
         return sx_gate();
+    }
+    else if (gate == Gate::SXDAG || gate == Gate::CSXDAG) {
+        return sxdag_gate();
     }
     else {
         throw std::runtime_error {"UNREACHABLE: dev error, invalid non-angle gate provided\n"};

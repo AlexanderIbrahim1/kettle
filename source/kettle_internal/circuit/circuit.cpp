@@ -143,6 +143,21 @@ void QuantumCircuit::add_s_gate(const Container& indices)
 template void QuantumCircuit::add_s_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
 template void QuantumCircuit::add_s_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
 
+void QuantumCircuit::add_sdag_gate(std::size_t target_index)
+{
+    add_one_target_gate_(target_index, Gate::SDAG);
+}
+
+template <QubitIndices Container>
+void QuantumCircuit::add_sdag_gate(const Container& indices)
+{
+    for (auto index : indices) {
+        add_sdag_gate(index);
+    }
+}
+template void QuantumCircuit::add_sdag_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
+template void QuantumCircuit::add_sdag_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
+
 void QuantumCircuit::add_t_gate(std::size_t target_index)
 {
     add_one_target_gate_(target_index, Gate::T);
@@ -158,6 +173,21 @@ void QuantumCircuit::add_t_gate(const Container& indices)
 template void QuantumCircuit::add_t_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
 template void QuantumCircuit::add_t_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
 
+void QuantumCircuit::add_tdag_gate(std::size_t target_index)
+{
+    add_one_target_gate_(target_index, Gate::TDAG);
+}
+
+template <QubitIndices Container>
+void QuantumCircuit::add_tdag_gate(const Container& indices)
+{
+    for (auto index : indices) {
+        add_tdag_gate(index);
+    }
+}
+template void QuantumCircuit::add_tdag_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
+template void QuantumCircuit::add_tdag_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
+
 void QuantumCircuit::add_sx_gate(std::size_t target_index)
 {
     add_one_target_gate_(target_index, Gate::SX);
@@ -172,6 +202,21 @@ void QuantumCircuit::add_sx_gate(const Container& indices)
 }
 template void QuantumCircuit::add_sx_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
 template void QuantumCircuit::add_sx_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
+
+void QuantumCircuit::add_sxdag_gate(std::size_t target_index)
+{
+    add_one_target_gate_(target_index, Gate::SXDAG);
+}
+
+template <QubitIndices Container>
+void QuantumCircuit::add_sxdag_gate(const Container& indices)
+{
+    for (auto index : indices) {
+        add_sxdag_gate(index);
+    }
+}
+template void QuantumCircuit::add_sxdag_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
+template void QuantumCircuit::add_sxdag_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
 
 void QuantumCircuit::add_rx_gate(std::size_t target_index, double angle)
 {
@@ -364,6 +409,21 @@ void QuantumCircuit::add_cs_gate(const Container& pairs)
 template void QuantumCircuit::add_cs_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
 template void QuantumCircuit::add_cs_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
 
+void QuantumCircuit::add_csdag_gate(std::size_t control_index, std::size_t target_index)
+{
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CSDAG);
+}
+
+template <ControlAndTargetIndices Container>
+void QuantumCircuit::add_csdag_gate(const Container& pairs)
+{
+    for (auto pair : pairs) {
+        add_csdag_gate(pair.first, pair.second);
+    }
+}
+template void QuantumCircuit::add_csdag_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
+template void QuantumCircuit::add_csdag_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
+
 void QuantumCircuit::add_ct_gate(std::size_t control_index, std::size_t target_index)
 {
     add_one_control_one_target_gate_(control_index, target_index, Gate::CT);
@@ -379,6 +439,21 @@ void QuantumCircuit::add_ct_gate(const Container& pairs)
 template void QuantumCircuit::add_ct_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
 template void QuantumCircuit::add_ct_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
 
+void QuantumCircuit::add_ctdag_gate(std::size_t control_index, std::size_t target_index)
+{
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CTDAG);
+}
+
+template <ControlAndTargetIndices Container>
+void QuantumCircuit::add_ctdag_gate(const Container& pairs)
+{
+    for (auto pair : pairs) {
+        add_ctdag_gate(pair.first, pair.second);
+    }
+}
+template void QuantumCircuit::add_ctdag_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
+template void QuantumCircuit::add_ctdag_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
+
 void QuantumCircuit::add_csx_gate(std::size_t control_index, std::size_t target_index)
 {
     add_one_control_one_target_gate_(control_index, target_index, Gate::CSX);
@@ -393,6 +468,21 @@ void QuantumCircuit::add_csx_gate(const Container& pairs)
 }
 template void QuantumCircuit::add_csx_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
 template void QuantumCircuit::add_csx_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
+
+void QuantumCircuit::add_csxdag_gate(std::size_t control_index, std::size_t target_index)
+{
+    add_one_control_one_target_gate_(control_index, target_index, Gate::CSXDAG);
+}
+
+template <ControlAndTargetIndices Container>
+void QuantumCircuit::add_csxdag_gate(const Container& pairs)
+{
+    for (auto pair : pairs) {
+        add_csxdag_gate(pair.first, pair.second);
+    }
+}
+template void QuantumCircuit::add_csxdag_gate<ControlAndTargetIndicesVector>(const ControlAndTargetIndicesVector& indices);
+template void QuantumCircuit::add_csxdag_gate<ControlAndTargetIndicesIList>(const ControlAndTargetIndicesIList& indices);
 
 void QuantumCircuit::add_crx_gate(std::size_t control_index, std::size_t target_index, double angle)
 {
