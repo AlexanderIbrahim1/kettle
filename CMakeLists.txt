@@ -55,6 +55,7 @@ add_library(
     source/kettle_internal/simulation/multithread_simulate_utils.cpp
     source/kettle_internal/simulation/operations.cpp
     source/kettle_internal/simulation/simulate_utils.cpp
+    source/kettle_internal/simulation/simulate_pauli.cpp
     source/kettle_internal/simulation/simulate.cpp
     source/kettle_internal/state/bitstring_utils.cpp
     source/kettle_internal/state/marginal.cpp
