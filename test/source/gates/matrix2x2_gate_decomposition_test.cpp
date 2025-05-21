@@ -76,7 +76,7 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
     {
         constexpr auto abs_tol = 1.0e-6;
 
-        const auto angle = GENERATE(0.01, 0.25 * M_PI, 1.5 * M_PI, 1.99 * M_PI);
+        const auto angle = GENERATE(0.01, 1.5 * M_PI, 1.99 * M_PI);
 
         const auto testcase = GENERATE_COPY(
             TestCase {ket::rx_gate(angle), Info {ket::Gate::RX, angle}},

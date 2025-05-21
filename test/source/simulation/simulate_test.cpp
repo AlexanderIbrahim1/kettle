@@ -79,6 +79,9 @@ static auto simulate_single_qubit_with_builtin(
         else if (gate_id == "S") {
             circuit.add_s_gate(target_index);
         }
+        else if (gate_id == "T") {
+            circuit.add_t_gate(target_index);
+        }
         else if (gate_id == "SX") {
             circuit.add_sx_gate(target_index);
         }
@@ -139,6 +142,9 @@ static auto simulate_double_qubit_with_builtin(
         }
         else if (gate_id == "CS") {
             circuit.add_cs_gate(control_index, target_index);
+        }
+        else if (gate_id == "CT") {
+            circuit.add_ct_gate(control_index, target_index);
         }
         else if (gate_id == "CSX") {
             circuit.add_csx_gate(control_index, target_index);
@@ -926,6 +932,15 @@ TEST_CASE("simulate U gate")
 
         REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
     }
+
+    SECTION("T gate mimic")
+    {
+        const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::t_gate(), 0}}, n_qubits);
+        const auto state_from_builtin = simulate_single_qubit_with_builtin(initial_state, {{"T", 0.0, 0}}, n_qubits);
+
+        REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+    }
+
     SECTION("SX gate mimic")
     {
         const auto state_from_matrix = simulate_single_qubit_with_ugate(initial_state, {{ket::sx_gate(), 0}}, n_qubits);
@@ -1013,6 +1028,14 @@ TEST_CASE("simulate CU gate")
         {
             const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::s_gate(), control_qubit, target_qubit}}, n_qubits);
             const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CS", 0.0, control_qubit, target_qubit}}, n_qubits);
+
+            REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
+        }
+
+        SECTION("CT gate mimic")
+        {
+            const auto state_from_matrix = simulate_double_qubit_with_ugate(initial_state, {{ket::t_gate(), control_qubit, target_qubit}}, n_qubits);
+            const auto state_from_builtin = simulate_double_qubit_with_builtin(initial_state, {{"CT", 0.0, control_qubit, target_qubit}}, n_qubits);
 
             REQUIRE(ket::almost_eq(state_from_matrix, state_from_builtin));
         }

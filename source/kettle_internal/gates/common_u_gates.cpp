@@ -1,5 +1,6 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include <cmath>
 
 #include "kettle/gates/common_u_gates.hpp"
 
@@ -63,6 +64,16 @@ auto s_gate() noexcept -> Matrix2X2
         .elem01={0.0, 0.0},
         .elem10={0.0, 0.0},
         .elem11={0.0, 1.0}
+    };
+}
+
+auto t_gate() noexcept -> Matrix2X2
+{
+    return {
+        .elem00={1.0, 0.0},
+        .elem01={0.0, 0.0},
+        .elem10={0.0, 0.0},
+        .elem11={M_SQRT1_2, M_SQRT1_2}
     };
 }
 
@@ -144,6 +155,9 @@ auto non_angle_gate(Gate gate) -> Matrix2X2
     }
     else if (gate == Gate::S || gate == Gate::CS) {
         return s_gate();
+    }
+    else if (gate == Gate::T || gate == Gate::CT) {
+        return t_gate();
     }
     else if (gate == Gate::SX || gate == Gate::CSX) {
         return sx_gate();
