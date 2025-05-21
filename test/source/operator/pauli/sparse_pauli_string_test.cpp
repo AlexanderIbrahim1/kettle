@@ -22,13 +22,13 @@ TEST_CASE("SparsePauliString.contains_index()")
         SECTION("contains")
         {
             pauli_string.add(3, ket::PauliTerm::X);
-            REQUIRE(pauli_string.contains_index(3) == 0);
+            REQUIRE(pauli_string.contains_index(3));
         }
 
         SECTION("does not contain")
         {
             pauli_string.add(3, ket::PauliTerm::X);
-            REQUIRE(pauli_string.contains_index(1) == std::nullopt);
+            REQUIRE(!pauli_string.contains_index(1));
         }
     }
 
@@ -38,21 +38,21 @@ TEST_CASE("SparsePauliString.contains_index()")
         {
             pauli_string.add(3, ket::PauliTerm::X);
             pauli_string.add(1, ket::PauliTerm::X);
-            REQUIRE(pauli_string.contains_index(3) == 0);
-            REQUIRE(pauli_string.contains_index(1) == 1);
+            REQUIRE(pauli_string.contains_index(3));
+            REQUIRE(pauli_string.contains_index(1));
         }
 
         SECTION("does not contain")
         {
             pauli_string.add(3, ket::PauliTerm::X);
             pauli_string.add(1, ket::PauliTerm::X);
-            REQUIRE(pauli_string.contains_index(2) == std::nullopt);
+            REQUIRE(!pauli_string.contains_index(2));
         }
     }
 
     SECTION("out of bounds returns std::nullopt")
     {
-        REQUIRE(pauli_string.contains_index(10) == std::nullopt);
+        REQUIRE(!pauli_string.contains_index(10));
     }
 }
 
@@ -148,13 +148,13 @@ TEST_CASE("SparsePauliString.remove()")
             pauli_string.add(3, ket::PauliTerm::X);
             pauli_string.add(2, ket::PauliTerm::Z);
 
-            REQUIRE(pauli_string.contains_index(2) != std::nullopt);
-            REQUIRE(pauli_string.contains_index(3) != std::nullopt);
+            REQUIRE(pauli_string.contains_index(2));
+            REQUIRE(pauli_string.contains_index(3));
             REQUIRE(pauli_string.size() == 2);
 
             pauli_string.remove(3);
 
-            REQUIRE(pauli_string.contains_index(2) != std::nullopt);
+            REQUIRE(pauli_string.contains_index(2));
             REQUIRE(pauli_string.size() == 1);
 
             pauli_string.remove(2);

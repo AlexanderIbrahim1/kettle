@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <stdexcept>
 #include <optional>
 #include <vector>
 
@@ -32,19 +31,12 @@ enum class PauliPhase : std::uint8_t
 class SparsePauliString
 {
 public:
-    explicit SparsePauliString(std::size_t n_qubits)
-        : phase_ {PauliPhase::PLUS_ONE}
-        , n_qubits_ {n_qubits}
-    {
-        if (n_qubits_ == 0) {
-            throw std::runtime_error {"ERROR: SparsePauliString cannot be constructed with 0 qubits.\n"};
-        }
-    }
+    explicit SparsePauliString(std::size_t n_qubits);
 
-    void set_phase(PauliPhase phase) noexcept
-    {
-        phase_ = phase;
-    }
+    /*
+        Set the phase of the `SparsePauliString`.
+    */
+    void set_phase(PauliPhase phase) noexcept;
 
     [[nodiscard]]
     constexpr auto phase() const noexcept -> PauliPhase
@@ -64,83 +56,52 @@ public:
         return pauli_terms_.size();
     }
 
+    /*
+        Returns the `PauliTerm` instance applied to the qubit at `qubit_index`;
+        throws a `std::runtime_error` if no `PauliTerm` is applied at the qubit.
+    */
     [[nodiscard]]
-    auto at(std::size_t qubit_index) const -> PauliTerm
-    {
-        const auto vector_index = contains_index(qubit_index);
+    auto at(std::size_t qubit_index) const -> PauliTerm;
 
-        if (vector_index) {
-            return pauli_terms_[vector_index.value()].second;
-        }
+    /*
+        Add a `PauliTerm` operator `term` to be applied to the qubit at `qubit_index`;
+        throws a `std::runtime_error` if an existing `PauliTerm` is already applied to the qubit.
+    */
+    void add(std::size_t qubit_index, PauliTerm term);
 
-        throw std::runtime_error {"ERROR: no Pauli term found for provided qubit index.\n"};
-    }
+    /*
+        Add a `PauliTerm` operator `term` to be applied to the qubit at `qubit_index`;
+        if an existing `PauliTerm` is already applied to the qubit, it will be overwritten
+        with the provided `term`.
+    */
+    void overwrite(std::size_t qubit_index, PauliTerm term);
 
-    void add(std::size_t qubit_index, PauliTerm term)
-    {
-        check_index_in_qubit_range_(qubit_index);
+    /*
+        Removes the `PauliTerm` operator being applied to the qubit at `qubit_index`;
+        does nothing if there is no `PauliTerm` operator at the qubit.
+    */
+    void remove(std::size_t qubit_index);
 
-        if (contains_index(qubit_index)) {
-            throw std::runtime_error {"ERROR: Pauli term is already present in the string\n"};
-        }
-
-        pauli_terms_.emplace_back(qubit_index, term);
-    }
-
-    void overwrite(std::size_t qubit_index, PauliTerm term)
-    {
-        check_index_in_qubit_range_(qubit_index);
-
-        const auto existing_index = contains_index(qubit_index);
-
-        if (existing_index) {
-            pauli_terms_[existing_index.value()].second = term;
-        } else {
-            pauli_terms_.emplace_back(qubit_index, term);
-        }
-    }
-
-    void remove(std::size_t qubit_index)
-    {
-        const auto vector_index = contains_index(qubit_index);
-
-        if (vector_index) {
-            const auto position = static_cast<std::ptrdiff_t>(vector_index.value());
-            pauli_terms_.erase(std::next(pauli_terms_.begin(), position));
-        }
-    }
-
+    /*
+        Checks if a `PauliTerm` operator is being applied to the qubit at `qubit_index`.
+    */
     [[nodiscard]]
-    auto contains_index(std::size_t qubit_index) const -> std::optional<std::size_t>
-    {
-        if (qubit_index >= n_qubits_) {
-            return std::nullopt;
-        }
-
-        for (std::size_t i {0}; i < pauli_terms_.size(); ++i) {
-            const auto& [existing_index, term] = pauli_terms_[i];
-
-            if (existing_index == qubit_index) {
-                return i;
-            }
-        }
-
-        return std::nullopt;
-    }
+    auto contains_index(std::size_t qubit_index) const noexcept -> bool;
 
 private:
     PauliPhase phase_ {};
     std::size_t n_qubits_;
     std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms_;
 
-    void check_index_in_qubit_range_(std::size_t index) const
-    {
-        if (index >= n_qubits_) {
-            throw std::runtime_error {
-                "ERROR: cannot perform operation on SparsePauliString with index beyond qubit range.\n"
-            };
-        }
-    }
+    void check_index_in_qubit_range_(std::size_t index) const;
+
+    /*
+        Checks if a `PauliTerm` operator is being applied to the qubit at `qubit_index`;
+        if yes, the index the `PauliTerm` instance in the internal container is returned,
+        and if no, then `std::nullopt` is returned.
+    */
+    [[nodiscard]]
+    auto vector_index_(std::size_t qubit_index) const -> std::optional<std::size_t>;
 
     // NOTE: why do we use a `std::vector` of pairs instead of a map?
     //   - first, because the Pauli string is sparse, we expect the container to hold very
