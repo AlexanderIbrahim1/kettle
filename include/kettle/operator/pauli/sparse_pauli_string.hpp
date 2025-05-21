@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <optional>
@@ -34,7 +35,11 @@ public:
     explicit SparsePauliString(std::size_t n_qubits)
         : phase_ {PauliPhase::PLUS_ONE}
         , n_qubits_ {n_qubits}
-    {}
+    {
+        if (n_qubits_ == 0) {
+            throw std::runtime_error {"ERROR: SparsePauliString cannot be constructed with 0 qubits.\n"};
+        }
+    }
 
     void set_phase(PauliPhase phase) noexcept
     {
@@ -53,16 +58,29 @@ public:
         return pauli_terms_;
     }
 
-    void add_nocheck(std::size_t qubit_index, PauliTerm term)
+    [[nodiscard]]
+    constexpr auto size() const noexcept -> std::size_t
     {
-        pauli_terms_.emplace_back(qubit_index, term);
+        return pauli_terms_.size();
+    }
+
+    [[nodiscard]]
+    auto at(std::size_t qubit_index) const -> PauliTerm
+    {
+        const auto vector_index = contains_index(qubit_index);
+
+        if (vector_index) {
+            return pauli_terms_[vector_index.value()].second;
+        }
+
+        throw std::runtime_error {"ERROR: no Pauli term found for provided qubit index.\n"};
     }
 
     void add(std::size_t qubit_index, PauliTerm term)
     {
         check_index_in_qubit_range_(qubit_index);
 
-        if (contains_index(qubit_index) != std::nullopt) {
+        if (contains_index(qubit_index)) {
             throw std::runtime_error {"ERROR: Pauli term is already present in the string\n"};
         }
 
@@ -76,9 +94,9 @@ public:
         const auto existing_index = contains_index(qubit_index);
 
         if (existing_index) {
-            pauli_terms_.emplace_back(qubit_index, term);
-        } else {
             pauli_terms_[existing_index.value()].second = term;
+        } else {
+            pauli_terms_.emplace_back(qubit_index, term);
         }
     }
 
