@@ -1,9 +1,12 @@
 #pragma once
 
+#include <complex>
 #include <cstddef>
 #include <cstdint>
+#include <unordered_map>
 #include <optional>
 #include <vector>
+
 
 
 namespace ket
@@ -23,6 +26,14 @@ enum class PauliPhase : std::uint8_t
     PLUS_EYE,
     MINUS_ONE,
     MINUS_EYE,
+};
+
+// NOLINTNEXTLINE(cert-err58-cpp)
+const auto PAULI_PHASE_MAP = std::unordered_map<PauliPhase, std::complex<double>> {
+    {PauliPhase::PLUS_ONE, {1.0, 0.0}},
+    {PauliPhase::PLUS_EYE, {0.0, 1.0}},
+    {PauliPhase::MINUS_ONE, {-1.0, 0.0}},
+    {PauliPhase::MINUS_EYE, {0.0, -1.0}},
 };
 
 /*
