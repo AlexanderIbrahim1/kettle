@@ -1,23 +1,18 @@
+#include <cstddef>
 #include <filesystem>
+#include <format>
+#include <fstream>
 #include <stdexcept>
 
 #include <kettle/kettle.hpp>
 
 /*
-    Measure the statevectors for the N = 2 and N = 3 gates for the rotor paper.
+    This code:
+      - loads in the final simulated statevector from the QPE simulations
+      - performs projective measurements on the final simulated statevector
+      - calculates the inner product between the initial statevector, and the statevector
+        recovered by projecting against each binary register string
 */
-
-constexpr auto get_measurement_qubits(std::size_t n_ancilla, std::size_t n_unitary) -> std::vector<std::size_t>
-{
-    auto output = std::vector<std::size_t> {};
-    output.reserve(n_ancilla);
-
-    for (std::size_t i {0}; i < n_ancilla; ++i) {
-        output.push_back(n_unitary + i);
-    }
-
-    return output;
-}
 
 static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {6};
 static constexpr auto N_UNITARY_QUBITS_THREE_ROTOR = std::size_t {9};
@@ -26,9 +21,9 @@ struct CommandLineArguments
 {
     CommandLineArguments(int argc, char** argv)
     {
-        if (argc != 4) {
+        if (argc != 6) {
             throw std::runtime_error {
-                "./a.out n_ancilla_qubits n_rotors abs_statevector_filepath\n"
+                "./a.out n_ancilla_qubits n_rotors abs_statevector_filepath abs_initial_circuit_filepath abs_output_filepath\n"
             };
         }
 
@@ -37,6 +32,8 @@ struct CommandLineArguments
         n_ancilla_qubits = std::stoul(arguments[0]);
         const auto n_rotors = std::stoul(arguments[1]);
         abs_statevector_filepath = std::filesystem::path {arguments[2]};
+        abs_initial_circuit_filepath = std::filesystem::path {arguments[3]};
+        abs_output_filepath = std::filesystem::path {arguments[4]};
 
         if (n_rotors == 2) {
             n_unitary_qubits = N_UNITARY_QUBITS_TWO_ROTOR;
@@ -49,16 +46,54 @@ struct CommandLineArguments
                 "Invalid number of rotors passed; allowed values are '2' and '3'\n"
             };
         }
+
+        n_total_qubits = n_ancilla_qubits + n_unitary_qubits;
     }
 
     std::size_t n_ancilla_qubits;
     std::size_t n_unitary_qubits;
+    std::size_t n_total_qubits;
     std::filesystem::path abs_statevector_filepath;
+    std::filesystem::path abs_initial_circuit_filepath;
+    std::filesystem::path abs_output_filepath;
 };
+
+auto create_original_state(const std::filesystem::path& abs_initial_circuit_filepath, std::size_t n_unitary_qubits) -> ket::QuantumState
+{
+    const auto initial_circuit = ket::read_tangelo_circuit(n_unitary_qubits, abs_initial_circuit_filepath, 0);
+    auto statevector = ket::QuantumState {n_unitary_qubits};
+    ket::simulate(initial_circuit, statevector);
+
+    return statevector;
+}
+
+class MapWithDefault
+{
+public:
+    MapWithDefault(std::map<std::string, std::size_t> counts, std::size_t default_value)
+        : counts_ {std::move(counts)}
+        , default_value_ {default_value}
+    {}
+
+    [[nodiscard]]
+    auto at(const std::string& entry) const -> std::size_t
+    {
+        if (counts_.contains(entry)) {
+            return counts_.at(entry);
+        } else {
+            return default_value_;
+        }
+    }
+
+private:
+    std::map<std::string, std::size_t> counts_;
+    std::size_t default_value_;
+};
+
 
 auto main(int argc, char** argv) -> int
 {
-    const auto arguments = [&]() {
+    const auto args = [&]() {
         try {
             return CommandLineArguments {argc, argv};
         }
@@ -69,106 +104,40 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
+    auto statevector = ket::load_statevector(args.abs_statevector_filepath);
 
-    auto marginal_qubits = ket::arange(0UL, arguments.n_unitary_qubits);
+    // perform measurements
+    auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 20, ket::arange(0UL, args.n_unitary_qubits));
+    const auto counts_wrapper = MapWithDefault {std::move(counts), 0UL};
 
-    auto statevector = ket::load_statevector(arguments.abs_statevector_filepath);
-    auto circuit = ket::QuantumCircuit {n_total_qubits};
+    const auto ancilla_qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
 
-    ket::simulate(circuit, statevector);
+    // calculate the original statevector to perform inner product calculations against
+    const auto original_statevector = create_original_state(args.abs_initial_circuit_filepath, args.n_unitary_qubits);
 
-    // const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 20, marginal_qubits);
+    auto outstream = std::ofstream {args.abs_output_filepath};
+    if (!outstream.is_open()) {
+        throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", args.abs_output_filepath.c_str())};
+    }
 
-    // create the original eigenstate
-    const auto initial_circuit = ket::read_tangelo_circuit(
-        6,
-        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/make_gates/rotors_2_ancilla_7_g_0.55_classical/initial_circuit.dat"},
-        0
-    );
+    // calculate the count and inner product for each register
+    for (std::size_t i_state {0}; i_state < (1UL << args.n_ancilla_qubits); ++i_state) {
+        const auto bitstring = ket::state_index_to_bitstring_big_endian(i_state, args.n_ancilla_qubits);
 
-    auto eigenstatevector = ket::QuantumState {6};
-    ket::simulate(initial_circuit, eigenstatevector);
+        const auto prefix = std::string(args.n_unitary_qubits, 'x');
+        const auto entry = prefix + bitstring;
+        const auto count = counts_wrapper.at(entry);
 
-    const auto qubit_indices = ket::arange(arguments.n_unitary_qubits, n_total_qubits);
-
-//    for (std::size_t i_state {0}; i_state < (1UL << arguments.n_ancilla_qubits); ++i_state) {
-//        const auto bitstring = ket::state_index_to_bitstring_big_endian(i_state, arguments.n_ancilla_qubits);
-//        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(bitstring);
-//
-//        const auto prefix = std::string(arguments.n_unitary_qubits, 'x');
-//        const auto entry = prefix + bitstring;
-//
-//        const auto count = [&]() {
-//            if (counts.contains(entry)) {
-//                return counts.at(entry);
-//            } else {
-//                return 0UL;
-//            }
-//        }();
-//
-//        try {
-//            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
-//            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
-//            std::cout << bitstring << ", " << count << ", " << inner_product_sq << '\n';
-//        }
-//        catch (const std::exception& e) {
-//            std::cout << bitstring << ", " << count << ", " << 0.0 << '\n';
-//        }
-//
-//    }
-
-    auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 1, 1, 0});
-    // auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 0, 1, 0, 1, 1});
-    // 111101011
-    // ket::save_statevector(std::cout, projected, ket::QuantumStateEndian::BIG);
-    // ket::save_statevector(std::cout, eigenstatevector, ket::QuantumStateEndian::BIG);
-
-    const auto reversing_circuit = ket::read_tangelo_circuit(
-        6,
-        std::filesystem::path {"/home/a68ibrah/research/qpe_dipolar_planar_rotors/app/plot_qpe/inverse_rotors_2_ancilla_7_g_0.55_classical.reverse"},
-        0
-    );
-
-    // ket::save_statevector(std::cout, eigenstatevector);
-    ket::simulate(reversing_circuit, projected);
-    // ket::simulate(reversing_circuit, eigenstatevector);
-    ket::save_statevector(std::cout, projected, ket::QuantumStateEndian::BIG);
-    // ket::save_statevector(std::cout, eigenstatevector, ket::QuantumStateEndian::BIG);
-
-//    for (const auto& [bitstring, count]: counts) {
-//        const auto lstripped_bitstring = ket::lstrip_marginal_bits(bitstring);
-//        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(lstripped_bitstring);
-//
-//        try {
-//            const auto projected = ket::project_statevector(statevector, qubit_indices, dyn_bitset);
-//
-//            const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
-//
-//            std::cout << "(state, count, inner_sq) = (" << bitstring << ", " << count << ", " << inner_product_sq << ")\n";
-//        }
-//        catch (const std::exception& e) {
-//            continue;
-//        }
-//    }
-
-//     const auto projected = ket::project_statevector(statevector, qubit_indices, {1, 1, 1, 1, 1, 0, 0});
-// 
-//     const auto inner_product_sq = ket::inner_product_norm_squared(eigenstatevector, projected);
-// 
-//     std::cout << "inner_product_sq = " << inner_product_sq << '\n';
-
-    // (state, count) = (xxxxxx1110101, 122)
-    // (state, count) = (xxxxxx1110110, 169)
-    // (state, count) = (xxxxxx1110111, 206)
-    // (state, count) = (xxxxxx1111000, 311)
-    // (state, count) = (xxxxxx1111001, 496)
-    // (state, count) = (xxxxxx1111010, 976)
-    // (state, count) = (xxxxxx1111011, 2729)
-    // (state, count) = (xxxxxx1111100, 21403)
-    // (state, count) = (xxxxxx1111101, 31967)
-    // (state, count) = (xxxxxx1111110, 3045)
-    // (state, count) = (xxxxxx1111111, 1140)
+        try {
+            const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(bitstring);
+            const auto projected = ket::project_statevector(statevector, ancilla_qubit_indices, dyn_bitset);
+            const auto inner_product_sq = ket::inner_product_norm_squared(original_statevector, projected);
+            outstream << bitstring << "   " << count << "   " << inner_product_sq << '\n';
+        }
+        catch (const std::exception& e) {
+            std::cout << bitstring << "   " << count << "   " << 0.0 << '\n';
+        }
+    }
 
     return 0;
 }
