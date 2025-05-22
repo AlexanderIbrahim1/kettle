@@ -14,8 +14,32 @@ SparsePauliString::SparsePauliString(std::size_t n_qubits)
     : phase_ {PauliPhase::PLUS_ONE}
     , n_qubits_ {n_qubits}
 {
-    if (n_qubits_ == 0) {
-        throw std::runtime_error {"ERROR: SparsePauliString cannot be constructed with 0 qubits.\n"};
+    check_n_qubits_not_zero_();
+}
+
+SparsePauliString::SparsePauliString(
+    std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms,
+    std::size_t n_qubits,
+    PauliPhase phase
+)
+    : phase_ {phase}
+    , n_qubits_ {n_qubits}
+    , pauli_terms_ {std::move(pauli_terms)}
+{
+    check_n_qubits_not_zero_();
+}
+
+SparsePauliString::SparsePauliString(
+    const std::vector<PauliTerm>& paulis,
+    PauliPhase phase
+)
+    : phase_ {phase}
+    , n_qubits_ {paulis.size()}
+{
+    check_n_qubits_not_zero_();
+
+    for (std::size_t i {0}; i < paulis.size(); ++i) {
+        pauli_terms_.emplace_back(i, paulis[i]);
     }
 }
 
@@ -101,6 +125,13 @@ void SparsePauliString::check_index_in_qubit_range_(std::size_t index) const
         throw std::runtime_error {
             "ERROR: cannot perform operation on SparsePauliString with index beyond qubit range.\n"
         };
+    }
+}
+
+void SparsePauliString::check_n_qubits_not_zero_() const
+{
+    if (n_qubits_ == 0) {
+        throw std::runtime_error {"ERROR: SparsePauliString cannot be constructed with 0 qubits.\n"};
     }
 }
 

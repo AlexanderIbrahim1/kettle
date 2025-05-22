@@ -44,6 +44,11 @@ class SparsePauliString
 public:
     explicit SparsePauliString(std::size_t n_qubits);
 
+    SparsePauliString(std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms, std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
+
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    SparsePauliString(const std::vector<PauliTerm>& paulis, PauliPhase phase = PauliPhase::PLUS_ONE);
+
     /*
         Set the phase of the `SparsePauliString`.
     */
@@ -111,6 +116,7 @@ private:
     std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms_;
 
     void check_index_in_qubit_range_(std::size_t index) const;
+    void check_n_qubits_not_zero_() const;
 
     /*
         Checks if a `PauliTerm` operator is being applied to the qubit at `qubit_index`;
