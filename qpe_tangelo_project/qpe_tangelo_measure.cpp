@@ -31,7 +31,7 @@ struct CommandLineArguments
 
         n_ancilla_qubits = std::stoul(arguments[0]);
         const auto n_rotors = std::stoul(arguments[1]);
-        abs_statevector_filepath = std::filesystem::path {arguments[2]};
+        abs_statevector_dirpath = std::filesystem::path {arguments[2]};
         abs_initial_circuit_filepath = std::filesystem::path {arguments[3]};
         abs_output_filepath = std::filesystem::path {arguments[4]};
 
@@ -53,7 +53,7 @@ struct CommandLineArguments
     std::size_t n_ancilla_qubits;
     std::size_t n_unitary_qubits;
     std::size_t n_total_qubits;
-    std::filesystem::path abs_statevector_filepath;
+    std::filesystem::path abs_statevector_dirpath;
     std::filesystem::path abs_initial_circuit_filepath;
     std::filesystem::path abs_output_filepath;
 };
@@ -104,7 +104,7 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    auto statevector = ket::load_statevector(args.abs_statevector_filepath);
+    auto statevector = ket::load_statevector(args.abs_statevector_dirpath);
 
     // perform measurements
     auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 20, ket::arange(0UL, args.n_unitary_qubits));

@@ -1,14 +1,14 @@
-#include "kettle/state/qubit_state_conversion.hpp"
 #include <filesystem>
+#include <format>
 #include <stdexcept>
 
 #include <kettle/kettle.hpp>
 
 /*
     This code:
-      - loads in the final simulated statevector from the QPE simulations
+      - loads in the final simulated statevector from the QPE simulations, after it also passed through the reverse circuit
       - projects the final statevector against a provided binary register string
-      - evolves the projected statevector over the reverse circuit
+      - saves the projected statevector
 */
 
 static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {6};
@@ -18,9 +18,9 @@ struct CommandLineArguments
 {
     CommandLineArguments(int argc, char** argv)
     {
-        if (argc != 6) {
+        if (argc != 7) {
             throw std::runtime_error {
-                "./a.out n_ancilla_qubits n_rotors abs_statevector_filepath abs_reverse_circuit_filepath abs_output_filepath binary_register_string\n"
+                "./a.out n_ancilla_qubits n_rotors abs_rev_input_dirpath abs_rev_output_dirpath statevector_filename binary_register_string\n"
             };
         }
 
@@ -28,10 +28,10 @@ struct CommandLineArguments
 
         n_ancilla_qubits = std::stoul(arguments[0]);
         const auto n_rotors = std::stoul(arguments[1]);
-        abs_statevector_filepath = std::filesystem::path {arguments[2]};
-        abs_reverse_circuit_filepath = std::filesystem::path {arguments[3]};
-        abs_output_filepath = std::filesystem::path {arguments[4]};
-        binary_register_bitset = ket::bitstring_to_dynamic_bitset(arguments[5]);
+        abs_rev_input_dirpath = std::filesystem::path {arguments[2]};
+        abs_rev_output_dirpath = std::filesystem::path {arguments[3]};
+        statevector_filename = arguments[4];
+        binary_register_string = arguments[5];
 
         if (n_rotors == 2) {
             n_unitary_qubits = N_UNITARY_QUBITS_TWO_ROTOR;
@@ -51,11 +51,12 @@ struct CommandLineArguments
     std::size_t n_ancilla_qubits;
     std::size_t n_unitary_qubits;
     std::size_t n_total_qubits;
-    std::filesystem::path abs_statevector_filepath;
-    std::filesystem::path abs_reverse_circuit_filepath;
-    std::filesystem::path abs_output_filepath;
-    std::vector<std::uint8_t> binary_register_bitset;
+    std::filesystem::path abs_rev_input_dirpath;
+    std::filesystem::path abs_rev_output_dirpath;
+    std::string statevector_filename;
+    std::string binary_register_string;
 };
+
 
 auto main(int argc, char** argv) -> int
 {
@@ -70,17 +71,17 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    // load in the final statevector
-    auto statevector = ket::load_statevector(args.abs_statevector_filepath);
+    // load in the final reversed statevector
+    auto rev_statevector = ket::load_statevector(args.abs_rev_input_dirpath / std::format("reversed_{}", args.statevector_filename));
 
     // project it against the provided binary register
     const auto qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
-    auto projected = ket::project_statevector(statevector, qubit_indices, args.binary_register_bitset);
+    const auto register_bitset = ket::bitstring_to_dynamic_bitset(args.binary_register_string);
+    auto projected = ket::project_statevector(rev_statevector, qubit_indices, register_bitset);
 
-    // evolve the projected state through the reversing circuit
-    const auto reversing_circuit = ket::read_tangelo_circuit(args.n_unitary_qubits, args.abs_reverse_circuit_filepath, 0);
-    ket::simulate(reversing_circuit, projected);
-    ket::save_statevector(std::cout, projected, ket::QuantumStateEndian::BIG);
+    // save the projected statevector
+    const auto output_filepath = args.abs_rev_output_dirpath / std::format("projected_{}_{}", args.binary_register_string, args.statevector_filename);
+    ket::save_statevector(output_filepath, projected, ket::QuantumStateEndian::BIG);
 
     return 0;
 }

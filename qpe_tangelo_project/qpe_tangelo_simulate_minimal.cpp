@@ -33,7 +33,7 @@ struct CommandLineArguments
         n_trotter_steps = std::stoul(arguments[2]);
         abs_circuits_dirpath = std::filesystem::path {arguments[3]};
         subcircuit_filename = arguments[4];
-        abs_output_dirpath = std::filesystem::path {arguments[5]};
+        abs_input_dirpath = std::filesystem::path {arguments[5]};
         init_state_kind = std::string {arguments[6]};
         i_continue = std::stoi(arguments[7]);
 
@@ -68,7 +68,7 @@ struct CommandLineArguments
     std::size_t n_trotter_steps;
     std::filesystem::path abs_circuits_dirpath;
     std::string subcircuit_filename;
-    std::filesystem::path abs_output_dirpath;
+    std::filesystem::path abs_input_dirpath;
     std::string init_state_kind;
     int i_continue;
 };
@@ -117,7 +117,7 @@ void simulate_unitary(
             ket::simulate(circuit, statevector);
         }
 
-        ket::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
+        ket::save_statevector(args.abs_input_dirpath / statevector_filename(count), statevector);
         ++count;
     }
 }
@@ -141,7 +141,7 @@ auto main(int argc, char** argv) -> int
         if (args.i_continue == RUN_FROM_START_KEY) {
             return ket::QuantumState {n_total_qubits};
         } else {
-            return ket::load_statevector(args.abs_output_dirpath / statevector_filename(args.i_continue));
+            return ket::load_statevector(args.abs_input_dirpath / statevector_filename(args.i_continue));
         }
     }();
 
@@ -170,7 +170,7 @@ auto main(int argc, char** argv) -> int
 
     simulate_subcircuit(args.abs_circuits_dirpath / "iqft_circuit.dat", statevector, n_total_qubits);
 
-    ket::save_statevector(args.abs_output_dirpath / statevector_filename(count), statevector);
+    ket::save_statevector(args.abs_input_dirpath / statevector_filename(count), statevector);
 
     return 0;
 }

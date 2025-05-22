@@ -18,8 +18,9 @@ function(add_exec NAME)
 endfunction()
 
 add_exec(qpe_tangelo_measure)
-add_exec(qpe_tangelo_reverse_and_project)
+add_exec(qpe_tangelo_project)
 add_exec(qpe_tangelo_simulate)
 add_exec(qpe_tangelo_simulate_minimal)
+add_exec(qpe_tangelo_simulate_reverse)
 
 add_folders(qpe_tangelo_project)
