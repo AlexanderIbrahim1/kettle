@@ -101,5 +101,17 @@ inline auto expectation_value(const PauliOperator& pauli_op, const QuantumState&
     return expval;
 }
 
+inline auto expectation_value(const SparsePauliString& sparse_pauli_string, const QuantumState& state) -> std::complex<double>
+{
+    auto ket = state;
+    simulate(sparse_pauli_string, ket);
+
+    const auto inner_prod = inner_product(state, ket);
+    const auto phase = PAULI_PHASE_MAP.at(sparse_pauli_string.phase());
+
+    const auto expval = phase * inner_prod;
+
+    return expval;
+}
 
 }  // namespace ket

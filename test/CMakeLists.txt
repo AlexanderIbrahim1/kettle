@@ -86,6 +86,7 @@ add_test_target(TARGET read_tangelo_file_test SOURCES "source/io/read_tangelo_fi
 add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_file_test.cpp")
 
 add_test_target(TARGET sparse_pauli_string_test SOURCES "source/operator/pauli/sparse_pauli_string_test.cpp")
+add_test_target(TARGET pauli_operator_test SOURCES "source/operator/pauli/pauli_operator_test.cpp")
 
 add_test_target(TARGET parameter_test SOURCES "source/parameter/parameter_test.cpp")
 add_test_target(TARGET parameter_expression_test SOURCES "source/parameter/parameter_expression_test.cpp")

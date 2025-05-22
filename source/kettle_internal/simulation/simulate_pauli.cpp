@@ -63,7 +63,7 @@ void simulate_pauli_gates_(
 {
     using PT = ket::PauliTerm;
 
-    for (const auto [target_index, pauli_term] : pauli_string.terms())
+    for (const auto& [target_index, pauli_term] : pauli_string.terms())
     {
         switch(pauli_term) {
             case PT::X : {
