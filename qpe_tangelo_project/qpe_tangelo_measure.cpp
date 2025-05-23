@@ -21,9 +21,9 @@ struct CommandLineArguments
 {
     CommandLineArguments(int argc, char** argv)
     {
-        if (argc != 6) {
+        if (argc != 7) {
             throw std::runtime_error {
-                "./a.out n_ancilla_qubits n_rotors abs_statevector_filepath abs_initial_circuit_filepath abs_output_filepath\n"
+                "./a.out n_ancilla_qubits n_rotors abs_init_circuit_dirpath abs_input_dirpath abs_output_dirpath statevector_filename\n"
             };
         }
 
@@ -31,9 +31,10 @@ struct CommandLineArguments
 
         n_ancilla_qubits = std::stoul(arguments[0]);
         const auto n_rotors = std::stoul(arguments[1]);
-        abs_statevector_dirpath = std::filesystem::path {arguments[2]};
-        abs_initial_circuit_filepath = std::filesystem::path {arguments[3]};
-        abs_output_filepath = std::filesystem::path {arguments[4]};
+        abs_init_circuit_dirpath = std::filesystem::path {arguments[2]};
+        abs_input_dirpath = std::filesystem::path {arguments[3]};
+        abs_output_dirpath = std::filesystem::path {arguments[4]};
+        statevector_filename = arguments[5];
 
         if (n_rotors == 2) {
             n_unitary_qubits = N_UNITARY_QUBITS_TWO_ROTOR;
@@ -53,9 +54,10 @@ struct CommandLineArguments
     std::size_t n_ancilla_qubits;
     std::size_t n_unitary_qubits;
     std::size_t n_total_qubits;
-    std::filesystem::path abs_statevector_dirpath;
-    std::filesystem::path abs_initial_circuit_filepath;
-    std::filesystem::path abs_output_filepath;
+    std::filesystem::path abs_init_circuit_dirpath;
+    std::filesystem::path abs_input_dirpath;
+    std::filesystem::path abs_output_dirpath;
+    std::string statevector_filename;
 };
 
 auto create_original_state(const std::filesystem::path& abs_initial_circuit_filepath, std::size_t n_unitary_qubits) -> ket::QuantumState
@@ -104,7 +106,7 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    auto statevector = ket::load_statevector(args.abs_statevector_dirpath);
+    auto statevector = ket::load_statevector(args.abs_input_dirpath / args.statevector_filename);
 
     // perform measurements
     auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1UL << 20, ket::arange(0UL, args.n_unitary_qubits));
@@ -113,12 +115,16 @@ auto main(int argc, char** argv) -> int
     const auto ancilla_qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
 
     // calculate the original statevector to perform inner product calculations against
-    const auto original_statevector = create_original_state(args.abs_initial_circuit_filepath, args.n_unitary_qubits);
+    const auto abs_init_circuit_filepath = args.abs_init_circuit_dirpath / "initial_circuit.dat";
+    const auto original_statevector = create_original_state(abs_init_circuit_filepath, args.n_unitary_qubits);
 
-    auto outstream = std::ofstream {args.abs_output_filepath};
+    const auto output_filepath = args.abs_output_dirpath / std::format("measurements_{}", args.statevector_filename);
+    auto outstream = std::ofstream {output_filepath};
     if (!outstream.is_open()) {
-        throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", args.abs_output_filepath.c_str())};
+        throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", output_filepath.c_str())};
     }
+
+    outstream << "# [projected register bitstring]   [count]   [|<true_ground_state|projected_state>|^2]\n";
 
     // calculate the count and inner product for each register
     for (std::size_t i_state {0}; i_state < (1UL << args.n_ancilla_qubits); ++i_state) {
@@ -128,15 +134,10 @@ auto main(int argc, char** argv) -> int
         const auto entry = prefix + bitstring;
         const auto count = counts_wrapper.at(entry);
 
-        try {
-            const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(bitstring);
-            const auto projected = ket::project_statevector(statevector, ancilla_qubit_indices, dyn_bitset);
-            const auto inner_product_sq = ket::inner_product_norm_squared(original_statevector, projected);
-            outstream << bitstring << "   " << count << "   " << inner_product_sq << '\n';
-        }
-        catch (const std::exception& e) {
-            std::cout << bitstring << "   " << count << "   " << 0.0 << '\n';
-        }
+        const auto dyn_bitset = ket::bitstring_to_dynamic_bitset(bitstring);
+        const auto projected = ket::project_statevector(statevector, ancilla_qubit_indices, dyn_bitset);
+        const auto inner_product_sq = ket::inner_product_norm_squared(original_statevector, projected);
+        outstream << bitstring << "   " << count << "   " << inner_product_sq << '\n';
     }
 
     return 0;

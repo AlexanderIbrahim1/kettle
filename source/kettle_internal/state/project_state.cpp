@@ -78,11 +78,13 @@ void normalize_amplitudes_(std::vector<std::complex<double>>& amplitudes, double
         sum_of_square_amplitudes += std::norm(amplitudes[i_state]);
     }
 
-    if (sum_of_square_amplitudes < minimum_norm_tol) {
+    const auto root_sum_of_square_amplitudes = std::sqrt(sum_of_square_amplitudes);
+
+    if (root_sum_of_square_amplitudes < minimum_norm_tol) {
         throw std::runtime_error {"The state cannot be normalized; norm of remaining amplitudes is 0.0\n"};
     }
 
-    const auto norm = std::sqrt(1.0 / sum_of_square_amplitudes);
+    const auto norm = 1.0 / root_sum_of_square_amplitudes;
 
     for (auto& amp : amplitudes) {
         amp *= norm;
