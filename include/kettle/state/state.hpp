@@ -116,6 +116,8 @@ auto tensor_product(const QuantumState& left, const QuantumState& right) -> Quan
 
 auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state) -> std::complex<double>;
 
+auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const QuantumState& state) -> std::complex<double>;
+
 auto inner_product_norm_squared(const QuantumState& left, const QuantumState& right) -> double;
 
 }  // namespace ket

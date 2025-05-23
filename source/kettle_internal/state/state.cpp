@@ -171,6 +171,22 @@ auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state)
     return inner_product;
 }
 
+auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const QuantumState& state) -> std::complex<double>
+{
+    if (eigenvalues.size() != state.n_states()) {
+        throw std::runtime_error {
+            "ERROR: mismatch in sizes when taking expectation value of diagonal operator.\n"
+        };
+    }
+
+    auto output = std::complex<double> {};
+    for (std::size_t i {0}; i < state.n_states(); ++i) {
+        output += (std::conj(state[i]) * eigenvalues[i] * state[i]);
+    }
+
+    return output;
+}
+
 auto inner_product_norm_squared(const QuantumState& left, const QuantumState& right) -> double
 {
     const auto inner_product_ = inner_product(left, right);
