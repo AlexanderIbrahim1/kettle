@@ -19,7 +19,7 @@ auto project_statevector(
     const QuantumState& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements,
-    double minimum_norm_tol = ket::NORMALIZATION_TOLERANCE
+    double minimum_norm_tol = ket::PROJECTION_NORMALIZATION_TOLERANCE
 ) -> QuantumState;
 
 }  // namespace ket

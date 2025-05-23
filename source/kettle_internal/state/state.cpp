@@ -29,14 +29,15 @@ QuantumState::QuantumState(std::size_t n_qubits)
 
 QuantumState::QuantumState(
     std::vector<std::complex<double>> coefficients,
-    QuantumStateEndian input_endian
+    QuantumStateEndian input_endian,
+    double normalization_tolerance
 )
     : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
     , n_states_ {coefficients.size()}
     , coefficients_ {std::move(coefficients)}
 {
     check_power_of_2_with_at_least_one_qubit_();
-    check_normalization_of_coefficients_();
+    check_normalization_of_coefficients_(normalization_tolerance);
 
     // the size of the coefficients vector is 2^{number of 0's in bit rep of the size}
     n_qubits_ = static_cast<std::size_t>(std::countr_zero(coefficients_.size()));
@@ -78,7 +79,7 @@ void QuantumState::check_power_of_2_with_at_least_one_qubit_() const
     }
 }
 
-void QuantumState::check_normalization_of_coefficients_() const
+void QuantumState::check_normalization_of_coefficients_(double normalization_tolerance) const
 {
     auto sum_of_squared_norms = double {0.0};
     for (const auto& elem : coefficients_) {
@@ -86,7 +87,7 @@ void QuantumState::check_normalization_of_coefficients_() const
     }
 
     const auto expected = 1.0;
-    const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < ket::NORMALIZATION_TOLERANCE;
+    const auto is_normalized = std::fabs(sum_of_squared_norms - expected) < normalization_tolerance;
 
     if (!is_normalized) {
         auto err_msg = std::stringstream {};

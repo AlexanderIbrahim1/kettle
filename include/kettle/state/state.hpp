@@ -25,7 +25,8 @@ public:
 
     explicit QuantumState(
         std::vector<std::complex<double>> coefficients,
-        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE,
+        double normalization_tolerance = ket::CONSTRUCTION_NORMALIZATION_TOLERANCE
     );
 
     explicit QuantumState(
@@ -96,7 +97,7 @@ private:
 
     void check_power_of_2_with_at_least_one_qubit_() const;
 
-    void check_normalization_of_coefficients_() const;
+    void check_normalization_of_coefficients_(double normalization_tolerance) const;
 
     void check_index_(std::size_t index) const;
 
