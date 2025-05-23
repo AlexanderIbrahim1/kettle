@@ -17,6 +17,7 @@ function(add_exec NAME)
   add_dependencies("run_${NAME}" "${NAME}")
 endfunction()
 
+add_exec(qpe_tangelo_eigenvalue)
 add_exec(qpe_tangelo_measure)
 add_exec(qpe_tangelo_project)
 add_exec(qpe_tangelo_simulate)
