@@ -49,6 +49,9 @@ public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     SparsePauliString(const std::vector<PauliTerm>& paulis, PauliPhase phase = PauliPhase::PLUS_ONE);
 
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    SparsePauliString(const std::initializer_list<PauliTerm>& paulis, PauliPhase phase = PauliPhase::PLUS_ONE);
+
     /*
         Set the phase of the `SparsePauliString`.
     */

@@ -4,9 +4,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
+#include "kettle/circuit/circuit.hpp"
 #include "kettle/common/mathtools.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/operator/pauli/pauli_operator.hpp"
+#include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 
 
@@ -98,11 +100,102 @@ TEST_CASE("expectation value of SparsePauliString, 2-qubit")
     REQUIRE(ket::almost_eq(expval, testcase.expected));
 }
 
-// make it easier to construct SparsePauliString first
-// TEST_CASE("expectation value of PauliOperator")
-// {
-//     SECTION("Z + X")
-//     {
-//         auto pauli_op = ket::PauliOperator {1};
-//     }
-// }
+TEST_CASE("expectation value of PauliOperator")
+{
+    SECTION("<0|(Z + X)|0>")
+    {
+        auto pauli_op = ket::PauliOperator {
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::Z}},
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::X}},
+        };
+
+        const auto statevector = ket::QuantumState {"0"};
+
+        const auto expval = ket::expectation_value(pauli_op, statevector);
+
+        REQUIRE(ket::almost_eq(expval, {1.0, 0.0}));
+    }
+
+    SECTION("<+|(Z - 2 * X)|+>")
+    {
+        auto pauli_op = ket::PauliOperator {
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::Z}},
+            {.coefficient={-2.0, 0.0}, .pauli_string={PT::X}},
+        };
+
+        const auto statevector = ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+
+        const auto expval = ket::expectation_value(pauli_op, statevector);
+
+        REQUIRE(ket::almost_eq(expval, {-2.0, 0.0}));
+    }
+
+    SECTION("<BELL[0+]|(ZZ + XX)|BELL[0+]>")
+    {
+        auto pauli_op = ket::PauliOperator {
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::Z, PT::Z}},
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::X, PT::X}},
+        };
+
+        const auto bell_state = []() {
+            auto circuit = ket::QuantumCircuit {2};
+            circuit.add_h_gate(0);
+            circuit.add_cx_gate(0, 1);
+
+            auto state = ket::QuantumState {"00"};
+            ket::simulate(circuit, state);
+
+            return state;
+        }();
+
+        const auto expval = ket::expectation_value(pauli_op, bell_state);
+
+        REQUIRE(ket::almost_eq(expval, {2.0, 0.0}));
+    }
+
+    SECTION("<GHZ|(ZZZ + XXX)|GHZ>")
+    {
+        auto pauli_op = ket::PauliOperator {
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::Z, PT::Z, PT::Z}},
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::X, PT::X, PT::X}},
+        };
+
+        const auto ghz_state = []() {
+            auto circuit = ket::QuantumCircuit {3};
+            circuit.add_h_gate(0);
+            circuit.add_cx_gate(0, 1);
+            circuit.add_cx_gate(0, 2);
+
+            auto state = ket::QuantumState {"000"};
+            ket::simulate(circuit, state);
+
+            return state;
+        }();
+
+        const auto expval = ket::expectation_value(pauli_op, ghz_state);
+
+        REQUIRE(ket::almost_eq(expval, {1.0, 0.0}));
+    }
+
+    SECTION("<++|(XI - iIX)|++>")
+    {
+        auto pauli_op = ket::PauliOperator {
+            {.coefficient={1.0, 0.0}, .pauli_string={PT::X, PT::I}},
+            {.coefficient={0.0, -1.0}, .pauli_string={PT::I, PT::X}},
+        };
+
+        const auto plus_plus_state = []() {
+            auto circuit = ket::QuantumCircuit {2};
+            circuit.add_h_gate({0, 1});
+
+            auto state = ket::QuantumState {"00"};
+            ket::simulate(circuit, state);
+
+            return state;
+        }();
+
+        const auto expval = ket::expectation_value(pauli_op, plus_plus_state);
+
+        REQUIRE(ket::almost_eq(expval, {1.0, -1.0}));
+    }
+}

@@ -43,6 +43,13 @@ SparsePauliString::SparsePauliString(
     }
 }
 
+SparsePauliString::SparsePauliString(
+    const std::initializer_list<PauliTerm>& paulis,
+    PauliPhase phase
+)
+    : SparsePauliString {std::vector<PauliTerm> {paulis}, phase}
+{}
+
 void SparsePauliString::set_phase(PauliPhase phase) noexcept
 {
     phase_ = phase;

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <complex>
+#include <initializer_list>
 #include <vector>
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
@@ -26,6 +28,38 @@ class PauliOperator
 public:
     explicit PauliOperator(std::size_t n_qubits)
         : n_qubits_ {n_qubits}
+    {}
+
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    PauliOperator(std::vector<WeightedPauliString> weighted_pauli_strings)
+        : n_qubits_ {0}
+        , weighted_pauli_strings_ {std::move(weighted_pauli_strings)}
+    {
+        const auto& strings_ = weighted_pauli_strings_;
+
+        if (strings_.size() == 0) {
+            throw std::runtime_error {
+                "ERROR: construction of `PauliOperator` with only WeightedPauliString instances requires\n"
+                "a non-empty vector.\n"
+            };
+        }
+
+        const auto has_nonequal_n_qubits = [](const auto& left, const auto& right) -> bool {
+            return left.pauli_string.n_qubits() != right.pauli_string.n_qubits();
+        };
+
+        if (std::ranges::adjacent_find(strings_, has_nonequal_n_qubits) != strings_.end()) {
+            throw std::runtime_error {
+                "ERROR: construction of `PauliOperator` with WeightedPauliString instances requires\n"
+                "all pauli strings to have the same number of qubits.\n"
+            };
+        }
+
+        n_qubits_ = strings_[0].pauli_string.n_qubits();
+    }
+
+    PauliOperator(const std::initializer_list<WeightedPauliString>& weighted_pauli_strings)
+        : PauliOperator {std::vector<WeightedPauliString> {weighted_pauli_strings}}
     {}
 
     [[nodiscard]]
