@@ -85,6 +85,9 @@ add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.c
 add_test_target(TARGET read_tangelo_file_test SOURCES "source/io/read_tangelo_file_test.cpp")
 add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_file_test.cpp")
 
+add_test_target(TARGET sparse_pauli_string_test SOURCES "source/operator/pauli/sparse_pauli_string_test.cpp")
+add_test_target(TARGET pauli_operator_test SOURCES "source/operator/pauli/pauli_operator_test.cpp")
+
 add_test_target(TARGET parameter_test SOURCES "source/parameter/parameter_test.cpp")
 add_test_target(TARGET parameter_expression_test SOURCES "source/parameter/parameter_expression_test.cpp")
 add_test_target(TARGET simulate_with_parameter_test SOURCES "source/parameter/simulate_with_parameter_test.cpp")
@@ -95,6 +98,7 @@ add_test_target(TARGET measure_test SOURCES "source/simulation/measure_test.cpp"
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/simulation/operations_test.cpp")
 add_test_target(TARGET simulate_test SOURCES "source/simulation/simulate_test.cpp")
+add_test_target(TARGET simulate_pauli_test SOURCES "source/simulation/simulate_pauli_test.cpp")
 
 add_test_target(TARGET bitstring_utils_test SOURCES "source/state/bitstring_utils_test.cpp")
 add_test_target(TARGET project_state_test SOURCES "source/state/project_state_test.cpp")
