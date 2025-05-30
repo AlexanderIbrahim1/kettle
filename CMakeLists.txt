@@ -51,6 +51,7 @@ add_library(
     source/kettle_internal/io/read_tangelo_file.cpp
     source/kettle_internal/io/statevector.cpp
     source/kettle_internal/io/write_tangelo_file.cpp
+    source/kettle_internal/operator/pauli/pauli_operator.cpp
     source/kettle_internal/operator/pauli/sparse_pauli_string.cpp
     source/kettle_internal/parameter/parameter.cpp
     source/kettle_internal/parameter/parameter_expression.cpp
