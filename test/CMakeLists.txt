@@ -33,9 +33,10 @@ cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH KETTLE_SOURCE_DIR)
 set(SOURCE_FILES_DIR "${KETTLE_SOURCE_DIR}/source")
 
 function(add_test_target)
+    set(OPTIONS USE_NLOPT)
     set(ONE_VALUE_ARGS TARGET)
     set(MULTI_VALUE_ARGS SOURCES)
-    cmake_parse_arguments(add_test_target "" "${ONE_VALUE_ARGS}" "${MULTI_VALUE_ARGS}" "${ARGN}")
+    cmake_parse_arguments(add_test_target "${OPTIONS}" "${ONE_VALUE_ARGS}" "${MULTI_VALUE_ARGS}" "${ARGN}")
 
     add_executable(
         ${add_test_target_TARGET}
@@ -52,6 +53,17 @@ function(add_test_target)
         PRIVATE kettle::kettle
         PRIVATE Catch2::Catch2WithMain
     )
+
+    if(add_test_target_USE_NLOPT)
+        get_target_property(NLOPT_INCLUDES nlopt::nlopt INTERFACE_INCLUDE_DIRECTORIES)
+        target_link_libraries(
+            ${add_test_target_TARGET}
+            PRIVATE nlopt::nlopt
+        )
+        target_include_directories(${add_test_target_TARGET}
+            SYSTEM PUBLIC ${NLOPT_INCLUDES}
+        )
+    endif()
 
     catch_discover_tests(${add_test_target_TARGET})
 endfunction()
@@ -87,6 +99,8 @@ add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_
 
 add_test_target(TARGET sparse_pauli_string_test SOURCES "source/operator/pauli/sparse_pauli_string_test.cpp")
 add_test_target(TARGET pauli_operator_test SOURCES "source/operator/pauli/pauli_operator_test.cpp")
+
+add_test_target(OPTIONS USE_NLOPT TARGET optimize_test SOURCES "source/optimize/optimize_test.cpp")
 
 add_test_target(TARGET parameter_test SOURCES "source/parameter/parameter_test.cpp")
 add_test_target(TARGET parameter_expression_test SOURCES "source/parameter/parameter_expression_test.cpp")

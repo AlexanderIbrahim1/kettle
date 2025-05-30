@@ -13,6 +13,9 @@ project(
 include(cmake/project-is-top-level.cmake)
 include(cmake/variables.cmake)
 
+# ---- Add Dependencies ----
+include(cmake/nlopt_external.cmake)
+
 # ---- Declare library ----
 
 add_library(
@@ -105,6 +108,19 @@ target_compile_features(
     kettle_kettle
     PUBLIC
     cxx_std_20
+)
+
+target_link_libraries(
+    kettle_kettle
+    PRIVATE
+    nlopt::nlopt
+)
+
+get_target_property(NLOPT_INCLUDES nlopt::nlopt INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(
+    kettle_kettle
+    SYSTEM
+    PUBLIC ${NLOPT_INCLUDES}
 )
 
 # ---- Install rules ----
