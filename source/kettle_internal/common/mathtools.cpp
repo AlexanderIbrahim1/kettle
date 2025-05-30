@@ -90,4 +90,18 @@ auto almost_eq(
     return diff_sq < tolerance_sq;
 }
 
+auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
+{
+    auto backward = std::size_t {0};
+
+    for (std::size_t i {0}; i < n_relevant_bits; ++i) {
+        backward <<= 1UL;
+        backward |= (value & 1UL);
+        value >>= 1UL;
+    }
+
+    return backward;
+}
+
+
 }  // namespace ket

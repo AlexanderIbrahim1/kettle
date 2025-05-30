@@ -114,7 +114,6 @@ add_test_target(TARGET operations_test SOURCES "source/simulation/operations_tes
 add_test_target(TARGET simulate_test SOURCES "source/simulation/simulate_test.cpp")
 add_test_target(TARGET simulate_pauli_test SOURCES "source/simulation/simulate_pauli_test.cpp")
 
-add_test_target(TARGET bitstring_utils_test SOURCES "source/state/bitstring_utils_test.cpp")
 add_test_target(TARGET project_state_test SOURCES "source/state/project_state_test.cpp")
 add_test_target(TARGET state_test SOURCES "source/state/state_test.cpp")
 

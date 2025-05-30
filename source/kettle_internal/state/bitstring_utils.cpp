@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cstddef>
 #include <stdexcept>
 #include <string>
 
@@ -8,19 +7,6 @@
 
 namespace ket::internal
 {
-
-auto endian_flip_(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
-{
-    auto backward = std::size_t {0};
-
-    for (std::size_t i {0}; i < n_relevant_bits; ++i) {
-        backward <<= 1UL;
-        backward |= (value & 1UL);
-        value >>= 1UL;
-    }
-
-    return backward;
-}
 
 auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
 {

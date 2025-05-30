@@ -13,4 +13,6 @@ auto almost_eq(
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;
 
+auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t;
+
 }  // namespace ket

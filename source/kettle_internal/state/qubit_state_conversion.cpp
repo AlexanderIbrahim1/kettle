@@ -5,11 +5,13 @@
 #include <string>
 #include <vector>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/state/endian.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/state/bitstring_utils.hpp"
+
 namespace
 {
 
@@ -46,7 +48,7 @@ auto bitstring_to_state_index(
     }
     else {
         const auto n_qubits = bitstring.size();
-        const auto little_endian_index = ket::internal::endian_flip_(big_endian_index, n_qubits);
+        const auto little_endian_index = ket::endian_flip(big_endian_index, n_qubits);
         return little_endian_index;
     }
 }

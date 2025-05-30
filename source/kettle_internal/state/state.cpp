@@ -115,7 +115,7 @@ void QuantumState::check_at_least_one_qubit_() const
 void QuantumState::perform_endian_flip_on_coefficients_() noexcept
 {
     for (std::size_t i {0}; i < n_states_; ++i) {
-        const auto i_flip = ket::internal::endian_flip_(i, n_qubits_);
+        const auto i_flip = ket::endian_flip(i, n_qubits_);
         if (i < i_flip) {
             std::swap(coefficients_[i], coefficients_[i_flip]);
         }
