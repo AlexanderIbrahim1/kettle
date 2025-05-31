@@ -7,10 +7,12 @@
 
 #include <kettle/kettle.hpp>
 
+#include "matrix2d.cpp"  // NOLINT
+
 /*
     This code:
-      - loads in the final simulated statevector from the QPE simulations, after it also passed through the reverse circuit
-      - loads in the corresponding eigenvalues
+      - loads in the final simulated statevector from the QPE simulations
+      - loads in the hamiltonian
       - projects the final statevector against all possible binary register strings
       - calculates the estimated eigenvalue of each projected statevector
 */
@@ -24,7 +26,7 @@ struct CommandLineArguments
     {
         if (argc != 7) {
             throw std::runtime_error {
-                "./a.out n_ancilla_qubits n_rotors abs_rev_input_dirpath abs_output_dirpath abs_eigenvalue_filepath statevector_filename\n"
+                "./a.out n_ancilla_qubits n_rotors abs_input_dirpath abs_output_dirpath abs_sparse_hamiltonian_filepath statevector_filename\n"
             };
         }
 
@@ -34,7 +36,7 @@ struct CommandLineArguments
         const auto n_rotors = std::stoul(arguments[1]);
         abs_input_dirpath = std::filesystem::path {arguments[2]};
         abs_output_dirpath = std::filesystem::path {arguments[3]};
-        abs_eigenvalue_filepath = std::filesystem::path {arguments[4]};
+        abs_sparse_hamiltonian_filepath = std::filesystem::path {arguments[4]};
         statevector_filename = arguments[5];
 
         if (n_rotors == 2) {
@@ -57,28 +59,9 @@ struct CommandLineArguments
     std::size_t n_total_qubits;
     std::filesystem::path abs_input_dirpath;
     std::filesystem::path abs_output_dirpath;
-    std::filesystem::path abs_eigenvalue_filepath;
+    std::filesystem::path abs_sparse_hamiltonian_filepath;
     std::string statevector_filename;
 };
-
-
-auto read_eigenvalues(std::istream& instream, std::size_t n_eigenvalues) -> std::vector<std::complex<double>>
-{
-    auto output = std::vector<std::complex<double>> {};
-    output.reserve(n_eigenvalues);
-
-    std::string line;
-    double eigenvalue;  // NOLINT(cppcoreguidelines-init-variables)
-
-    while (std::getline(instream, line)) {
-        auto sstream = std::stringstream {line};
-        sstream >> eigenvalue;
-
-        output.emplace_back(eigenvalue, 0.0);
-    }
-
-    return output;
-}
 
 
 auto main(int argc, char** argv) -> int
@@ -94,36 +77,24 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    // load in the final reversed statevector
-    auto rev_statevector = ket::load_statevector(args.abs_input_dirpath / std::format("reversed_{}", args.statevector_filename));
-
+    auto statevector = ket::load_statevector(args.abs_input_dirpath / args.statevector_filename);
     const auto ancilla_qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
+    const auto n_unitary_states = 1UL << args.n_unitary_qubits;
 
+    // stream to where the expectation values will be written
     const auto output_filepath = args.abs_output_dirpath / std::format("eigenvalues_{}", args.statevector_filename);
     auto outstream = std::ofstream {output_filepath};
     if (!outstream.is_open()) {
         throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", output_filepath.c_str())};
     }
 
-    const auto n_eigenvalues = (1UL << args.n_unitary_qubits);
+    // read in the hamiltonian
+    auto hstream = std::ifstream {args.abs_sparse_hamiltonian_filepath};
+    if (!hstream.is_open()) {
+        throw std::ios::failure {std::format("ERROR: cannot open hamiltonian file '{}'", args.abs_sparse_hamiltonian_filepath.c_str())};
+    }
 
-    const auto eigenvalues = [&]() {
-        auto eigenvalue_stream = std::ifstream {args.abs_eigenvalue_filepath};
-        if (!eigenvalue_stream.is_open()) {
-            throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", args.abs_eigenvalue_filepath.c_str())};
-        }
-
-        auto eigenvalues_ = read_eigenvalues(eigenvalue_stream, n_eigenvalues);
-
-        for (std::size_t i {0}; i < eigenvalues_.size(); ++i) {
-            const auto i_swap = ket::endian_flip(i, args.n_unitary_qubits);
-            if (i < i_swap) {
-                std::swap(eigenvalues_[i], eigenvalues_[i_swap]);
-            }
-        }
-
-        return eigenvalues_;
-    }();
+    const auto hamiltonian = load_square_matrix(hstream, n_unitary_states);
 
     outstream << "# [projected register bitstring]   [<projected_state|H|projected_state> (classical rescale)]\n";
     outstream << std::fixed << std::setprecision(14);
@@ -132,16 +103,17 @@ auto main(int argc, char** argv) -> int
         // project it against the provided binary register
         const auto ancilla_bitstring = ket::state_index_to_bitstring_big_endian(i_state, args.n_ancilla_qubits);
         const auto ancilla_bitset = ket::bitstring_to_dynamic_bitset(ancilla_bitstring);
-        const auto projected = ket::project_statevector(rev_statevector, ancilla_qubit_indices, ancilla_bitset);
+        const auto projected = ket::project_statevector(statevector, ancilla_qubit_indices, ancilla_bitset);
 
-        auto eigenvalue = ket::diagonal_expectation_value(eigenvalues, projected);
+        auto expvalue = expectation_value(hamiltonian, projected);
         
-        if (std::fabs(eigenvalue.imag()) > 1.0e-6) {
-            throw std::runtime_error {"Found eigenvalue with a non-zero imaginary component\n"};
+        if (std::fabs(expvalue.imag()) > 1.0e-6) {
+            const auto msg = std::format("Found eigenvalue with a non-zero imaginary component: {}, {}", expvalue.real(), expvalue.imag());
+            throw std::runtime_error {msg};
             std::exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
         }
 
-        outstream << ancilla_bitstring << "   " << eigenvalue.real() << '\n';
+        outstream << ancilla_bitstring << "   " << expvalue.real() << '\n';
     }
 
     return 0;
