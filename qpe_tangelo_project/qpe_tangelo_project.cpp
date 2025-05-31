@@ -1,14 +1,16 @@
 #include <filesystem>
 #include <format>
+#include <fstream>
 #include <stdexcept>
 
 #include <kettle/kettle.hpp>
 
 /*
     This code:
-      - loads in the final simulated statevector from the QPE simulations, after it also passed through the reverse circuit
-      - projects the final statevector against a provided binary register string
-      - saves the projected statevector
+      - loads in the final simulated statevector from the QPE simulations
+      - for each register bitstring:
+        - projects the final statevector against the register bitstring
+        - saves the projected statevector in its own file in the output directory
 */
 
 static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {6};
@@ -18,9 +20,9 @@ struct CommandLineArguments
 {
     CommandLineArguments(int argc, char** argv)
     {
-        if (argc != 7) {
+        if (argc != 6) {
             throw std::runtime_error {
-                "./a.out n_ancilla_qubits n_rotors abs_rev_input_dirpath abs_rev_output_dirpath statevector_filename binary_register_string\n"
+                "./a.out n_ancilla_qubits n_rotors abs_input_dirpath abs_output_dirpath statevector_filename\n"
             };
         }
 
@@ -28,10 +30,9 @@ struct CommandLineArguments
 
         n_ancilla_qubits = std::stoul(arguments[0]);
         const auto n_rotors = std::stoul(arguments[1]);
-        abs_rev_input_dirpath = std::filesystem::path {arguments[2]};
-        abs_rev_output_dirpath = std::filesystem::path {arguments[3]};
+        abs_input_dirpath = std::filesystem::path {arguments[2]};
+        abs_output_dirpath = std::filesystem::path {arguments[3]};
         statevector_filename = arguments[4];
-        binary_register_string = arguments[5];
 
         if (n_rotors == 2) {
             n_unitary_qubits = N_UNITARY_QUBITS_TWO_ROTOR;
@@ -51,10 +52,9 @@ struct CommandLineArguments
     std::size_t n_ancilla_qubits;
     std::size_t n_unitary_qubits;
     std::size_t n_total_qubits;
-    std::filesystem::path abs_rev_input_dirpath;
-    std::filesystem::path abs_rev_output_dirpath;
+    std::filesystem::path abs_input_dirpath;
+    std::filesystem::path abs_output_dirpath;
     std::string statevector_filename;
-    std::string binary_register_string;
 };
 
 
@@ -71,18 +71,23 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    // load in the final reversed statevector
-    auto rev_statevector = ket::load_statevector(args.abs_rev_input_dirpath / std::format("reversed_{}", args.statevector_filename));
+    auto statevector = ket::load_statevector(args.abs_input_dirpath / args.statevector_filename);
+    const auto ancilla_qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
 
-    // project it against the provided binary register
-    const auto qubit_indices = ket::arange(args.n_unitary_qubits, args.n_total_qubits);
-    const auto register_bitset = ket::bitstring_to_dynamic_bitset(args.binary_register_string);
-    auto projected = ket::project_statevector(rev_statevector, qubit_indices, register_bitset);
+    for (std::size_t i_state {0}; i_state < (1UL << args.n_ancilla_qubits); ++i_state) {
+        // project it against the provided binary register
+        const auto ancilla_bitstring = ket::state_index_to_bitstring_big_endian(i_state, args.n_ancilla_qubits);
+        const auto ancilla_bitset = ket::bitstring_to_dynamic_bitset(ancilla_bitstring);
+        const auto projected = ket::project_statevector(statevector, ancilla_qubit_indices, ancilla_bitset);
 
-    // save the projected statevector
-    const auto output_filepath = args.abs_rev_output_dirpath / std::format("projected_{}_{}", args.binary_register_string, args.statevector_filename);
-    ket::save_statevector(output_filepath, projected, ket::QuantumStateEndian::BIG);
+        const auto output_filepath = args.abs_output_dirpath / std::format("projected_{}_{}", ancilla_bitstring, args.statevector_filename);
+        auto outstream = std::ofstream {output_filepath};
+        if (!outstream.is_open()) {
+            throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", output_filepath.c_str())};
+        }
+
+        ket::save_statevector(outstream, projected, ket::QuantumStateEndian::BIG);
+    }
 
     return 0;
 }
-
