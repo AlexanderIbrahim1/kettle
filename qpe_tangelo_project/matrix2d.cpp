@@ -1,4 +1,3 @@
-#include "kettle/state/endian.hpp"
 #include <complex>
 #include <cstddef>
 #include <format>
