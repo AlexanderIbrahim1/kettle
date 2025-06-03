@@ -10,13 +10,14 @@
 
 // TODO: add ability to set the initial parameters of the circuit
 // - or maybe do it post-initialization?
+namespace gid = ket::internal::gate_id;
 
 namespace 
 {
 
 inline constexpr auto DEFAULT_ROTATION_GATE_PARAMETER = double {0.0};
 
-void verify_valid_gates(const std::vector<ket::Gate>& gates)
+void verify_valid_gates_(const std::vector<ket::Gate>& gates)
 {
     for (auto gate : gates) {
         if (gate == ket::Gate::U || gate == ket::Gate::CU || gate == ket::Gate::M) {
@@ -25,13 +26,20 @@ void verify_valid_gates(const std::vector<ket::Gate>& gates)
     }
 }
 
-auto apply_rotation_gates(
+void verify_valid_entanglement_gates_(const std::vector<ket::Gate>& gates)
+{
+    for (auto gate : gates) {
+        if (!gid::is_1c1t_gate(gate) && !gid::is_1c1t1a_gate(gate)) {
+            throw std::runtime_error {"ERROR: entanglement gate must be controlled\n"};
+        }
+    }
+}
+
+auto apply_rotation_gates_(
     ket::QuantumCircuit& circuit,
     const std::vector<ket::Gate>& rotation_blocks
 ) -> std::vector<ket::param::ParameterID>
 {
-    namespace gid = ket::internal::gate_id;
-
     auto parameter_ids = std::vector<ket::param::ParameterID> {};
 
     constexpr auto key = ket::param::parameterized {};
@@ -79,10 +87,3 @@ auto apply_rotation_gates(
 }
 
 }  // namespace
-
-
-namespace ket
-{
-
-
-}  // namespace ket
