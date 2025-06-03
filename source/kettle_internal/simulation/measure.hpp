@@ -13,13 +13,13 @@ namespace ket::internal
 
 auto probabilities_of_collapsed_states_(
     ket::QuantumState& state,
-    const ket::GateInfo& info
+    const ket::PrimitiveGateInfo& info
 ) -> std::tuple<double, double>;
 
 template <int StateToCollapse>
 void collapse_and_renormalize_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     double norm_of_surviving_state
 );
 
@@ -33,7 +33,7 @@ void collapse_and_renormalize_(
 template <ket::internal::DiscreteDistribution Distribution = std::discrete_distribution<int>>
 auto simulate_measurement_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     std::optional<int> seed = std::nullopt
 ) -> Distribution::result_type
 {

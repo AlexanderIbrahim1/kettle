@@ -8,7 +8,7 @@
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
-using G = ket::Gate;
+using G = ket::PrimitiveGate;
 namespace cre = ket::internal::create;
 
 TEST_CASE("Test create and unpack gate functions")

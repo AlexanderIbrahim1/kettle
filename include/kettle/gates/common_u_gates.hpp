@@ -36,8 +36,8 @@ auto rz_gate(double angle) noexcept -> Matrix2X2;
 
 auto p_gate(double angle) noexcept -> Matrix2X2;
 
-auto non_angle_gate(Gate gate) -> Matrix2X2;
+auto non_angle_gate(PrimitiveGate gate) -> Matrix2X2;
 
-auto angle_gate(Gate gate, double angle) -> Matrix2X2;
+auto angle_gate(PrimitiveGate gate, double angle) -> Matrix2X2;
 
 }  // namespace ket

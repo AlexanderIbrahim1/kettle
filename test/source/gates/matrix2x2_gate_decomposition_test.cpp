@@ -36,7 +36,7 @@ static constexpr auto between_0_and_period(double x, double period) -> double {
 
 TEST_CASE("decomp_to_single_primitive_gate_()")
 {
-    using Info = ket::internal::PrimitiveGateInfo_;
+    using Info = ket::internal::Matrix2X2GateInfo_;
 
     struct TestCase
     {
@@ -49,11 +49,11 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
         SECTION("successful decomposition")
         {
             const auto testcase = GENERATE(
-                TestCase {ket::h_gate(), Info {ket::Gate::H, {}}},
-                TestCase {ket::x_gate(), Info {ket::Gate::X, {}}},
-                TestCase {ket::y_gate(), Info {ket::Gate::Y, {}}},
-                TestCase {ket::z_gate(), Info {ket::Gate::Z, {}}},
-                TestCase {ket::sx_gate(), Info {ket::Gate::SX, {}}}
+                TestCase {ket::h_gate(), Info {ket::PrimitiveGate::H, {}}},
+                TestCase {ket::x_gate(), Info {ket::PrimitiveGate::X, {}}},
+                TestCase {ket::y_gate(), Info {ket::PrimitiveGate::Y, {}}},
+                TestCase {ket::z_gate(), Info {ket::PrimitiveGate::Z, {}}},
+                TestCase {ket::sx_gate(), Info {ket::PrimitiveGate::SX, {}}}
             );
 
             const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
@@ -79,10 +79,10 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
         const auto angle = GENERATE(0.01, 1.45 * M_PI, 1.99 * M_PI);
 
         const auto testcase = GENERATE_COPY(
-            TestCase {ket::rx_gate(angle), Info {ket::Gate::RX, angle}},
-            TestCase {ket::ry_gate(angle), Info {ket::Gate::RY, angle}},
-            TestCase {ket::rz_gate(angle), Info {ket::Gate::RZ, angle}},
-            TestCase {ket::p_gate(angle), Info {ket::Gate::P, angle}}
+            TestCase {ket::rx_gate(angle), Info {ket::PrimitiveGate::RX, angle}},
+            TestCase {ket::ry_gate(angle), Info {ket::PrimitiveGate::RY, angle}},
+            TestCase {ket::rz_gate(angle), Info {ket::PrimitiveGate::RZ, angle}},
+            TestCase {ket::p_gate(angle), Info {ket::PrimitiveGate::P, angle}}
         );
 
         const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
@@ -119,10 +119,10 @@ TEST_CASE("decompose to primtive gates; general")
 
         // make sure the expect gates come out
         REQUIRE(decomp_gates.size() == 4);
-        REQUIRE(decomp_gates[0].gate == ket::Gate::RZ);
-        REQUIRE(decomp_gates[1].gate == ket::Gate::RY);
-        REQUIRE(decomp_gates[2].gate == ket::Gate::RZ);
-        REQUIRE(decomp_gates[3].gate == ket::Gate::P);
+        REQUIRE(decomp_gates[0].gate == ket::PrimitiveGate::RZ);
+        REQUIRE(decomp_gates[1].gate == ket::PrimitiveGate::RY);
+        REQUIRE(decomp_gates[2].gate == ket::PrimitiveGate::RZ);
+        REQUIRE(decomp_gates[3].gate == ket::PrimitiveGate::P);
 
         // construct a circuit from the unitary matrix
         auto circuit0 = ket::QuantumCircuit {1};
@@ -158,10 +158,10 @@ TEST_CASE("decompose to primtive gates; general")
 
         // make sure the expect gates come out
         REQUIRE(decomp_gates.size() == 4);
-        REQUIRE(decomp_gates[0].gate == ket::Gate::CRZ);
-        REQUIRE(decomp_gates[1].gate == ket::Gate::CRY);
-        REQUIRE(decomp_gates[2].gate == ket::Gate::CRZ);
-        REQUIRE(decomp_gates[3].gate == ket::Gate::CP);
+        REQUIRE(decomp_gates[0].gate == ket::PrimitiveGate::CRZ);
+        REQUIRE(decomp_gates[1].gate == ket::PrimitiveGate::CRY);
+        REQUIRE(decomp_gates[2].gate == ket::PrimitiveGate::CRZ);
+        REQUIRE(decomp_gates[3].gate == ket::PrimitiveGate::CP);
 
         // construct a circuit from the unitary matrix
         auto circuit0 = ket::QuantumCircuit {2};

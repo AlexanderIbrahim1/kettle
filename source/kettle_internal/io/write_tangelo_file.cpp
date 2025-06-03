@@ -42,7 +42,7 @@ auto format_matrix2x2_(const ket::Matrix2X2& mat) -> std::string
     return output.str();
 }
 
-auto format_one_target_gate_(const ket::GateInfo& info) -> std::string
+auto format_one_target_gate_(const ket::PrimitiveGateInfo& info) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
@@ -50,7 +50,7 @@ auto format_one_target_gate_(const ket::GateInfo& info) -> std::string
     return std::format("{:<10}target : [{}]\n", gate_name, target);
 }
 
-auto format_one_control_one_target_gate_(const ket::GateInfo& info) -> std::string
+auto format_one_control_one_target_gate_(const ket::PrimitiveGateInfo& info) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto [control, target] = ket::internal::create::unpack_double_qubit_gate_indices(info);
@@ -58,7 +58,7 @@ auto format_one_control_one_target_gate_(const ket::GateInfo& info) -> std::stri
     return std::format("{:<10}target : [{}]   control : [{}]\n", gate_name, target, control);
 }
 
-auto format_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
+auto format_one_target_one_angle_gate_(const ket::PrimitiveGateInfo& info) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto [target, angle] = ket::internal::create::unpack_one_target_one_angle_gate(info);
@@ -66,7 +66,7 @@ auto format_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
     return std::format("{:<10}target : [{}]   parameter : {:.16f}\n", gate_name, target, angle);
 }
 
-auto format_one_control_one_target_one_angle_gate_(const ket::GateInfo& info) -> std::string
+auto format_one_control_one_target_one_angle_gate_(const ket::PrimitiveGateInfo& info) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto [control, target, angle] = ket::internal::create::unpack_one_control_one_target_one_angle_gate(info);
@@ -74,7 +74,7 @@ auto format_one_control_one_target_one_angle_gate_(const ket::GateInfo& info) ->
     return std::format("{:<10}target : [{}]   control : [{}]   parameter : {:.16f}\n", gate_name, target, control, angle);
 }
 
-auto format_m_gate_(const ket::GateInfo& info) -> std::string
+auto format_m_gate_(const ket::PrimitiveGateInfo& info) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto [qubit, bit] = ket::internal::create::unpack_m_gate(info);
@@ -82,7 +82,7 @@ auto format_m_gate_(const ket::GateInfo& info) -> std::string
     return std::format("{:<10}target : [{}]   bit : [{}]\n", gate_name, qubit, bit);
 }
 
-auto format_u_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
+auto format_u_gate_(const ket::PrimitiveGateInfo& info, const ket::Matrix2X2& mat) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
@@ -94,7 +94,7 @@ auto format_u_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std
     return output.str();
 }
 
-auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> std::string
+auto format_cu_gate_(const ket::PrimitiveGateInfo& info, const ket::Matrix2X2& mat) -> std::string
 {
     const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(info.gate);
     const auto [control, target] = ket::internal::create::unpack_double_qubit_gate_indices(info);
@@ -126,7 +126,7 @@ void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-c
 {
     namespace gid = ket::internal::gate_id;
     namespace io_fmt = ket::internal::format;
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     const auto whitespace = std::string(n_leading_whitespace, ' ');
     constexpr auto n_whitespace = ket::internal::CONTROL_FLOW_WHITESPACE_DEFAULT;

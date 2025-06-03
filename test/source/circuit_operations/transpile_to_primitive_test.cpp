@@ -13,58 +13,58 @@
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
 
-using G = ket::Gate;
+using G = ket::PrimitiveGate;
 using Matrices = std::vector<ket::Matrix2X2>;
 namespace gid = ket::internal::gate_id;
 
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
 */
-static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg_infos) -> ket::Matrix2X2
+static auto make_matrix(const std::vector<ket::internal::Matrix2X2GateInfo_>& pg_infos) -> ket::Matrix2X2
 {
     auto output = ket::i_gate();
 
     for (const auto& pg_info : pg_infos) {
         switch (pg_info.gate)
         {
-            case ket::Gate::H : {
+            case ket::PrimitiveGate::H : {
                 output = ket::h_gate() * output;
                 break;
             }
-            case ket::Gate::X : {
+            case ket::PrimitiveGate::X : {
                 output = ket::x_gate() * output;
                 break;
             }
-            case ket::Gate::Y : {
+            case ket::PrimitiveGate::Y : {
                 output = ket::y_gate() * output;
                 break;
             }
-            case ket::Gate::Z : {
+            case ket::PrimitiveGate::Z : {
                 output = ket::z_gate() * output;
                 break;
             }
-            case ket::Gate::SX : {
+            case ket::PrimitiveGate::SX : {
                 output = ket::sx_gate() * output;
                 break;
             }
-            case ket::Gate::RX : {
+            case ket::PrimitiveGate::RX : {
                 output = ket::rx_gate(pg_info.parameter.value()) * output;
                 break;
             }
-            case ket::Gate::RY : {
+            case ket::PrimitiveGate::RY : {
                 output = ket::ry_gate(pg_info.parameter.value()) * output;
                 break;
             }
-            case ket::Gate::RZ : {
+            case ket::PrimitiveGate::RZ : {
                 output = ket::rz_gate(pg_info.parameter.value()) * output;
                 break;
             }
-            case ket::Gate::P : {
+            case ket::PrimitiveGate::P : {
                 output = ket::p_gate(pg_info.parameter.value()) * output;
                 break;
             }
             default : {
-                throw std::runtime_error {"Invalid PrimitiveGateInfo gate found.\n"};
+                throw std::runtime_error {"Invalid Matrix2X2GateInfo_ gate found.\n"};
             }
         }
     }

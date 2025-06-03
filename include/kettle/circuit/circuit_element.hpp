@@ -24,7 +24,7 @@ struct CircuitElement
 {
 public:
     // NOLINTNEXTLINE(*-explicit-*)
-    CircuitElement(const GateInfo& ginfo)
+    CircuitElement(const PrimitiveGateInfo& ginfo)
         : element_ {ginfo}
     {}
 
@@ -56,7 +56,7 @@ public:
     [[nodiscard]]
     constexpr auto is_gate() const -> bool
     {
-        return std::holds_alternative<GateInfo>(element_);
+        return std::holds_alternative<PrimitiveGateInfo>(element_);
     }
 
     [[nodiscard]]
@@ -72,9 +72,9 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto get_gate() const -> const GateInfo&
+    constexpr auto get_gate() const -> const PrimitiveGateInfo&
     {
-        return std::get<GateInfo>(element_);
+        return std::get<PrimitiveGateInfo>(element_);
     }
 
     [[nodiscard]]
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    std::variant<GateInfo, ClassicalControlFlowInstruction, CircuitLogger> element_;
+    std::variant<PrimitiveGateInfo, ClassicalControlFlowInstruction, CircuitLogger> element_;
 };
 
 }  // namespace ket

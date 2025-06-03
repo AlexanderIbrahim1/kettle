@@ -95,7 +95,7 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
 
 void make_one_target_gate_controlled(
     ket::QuantumCircuit& circuit,
-    ket::Gate gate,
+    ket::PrimitiveGate gate,
     std::size_t control,
     std::size_t target
 )
@@ -108,7 +108,7 @@ void make_one_target_gate_controlled(
 
 void make_one_target_one_angle_gate_controlled(
     ket::QuantumCircuit& circuit,
-    ket::Gate gate,
+    ket::PrimitiveGate gate,
     std::size_t control,
     std::size_t target,
     double angle
@@ -181,18 +181,18 @@ auto make_controlled_circuit(
             const auto matrix = angle_gate(gate_info.gate, angle);
             apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
         }
-        else if (gate_info.gate == Gate::U) {
+        else if (gate_info.gate == PrimitiveGate::U) {
             const auto [original_target, unitary_ptr] = cre::unpack_u_gate(gate_info);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             new_circuit.add_cu_gate(*unitary_ptr, control, new_target);
         }
-        else if (gate_info.gate == Gate::CU) {
+        else if (gate_info.gate == PrimitiveGate::CU) {
             const auto [original_control, original_target, unitary_ptr] = cre::unpack_cu_gate(gate_info);
             const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             apply_doubly_controlled_gate(new_circuit, *unitary_ptr, {control, new_control}, new_target);
         }
-        else if (gate_info.gate == Gate::M) {
+        else if (gate_info.gate == PrimitiveGate::M) {
             throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};
         }
         else {
@@ -283,19 +283,19 @@ auto make_multiplicity_controlled_circuit(
             const auto matrix = angle_gate(gate_info.gate, angle);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, new_controls);
         }
-        else if (gate_info.gate == Gate::U) {
+        else if (gate_info.gate == PrimitiveGate::U) {
             const auto [original_target, unitary_ptr] = cre::unpack_u_gate(gate_info);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, control_qubits);
         }
-        else if (gate_info.gate == Gate::CU) {
+        else if (gate_info.gate == PrimitiveGate::CU) {
             const auto [original_control, original_target, unitary_ptr] = cre::unpack_cu_gate(gate_info);
             const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto new_controls = ket::internal::extend_container_to_vector(control_qubits, {new_control});
             apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, new_controls);
         }
-        else if (gate_info.gate == Gate::M) {
+        else if (gate_info.gate == PrimitiveGate::M) {
             throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};
         }
         else {

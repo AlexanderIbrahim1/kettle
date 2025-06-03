@@ -59,7 +59,7 @@ static void normalize(std::vector<std::complex<double>>& values)
 
 static void simulate_measurement_wrapper(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     int measured_state
 )
 {

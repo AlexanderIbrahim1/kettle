@@ -13,11 +13,11 @@ namespace cre = ket::internal::create;
 
 TEST_CASE("format_one_target_gate_()")
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     struct TestCase
     {
-        ket::Gate gate;
+        ket::PrimitiveGate gate;
         std::size_t target;
         std::string expected;
     };
@@ -38,11 +38,11 @@ TEST_CASE("format_one_target_gate_()")
 
 TEST_CASE("format_one_control_one_target_gate_()")
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     struct TestCase
     {
-        ket::Gate gate;
+        ket::PrimitiveGate gate;
         std::size_t target;
         std::size_t control;
         std::string expected;
@@ -69,11 +69,11 @@ TEST_CASE("format_one_control_one_target_gate_()")
 
 TEST_CASE("format_one_target_one_angle_gate_()")
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     struct TestCase
     {
-        ket::Gate gate;
+        ket::PrimitiveGate gate;
         std::size_t target;
         double angle;
         std::string expected;
@@ -102,11 +102,11 @@ TEST_CASE("format_one_target_one_angle_gate_()")
 
 TEST_CASE("format_one_control_one_target_one_angle_gate_()")
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     struct TestCase
     {
-        ket::Gate gate;
+        ket::PrimitiveGate gate;
         std::size_t target;
         std::size_t control;
         double angle;
@@ -137,11 +137,11 @@ TEST_CASE("format_one_control_one_target_one_angle_gate_()")
 
 TEST_CASE("format_m_gate_()")
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     struct TestCase
     {
-        ket::Gate gate;
+        ket::PrimitiveGate gate;
         std::size_t qubit;
         std::size_t bit;
         std::string expected;

@@ -16,9 +16,9 @@ namespace ket::internal
 {
 
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-struct PrimitiveGateInfo_
+struct Matrix2X2GateInfo_
 {
-    ket::Gate gate;
+    ket::PrimitiveGate gate;
     std::optional<double> parameter = std::nullopt;
 };
 
@@ -37,7 +37,7 @@ auto determinant_angle_(const ket::Matrix2X2& matrix) -> double;
 auto decomp_to_single_primitive_gate_(
     const ket::Matrix2X2& unitary,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::optional<PrimitiveGateInfo_>;
+) -> std::optional<Matrix2X2GateInfo_>;
 
 /*
     The implementation of this decomposition is taken directly from the following file:
@@ -49,24 +49,24 @@ auto decomp_to_single_primitive_gate_(
 auto decomp_special_unitary_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<PrimitiveGateInfo_>;
+) -> std::vector<Matrix2X2GateInfo_>;
 
 auto decomp_to_primitive_gates_(
     const ket::Matrix2X2& unitary,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<PrimitiveGateInfo_>;
+) -> std::vector<Matrix2X2GateInfo_>;
 
 auto decomp_to_one_target_primitive_gates_(
     std::size_t target,
     const ket::Matrix2X2& unitary,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<ket::GateInfo>;
+) -> std::vector<ket::PrimitiveGateInfo>;
 
 auto decomp_to_one_control_one_target_primitive_gates_(
     std::size_t control,
     std::size_t target,
     const ket::Matrix2X2& unitary,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> std::vector<ket::GateInfo>;
+) -> std::vector<ket::PrimitiveGateInfo>;
 
 }  // namespace ket::internal

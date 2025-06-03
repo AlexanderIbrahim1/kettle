@@ -14,7 +14,7 @@
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 
 
-using G = ket::Gate;
+using G = ket::PrimitiveGate;
 namespace cre = ket::internal::create;
 namespace comp = ket::internal::compare;
 
@@ -77,9 +77,9 @@ TEST_CASE("read_tangelo_file()")
         const auto gate2 = actual[2].get_gate();
 
         REQUIRE(number_of_elements(actual) == 3);
-        REQUIRE(gate0.gate == ket::Gate::CX);
-        REQUIRE(gate1.gate == ket::Gate::CX);
-        REQUIRE(gate2.gate == ket::Gate::CX);
+        REQUIRE(gate0.gate == ket::PrimitiveGate::CX);
+        REQUIRE(gate1.gate == ket::PrimitiveGate::CX);
+        REQUIRE(gate2.gate == ket::PrimitiveGate::CX);
 
         const auto [q_left_0, q_right_0] = cre::unpack_one_control_one_target_gate(gate0);
         const auto [q_left_1, q_right_1] = cre::unpack_one_control_one_target_gate(gate1);
@@ -109,8 +109,8 @@ TEST_CASE("read_tangelo_file()")
         struct TestCase
         {
             std::string stream_contents;
-            ket::Gate gate;
-            std::function<std::tuple<std::size_t, std::size_t, double>(ket::GateInfo)> unpack_func;
+            ket::PrimitiveGate gate;
+            std::function<std::tuple<std::size_t, std::size_t, double>(ket::PrimitiveGateInfo)> unpack_func;
         };
 
         const auto unpack = cre::unpack_one_control_one_target_one_angle_gate;
@@ -119,22 +119,22 @@ TEST_CASE("read_tangelo_file()")
         auto testcase = GENERATE_REF(
             TestCase {
                 "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CP,
+                ket::PrimitiveGate::CP,
                 unpack
             },
             TestCase {
                 "CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRX,
+                ket::PrimitiveGate::CRX,
                 unpack
             },
             TestCase {
                 "CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRY,
+                ket::PrimitiveGate::CRY,
                 unpack
             },
             TestCase {
                 "CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRZ,
+                ket::PrimitiveGate::CRZ,
                 unpack
             }
         );
@@ -169,7 +169,7 @@ TEST_CASE("read_tangelo_file()")
         const auto gate = actual[0].get_gate();
 
         REQUIRE(number_of_elements(actual) == 1);
-        REQUIRE(gate.gate == ket::Gate::U);
+        REQUIRE(gate.gate == ket::PrimitiveGate::U);
 
         const auto [target, unitary_ptr] = cre::unpack_u_gate(gate);
         
@@ -195,7 +195,7 @@ TEST_CASE("read_tangelo_file()")
         const auto gate = actual[0].get_gate();
 
         REQUIRE(number_of_elements(actual) == 1);
-        REQUIRE(gate.gate == ket::Gate::CU);
+        REQUIRE(gate.gate == ket::PrimitiveGate::CU);
 
         const auto [control, target, unitary_ptr] = cre::unpack_cu_gate(gate);
         

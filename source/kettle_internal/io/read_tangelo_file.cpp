@@ -55,7 +55,7 @@ void parse_swap_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
     ket::apply_swap(circuit, target_qubit0, target_qubit1);
 }
 
-void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_gate_(ket::PrimitiveGate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
@@ -71,7 +71,7 @@ void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::s
     (circuit.*func)(target_qubit);
 }
 
-void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_control_one_target_gate_(ket::PrimitiveGate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
@@ -93,7 +93,7 @@ void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& cir
     (circuit.*func)(control_qubit, target_qubit);
 }
 
-void parse_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_target_one_angle_gate_(ket::PrimitiveGate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
@@ -113,7 +113,7 @@ void parse_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circu
     (circuit.*func)(target_qubit, angle);
 }
 
-void parse_one_control_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
+void parse_one_control_one_target_one_angle_gate_(ket::PrimitiveGate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
     char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
@@ -248,7 +248,7 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
 {
     namespace gid = ket::internal::gate_id;
     namespace io_par = ket::internal::parse;
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     constexpr auto n_whitespace = ket::internal::CONTROL_FLOW_WHITESPACE_DEFAULT;
 

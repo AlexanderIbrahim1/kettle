@@ -11,7 +11,7 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 
-using G = ket::Gate;
+using G = ket::PrimitiveGate;
 namespace cre = ket::internal::create;
 namespace comp = ket::internal::compare;
 
@@ -434,9 +434,9 @@ TEST_CASE("QuantumCircuit: almost_eq()")
 
 TEST_CASE("CircuitElement")
 {
-    SECTION("construct with ket::GateInfo")
+    SECTION("construct with ket::PrimitiveGateInfo")
     {
-        const auto ginfo = cre::create_one_target_gate(ket::Gate::X, 0);
+        const auto ginfo = cre::create_one_target_gate(ket::PrimitiveGate::X, 0);
         const auto circuit_element = ket::CircuitElement {ginfo};
 
         REQUIRE(circuit_element.is_gate());

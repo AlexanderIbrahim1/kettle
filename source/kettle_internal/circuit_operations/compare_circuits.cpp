@@ -15,7 +15,7 @@
 namespace
 {
 
-auto non_u_gate_to_u_gate_(const ket::GateInfo& info) -> ket::Matrix2X2
+auto non_u_gate_to_u_gate_(const ket::PrimitiveGateInfo& info) -> ket::Matrix2X2
 {
     if (ket::internal::gate_id::is_non_angle_transform_gate(info.gate)) {
         return ket::non_angle_gate(info.gate);
@@ -29,9 +29,9 @@ auto non_u_gate_to_u_gate_(const ket::GateInfo& info) -> ket::Matrix2X2
     throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};
 }
 
-auto as_u_gate_(const ket::GateInfo& info) -> ket::GateInfo
+auto as_u_gate_(const ket::PrimitiveGateInfo& info) -> ket::PrimitiveGateInfo
 {
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     if (info.gate == G::U || info.gate == G::CU) {
         return info;
@@ -53,26 +53,26 @@ auto as_u_gate_(const ket::GateInfo& info) -> ket::GateInfo
         return u_gate_info;
     }
 
-    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'as_u_gate()'"};
+    throw std::runtime_error {"UNREACHABLE: dev error, invalid PrimitiveGate found in 'as_u_gate()'"};
 }
 
-auto have_matching_indices_(const ket::GateInfo& left_info, const ket::GateInfo& right_info) -> bool
+auto have_matching_indices_(const ket::PrimitiveGateInfo& left_info, const ket::PrimitiveGateInfo& right_info) -> bool
 {
     if (left_info.gate != right_info.gate) {
         return false;
     }
 
-    if (left_info.gate == ket::Gate::U) {
+    if (left_info.gate == ket::PrimitiveGate::U) {
         const auto unpack = ket::internal::create::unpack_single_qubit_gate_index;
         return unpack(left_info) == unpack(right_info);
     }
 
-    if (left_info.gate == ket::Gate::CU) {
+    if (left_info.gate == ket::PrimitiveGate::CU) {
         const auto unpack = ket::internal::create::unpack_double_qubit_gate_indices;
         return unpack(left_info) == unpack(right_info);
     }
 
-    throw std::runtime_error {"UNREACHABLE: dev error, invalid Gate found in 'have_matching_indices_()'"};
+    throw std::runtime_error {"UNREACHABLE: dev error, invalid PrimitiveGate found in 'have_matching_indices_()'"};
 }
 
 auto all_remaining_elements_are_circuit_loggers_(const ket::QuantumCircuit& circuit, std::size_t i_start) -> bool
@@ -170,12 +170,12 @@ auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-com
             const auto& left_gate = left_element.get_gate();
             const auto& right_gate = right_element.get_gate();
 
-            if (left_gate.gate == Gate::M && right_gate.gate == Gate::M) {
+            if (left_gate.gate == PrimitiveGate::M && right_gate.gate == PrimitiveGate::M) {
                 if (!comp::is_m_gate_equal(left_gate, right_gate)) {
                     return false;
                 }
             }
-            else if (left_gate.gate != Gate::M && right_gate.gate != Gate::M) {
+            else if (left_gate.gate != PrimitiveGate::M && right_gate.gate != PrimitiveGate::M) {
                 const auto new_left_gate = as_u_gate_(left_gate);
                 const auto new_right_gate = as_u_gate_(right_gate);
 

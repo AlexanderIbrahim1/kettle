@@ -11,7 +11,7 @@
 namespace ket
 {
 
-enum class Gate : std::uint8_t
+enum class PrimitiveGate : std::uint8_t
 {
     H,
     X,
@@ -47,9 +47,9 @@ enum class Gate : std::uint8_t
 };
 
 /*
-    The `GateInfo` type holds all the information needed to describe any of the primitive gates in
+    The `PrimitiveGateInfo` type holds all the information needed to describe any of the primitive gates in
     the project's specification. This implementation forces the gate to carry the information needed
-    for every possible type of gate, even if some parameters are not used. For example, the `GateInfo`
+    for every possible type of gate, even if some parameters are not used. For example, the `PrimitiveGateInfo`
     instance for an X-gate only needs the target index (one `std::size_t`), but it still holds all the
     other parameters.
 
@@ -63,9 +63,9 @@ enum class Gate : std::uint8_t
     The U and CU primitive gates can hold a pointer to a unitary 2x2 matrix.
 
 */
-struct GateInfo
+struct PrimitiveGateInfo
 {
-    Gate gate;
+    PrimitiveGate gate;
     std::size_t arg0;
     std::size_t arg1;
     double arg2;

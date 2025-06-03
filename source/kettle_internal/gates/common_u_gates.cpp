@@ -169,36 +169,36 @@ auto p_gate(double angle) noexcept -> Matrix2X2
     };
 }
 
-auto non_angle_gate(Gate gate) -> Matrix2X2
+auto non_angle_gate(PrimitiveGate gate) -> Matrix2X2
 {
-    if (gate == Gate::H || gate == Gate::CH) {
+    if (gate == PrimitiveGate::H || gate == PrimitiveGate::CH) {
         return h_gate();
     }
-    else if (gate == Gate::X || gate == Gate::CX) {
+    else if (gate == PrimitiveGate::X || gate == PrimitiveGate::CX) {
         return x_gate();
     }
-    else if (gate == Gate::Y || gate == Gate::CY) {
+    else if (gate == PrimitiveGate::Y || gate == PrimitiveGate::CY) {
         return y_gate();
     }
-    else if (gate == Gate::Z || gate == Gate::CZ) {
+    else if (gate == PrimitiveGate::Z || gate == PrimitiveGate::CZ) {
         return z_gate();
     }
-    else if (gate == Gate::S || gate == Gate::CS) {
+    else if (gate == PrimitiveGate::S || gate == PrimitiveGate::CS) {
         return s_gate();
     }
-    else if (gate == Gate::SDAG || gate == Gate::CSDAG) {
+    else if (gate == PrimitiveGate::SDAG || gate == PrimitiveGate::CSDAG) {
         return sdag_gate();
     }
-    else if (gate == Gate::T || gate == Gate::CT) {
+    else if (gate == PrimitiveGate::T || gate == PrimitiveGate::CT) {
         return t_gate();
     }
-    else if (gate == Gate::TDAG || gate == Gate::CTDAG) {
+    else if (gate == PrimitiveGate::TDAG || gate == PrimitiveGate::CTDAG) {
         return tdag_gate();
     }
-    else if (gate == Gate::SX || gate == Gate::CSX) {
+    else if (gate == PrimitiveGate::SX || gate == PrimitiveGate::CSX) {
         return sx_gate();
     }
-    else if (gate == Gate::SXDAG || gate == Gate::CSXDAG) {
+    else if (gate == PrimitiveGate::SXDAG || gate == PrimitiveGate::CSXDAG) {
         return sxdag_gate();
     }
     else {
@@ -206,18 +206,18 @@ auto non_angle_gate(Gate gate) -> Matrix2X2
     }
 }
 
-auto angle_gate(Gate gate, double angle) -> Matrix2X2
+auto angle_gate(PrimitiveGate gate, double angle) -> Matrix2X2
 {
-    if (gate == Gate::RX || gate == Gate::CRX) {
+    if (gate == PrimitiveGate::RX || gate == PrimitiveGate::CRX) {
         return rx_gate(angle);
     }
-    else if (gate == Gate::RY || gate == Gate::CRY) {
+    else if (gate == PrimitiveGate::RY || gate == PrimitiveGate::CRY) {
         return ry_gate(angle);
     }
-    else if (gate == Gate::RZ || gate == Gate::CRZ) {
+    else if (gate == PrimitiveGate::RZ || gate == PrimitiveGate::CRZ) {
         return rz_gate(angle);
     }
-    else if (gate == Gate::P || gate == Gate::CP) {
+    else if (gate == PrimitiveGate::P || gate == PrimitiveGate::CP) {
         return p_gate(angle);
     }
     else {

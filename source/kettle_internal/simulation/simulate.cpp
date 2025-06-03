@@ -30,17 +30,17 @@ namespace
 {
 
 /*
-    Helper struct for the static_assert(), to see what ket::Gate instance is passed that causes
+    Helper struct for the static_assert(), to see what ket::PrimitiveGate instance is passed that causes
     the template instantiation to fail.
 */
-template <ket::Gate GateType>
+template <ket::PrimitiveGate PrimitiveGateType>
 struct gate_always_false : std::false_type
 {};
 
 
 auto unpack_target_and_angle(
     const kpi::MapVariant& parameter_values_map,
-    const ket::GateInfo& info
+    const ket::PrimitiveGateInfo& info
 ) -> std::tuple<std::size_t, double>
 {
     if (info.param_expression_ptr) {
@@ -56,7 +56,7 @@ auto unpack_target_and_angle(
 
 auto unpack_control_target_and_angle(
     const kpi::MapVariant& parameter_values_map,
-    const ket::GateInfo& info
+    const ket::PrimitiveGateInfo& info
 ) -> std::tuple<std::size_t, std::size_t, double>
 {
     if (info.param_expression_ptr) {
@@ -90,15 +90,15 @@ auto create_parameter_values_map(
 
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
-template <ket::Gate GateType>
+template <ket::PrimitiveGate PrimitiveGateType>
 void simulate_one_target_gate_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ki::FlatIndexPair& pair
 )
 {
     namespace cre = ki::create;
-    using Gate = ket::Gate;
+    using PrimitiveGate = ket::PrimitiveGate;
 
     const auto target_index = cre::unpack_single_qubit_gate_index(info);
     const auto n_qubits = state.n_qubits();
@@ -109,52 +109,52 @@ void simulate_one_target_gate_(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if constexpr (GateType == Gate::H) {
+        if constexpr (PrimitiveGateType == PrimitiveGate::H) {
             ki::apply_h_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::X) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::X) {
             ki::apply_x_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::Y) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::Y) {
             ki::apply_y_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::Z) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::Z) {
             ki::apply_z_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::S) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::S) {
             ki::apply_s_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::SDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::SDAG) {
             ki::apply_sdag_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::T) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::T) {
             ki::apply_t_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::TDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::TDAG) {
             ki::apply_tdag_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::SX) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::SX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::SXDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::SXDAG) {
             ki::apply_sxdag_gate(state, state0_index, state1_index);
         }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid one target gate.");
+            static_assert(gate_always_false<PrimitiveGateType>::value, "Invalid one target gate.");
         }
     }
 }
 
 
-template <ket::Gate GateType>
+template <ket::PrimitiveGate PrimitiveGateType>
 void simulate_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ki::FlatIndexPair& pair
 )
 {
-    using Gate = ket::Gate;
+    using PrimitiveGate = ket::PrimitiveGate;
 
     const auto [target_index, theta] = unpack_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
@@ -165,20 +165,20 @@ void simulate_one_target_one_angle_gate_(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if constexpr (GateType == Gate::RX) {
+        if constexpr (PrimitiveGateType == PrimitiveGate::RX) {
             ki::apply_rx_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::RY) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::RY) {
             ki::apply_ry_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::RZ) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::RZ) {
             ki::apply_rz_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::P) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::P) {
             ki::apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid one target one angle gate.");
+            static_assert(gate_always_false<PrimitiveGateType>::value, "Invalid one target one angle gate.");
         }
     }
 }
@@ -186,7 +186,7 @@ void simulate_one_target_one_angle_gate_(
 
 void simulate_u_gate_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ket::Matrix2X2& mat,
     const ki::FlatIndexPair& pair
 )
@@ -203,15 +203,15 @@ void simulate_u_gate_(
 }
 
 
-template <ket::Gate GateType>
+template <ket::PrimitiveGate PrimitiveGateType>
 void simulate_one_control_one_target_gate_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ki::FlatIndexPair& pair
 )
 {
     namespace cre = ki::create;
-    using Gate = ket::Gate;
+    using PrimitiveGate = ket::PrimitiveGate;
 
     const auto [control_index, target_index] = cre::unpack_double_qubit_gate_indices(info);
     const auto n_qubits = state.n_qubits();
@@ -222,52 +222,52 @@ void simulate_one_control_one_target_gate_(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if constexpr (GateType == Gate::CH) {
+        if constexpr (PrimitiveGateType == PrimitiveGate::CH) {
             ki::apply_h_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::CX) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CX) {
             ki::apply_x_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::CY) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CY) {
             ki::apply_y_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::CZ) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CZ) {
             ki::apply_z_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::CS) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CS) {
             ki::apply_s_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::CSDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CSDAG) {
             ki::apply_sdag_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::CT) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CT) {
             ki::apply_t_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::CTDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CTDAG) {
             ki::apply_tdag_gate(state, state1_index);
         }
-        else if constexpr (GateType == Gate::CSX) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CSX) {
             ki::apply_sx_gate(state, state0_index, state1_index);
         }
-        else if constexpr (GateType == Gate::CSXDAG) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CSXDAG) {
             ki::apply_sxdag_gate(state, state0_index, state1_index);
         }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid one control one target gate.");
+            static_assert(gate_always_false<PrimitiveGateType>::value, "Invalid one control one target gate.");
         }
     }
 }
 
 
-template <ket::Gate GateType>
+template <ket::PrimitiveGate PrimitiveGateType>
 void simulate_one_control_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ki::FlatIndexPair& pair
 )
 {
-    using Gate = ket::Gate;
+    using PrimitiveGate = ket::PrimitiveGate;
 
     const auto [control_index, target_index, theta] = unpack_control_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
@@ -278,20 +278,20 @@ void simulate_one_control_one_target_one_angle_gate_(
     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
 
-        if constexpr (GateType == Gate::CRX) {
+        if constexpr (PrimitiveGateType == PrimitiveGate::CRX) {
             ki::apply_rx_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::CRY) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CRY) {
             ki::apply_ry_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::CRZ) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CRZ) {
             ki::apply_rz_gate(state, state0_index, state1_index, theta);
         }
-        else if constexpr (GateType == Gate::CP) {
+        else if constexpr (PrimitiveGateType == PrimitiveGate::CP) {
             ki::apply_p_gate(state, state1_index, theta);
         }
         else {
-            static_assert(gate_always_false<GateType>::value, "Invalid one control one target one angle gate.");
+            static_assert(gate_always_false<PrimitiveGateType>::value, "Invalid one control one target one angle gate.");
         }
     }
 }
@@ -299,7 +299,7 @@ void simulate_one_control_one_target_one_angle_gate_(
 
 void simulate_cu_gate_(
     ket::QuantumState& state,
-    const ket::GateInfo& info,
+    const ket::PrimitiveGateInfo& info,
     const ket::Matrix2X2& mat,
     const ki::FlatIndexPair& pair
 )
@@ -321,14 +321,14 @@ void simulate_gate_info_(
     ket::QuantumState& state,
     const ki::FlatIndexPair& single_pair,
     const ki::FlatIndexPair& double_pair,
-    const ket::GateInfo& gate_info,
+    const ket::PrimitiveGateInfo& gate_info,
     int thread_id,
     std::optional<int> prng_seed,
     ket::ClassicalRegister& c_register
 )
 {
     namespace cre = ki::create;
-    using G = ket::Gate;
+    using G = ket::PrimitiveGate;
 
     switch (gate_info.gate) {
         case G::H : {
