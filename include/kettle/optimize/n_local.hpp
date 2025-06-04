@@ -1,13 +1,17 @@
 #pragma once
 
 #include <cstdint>
+#include <variant>
 #include <vector>
 
 #include <kettle/circuit/circuit.hpp>
+#include <kettle/gates/compound_gate.hpp>
 #include <kettle/gates/primitive_gate.hpp>
 
 namespace ket
 {
+
+using GeneralGate = std::variant<Gate, CompoundGate>;
 
 enum class NLocalEntangelement : std::uint8_t
 {
@@ -15,21 +19,19 @@ enum class NLocalEntangelement : std::uint8_t
     LINEAR
 };
 
-struct skip_last_rotation_layer
+enum class SkipLastRotationLayerFlag : std::uint8_t
 {
-    explicit skip_last_rotation_layer() = default;
+    TRUE,
+    FALSE
 };
 
-inline auto n_local(
+auto n_local(
     std::size_t n_qubits,
-    const std::vector<Gate>& rotation_blocks,
-    const std::vector<Gate>& entanglement_blocks,
-    NLocalEntangelement entangelemnt_kind,
+    const std::vector<GeneralGate>& rotation_blocks,
+    const std::vector<GeneralGate>& entanglement_blocks,
+    NLocalEntangelement entanglement_kind,
     std::size_t n_repetitions,
-    skip_last_rotation_layer key
-)
-{
-
-}
+    SkipLastRotationLayerFlag flag = SkipLastRotationLayerFlag::FALSE
+) -> std::tuple<QuantumCircuit, std::vector<ket::param::ParameterID>>;
 
 }  // namespace ket
