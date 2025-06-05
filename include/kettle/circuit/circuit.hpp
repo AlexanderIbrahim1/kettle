@@ -2,34 +2,24 @@
 
 #include <cmath>
 #include <iterator>
-#include <optional>
 #include <unordered_map>
 #include <vector>
 
 #include "kettle/circuit/control_flow_predicate.hpp"
+#include "kettle/circuit/control_flow.hpp"
+#include "kettle/circuit/circuit_element.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/tolerance.hpp"
 #include "kettle/common/utils.hpp"
-#include "kettle/circuit/control_flow.hpp"
-#include "kettle/circuit/circuit_element.hpp"
 #include "kettle/parameter/parameter.hpp"
 
 
 namespace ket
 {
 
-struct ParameterData
-{
-    std::optional<double> value;
-    std::string name;
-    std::size_t count;
-};
-
 class QuantumCircuit
 {
 public:
-    using ParameterDataMap = std::unordered_map<ket::param::ParameterID, ParameterData, param::ParameterIdHash>;
-
     explicit QuantumCircuit(std::size_t n_qubits, std::size_t n_bits)
         : n_qubits_ {n_qubits}
         , n_bits_ {n_bits}
@@ -85,7 +75,7 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto parameter_data_map() const noexcept -> const ParameterDataMap&
+    constexpr auto parameter_data_map() const noexcept -> const ket::param::ParameterDataMap&
     {
         return parameter_data_;
     }
@@ -339,7 +329,7 @@ private:
     std::size_t n_qubits_;
     std::size_t n_bits_;
     std::vector<CircuitElement> elements_;
-    ParameterDataMap parameter_data_;
+    ket::param::ParameterDataMap parameter_data_;
     std::size_t parameter_count_ {0};
 
     void check_qubit_range_(std::size_t target_index, std::string_view qubit_name, std::string_view gate_name) const;

@@ -11,7 +11,7 @@ namespace kpi = ket::param::internal;
 
 TEST_CASE("EvaluateExpression")
 {
-    const auto dummy_map = kpi::Map {};
+    const auto dummy_map = kp::EvaluatedParameterDataMap {};
     const auto dummy_map_variant = kpi::MapVariant {std::reference_wrapper {dummy_map}};
 
     SECTION("a single literal")
@@ -25,7 +25,7 @@ TEST_CASE("EvaluateExpression")
     SECTION("a single parameter")
     {
         const auto parameter = kp::Parameter {"theta"};
-        const auto map = kpi::Map { {parameter.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap { {parameter.id(), 1.5} };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto evaluator = kpi::Evaluator {};
@@ -47,7 +47,7 @@ TEST_CASE("EvaluateExpression")
     SECTION("addition between literal and parameter")
     {
         const auto parameter = kp::Parameter {"theta"};
-        const auto map = kpi::Map { {parameter.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap { {parameter.id(), 1.5} };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto expr = kp::BinaryExpression {
@@ -64,7 +64,7 @@ TEST_CASE("EvaluateExpression")
     {
         const auto theta = kp::Parameter {"theta"};
         const auto phi = kp::Parameter {"phi"};
-        const auto map = kpi::Map { {theta.id(), 1.5}, {phi.id(), -0.4} };
+        const auto map = kp::EvaluatedParameterDataMap { {theta.id(), 1.5}, {phi.id(), -0.4} };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto expr = kp::BinaryExpression {
@@ -92,7 +92,7 @@ TEST_CASE("EvaluateExpression")
     SECTION("multiply parameter and literal, then add literal")
     {
         const auto theta = kp::Parameter {"theta"};
-        const auto map = kpi::Map { {theta.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap { {theta.id(), 1.5} };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto left_expr = kp::BinaryExpression {

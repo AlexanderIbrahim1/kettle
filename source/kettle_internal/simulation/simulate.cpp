@@ -21,10 +21,7 @@
 
 
 namespace ki = ket::internal;
-namespace kp = ket::param;
 namespace kpi = ket::param::internal;
-
-using ParameterDataMap = std::unordered_map<kp::ParameterID, ket::ParameterData, kp::ParameterIdHash>;
 
 namespace
 {
@@ -36,57 +33,6 @@ namespace
 template <ket::Gate GateType>
 struct gate_always_false : std::false_type
 {};
-
-
-auto unpack_target_and_angle(
-    const kpi::MapVariant& parameter_values_map,
-    const ket::GateInfo& info
-) -> std::tuple<std::size_t, double>
-{
-    if (info.param_expression_ptr) {
-        auto [target_qubit, param_expression_ptr] = ki::create::unpack_one_target_one_parameter_gate(info);
-        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, parameter_values_map);
-
-        return {target_qubit, angle};
-    } else {
-        return ki::create::unpack_one_target_one_angle_gate(info);
-    }
-}
-
-
-auto unpack_control_target_and_angle(
-    const kpi::MapVariant& parameter_values_map,
-    const ket::GateInfo& info
-) -> std::tuple<std::size_t, std::size_t, double>
-{
-    if (info.param_expression_ptr) {
-        auto [control_qubit, target_qubit, param_expression_ptr] = ki::create::unpack_one_control_one_target_one_parameter_gate(info);
-        auto angle = kpi::Evaluator{}.evaluate(*param_expression_ptr, parameter_values_map);
-
-        return {control_qubit, target_qubit, angle};
-    } else {
-        return ki::create::unpack_one_control_one_target_one_angle_gate(info);
-    }
-}
-
-
-auto create_parameter_values_map(
-    const std::unordered_map<kp::ParameterID, ket::ParameterData, kp::ParameterIdHash>& param_data_map
-) -> std::unordered_map<kp::ParameterID, double, kp::ParameterIdHash>
-{
-    auto output = std::unordered_map<kp::ParameterID, double, kp::ParameterIdHash> {};
-
-    for (const auto& [id, data]: param_data_map) {
-        if (data.value == std::nullopt) {
-            throw std::runtime_error {"ERROR: cannot perform simulation with an uninitialized parameter value.\n"};
-        }
-
-        output[id] = data.value.value();
-    }
-
-    return output;
-}
-
 
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
@@ -156,7 +102,7 @@ void simulate_one_target_one_angle_gate_(
 {
     using Gate = ket::Gate;
 
-    const auto [target_index, theta] = unpack_target_and_angle(parameter_values_map, info);
+    const auto [target_index, theta] = kpi::unpack_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
@@ -269,7 +215,7 @@ void simulate_one_control_one_target_one_angle_gate_(
 {
     using Gate = ket::Gate;
 
-    const auto [control_index, target_index, theta] = unpack_control_target_and_angle(parameter_values_map, info);
+    const auto [control_index, target_index, theta] = kpi::unpack_control_target_and_angle(parameter_values_map, info);
     const auto n_qubits = state.n_qubits();
 
     auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
@@ -488,7 +434,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
 
     auto circuit_loggers = std::vector<ket::CircuitLogger> {};
 
-    const auto& parameter_values_map = create_parameter_values_map(circuit.parameter_data_map());
+    const auto& parameter_values_map = kpi::create_parameter_values_map(circuit.parameter_data_map());
 
     while (elements_stack.size() != 0) {
         const auto& elements = elements_stack.back();
