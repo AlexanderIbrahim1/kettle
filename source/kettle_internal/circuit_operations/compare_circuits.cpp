@@ -4,32 +4,44 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
 #include "kettle/common/clone_ptr.hpp"
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
+#include "kettle/gates/primitive_gate.hpp"
+#include "kettle/parameter/parameter.hpp"
 
+#include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 
+namespace kp = ket::param;
+namespace kpi = ket::param::internal;
+
 namespace
 {
 
-auto non_u_gate_to_u_gate_(const ket::GateInfo& info) -> ket::Matrix2X2
+auto non_u_gate_to_u_gate_(const kp::EvaluatedParameterDataMap& param_map, const ket::GateInfo& info) -> ket::Matrix2X2
 {
     if (ket::internal::gate_id::is_non_angle_transform_gate(info.gate)) {
         return ket::non_angle_gate(info.gate);
     }
 
     if (ket::internal::gate_id::is_angle_transform_gate(info.gate)) {
-        const auto angle = ket::internal::create::unpack_gate_angle(info);
+        const auto angle = [&]() {
+            if (info.param_expression_ptr) {
+                return kpi::Evaluator{}.evaluate(*info.param_expression_ptr, param_map);
+            } else {
+                return ket::internal::create::unpack_gate_angle(info);
+            }
+        }();
+
         return ket::angle_gate(info.gate, angle);
     }
 
     throw std::runtime_error {"UNREACHABLE: dev error, gate provided cannot be turned to a U-gate."};
 }
 
-auto as_u_gate_(const ket::GateInfo& info) -> ket::GateInfo
+auto as_u_gate_(const kp::EvaluatedParameterDataMap& param_map, const ket::GateInfo& info) -> ket::GateInfo
 {
     using G = ket::Gate;
 
@@ -37,7 +49,8 @@ auto as_u_gate_(const ket::GateInfo& info) -> ket::GateInfo
         return info;
     }
 
-    auto unitary = ket::ClonePtr<ket::Matrix2X2> {non_u_gate_to_u_gate_(info)};
+    const auto u_gate = non_u_gate_to_u_gate_(param_map, info);
+    auto unitary = ket::ClonePtr<ket::Matrix2X2> {u_gate};
 
     if (ket::internal::gate_id::is_single_qubit_transform_gate(info.gate) && info.gate != G::U) {
         const auto target = ket::internal::create::unpack_single_qubit_gate_index(info);
@@ -117,6 +130,9 @@ auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-com
     auto i_left = std::size_t {0};
     auto i_right = std::size_t {0};
 
+    const auto& left_param_map = kpi::create_parameter_values_map(left.parameter_data_map());
+    const auto& right_param_map = kpi::create_parameter_values_map(right.parameter_data_map());
+
     while (i_left < left.n_circuit_elements() && i_right < right.n_circuit_elements()) {
         const auto& left_element = left[i_left];
         if (left_element.is_circuit_logger()) {
@@ -176,8 +192,8 @@ auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-com
                 }
             }
             else if (left_gate.gate != Gate::M && right_gate.gate != Gate::M) {
-                const auto new_left_gate = as_u_gate_(left_gate);
-                const auto new_right_gate = as_u_gate_(right_gate);
+                const auto new_left_gate = as_u_gate_(left_param_map, left_gate);
+                const auto new_right_gate = as_u_gate_(right_param_map, right_gate);
 
                 if (!have_matching_indices_(new_left_gate, new_right_gate)) {
                     return false;
