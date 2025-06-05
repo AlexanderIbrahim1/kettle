@@ -31,6 +31,7 @@ void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
     const auto n_new_elements = left.elements_.size() + right.elements_.size();
     left.elements_.reserve(n_new_elements);
     left.elements_.insert(left.elements_.end(), right.elements_.begin(), right.elements_.end());
+    left.parameter_data_.insert(right.parameter_data_.begin(), right.parameter_data_.end());
 }
 
 auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> QuantumCircuit

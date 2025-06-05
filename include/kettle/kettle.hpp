@@ -24,7 +24,11 @@
 #include <kettle/io/numpy_statevector.hpp>
 #include <kettle/io/statevector.hpp>
 #include <kettle/io/write_tangelo_file.hpp>
+#include <kettle/operator/pauli/pauli_operator.hpp>
+#include <kettle/operator/pauli/sparse_pauli_string.hpp>
+#include <kettle/optimize/n_local.hpp>
 #include <kettle/simulation/simulate.hpp>
+#include <kettle/simulation/simulate_pauli.hpp>
 #include <kettle/state/endian.hpp>
 #include <kettle/state/marginal.hpp>
 #include <kettle/state/project_state.hpp>
