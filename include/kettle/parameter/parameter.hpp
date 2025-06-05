@@ -2,7 +2,9 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
+#include <unordered_map>
 
 
 namespace ket::param
@@ -52,5 +54,15 @@ struct ParameterIdHash
 {
     auto operator()(const ParameterID& id) const noexcept -> std::size_t;
 };
+
+struct ParameterData
+{
+    std::optional<double> value;
+    std::string name;
+    std::size_t count;
+};
+
+using ParameterDataMap = std::unordered_map<ParameterID, ParameterData, ParameterIdHash>;
+using EvaluatedParameterDataMap = std::unordered_map<ParameterID, double, ParameterIdHash>;
 
 }  // namespace ket::param

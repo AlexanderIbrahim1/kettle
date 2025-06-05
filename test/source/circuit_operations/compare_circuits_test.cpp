@@ -4,6 +4,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
+#include "kettle/parameter/parameter.hpp"
 
 TEST_CASE("almost_eq() with control flow statements")
 {
@@ -120,4 +121,19 @@ TEST_CASE("almost_eq(); circuit loggers do not affect comparison")
 
         REQUIRE(ket::almost_eq(circuit0, circuit1));
     }
+}
+
+TEST_CASE("compare parameterized circuits")
+{
+    auto circuit0 = ket::QuantumCircuit {2};
+    circuit0.add_rx_gate(0, 0.1234, ket::param::parameterized {});
+    circuit0.add_rx_gate(0, 1.2345);
+    circuit0.add_rx_gate(1, 2.3456, ket::param::parameterized {});
+
+    auto circuit1 = ket::QuantumCircuit {2};
+    circuit1.add_rx_gate(0, 0.1234, ket::param::parameterized {});
+    circuit1.add_rx_gate(0, 1.2345, ket::param::parameterized {});
+    circuit1.add_rx_gate(1, 2.3456);
+
+    REQUIRE(ket::almost_eq(circuit0, circuit1));
 }

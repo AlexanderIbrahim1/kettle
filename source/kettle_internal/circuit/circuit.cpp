@@ -998,7 +998,7 @@ auto QuantumCircuit::create_uninitialized_parameter_data_(const ket::param::Para
     auto name = default_parameter_name_(parameter_count_++);
     auto parameter = ket::param::Parameter {name, id};
 
-    parameter_data_[id] = ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
+    parameter_data_[id] = ket::param::ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 
@@ -1012,7 +1012,7 @@ auto QuantumCircuit::create_initialized_parameter_data_(
     auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_++)};
     auto id = parameter.id();
 
-    parameter_data_[id] = ParameterData {.value=value, .name=parameter.name(), .count=1};
+    parameter_data_[id] = ket::param::ParameterData {.value=value, .name=parameter.name(), .count=1};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 

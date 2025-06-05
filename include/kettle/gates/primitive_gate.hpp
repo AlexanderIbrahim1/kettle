@@ -11,6 +11,11 @@
 namespace ket
 {
 
+/*
+    The `Gate` type represents quantum gates that are directly simulated on a simulator. If
+    a gate is not one of these gates, then it must be decomposed into one or more of these
+    gates to be simulated.
+*/
 enum class Gate : std::uint8_t
 {
     H,
