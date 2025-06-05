@@ -18,8 +18,6 @@ namespace gid = ket::internal::gate_id;
 namespace 
 {
 
-inline constexpr auto DEFAULT_ROTATION_GATE_PARAMETER = double {0.0};
-
 void verify_valid_rotation_gates_(const std::vector<ket::GeneralGate>& gates)
 {
     for (auto gen_gate : gates) {
@@ -74,7 +72,7 @@ void apply_rotation_gates_1t1a_(
     constexpr auto key = ket::param::parameterized {};
     const auto func = ket::internal::GATE_TO_FUNCTION_1T1A_INIT_PARAM.at(gate);
     for (std::size_t i_target {0}; i_target < circuit.n_qubits(); ++i_target) {
-        parameter_ids.emplace_back((circuit.*func)(i_target, DEFAULT_ROTATION_GATE_PARAMETER, key));
+        parameter_ids.emplace_back((circuit.*func)(i_target, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
     }
 }
 
@@ -102,7 +100,7 @@ void apply_rotation_gates_1c1t1a_(
     for (std::size_t i {0}; i < (circuit.n_qubits() / 2); ++i) {
         const auto i_control = 2 * i;
         const auto i_target = i_control + 1;
-        parameter_ids.emplace_back((circuit.*func)(i_control, i_target, DEFAULT_ROTATION_GATE_PARAMETER, key));
+        parameter_ids.emplace_back((circuit.*func)(i_control, i_target, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
     }
 }
 
@@ -213,10 +211,10 @@ void apply_entanglement_gates_1c1t1a_linear_(
 {
     constexpr auto key = ket::param::parameterized {};
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T1A_INIT_PARAM.at(gate);
-    for (std::size_t i {0}; i < (circuit.n_qubits() / 2); ++i) {
+    for (std::size_t i {0}; i < circuit.n_qubits() - 1; ++i) {
         const auto i_control = i;
         const auto i_target = i_control + 1;
-        parameter_ids.emplace_back((circuit.*func)(i_control, i_target, DEFAULT_ROTATION_GATE_PARAMETER, key));
+        parameter_ids.emplace_back((circuit.*func)(i_control, i_target, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
     }
 }
 
@@ -229,7 +227,7 @@ void apply_entanglement_gates_doubly_controlled_1t_linear_(
 {
     using CG = ket::CompoundGate;
 
-    for (std::size_t i {0}; i < (circuit.n_qubits() / 3); ++i) {
+    for (std::size_t i {0}; i < circuit.n_qubits() - 2; ++i) {
         const auto control0 = i;
         const auto control1 = i + 1;
         const auto target = i + 2;
@@ -240,7 +238,7 @@ void apply_entanglement_gates_doubly_controlled_1t_linear_(
         else if (gate == CG::CCZ) {
             circuit.add_h_gate(target);
         }
-        else {
+        else if (gate != CG::CCX) {
             // TODO: replace with a better macro
             throw std::runtime_error {"DEV ERROR: invalid gate found in `apply_rotation_gates_doubly_controlled_1t_()`.\n"};
         }
@@ -258,7 +256,7 @@ void apply_entanglement_gates_doubly_controlled_1t_linear_(
         else if (gate == CG::CCZ) {
             circuit.add_h_gate(target);
         }
-        else {
+        else if (gate != CG::CCX) {
             // TODO: replace with a better macro
             throw std::runtime_error {"DEV ERROR: invalid gate found in `apply_rotation_gates_doubly_controlled_1t_()`.\n"};
         }
@@ -330,15 +328,15 @@ auto n_local(
 
     for (std::size_t i {0}; i < n_repetitions; ++i) {
         const auto rotation_param_ids= apply_rotation_gates_(circuit, rotation_blocks);
-        parameter_ids.insert(parameter_ids.begin(), rotation_param_ids.begin(), rotation_param_ids.end());
+        parameter_ids.insert(parameter_ids.end(), rotation_param_ids.begin(), rotation_param_ids.end());
 
         const auto entanglement_param_ids= apply_entanglement_gates_linear_(circuit, entanglement_blocks);
-        parameter_ids.insert(parameter_ids.begin(), entanglement_param_ids.begin(), entanglement_param_ids.end());
+        parameter_ids.insert(parameter_ids.end(), entanglement_param_ids.begin(), entanglement_param_ids.end());
     }
 
     if (flag == SkipLastRotationLayerFlag::FALSE) {
         const auto rotation_param_ids= apply_rotation_gates_(circuit, rotation_blocks);
-        parameter_ids.insert(parameter_ids.begin(), rotation_param_ids.begin(), rotation_param_ids.end());
+        parameter_ids.insert(parameter_ids.end(), rotation_param_ids.begin(), rotation_param_ids.end());
     }
 
     return {circuit, parameter_ids};

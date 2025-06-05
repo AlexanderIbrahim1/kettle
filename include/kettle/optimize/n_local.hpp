@@ -11,6 +11,8 @@
 namespace ket
 {
 
+inline constexpr auto DEFAULT_NLOCAL_GATE_PARAMETER = double {0.0};
+
 using GeneralGate = std::variant<Gate, CompoundGate>;
 
 enum class NLocalEntangelement : std::uint8_t
