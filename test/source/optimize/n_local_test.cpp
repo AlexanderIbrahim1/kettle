@@ -239,7 +239,45 @@ TEST_CASE("n_local construction")
             return circuit;
         }();
 
+        const auto n_rotation_parameters = 2 * n_qubits * (n_repetitions + 1);
+        const auto n_entangle_parameters = 2 * (n_qubits - 1) * n_repetitions;
+
         REQUIRE(ket::almost_eq(n_local_circuit, expected));
-        REQUIRE(parameters.size() == 2 * (n_qubits * (n_repetitions + 1) + (n_qubits - 1) * n_repetitions));
+        REQUIRE(parameters.size() == n_rotation_parameters + n_entangle_parameters);
     }
+}
+
+
+TEST_CASE("n_local assign parameters")
+{
+    // set the parameter values at the very beginning
+    const auto parameter_values = std::vector<double> {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
+
+    // create the n-local circuit from the n-local function, and assign the parameters
+    const auto n_qubits = 2;
+    const auto n_repetitions = 2;
+    auto [n_local_circuit, parameter_ids] = ket::n_local(n_qubits, {G::RX}, {G::CX}, Entangle::LINEAR, n_repetitions);
+
+    REQUIRE(parameter_ids.size() == parameter_values.size());
+
+    for (std::size_t i {0}; i < parameter_ids.size(); ++i) {
+        n_local_circuit.set_parameter_value(parameter_ids[i], parameter_values[i]);
+    }
+
+    // create an identical circuit manually
+    const auto identical_circuit = [&]() {
+        auto circuit = ket::QuantumCircuit {2};
+        circuit.add_rx_gate(0, parameter_values[0]);
+        circuit.add_rx_gate(1, parameter_values[1]);
+        circuit.add_cx_gate(0, 1);
+        circuit.add_rx_gate(0, parameter_values[2]);
+        circuit.add_rx_gate(1, parameter_values[3]);
+        circuit.add_cx_gate(0, 1);
+        circuit.add_rx_gate(0, parameter_values[4]);
+        circuit.add_rx_gate(1, parameter_values[5]);
+
+        return circuit;
+    }();
+
+    REQUIRE(ket::almost_eq(n_local_circuit, identical_circuit));
 }
