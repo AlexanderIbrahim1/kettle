@@ -42,7 +42,7 @@ const auto PAULI_PHASE_MAP = std::unordered_map<PauliPhase, std::complex<double>
 class SparsePauliString
 {
 public:
-    explicit SparsePauliString(std::size_t n_qubits);
+    explicit SparsePauliString(std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
 
     SparsePauliString(std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms, std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
 
@@ -113,9 +113,15 @@ public:
     [[nodiscard]]
     auto contains_index(std::size_t qubit_index) const noexcept -> bool;
 
+    [[nodiscard]]
+    auto equal_up_to_phase(const SparsePauliString& other) const -> bool;
+
+    friend
+    auto operator==(const SparsePauliString& left, const SparsePauliString& right) -> bool;
+
 private:
-    PauliPhase phase_ {};
     std::size_t n_qubits_;
+    PauliPhase phase_ {};
     std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms_;
 
     void check_index_in_qubit_range_(std::size_t index) const;

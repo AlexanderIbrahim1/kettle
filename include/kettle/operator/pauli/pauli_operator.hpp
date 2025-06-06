@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <vector>
 
+#include "kettle/common/tolerance.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/state/state.hpp"
 
@@ -72,6 +73,11 @@ private:
     std::vector<WeightedPauliString> weighted_pauli_strings_;
 };
 
+auto almost_eq(
+    const PauliOperator& left_op,
+    const PauliOperator& right_op,
+    double coeff_tolerance = COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+) -> bool;
 
 auto expectation_value(const PauliOperator& pauli_op, const QuantumState& state) -> std::complex<double>;
 

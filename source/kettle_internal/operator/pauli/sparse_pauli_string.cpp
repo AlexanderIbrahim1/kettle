@@ -6,13 +6,12 @@
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
-
 namespace ket
 {
 
-SparsePauliString::SparsePauliString(std::size_t n_qubits)
-    : phase_ {PauliPhase::PLUS_ONE}
-    , n_qubits_ {n_qubits}
+SparsePauliString::SparsePauliString(std::size_t n_qubits, PauliPhase phase)
+    : n_qubits_ {n_qubits}
+    , phase_ {phase}
 {
     check_n_qubits_not_zero_();
 }
@@ -22,8 +21,8 @@ SparsePauliString::SparsePauliString(
     std::size_t n_qubits,
     PauliPhase phase
 )
-    : phase_ {phase}
-    , n_qubits_ {n_qubits}
+    : n_qubits_ {n_qubits}
+    , phase_ {phase}
     , pauli_terms_ {std::move(pauli_terms)}
 {
     check_n_qubits_not_zero_();
@@ -33,8 +32,8 @@ SparsePauliString::SparsePauliString(
     const std::vector<PauliTerm>& paulis,
     PauliPhase phase
 )
-    : phase_ {phase}
-    , n_qubits_ {paulis.size()}
+    : n_qubits_ {paulis.size()}
+    , phase_ {phase}
 {
     check_n_qubits_not_zero_();
 
@@ -140,6 +139,35 @@ void SparsePauliString::check_n_qubits_not_zero_() const
     if (n_qubits_ == 0) {
         throw std::runtime_error {"ERROR: SparsePauliString cannot be constructed with 0 qubits.\n"};
     }
+}
+
+auto SparsePauliString::equal_up_to_phase(const SparsePauliString& other) const -> bool
+{
+    if (n_qubits_ != other.n_qubits_) {
+        return false;
+    }
+
+    if (pauli_terms_.size() != other.pauli_terms_.size()) {
+        return false;
+    }
+
+    const auto index_compare = [](const auto& left, const auto& right) { return left.first < right.first; };
+
+    auto curr_copy = pauli_terms_;
+    std::ranges::sort(curr_copy, index_compare);
+    auto other_copy = other.pauli_terms_;
+    std::ranges::sort(other_copy, index_compare);
+
+    return curr_copy == other_copy;
+}
+
+auto operator==(const SparsePauliString& left, const SparsePauliString& right) -> bool
+{
+    if (left.phase_ != right.phase_) {
+        return false;
+    }
+
+    return left.equal_up_to_phase(right);
 }
 
 }  // namespace ket

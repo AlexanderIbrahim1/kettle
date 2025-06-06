@@ -175,3 +175,98 @@ TEST_CASE("SparsePauliString construct from vector of terms")
     REQUIRE(pauli_string.at(1) == PT::Y);
     REQUIRE(pauli_string.at(2) == PT::Z);
 }
+
+
+TEST_CASE("SparsePauliString operator==")
+{
+    SECTION("different number of qubits")
+    {
+        auto string0 = ket::SparsePauliString {3};
+        auto string1 = ket::SparsePauliString {1};
+
+        REQUIRE(string0 != string1);
+    }
+
+    SECTION("different phase")
+    {
+        auto string0 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_EYE};
+        auto string1 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_ONE};
+
+        REQUIRE(string0 != string1);
+    }
+
+    SECTION("empty")
+    {
+        SECTION("same phase")
+        {
+            auto string0 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_EYE};
+            auto string1 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_EYE};
+
+            REQUIRE(string0 == string1);
+            REQUIRE(string0.equal_up_to_phase(string1));
+        }
+
+        SECTION("different phase")
+        {
+            auto string0 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_EYE};
+            auto string1 = ket::SparsePauliString {3, ket::PauliPhase::MINUS_ONE};
+
+            REQUIRE(string0 != string1);
+            REQUIRE(string0.equal_up_to_phase(string1));
+        }
+    }
+
+    SECTION("not empty")
+    {
+        SECTION("same phase; same terms")
+        {
+            SECTION("1 term")
+            {
+                auto string0 = ket::SparsePauliString {{{0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string1 = ket::SparsePauliString {{{0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+
+                REQUIRE(string0 == string1);
+                REQUIRE(string0.equal_up_to_phase(string1));
+            }
+
+            SECTION("2 terms, different order")
+            {
+                auto string0 = ket::SparsePauliString {{{0, PT::X}, {2, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string1 = ket::SparsePauliString {{{2, PT::X}, {0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+
+                REQUIRE(string0 == string1);
+                REQUIRE(string0.equal_up_to_phase(string1));
+            }
+        }
+
+        SECTION("same phase; different terms")
+        {
+            SECTION("1 term, different index")
+            {
+                auto string0 = ket::SparsePauliString {{{0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string1 = ket::SparsePauliString {{{1, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+
+                REQUIRE(string0 != string1);
+                REQUIRE(!string0.equal_up_to_phase(string1));
+            }
+
+            SECTION("1 term, different pauli term")
+            {
+                auto string0 = ket::SparsePauliString {{{0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string1 = ket::SparsePauliString {{{0, PT::Y}}, 3, ket::PauliPhase::MINUS_EYE};
+
+                REQUIRE(string0 != string1);
+                REQUIRE(!string0.equal_up_to_phase(string1));
+            }
+
+            SECTION("2 terms, different paulis")
+            {
+                auto string0 = ket::SparsePauliString {{{0, PT::X}, {2, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string1 = ket::SparsePauliString {{{2, PT::Y}, {0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+
+                REQUIRE(string0 != string1);
+                REQUIRE(!string0.equal_up_to_phase(string1));
+            }
+        }
+    }
+}
