@@ -16,6 +16,6 @@ namespace ket
 
 auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::PauliOperator;
 
-auto read_pauli_operator(std::filesystem::path& filepath, std::size_t n_qubits) -> ket::PauliOperator;
+auto read_pauli_operator(const std::filesystem::path& filepath, std::size_t n_qubits) -> ket::PauliOperator;
 
 }  // namespace ket

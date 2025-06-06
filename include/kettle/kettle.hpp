@@ -20,6 +20,7 @@
 #include <kettle/gates/random_u_gates.hpp>
 #include <kettle/gates/swap.hpp>
 #include <kettle/gates/toffoli.hpp>
+#include <kettle/io/read_pauli_operator.hpp>
 #include <kettle/io/read_tangelo_file.hpp>
 #include <kettle/io/numpy_statevector.hpp>
 #include <kettle/io/statevector.hpp>

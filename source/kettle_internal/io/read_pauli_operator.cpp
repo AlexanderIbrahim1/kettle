@@ -68,7 +68,7 @@ auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::P
     return pauli_op;
 }
 
-auto read_pauli_operator(std::filesystem::path& filepath, std::size_t n_qubits) -> ket::PauliOperator
+auto read_pauli_operator(const std::filesystem::path& filepath, std::size_t n_qubits) -> ket::PauliOperator
 {
     auto instream = std::ifstream {filepath};
     if (!instream.is_open()) {
