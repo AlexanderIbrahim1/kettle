@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <vector>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/simulation/simulate_pauli.hpp"
@@ -11,7 +12,6 @@
 /*
     This file contains the `PauliOperator` class for 
 */
-
 
 namespace ket
 {
@@ -102,6 +102,36 @@ auto expectation_value(const SparsePauliString& sparse_pauli_string, const Quant
     const auto expval = phase * inner_prod;
 
     return expval;
+}
+
+auto almost_eq(
+    const PauliOperator& left_op,
+    const PauliOperator& right_op,
+    double coeff_tolerance
+) -> bool
+{
+    // TODO: if there is only a single pauli string in the pauli operator, then technically the phase
+    // might not matter;
+    // not sure if this is something I even want to account for; the behaviour might be unexpected
+    if (left_op.size() != right_op.size()) {
+        return false;
+    }
+
+    const auto size = left_op.size();
+    for (std::size_t i {0}; i < size; ++i) {
+        const auto& left = left_op.at(i);
+        const auto& right = right_op.at(i);
+
+        if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
+            return false;
+        }
+
+        if (left.pauli_string != right.pauli_string) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 }  // namespace ket

@@ -199,3 +199,68 @@ TEST_CASE("expectation value of PauliOperator")
         REQUIRE(ket::almost_eq(expval, {1.0, -1.0}));
     }
 }
+
+TEST_CASE("PauliOperator comparison")
+{
+    SECTION("equal")
+    {
+        const auto pauli_op0 = ket::PauliOperator {
+            {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+            {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+        };
+
+        const auto pauli_op1 = ket::PauliOperator {
+            {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+            {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+        };
+
+        REQUIRE(ket::almost_eq(pauli_op0, pauli_op1));
+    }
+
+    SECTION("not equal")
+    {
+        SECTION("different coefficients")
+        {
+            const auto pauli_op0 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+                {.coefficient={3.0, 4.0}, .pauli_string={PT::I, PT::X}},
+            };
+
+            const auto pauli_op1 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+            };
+
+            REQUIRE(!ket::almost_eq(pauli_op0, pauli_op1));
+        }
+
+        SECTION("different terms")
+        {
+            const auto pauli_op0 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::Y, PT::Z}},
+            };
+
+            const auto pauli_op1 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+            };
+
+            REQUIRE(!ket::almost_eq(pauli_op0, pauli_op1));
+        }
+
+        SECTION("different number of terms")
+        {
+            const auto pauli_op0 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::Y, PT::Z}},
+            };
+
+            const auto pauli_op1 = ket::PauliOperator {
+                {.coefficient={1.0, 2.0}, .pauli_string={PT::I, PT::X}},
+            };
+
+            REQUIRE(!ket::almost_eq(pauli_op0, pauli_op1));
+        }
+    }
+}

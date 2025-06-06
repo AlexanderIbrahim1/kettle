@@ -49,6 +49,7 @@ add_library(
     source/kettle_internal/gates/toffoli.cpp
     source/kettle_internal/io/io_control_flow.cpp
     source/kettle_internal/io/numpy_statevector.cpp
+    source/kettle_internal/io/read_pauli_operator.cpp
     source/kettle_internal/io/read_tangelo_file.cpp
     source/kettle_internal/io/statevector.cpp
     source/kettle_internal/io/write_tangelo_file.cpp
