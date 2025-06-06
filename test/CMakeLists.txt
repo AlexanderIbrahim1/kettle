@@ -94,6 +94,7 @@ add_test_target(TARGET toffoli_test SOURCES "source/gates/toffoli_test.cpp")
 add_test_target(TARGET io_control_flow_test SOURCES "source/io/io_control_flow_test.cpp")
 add_test_target(TARGET io_numpy_statevector_test SOURCES "source/io/numpy_statevector_test.cpp")
 add_test_target(TARGET io_statevector_test SOURCES "source/io/statevector_test.cpp")
+add_test_target(TARGET read_pauli_operator_test SOURCES "source/io/read_pauli_operator_test.cpp")
 add_test_target(TARGET read_tangelo_file_test SOURCES "source/io/read_tangelo_file_test.cpp")
 add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_file_test.cpp")
 

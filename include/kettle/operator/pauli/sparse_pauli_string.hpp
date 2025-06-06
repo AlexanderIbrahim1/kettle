@@ -44,13 +44,13 @@ class SparsePauliString
 public:
     explicit SparsePauliString(std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
 
-    SparsePauliString(std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms, std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
+    SparsePauliString(std::vector<std::pair<std::size_t, PauliTerm>> pauli_indexed_terms, std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    SparsePauliString(const std::vector<PauliTerm>& paulis, PauliPhase phase = PauliPhase::PLUS_ONE);
+    SparsePauliString(const std::vector<PauliTerm>& pauli_terms, PauliPhase phase = PauliPhase::PLUS_ONE);
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    SparsePauliString(const std::initializer_list<PauliTerm>& paulis, PauliPhase phase = PauliPhase::PLUS_ONE);
+    SparsePauliString(const std::initializer_list<PauliTerm>& pauli_terms, PauliPhase phase = PauliPhase::PLUS_ONE);
 
     /*
         Set the phase of the `SparsePauliString`.
@@ -72,13 +72,13 @@ public:
     [[nodiscard]]
     constexpr auto terms() const noexcept -> const std::vector<std::pair<std::size_t, PauliTerm>>&
     {
-        return pauli_terms_;
+        return pauli_indexed_terms_;
     }
 
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
-        return pauli_terms_.size();
+        return pauli_indexed_terms_.size();
     }
 
     /*
@@ -122,7 +122,7 @@ public:
 private:
     std::size_t n_qubits_;
     PauliPhase phase_ {};
-    std::vector<std::pair<std::size_t, PauliTerm>> pauli_terms_;
+    std::vector<std::pair<std::size_t, PauliTerm>> pauli_indexed_terms_;
 
     void check_index_in_qubit_range_(std::size_t index) const;
     void check_n_qubits_not_zero_() const;

@@ -1,8 +1,13 @@
+#include <cstddef>
+#include <filesystem>
+#include <format>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 
-#include <kettle/kettle.hpp>
+#include "kettle/operator/pauli/pauli_operator.hpp"
+#include "kettle/io/read_pauli_operator.hpp"
 
 /*
     This file contains the `read_pauli_operator()` function, which takes an output file
@@ -10,12 +15,16 @@
     instance.
 */
 
+// NOLINTNEXTLINE(cert-err58-cpp)
 const auto MAP_PAULI_GATE_STRING_TO_TERM = std::unordered_map<char, ket::PauliTerm> {
     {'X', ket::PauliTerm::X},
     {'Y', ket::PauliTerm::Y},
     {'Z', ket::PauliTerm::Z},
 };
 
+
+namespace ket
+{
 
 auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::PauliOperator
 {
@@ -58,3 +67,15 @@ auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::P
 
     return pauli_op;
 }
+
+auto read_pauli_operator(std::filesystem::path& filepath, std::size_t n_qubits) -> ket::PauliOperator
+{
+    auto instream = std::ifstream {filepath};
+    if (!instream.is_open()) {
+        throw std::ios::failure {std::format("ERROR: unable to open: {}", filepath.c_str())};
+    }
+
+    return read_pauli_operator(instream, n_qubits);
+}
+
+}  // namespace ket
