@@ -3,7 +3,6 @@
 
 #include <kettle/circuit_operations/compare_circuits.hpp>
 #include <kettle/gates/compound_gate.hpp>
-#include <kettle/gates/toffoli.hpp>
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/optimize/n_local.hpp>
 

@@ -242,6 +242,10 @@ public:
     template <TwoControlOneTargetIndices Container = TwoControlOneTargetIndicesIList>
     void add_ccx_gate(const Container& triplets);
 
+    void add_ccu_gate(const Matrix2X2& unitary, std::size_t control_index0, std::size_t control_index1, std::size_t target_index);
+    template <TwoControlOneTargetIndices Container = TwoControlOneTargetIndicesIList>
+    void add_ccu_gate(const Matrix2X2& unitary, const Container& triplets);
+
     // --- NON-GATE CIRCUIT ELEMENTS ---
 
     /*

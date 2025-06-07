@@ -8,7 +8,6 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/gates/toffoli.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
@@ -172,14 +171,14 @@ auto make_controlled_circuit(
             const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = non_angle_gate(gate_info.gate);
-            apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
+            new_circuit.add_ccu_gate(matrix, control, new_control, new_target);
         }
         else if (gid::is_one_control_one_target_one_angle_transform_gate(gate_info.gate)) {
             const auto [original_control, original_target, angle] = cre::unpack_one_control_one_target_one_angle_gate(gate_info);
             const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = angle_gate(gate_info.gate, angle);
-            apply_doubly_controlled_gate(new_circuit, matrix, {control, new_control}, new_target);
+            new_circuit.add_ccu_gate(matrix, control, new_control, new_target);
         }
         else if (gate_info.gate == Gate::U) {
             const auto [original_target, unitary_ptr] = cre::unpack_u_gate(gate_info);
@@ -190,7 +189,7 @@ auto make_controlled_circuit(
             const auto [original_control, original_target, unitary_ptr] = cre::unpack_cu_gate(gate_info);
             const auto new_control = ket::internal::get_container_index(mapped_qubits, original_control);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
-            apply_doubly_controlled_gate(new_circuit, *unitary_ptr, {control, new_control}, new_target);
+            new_circuit.add_ccu_gate(*unitary_ptr, control, new_control, new_target);
         }
         else if (gate_info.gate == Gate::M) {
             throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};

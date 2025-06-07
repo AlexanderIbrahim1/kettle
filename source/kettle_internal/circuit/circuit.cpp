@@ -712,6 +712,27 @@ void QuantumCircuit::add_ccx_gate(const Container& triplets)
 template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
 template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
 
+void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
+{
+    const auto mat_sqrt = matrix_square_root(unitary);
+    const auto mat_sqrt_adj = conjugate_transpose(mat_sqrt);
+
+    add_cu_gate(mat_sqrt, control_index1, target_index);
+    add_cx_gate(control_index0, control_index1);
+    add_cu_gate(mat_sqrt_adj, control_index1, target_index);
+    add_cx_gate(control_index0, control_index1);
+    add_cu_gate(mat_sqrt, control_index0, target_index);
+}
+
+template <TwoControlOneTargetIndices Container>
+void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, const Container& triplets)
+{
+    for (auto [control0, control1, target] : triplets) {
+        add_ccu_gate(unitary, control0, control1, target);
+    }
+}
+template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesVector>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesVector& indices);
+template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesIList>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesIList& indices);
 
 // --- NON-GATE CIRCUIT ELEMENTS ---
 

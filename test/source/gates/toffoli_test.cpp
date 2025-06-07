@@ -6,7 +6,6 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/gates/common_u_gates.hpp"
-#include "kettle/gates/toffoli.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -114,7 +113,7 @@ TEST_CASE("toffoli gate with 4 qubits")
     REQUIRE(ket::almost_eq(state, info.expected));
 }
 
-TEST_CASE("circuit.add_ccx_gate() and apply_doubly_controlled_gate() match")
+TEST_CASE("circuit.add_ccx_gate() and circuit.add_ccu_gate() match")
 {
     const std::string init_bitstring = GENERATE("000", "100", "010", "110", "001", "101", "011", "111");
 
@@ -122,7 +121,7 @@ TEST_CASE("circuit.add_ccx_gate() and apply_doubly_controlled_gate() match")
     circuit0.add_ccx_gate(0, 1, 2);
 
     auto circuit1 = ket::QuantumCircuit {3};
-    ket::apply_doubly_controlled_gate(circuit0, ket::x_gate(), {0, 1}, 2);
+    circuit0.add_ccu_gate(ket::x_gate(), 0, 1, 2);
 
     auto state0 = ket::QuantumState {init_bitstring};
     auto state1 = ket::QuantumState {init_bitstring};
