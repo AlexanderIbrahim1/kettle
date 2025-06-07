@@ -768,6 +768,54 @@ void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, const Container& tri
 template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesVector>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesVector& indices);
 template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesIList>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesIList& indices);
 
+void QuantumCircuit::add_swap_gate(std::size_t target_index0, std::size_t target_index1)
+{
+    if (target_index0 == target_index1) {
+        throw std::runtime_error {"Cannot swap a index with itself"};
+    }
+
+    add_cx_gate(target_index0, target_index1);
+    add_cx_gate(target_index1, target_index0);
+    add_cx_gate(target_index0, target_index1);
+}
+
+template <TwoTargetIndices Container>
+void QuantumCircuit::add_swap_gate(const Container& target_index_pairs)
+{
+    for (auto [target0, target1] : target_index_pairs) {
+        add_swap_gate(target0, target1);
+    }
+}
+template void QuantumCircuit::add_swap_gate<TwoTargetIndicesVector>(const TwoTargetIndicesVector& indices);
+template void QuantumCircuit::add_swap_gate<TwoTargetIndicesIList>(const TwoTargetIndicesIList& indices);
+
+void QuantumCircuit::add_cswap_gate(std::size_t control_qubit, std::size_t target_index0, std::size_t target_index1)
+{
+    // solution taken from: https://quantumcomputing.stackexchange.com/a/9343
+
+    if (target_index0 == target_index1) {
+        throw std::runtime_error {"Cannot swap a qubit with itself"};
+    }
+
+    if (control_qubit == target_index0 || control_qubit == target_index1) {
+        throw std::runtime_error {"Cannot use the control qubit as one of the qubits to be swapped"};
+    }
+
+    add_cx_gate(target_index1, target_index0);
+    add_ccx_gate(control_qubit, target_index0, target_index1);
+    add_cx_gate(target_index1, target_index0);
+}
+
+template <OneControlTwoTargetIndices Container>
+void QuantumCircuit::add_cswap_gate(const Container& triplets)
+{
+    for (auto [control, target0, target1] : triplets) {
+        add_cswap_gate(control, target0, target1);
+    }
+}
+template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesIList>(const OneControlTwoTargetIndicesIList& indices);
+template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesVector>(const OneControlTwoTargetIndicesVector& indices);
+
 // --- NON-GATE CIRCUIT ELEMENTS ---
 
 void QuantumCircuit::add_if_statement(

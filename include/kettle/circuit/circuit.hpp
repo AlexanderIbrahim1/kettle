@@ -254,6 +254,20 @@ public:
     template <TwoControlOneTargetIndices Container = TwoControlOneTargetIndicesIList>
     void add_ccu_gate(const Matrix2X2& unitary, const Container& triplets);
 
+    /*
+        Apply a SWAP gate to the qubits whose indices are given by `target_index0` and `target_index1`.
+    */
+    void add_swap_gate(std::size_t target_index0, std::size_t target_index1);
+    template <TwoTargetIndices Container = TwoTargetIndicesIList>
+    void add_swap_gate(const Container& target_index_pairs);
+    /*
+        Apply a SWAP gate to the qubits whose indices are given by `target_index0` and `target_index1`,
+        dependent on the qubit at index `control_qubit` being in the 1 state.
+    */
+    void add_cswap_gate(std::size_t control_qubit, std::size_t target_index0, std::size_t target_index1);
+    template <OneControlTwoTargetIndices Container = OneControlTwoTargetIndicesIList>
+    void add_cswap_gate(const Container& triplets);
+
     // --- NON-GATE CIRCUIT ELEMENTS ---
 
     /*

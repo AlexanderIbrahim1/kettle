@@ -4,7 +4,6 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/gates/fourier.hpp"
-#include "kettle/gates/swap.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/common/utils_internal.hpp"
@@ -24,7 +23,7 @@ void apply_fourier_transform_swaps_(ket::QuantumCircuit& circuit, const Containe
     while (i_right_pre > i_left_pre) {
         const auto i_left = ket::internal::get_container_index(container, i_left_pre);
         const auto i_right = ket::internal::get_container_index(container, i_right_pre);
-        ket::apply_swap(circuit, i_left, i_right);
+        circuit.add_swap_gate(i_left, i_right);
 
         ++i_left_pre;
         --i_right_pre;

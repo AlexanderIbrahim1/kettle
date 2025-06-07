@@ -6,7 +6,6 @@
 #include <string>
 
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/gates/swap.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/io/read_tangelo_file.hpp"
 
@@ -52,7 +51,7 @@ void parse_swap_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
     stream >> target_qubit1; // target qubit 1
     stream >> dummy_ch;     // ']'
 
-    ket::apply_swap(circuit, target_qubit0, target_qubit1);
+    circuit.add_swap_gate(target_qubit0, target_qubit1);
 }
 
 void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)

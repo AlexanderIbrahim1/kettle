@@ -62,20 +62,20 @@ void control_multiplication_mod15(
 
     for (std::size_t i {0}; i < n_iterations; ++i) {
         if (base == 2 || base == 13) {
-            ket::apply_control_swap(circuit, control_qubit, i2, i3);
-            ket::apply_control_swap(circuit, control_qubit, i1, i2);
-            ket::apply_control_swap(circuit, control_qubit, i0, i1);
+            circuit.add_cswap_gate(control_qubit, i2, i3);
+            circuit.add_cswap_gate(control_qubit, i1, i2);
+            circuit.add_cswap_gate(control_qubit, i0, i1);
         }
 
         if (base == 7 || base == 8) {
-            ket::apply_control_swap(circuit, control_qubit, i0, i1);
-            ket::apply_control_swap(circuit, control_qubit, i1, i2);
-            ket::apply_control_swap(circuit, control_qubit, i2, i3);
+            circuit.add_cswap_gate(control_qubit, i0, i1);
+            circuit.add_cswap_gate(control_qubit, i1, i2);
+            circuit.add_cswap_gate(control_qubit, i2, i3);
         }
 
         if (base == 4 || base == 11) {
-            ket::apply_control_swap(circuit, control_qubit, i1, i3);
-            ket::apply_control_swap(circuit, control_qubit, i0, i2);
+            circuit.add_cswap_gate(control_qubit, i1, i3);
+            circuit.add_cswap_gate(control_qubit, i0, i2);
         }
 
         if (base == 7 || base == 11 || base == 13) {
