@@ -1,5 +1,6 @@
 #include <cmath>
 #include <memory>
+#include <ranges>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -18,8 +19,10 @@
 
 #include "kettle/circuit/circuit.hpp"
 
+#include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 
 // NOTE:
 // - there is the potential for a lot of code reduction here
@@ -30,6 +33,8 @@
 //
 // - however, I'm very hesitant to use macros
 //   - I'll tolerate the code duplication for now
+
+namespace ki = ket::internal;
 
 namespace
 {
@@ -42,13 +47,38 @@ auto default_parameter_name_(std::size_t param_number) -> std::string
     return output.str();
 }
 
+template <ket::QubitIndices Container = ket::QubitIndicesIList>
+void apply_fourier_transform_swaps_(ket::QuantumCircuit& circuit, const Container& container)
+{
+    const auto size = ki::get_container_size(container);
+
+    // apply the swaps
+    auto i_left_pre = std::size_t {0};
+    auto i_right_pre = size - 1;
+
+    while (i_right_pre > i_left_pre) {
+        const auto i_left = ki::get_container_index(container, i_left_pre);
+        const auto i_right = ki::get_container_index(container, i_right_pre);
+        circuit.add_swap_gate(i_left, i_right);
+
+        ++i_left_pre;
+        --i_right_pre;
+    }
+}
+template void apply_fourier_transform_swaps_<ket::QubitIndicesVector>(
+    ket::QuantumCircuit& circuit, const ket::QubitIndicesVector& container
+);
+template void apply_fourier_transform_swaps_<ket::QubitIndicesIList>(
+    ket::QuantumCircuit& circuit, const ket::QubitIndicesIList& container
+);
+
 }  // namespace
 
 
 namespace ket
 {
 
-namespace create = ket::internal::create;
+namespace create = ki::create;
 
 void QuantumCircuit::set_parameter_value(const ket::param::ParameterID& id, double angle)
 {
@@ -816,6 +846,60 @@ void QuantumCircuit::add_cswap_gate(const Container& triplets)
 template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesIList>(const OneControlTwoTargetIndicesIList& indices);
 template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesVector>(const OneControlTwoTargetIndicesVector& indices);
 
+
+template <QubitIndices Container>
+void QuantumCircuit::add_qft_gate(const Container& indices)
+{
+    // TODO: maybe replace with get_container_size?
+    const auto size = static_cast<std::size_t>(std::distance(indices.begin(), indices.end()));
+
+    // perform the combination of Hadamard gates and controlled RZ gates
+    for (std::size_t i_target_pre {0}; i_target_pre < size; ++i_target_pre) {
+        const auto i_target = ki::get_container_index(indices, i_target_pre);
+        add_h_gate(i_target);
+
+        auto i_angle_denom = std::size_t {2};
+        for (std::size_t i_control_pre {i_target_pre + 1}; i_control_pre < size; ++i_control_pre) {
+            const auto i_control = ki::get_container_index(indices, i_control_pre);
+            const auto angle = 2.0 * M_PI / static_cast<double>(ki::pow_2_int(i_angle_denom));
+            add_cp_gate(i_control, i_target, angle);
+            ++i_angle_denom;
+        }
+    }
+
+    // apply the swaps
+    apply_fourier_transform_swaps_(*this, indices);
+}
+template void QuantumCircuit::add_qft_gate<ket::QubitIndicesVector>(const ket::QubitIndicesVector& indices);
+template void QuantumCircuit::add_qft_gate<ket::QubitIndicesIList>(const ket::QubitIndicesIList& indices);
+
+template <QubitIndices Container>
+void QuantumCircuit::add_iqft_gate(const Container& indices)
+{
+    namespace sv = std::views;
+
+    // apply the swaps
+    apply_fourier_transform_swaps_(*this, indices);
+
+    const auto size = static_cast<std::size_t>(std::distance(indices.begin(), indices.end()));
+
+    for (std::size_t i_target_pre : sv::iota(0UL, size) | sv::reverse) {
+        const auto i_target = ket::internal::get_container_index(indices, i_target_pre);
+
+        auto i_angle_denom = size - i_target_pre;
+        for (std::size_t i_control_pre : sv::iota(i_target_pre + 1, size) | sv::reverse) {
+            const auto i_control = ket::internal::get_container_index(indices, i_control_pre);
+            const auto angle = 2.0 * M_PI / static_cast<double>(ket::internal::pow_2_int(i_angle_denom));
+            add_cp_gate(i_control, i_target, -angle);
+            --i_angle_denom;
+        }
+
+        add_h_gate(i_target);
+    }
+}
+template void QuantumCircuit::add_iqft_gate<ket::QubitIndicesVector>(const ket::QubitIndicesVector& container);
+template void QuantumCircuit::add_iqft_gate<ket::QubitIndicesIList>(const ket::QubitIndicesIList& container);
+
 // --- NON-GATE CIRCUIT ELEMENTS ---
 
 void QuantumCircuit::add_if_statement(
@@ -947,7 +1031,7 @@ void QuantumCircuit::add_one_target_gate_(
     ket::Gate gate
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
     elements_.emplace_back(create::create_one_target_gate(gate, target_index));
 }
@@ -958,7 +1042,7 @@ void QuantumCircuit::add_one_target_one_angle_gate_(
     ket::Gate gate
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
     elements_.emplace_back(create::create_one_target_one_angle_gate(gate, target_index, angle));
 }
@@ -969,7 +1053,7 @@ void QuantumCircuit::add_one_control_one_target_gate_(
     ket::Gate gate
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(control_index, "control qubit", gate_name);
     check_qubit_range_(target_index, "target qubit", gate_name);
     elements_.emplace_back(create::create_one_control_one_target_gate(gate, control_index, target_index));
@@ -982,7 +1066,7 @@ void QuantumCircuit::add_one_control_one_target_one_angle_gate_(
     ket::Gate gate
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(control_index, "control qubit", gate_name);
     check_qubit_range_(target_index, "target qubit", gate_name);
     elements_.emplace_back(create::create_one_control_one_target_one_angle_gate(gate, control_index, target_index, angle));
@@ -995,7 +1079,7 @@ auto QuantumCircuit::add_one_target_one_parameter_gate_with_angle_(
     [[maybe_unused]] ket::param::parameterized key
 ) -> ket::param::ParameterID
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
 
     auto [expression, id] = create_initialized_parameter_data_(initial_angle);
@@ -1010,7 +1094,7 @@ void QuantumCircuit::add_one_target_one_parameter_gate_without_angle_(
     const ket::param::ParameterID& id
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
 
     if (parameter_data_.contains(id)) {
@@ -1035,7 +1119,7 @@ auto QuantumCircuit::add_one_control_one_target_one_parameter_gate_with_angle_(
     [[maybe_unused]] ket::param::parameterized key
 ) -> ket::param::ParameterID
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(control_index, "control qubit", gate_name);
     check_qubit_range_(target_index, "target qubit", gate_name);
 
@@ -1052,7 +1136,7 @@ void QuantumCircuit::add_one_control_one_target_one_parameter_gate_without_angle
     const ket::param::ParameterID& id
 )
 {
-    const auto gate_name = ket::internal::PRIMITIVE_GATES_TO_STRING.at(gate);
+    const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(control_index, "control qubit", gate_name);
     check_qubit_range_(target_index, "target qubit", gate_name);
 

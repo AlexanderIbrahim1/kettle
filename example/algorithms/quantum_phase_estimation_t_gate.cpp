@@ -54,7 +54,7 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2});
     circuit.add_x_gate(3);
     apply_multiplicity_controlled_t_gate_manually(circuit);
-    ket::apply_inverse_fourier_transform(circuit, {2, 1, 0});
+    circuit.add_iqft_gate({2, 1, 0});
 
     // construct the statevector in the 0-state, and propagate it through the circuit
     auto statevector = ket::QuantumState {"0000"};

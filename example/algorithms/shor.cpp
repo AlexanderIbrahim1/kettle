@@ -169,7 +169,7 @@ auto main(int argc, char** argv) -> int
     }
 
     // the final step of QPE requires the inverse QFT
-    ket::apply_inverse_fourier_transform(circuit, ket::revarange(n_counting_qubits));
+    circuit.add_iqft_gate(ket::revarange(n_counting_qubits));
 
     // create the statevector and evolve the quantum state
     auto statevector = ket::QuantumState {n_total_qubits};

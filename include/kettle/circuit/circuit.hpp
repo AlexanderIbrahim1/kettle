@@ -260,13 +260,20 @@ public:
     void add_swap_gate(std::size_t target_index0, std::size_t target_index1);
     template <TwoTargetIndices Container = TwoTargetIndicesIList>
     void add_swap_gate(const Container& target_index_pairs);
+
     /*
-        Apply a SWAP gate to the qubits whose indices are given by `target_index0` and `target_index1`,
+        Apply a CSWAP gate to the qubits whose indices are given by `target_index0` and `target_index1`,
         dependent on the qubit at index `control_qubit` being in the 1 state.
     */
     void add_cswap_gate(std::size_t control_qubit, std::size_t target_index0, std::size_t target_index1);
     template <OneControlTwoTargetIndices Container = OneControlTwoTargetIndicesIList>
     void add_cswap_gate(const Container& triplets);
+
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_qft_gate(const Container& indices);
+
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_iqft_gate(const Container& indices);
 
     // --- NON-GATE CIRCUIT ELEMENTS ---
 
