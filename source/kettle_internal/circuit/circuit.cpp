@@ -712,6 +712,40 @@ void QuantumCircuit::add_ccx_gate(const Container& triplets)
 template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
 template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
 
+void QuantumCircuit::add_ccy_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
+{
+    add_sdag_gate(target_index);
+    add_ccx_gate(control_index0, control_index1, target_index);
+    add_s_gate(target_index);
+}
+
+template <TwoControlOneTargetIndices Container>
+void QuantumCircuit::add_ccy_gate(const Container& triplets)
+{
+    for (auto [control0, control1, target] : triplets) {
+        add_ccy_gate(control0, control1, target);
+    }
+}
+template void QuantumCircuit::add_ccy_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
+template void QuantumCircuit::add_ccy_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
+
+void QuantumCircuit::add_ccz_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
+{
+    add_h_gate(target_index);
+    add_ccx_gate(control_index0, control_index1, target_index);
+    add_h_gate(target_index);
+}
+
+template <TwoControlOneTargetIndices Container>
+void QuantumCircuit::add_ccz_gate(const Container& triplets)
+{
+    for (auto [control0, control1, target] : triplets) {
+        add_ccz_gate(control0, control1, target);
+    }
+}
+template void QuantumCircuit::add_ccz_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
+template void QuantumCircuit::add_ccz_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
+
 void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
 {
     const auto mat_sqrt = matrix_square_root(unitary);
