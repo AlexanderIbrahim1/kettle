@@ -3,7 +3,6 @@
 
 #include <kettle/circuit_operations/compare_circuits.hpp>
 #include <kettle/gates/compound_gate.hpp>
-#include <kettle/gates/toffoli.hpp>
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/optimize/n_local.hpp>
 
@@ -187,7 +186,7 @@ TEST_CASE("n_local construction")
             }
             
             for (std::size_t i_qubit {0}; i_qubit < n_qubits - 2; ++i_qubit) {
-                ket::apply_toffoli_gate(circuit, {i_qubit, i_qubit + 1}, i_qubit + 2);
+                circuit.add_ccx_gate(i_qubit, i_qubit + 1, i_qubit + 2);
             }
 
             for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {

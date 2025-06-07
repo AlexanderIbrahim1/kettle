@@ -5,8 +5,8 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
-#include "kettle/gates/toffoli.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -51,7 +51,7 @@ TEST_CASE("toffoli gate with 3 qubits")
 
     auto state = ket::QuantumState {info.initial_bitstring};
     auto circuit = ket::QuantumCircuit {3};
-    ket::apply_toffoli_gate(circuit, info.control_qubits, info.target_qubit);
+    circuit.add_ccx_gate(info.control_qubits.first, info.control_qubits.second, info.target_qubit);
 
     ket::simulate(circuit, state);
 
@@ -107,22 +107,36 @@ TEST_CASE("toffoli gate with 4 qubits")
 
     auto state = ket::QuantumState {info.initial_bitstring};
     auto circuit = ket::QuantumCircuit {4};
-    ket::apply_toffoli_gate(circuit, info.control_qubits, info.target_qubit);
+    circuit.add_ccx_gate(info.control_qubits.first, info.control_qubits.second, info.target_qubit);
 
     ket::simulate(circuit, state);
 
     REQUIRE(ket::almost_eq(state, info.expected));
 }
 
-TEST_CASE("apply_toffoli_gate() and apply_doubly_controlled_gate() match")
+
+TEST_CASE("circuit.add_ccx_gate() and circuit.add_ccu_gate() match")
 {
+    using memberfunc = void(ket::QuantumCircuit::*)(std::size_t, std::size_t, std::size_t);
+
+    struct TestCase
+    {
+        memberfunc func;
+        ket::Matrix2X2 unitary;
+    };
+
     const std::string init_bitstring = GENERATE("000", "100", "010", "110", "001", "101", "011", "111");
+    const auto testcase = GENERATE(
+        TestCase {&ket::QuantumCircuit::add_ccx_gate, ket::x_gate()},
+        TestCase {&ket::QuantumCircuit::add_ccy_gate, ket::y_gate()},
+        TestCase {&ket::QuantumCircuit::add_ccz_gate, ket::z_gate()}
+    );
 
     auto circuit0 = ket::QuantumCircuit {3};
-    ket::apply_toffoli_gate(circuit0, {0, 1}, 2);
+    (circuit0.*testcase.func)(0, 1, 2);
 
     auto circuit1 = ket::QuantumCircuit {3};
-    ket::apply_doubly_controlled_gate(circuit0, ket::x_gate(), {0, 1}, 2);
+    circuit1.add_ccu_gate(testcase.unitary, 0, 1, 2);
 
     auto state0 = ket::QuantumState {init_bitstring};
     auto state1 = ket::QuantumState {init_bitstring};

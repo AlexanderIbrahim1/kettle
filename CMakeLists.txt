@@ -37,16 +37,14 @@ add_library(
     source/kettle_internal/common/utils_internal.cpp
     source/kettle_internal/gates/common_u_gates.cpp
     source/kettle_internal/gates/compound_gate/gate_id.cpp
-    source/kettle_internal/gates/fourier.cpp
+    source/kettle_internal/gates/compound_gate_map.cpp
+    source/kettle_internal/gates/primitive_gate_map.cpp
     source/kettle_internal/gates/primitive_gate/gate_compare.cpp
     source/kettle_internal/gates/primitive_gate/gate_create.cpp
     source/kettle_internal/gates/primitive_gate/gate_id.cpp
-    source/kettle_internal/gates/primitive_gate_map.cpp
     source/kettle_internal/gates/matrix2x2_gate_decomposition.cpp
     source/kettle_internal/gates/multiplicity_controlled_u_gate.cpp
     source/kettle_internal/gates/random_u_gates.cpp
-    source/kettle_internal/gates/swap.cpp
-    source/kettle_internal/gates/toffoli.cpp
     source/kettle_internal/io/io_control_flow.cpp
     source/kettle_internal/io/numpy_statevector.cpp
     source/kettle_internal/io/read_pauli_operator.cpp

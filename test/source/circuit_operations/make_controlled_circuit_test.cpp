@@ -7,7 +7,6 @@
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
-#include "kettle/gates/toffoli.hpp"
 #include "kettle/circuit_operations/append_circuits.hpp"
 #include "kettle/circuit_operations/make_controlled_circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
@@ -82,7 +81,7 @@ TEST_CASE("make_controlled_circuit()")
             subcircuit.add_cx_gate(0, 1);
             auto new_circuit = ket::make_controlled_circuit(subcircuit, 3, 0, {1, 2});
 
-            ket::apply_toffoli_gate(expected, {0, 1}, 2);
+            expected.add_ccx_gate(0, 1, 2);
 
             ket::simulate(new_circuit, state0);
             ket::simulate(expected, state1);

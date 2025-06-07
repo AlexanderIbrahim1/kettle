@@ -14,12 +14,9 @@
 #include <kettle/common/mathtools.hpp>
 #include <kettle/common/matrix2x2.hpp>
 #include <kettle/gates/common_u_gates.hpp>
-#include <kettle/gates/fourier.hpp>
 #include <kettle/gates/multiplicity_controlled_u_gate.hpp>
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/gates/random_u_gates.hpp>
-#include <kettle/gates/swap.hpp>
-#include <kettle/gates/toffoli.hpp>
 #include <kettle/io/read_pauli_operator.hpp>
 #include <kettle/io/read_tangelo_file.hpp>
 #include <kettle/io/numpy_statevector.hpp>

@@ -6,8 +6,8 @@
 auto main() -> int
 {
     auto circuit = ket::QuantumCircuit {4};
-    ket::apply_forward_fourier_transform(circuit, {0, 1, 3});
-    ket::apply_inverse_fourier_transform(circuit, {0, 1, 3});
+    circuit.add_qft_gate({0, 1, 3});
+    circuit.add_iqft_gate({0, 1, 3});
 
     auto state = ket::QuantumState {"0000"};
 

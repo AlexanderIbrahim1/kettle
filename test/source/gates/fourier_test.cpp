@@ -7,7 +7,6 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/arange.hpp"
-#include "kettle/gates/fourier.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -18,7 +17,7 @@ TEST_CASE("Forward QFT on |0> state")
         auto state = ket::QuantumState {"0"};
         auto circuit = ket::QuantumCircuit {1};
 
-        ket::apply_forward_fourier_transform(circuit, {0});
+        circuit.add_qft_gate({0});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(2.0);
@@ -40,7 +39,7 @@ TEST_CASE("Forward QFT on |0> state")
         auto state = ket::QuantumState {"00"};
         auto circuit = ket::QuantumCircuit {2};
 
-        ket::apply_forward_fourier_transform(circuit, {0, 1});
+        circuit.add_qft_gate({0, 1});
 
         // clang-format off
         const auto norm = 1.0 / 2.0;
@@ -64,7 +63,7 @@ TEST_CASE("Forward QFT on |0> state")
         auto state = ket::QuantumState {"000"};
         auto circuit = ket::QuantumCircuit {3};
 
-        ket::apply_forward_fourier_transform(circuit, {0, 1, 2});
+        circuit.add_qft_gate({0, 1, 2});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(8.0);
@@ -110,7 +109,7 @@ TEST_CASE("basic Forward QFT on 2-qubit computational basis states")
     auto state = ket::QuantumState {pair.input};
     auto circuit = ket::QuantumCircuit {2};
 
-    ket::apply_forward_fourier_transform(circuit, {0, 1});
+    circuit.add_qft_gate({0, 1});
     ket::simulate(circuit, state);
 
     REQUIRE(ket::almost_eq(state, pair.expected));
@@ -159,7 +158,7 @@ TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
     auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
     auto circuit = ket::QuantumCircuit {3};
 
-    ket::apply_forward_fourier_transform(circuit, {0, 1, 2});
+    circuit.add_qft_gate({0, 1, 2});
     ket::simulate(circuit, state);
 
     const auto expected = create_expected_state(pair);
@@ -218,7 +217,7 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
     auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
     auto circuit = ket::QuantumCircuit {4};
 
-    ket::apply_forward_fourier_transform(circuit, {0, 1, 2, 3});
+    circuit.add_qft_gate({0, 1, 2, 3});
     ket::simulate(circuit, state);
 
     const auto expected = create_expected_state(pair);
@@ -245,8 +244,8 @@ TEST_CASE("inverse QFT after forward QFT")
         const auto qubit_indices = ket::arange(init_bitstring.size());
 
         auto circuit = ket::QuantumCircuit {init_bitstring.size()};
-        ket::apply_forward_fourier_transform(circuit, qubit_indices);
-        ket::apply_inverse_fourier_transform(circuit, qubit_indices);
+        circuit.add_qft_gate(qubit_indices);
+        circuit.add_iqft_gate(qubit_indices);
 
         ket::simulate(circuit, state);
 

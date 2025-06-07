@@ -6,7 +6,6 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/state/state.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/gates/swap.hpp"
 
 TEST_CASE("control swap gate on 3-qubit circuit")
 {
@@ -37,14 +36,14 @@ TEST_CASE("control swap gate on 3-qubit circuit")
 
         SECTION("swap qubits are 1 and 2")
         {
-            ket::apply_control_swap(circuit, 0, 1, 2);
+            circuit.add_cswap_gate(0, 1, 2);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 2 and 1")
         {
-            ket::apply_control_swap(circuit, 0, 2, 1);
+            circuit.add_cswap_gate(0, 2, 1);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
@@ -71,14 +70,14 @@ TEST_CASE("control swap gate on 3-qubit circuit")
 
         SECTION("swap qubits are 0 and 2")
         {
-            ket::apply_control_swap(circuit, 1, 0, 2);
+            circuit.add_cswap_gate(1, 0, 2);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 2 and 0")
         {
-            ket::apply_control_swap(circuit, 1, 2, 0);
+            circuit.add_cswap_gate(1, 2, 0);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
@@ -105,14 +104,14 @@ TEST_CASE("control swap gate on 3-qubit circuit")
 
         SECTION("swap qubits are 0 and 1")
         {
-            ket::apply_control_swap(circuit, 2, 0, 1);
+            circuit.add_cswap_gate(2, 0, 1);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
 
         SECTION("swap qubits are 1 and 0")
         {
-            ket::apply_control_swap(circuit, 2, 1, 0);
+            circuit.add_cswap_gate(2, 1, 0);
             ket::simulate(circuit, state);
             REQUIRE(ket::almost_eq(state, expected));
         }
@@ -152,7 +151,7 @@ TEST_CASE("control swap gate on 4-qubit circuit")
     auto expected = ket::QuantumState {info.expected_bitstring};
     auto circuit = ket::QuantumCircuit {4};
  
-    ket::apply_control_swap(circuit, 0, 1, 3);
+    circuit.add_cswap_gate(0, 1, 3);
     ket::simulate(circuit, state);
     REQUIRE(ket::almost_eq(state, expected));
 }
@@ -163,17 +162,17 @@ TEST_CASE("control swap gate throws exceptions on invalid inputs")
 
     SECTION("swap qubits are identical")
     {
-        REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 1, 1), std::runtime_error);
+        REQUIRE_THROWS_AS(circuit.add_cswap_gate(0, 1, 1), std::runtime_error);
     }
 
     SECTION("control qubit matches a swap qubit")
     {
         SECTION("matches first swap qubit") {
-            REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 0, 1), std::runtime_error);
+            REQUIRE_THROWS_AS(circuit.add_cswap_gate(0, 0, 1), std::runtime_error);
         }
 
         SECTION("matches second swap qubit") {
-            REQUIRE_THROWS_AS(ket::apply_control_swap(circuit, 0, 1, 0), std::runtime_error);
+            REQUIRE_THROWS_AS(circuit.add_cswap_gate(0, 1, 0), std::runtime_error);
         }
     }
 }
