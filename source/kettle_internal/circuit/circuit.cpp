@@ -689,6 +689,32 @@ void QuantumCircuit::add_m_gate(const Container& pairs)
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesVector>(const QubitAndBitIndicesVector& indices);
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesIList>(const QubitAndBitIndicesIList& indices);
 
+
+// --- NON-PRIMITIVE GATES ---
+void QuantumCircuit::add_ccx_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
+{
+    // TODO: add other decompositions, probably through an optional argument
+    add_csx_gate(control_index1, target_index);
+    add_cx_gate(control_index0, control_index1);
+    add_cx_gate(control_index1, target_index);
+    add_csx_gate(control_index1, target_index);
+    add_cx_gate(control_index0, control_index1);
+    add_csx_gate(control_index0, target_index);
+}
+
+template <TwoControlOneTargetIndices Container>
+void QuantumCircuit::add_ccx_gate(const Container& triplets)
+{
+    for (auto [control0, control1, target] : triplets) {
+        add_ccx_gate(control0, control1, target);
+    }
+}
+template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
+template void QuantumCircuit::add_ccx_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
+
+
+// --- NON-GATE CIRCUIT ELEMENTS ---
+
 void QuantumCircuit::add_if_statement(
     ControlFlowPredicate predicate,
     QuantumCircuit circuit,

@@ -237,6 +237,13 @@ public:
     template <QubitAndBitIndices Container = QubitAndBitIndicesIList>
     void add_m_gate(const Container& pairs);
 
+    // --- NON-PRIMITIVE GATES ---
+    void add_ccx_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index);
+    template <TwoControlOneTargetIndices Container = TwoControlOneTargetIndicesIList>
+    void add_ccx_gate(const Container& triplets);
+
+    // --- NON-GATE CIRCUIT ELEMENTS ---
+
     /*
         Add a classical if statement to the `QuantumCircuit`.
 

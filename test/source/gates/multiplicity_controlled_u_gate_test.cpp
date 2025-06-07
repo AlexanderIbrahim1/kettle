@@ -7,7 +7,6 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
-#include "kettle/gates/toffoli.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/state.hpp"
 
@@ -71,7 +70,7 @@ TEST_CASE("multiplicity-controlled X gate test")
         );
 
         const auto modify_via_toffoli = [&] (ket::QuantumCircuit& circuit) {
-            ket::apply_toffoli_gate(circuit, {control0, control1}, target);
+            circuit.add_ccx_gate(control0, control1, target);
         };
 
         const auto modify_via_mcu = [&] (ket::QuantumCircuit& circuit) {

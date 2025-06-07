@@ -8,22 +8,6 @@
 namespace ket
 {
 
-void apply_toffoli_gate(
-    QuantumCircuit& circuit,
-    const std::pair<std::size_t, std::size_t>& control_qubits,
-    std::size_t target_qubit
-)
-{
-    const auto [control_qubit0, control_qubit1] = control_qubits;
-
-    circuit.add_csx_gate(control_qubit1, target_qubit);
-    circuit.add_cx_gate(control_qubit0, control_qubit1);
-    circuit.add_cx_gate(control_qubit1, target_qubit);
-    circuit.add_csx_gate(control_qubit1, target_qubit);
-    circuit.add_cx_gate(control_qubit0, control_qubit1);
-    circuit.add_csx_gate(control_qubit0, target_qubit);
-}
-
 void apply_doubly_controlled_gate(
     QuantumCircuit& circuit,
     const Matrix2X2& unitary,

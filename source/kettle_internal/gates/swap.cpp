@@ -2,7 +2,6 @@
 #include <stdexcept>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/gates/toffoli.hpp"
 #include "kettle/gates/swap.hpp"
 
 namespace ket
@@ -32,7 +31,7 @@ void apply_control_swap(QuantumCircuit& circuit, std::size_t control_qubit, std:
     }
 
     circuit.add_cx_gate(swap_qubit1, swap_qubit0);
-    apply_toffoli_gate(circuit, {control_qubit, swap_qubit0}, swap_qubit1);
+    circuit.add_ccx_gate(control_qubit, swap_qubit0, swap_qubit1);
     circuit.add_cx_gate(swap_qubit1, swap_qubit0);
 }
 
