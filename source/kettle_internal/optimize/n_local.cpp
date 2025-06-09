@@ -146,50 +146,92 @@ auto apply_rotation_gates_(
     return parameter_ids;
 }
 
-void apply_entanglement_gates_1c1t_linear_(
+void apply_entanglement_gates_1c1t_(
     ket::Gate gate,
-    ket::QuantumCircuit& circuit
+    ket::QuantumCircuit& circuit,
+    ket::NLocalEntangelement entanglement_kind
 )
 {
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T.at(gate);
-    for (std::size_t i {0}; i < circuit.n_qubits() - 1; ++i) {
-        const auto i_control = i;
-        const auto i_target = i_control + 1;
-        (circuit.*func)(i_control, i_target);
+
+    if (entanglement_kind == ket::NLocalEntangelement::LINEAR) {
+        for (std::size_t i_qubit {0}; i_qubit < circuit.n_qubits() - 1; ++i_qubit) {
+            (circuit.*func)(i_qubit, i_qubit + 1);
+        }
+    }
+    else if (entanglement_kind == ket::NLocalEntangelement::FULL) {
+        for (std::size_t i_control {0}; i_control < circuit.n_qubits() - 1; ++i_control) {
+            for (std::size_t i_target {i_control + 1}; i_target < circuit.n_qubits(); ++i_target) {
+                (circuit.*func)(i_control, i_target);
+            }
+        }
+    }
+    else {
+        throw std::runtime_error {"DEV ERROR: Invalid entanglement chosen for applying 1c1t entanglement gates.\n"};
     }
 }
 
-void apply_entanglement_gates_1c1t1a_linear_(
+void apply_entanglement_gates_1c1t1a_(
     ket::Gate gate,
     ket::QuantumCircuit& circuit,
-    std::vector<kp::ParameterID>& parameter_ids
+    std::vector<kp::ParameterID>& parameter_ids,
+    ket::NLocalEntangelement entanglement_kind
 )
 {
     constexpr auto key = kp::parameterized {};
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T1A_INIT_PARAM.at(gate);
-    for (std::size_t i {0}; i < circuit.n_qubits() - 1; ++i) {
-        const auto i_control = i;
-        const auto i_target = i_control + 1;
-        parameter_ids.emplace_back((circuit.*func)(i_control, i_target, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
+
+    if (entanglement_kind == ket::NLocalEntangelement::LINEAR) {
+        for (std::size_t i_qubit {0}; i_qubit < circuit.n_qubits() - 1; ++i_qubit) {
+            parameter_ids.emplace_back((circuit.*func)(i_qubit, i_qubit + 1, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
+        }
+    }
+    else if (entanglement_kind == ket::NLocalEntangelement::FULL) {
+        for (std::size_t i_control {0}; i_control < circuit.n_qubits() - 1; ++i_control) {
+            for (std::size_t i_target {i_control + 1}; i_control < circuit.n_qubits(); ++i_target) {
+                parameter_ids.emplace_back((circuit.*func)(i_control, i_target, ket::DEFAULT_NLOCAL_GATE_PARAMETER, key));
+            }
+        }
+    }
+    else {
+        throw std::runtime_error {"DEV ERROR: Invalid entanglement chosen for applying 1c1t1a entanglement gates.\n"};
     }
 }
 
 // TODO: find a way to get rid of all of this repetition, after I get it working!
 // - probably by making it a circuit member function
-void apply_entanglement_gates_2c1t_lineat_(ket::CompoundGate gate, ket::QuantumCircuit& circuit)
+void apply_entanglement_gates_2c1t_(
+    ket::CompoundGate gate,
+    ket::QuantumCircuit& circuit,
+    ket::NLocalEntangelement entanglement_kind
+)
 {
     const auto func = ket::internal::GATE_TO_FUNCTION_2C1T.at(gate);
-    for (std::size_t i {0}; i < circuit.n_qubits() - 2; ++i) {
-        const auto control0 = i;
-        const auto control1 = i + 1;
-        const auto target = i + 2;
-        (circuit.*func)(control0, control1, target);
+
+    if (entanglement_kind == ket::NLocalEntangelement::LINEAR) {
+        for (std::size_t i_qubit {0}; i_qubit < circuit.n_qubits() - 2; ++i_qubit) {
+            (circuit.*func)(i_qubit, i_qubit + 1, i_qubit + 2);
+        }
     }
+    else if (entanglement_kind == ket::NLocalEntangelement::FULL) {
+        for (std::size_t i_control0 {0}; i_control0 < circuit.n_qubits() - 2; ++i_control0) {
+            for (std::size_t i_control1 {i_control0 + 1}; i_control1 < circuit.n_qubits() - 1; ++i_control1) {
+                for (std::size_t i_target {i_control1 + 1}; i_target < circuit.n_qubits(); ++i_target) {
+                    (circuit.*func)(i_control0, i_control1, i_target);
+                }
+            }
+        }
+    }
+    else {
+        throw std::runtime_error {"DEV ERROR: Invalid entanglement chosen for applying 2c1t entanglement gates.\n"};
+    }
+
 }
 
-auto apply_entanglement_gates_linear_(
+auto apply_entanglement_gates_(
     ket::QuantumCircuit& circuit,
-    const std::vector<ket::GeneralGate>& entanglement_blocks
+    const std::vector<ket::GeneralGate>& entanglement_blocks,
+    ket::NLocalEntangelement entanglement_kind
 ) -> std::vector<kp::ParameterID>
 {
     auto parameter_ids = std::vector<kp::ParameterID> {};
@@ -198,10 +240,10 @@ auto apply_entanglement_gates_linear_(
         if (std::holds_alternative<ket::Gate>(gen_gate)) {
             const auto gate = std::get<ket::Gate>(gen_gate);
             if (gid::is_1c1t_gate(gate)) {
-                apply_entanglement_gates_1c1t_linear_(gate, circuit);
+                apply_entanglement_gates_1c1t_(gate, circuit, entanglement_kind);
             }
             else if (gid::is_1c1t1a_gate(gate)) {
-                apply_entanglement_gates_1c1t1a_linear_(gate, circuit, parameter_ids);
+                apply_entanglement_gates_1c1t1a_(gate, circuit, parameter_ids, entanglement_kind);
             }
             else {
                 throw std::runtime_error {"DEV ERROR: invalid `Gate` found when applying entanglement gates.\n"};
@@ -210,7 +252,7 @@ auto apply_entanglement_gates_linear_(
         else if (std::holds_alternative<ket::CompoundGate>(gen_gate)) {
             const auto gate = std::get<ket::CompoundGate>(gen_gate);
             if (gid::is_doubly_controled_gate(gate)) {
-                apply_entanglement_gates_2c1t_lineat_(gate, circuit);
+                apply_entanglement_gates_2c1t_(gate, circuit, entanglement_kind);
             }
             else {
                 throw std::runtime_error {"DEV ERROR: invalid `CompoundGate` found when applying entanglement gates.\n"};
@@ -242,10 +284,6 @@ auto n_local(
     verify_valid_rotation_gates_(rotation_blocks);
     verify_valid_entanglement_gates_(entanglement_blocks);
 
-    if (entanglement_kind != NLocalEntangelement::LINEAR) {
-        throw std::runtime_error {"DEV ERROR: Right now we are limited to LINEAR.\n"};
-    }
-
     auto circuit = QuantumCircuit {n_qubits};
 
     auto parameter_ids = std::vector<kp::ParameterID> {};
@@ -254,7 +292,7 @@ auto n_local(
         const auto rotation_param_ids= apply_rotation_gates_(circuit, rotation_blocks);
         parameter_ids.insert(parameter_ids.end(), rotation_param_ids.begin(), rotation_param_ids.end());
 
-        const auto entanglement_param_ids= apply_entanglement_gates_linear_(circuit, entanglement_blocks);
+        const auto entanglement_param_ids= apply_entanglement_gates_(circuit, entanglement_blocks, entanglement_kind);
         parameter_ids.insert(parameter_ids.end(), entanglement_param_ids.begin(), entanglement_param_ids.end());
     }
 

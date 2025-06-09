@@ -1,5 +1,3 @@
-#include "kettle/io/read_pauli_operator.hpp"
-#include "kettle/optimize/n_local.hpp"
 #include <vector>
 
 #include <nlopt.hpp>
@@ -14,10 +12,13 @@
 
 using PT = ket::PauliTerm;
 using G = ket::Gate;
+using CG = ket::CompoundGate;
 using Entangle = ket::NLocalEntangelement;
 
-static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {6};
-static constexpr auto N_UNITARY_QUBITS_THREE_ROTOR = std::size_t {9};
+// static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {6};
+// static constexpr auto N_UNITARY_QUBITS_THREE_ROTOR = std::size_t {9};
+static constexpr auto N_UNITARY_QUBITS_TWO_ROTOR = std::size_t {4};
+static constexpr auto N_UNITARY_QUBITS_THREE_ROTOR = std::size_t {6};
 
 struct CommandLineArguments
 {
@@ -85,11 +86,11 @@ auto main(int argc, char** argv) -> int
 
     // perform the initial state construction
     for (std::size_t i {0}; i < args.n_rotors; ++i) {
-        circuit.add_x_gate((3 * i) + 2);
+        circuit.add_x_gate((2 * i) + 1);
     }
 
     // create the ansatz, and append it to the existing circuit
-    auto [n_local, parameter_ids] = ket::n_local(args.n_qubits, {G::RX, G::RY, G::RZ}, {G::CX}, Entangle::LINEAR, args.n_repetitions);
+    auto [n_local, parameter_ids] = ket::n_local(args.n_qubits, {G::RX, G::RY, G::RZ}, {CG::CCX}, Entangle::FULL, args.n_repetitions);
     ket::extend_circuit(circuit, n_local);
 
     auto context = OptimizationContext {
@@ -136,7 +137,10 @@ auto main(int argc, char** argv) -> int
     auto opt = nlopt::opt {nlopt::LN_COBYLA, static_cast<unsigned int>(n_parameters)};
     opt.set_min_objective(cost_function, &context);
     opt.set_xtol_rel(1.0e-4);
-    opt.set_maxeval(1000);
+    opt.set_maxeval(2000);
+    opt.set_lower_bounds(0.0);
+    opt.set_upper_bounds(2.0 * M_PI);
+    opt.set_initial_step(0.1);
 
     double minimum_eigenvalue;  // NOLINT
 
