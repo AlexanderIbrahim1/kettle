@@ -34,6 +34,20 @@ function(add_example_with_nlopt SUBDIR NAME)
     add_dependencies(run-examples "run_${NAME}")
 endfunction()
 
+function(add_example_with_eigen SUBDIR NAME)
+    add_executable("${NAME}" "${SUBDIR}/${NAME}.cpp")
+    target_link_libraries("${NAME}" PRIVATE kettle::kettle)
+    target_compile_features("${NAME}" PRIVATE cxx_std_20)
+
+    get_target_property(EIGEN_INCLUDES Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
+    target_link_libraries("${NAME}" PRIVATE Eigen3::Eigen)
+    target_include_directories("${NAME}" SYSTEM PUBLIC ${EIGEN_INCLUDES})
+
+    add_custom_target("run_${NAME}" COMMAND "${NAME}" VERBATIM)
+    add_dependencies("run_${NAME}" "${NAME}")
+    add_dependencies(run-examples "run_${NAME}")
+endfunction()
+
 add_example("algorithms" deutsch_jozsa_balanced_ibm_example)
 add_example("algorithms" deutsch_jozsa)
 add_example("algorithms" deutsch)
@@ -49,5 +63,6 @@ add_example("general" creating_the_bell_state)
 add_example("general" inverse_fourier)
 add_example("general" random_state)
 add_example("general" save_statevector_example)
+add_example_with_eigen("general" hello_eigen)
 
 add_folders(Example)

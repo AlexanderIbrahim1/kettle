@@ -14,6 +14,7 @@ include(cmake/project-is-top-level.cmake)
 include(cmake/variables.cmake)
 
 # ---- Add Dependencies ----
+include(cmake/eigen_external.cmake)
 include(cmake/nlopt_external.cmake)
 
 # ---- Declare library ----
