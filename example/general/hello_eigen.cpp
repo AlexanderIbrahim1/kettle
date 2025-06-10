@@ -16,6 +16,6 @@ int main() {
     // Solve the linear system A * x = b
     Eigen::Vector2d x = A.colPivHouseholderQr().solve(b);
 
-    std::cout << "Solution x:\n" << x << std::endl;
+    std::cout << "Solution x:\n" << x << '\n';
     return 0;
 }
