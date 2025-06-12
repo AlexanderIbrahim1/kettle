@@ -86,7 +86,7 @@ auto main() -> int
     circuit.add_h_gate({0, 1, 2});
 
     // create the statevector, and propagate it through the circuit
-    auto state = ket::QuantumState {"000000"};
+    auto state = ket::Statevector {"000000"};
     ket::simulate(circuit, state);
 
     // get a map of the bitstrings to the counts; in Simon's algorithm, we are concerned

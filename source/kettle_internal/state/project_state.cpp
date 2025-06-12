@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/project_state.hpp"
 #include "kettle_internal/state/project_state_internal.hpp"
 
@@ -49,7 +49,7 @@ auto QubitStateChecker_::all_indices_match(std::size_t value) const -> bool
 }
 
 auto copy_projected_amplitudes_(
-    const ket::QuantumState& statevector,
+    const ket::Statevector& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements
 ) -> std::vector<std::complex<double>>
@@ -98,11 +98,11 @@ namespace ket
 {
 
 auto project_statevector(
-    const QuantumState& statevector,
+    const Statevector& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements,
     double minimum_norm_tol
-) -> QuantumState
+) -> Statevector
 {
     namespace ki = ket::internal;
 
@@ -117,7 +117,7 @@ auto project_statevector(
     auto new_amplitudes = ki::copy_projected_amplitudes_(statevector, qubit_indices, expected_measurements);
     ki::normalize_amplitudes_(new_amplitudes, minimum_norm_tol);
 
-    return QuantumState {new_amplitudes};
+    return Statevector {new_amplitudes};
 }
 
 }  // namespace ket

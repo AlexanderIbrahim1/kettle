@@ -4,7 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/project_state.hpp"
 #include "kettle_internal/state/project_state_internal.hpp"
 
@@ -143,8 +143,8 @@ TEST_CASE("measure_and_collapse()")
         const auto x_in = std::sqrt(1.0 / 4.0);
         const auto x_out = std::sqrt(1.0 / 2.0);
 
-        const auto input = ket::QuantumState{ { {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0} } };
-        const auto expected = ket::QuantumState{ { {x_out, 0.0}, {x_out, 0.0} } };
+        const auto input = ket::Statevector{ { {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0} } };
+        const auto expected = ket::Statevector{ { {x_out, 0.0}, {x_out, 0.0} } };
 
         const auto actual = ket::project_statevector(input, {0}, {0});
 
@@ -162,7 +162,7 @@ TEST_CASE("measure_and_collapse()")
         // 011 -> 7
         // 111 -> 8
         auto initial_amplitudes = get_normalized_amplitudes({1, 2, 3, 4, 5, 6, 7, 8});
-        const auto initial_state = ket::QuantumState {std::move(initial_amplitudes)};
+        const auto initial_state = ket::Statevector {std::move(initial_amplitudes)};
 
         SECTION("collase: 0th qubit is 0")
         {
@@ -171,7 +171,7 @@ TEST_CASE("measure_and_collapse()")
             // 001 -> 5
             // 011 -> 7
             auto expected_amplitudes = get_normalized_amplitudes({1, 3, 5, 7});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {0}, {0});
 
@@ -185,7 +185,7 @@ TEST_CASE("measure_and_collapse()")
             // 101 -> 6
             // 111 -> 8
             auto expected_amplitudes = get_normalized_amplitudes({2, 4, 6, 8});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {0}, {1});
 
@@ -199,7 +199,7 @@ TEST_CASE("measure_and_collapse()")
             // 001 -> 5
             // 101 -> 6
             auto expected_amplitudes = get_normalized_amplitudes({1, 2, 5, 6});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {1}, {0});
 
@@ -213,7 +213,7 @@ TEST_CASE("measure_and_collapse()")
             // 011 -> 7
             // 111 -> 8
             auto expected_amplitudes = get_normalized_amplitudes({3, 4, 7, 8});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {1}, {1});
 
@@ -225,7 +225,7 @@ TEST_CASE("measure_and_collapse()")
             // 100 -> 2
             // 101 -> 6
             auto expected_amplitudes = get_normalized_amplitudes({2, 6});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {0, 1}, {1, 0});
 
@@ -252,7 +252,7 @@ TEST_CASE("measure_and_collapse()")
         // 0111 -> 15
         // 1111 -> 16
         auto initial_amplitudes = get_normalized_amplitudes({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
-        const auto initial_state = ket::QuantumState {std::move(initial_amplitudes)};
+        const auto initial_state = ket::Statevector {std::move(initial_amplitudes)};
 
         SECTION("collase: qubits {1, 3} collapse to {1, 0}")
         {
@@ -261,7 +261,7 @@ TEST_CASE("measure_and_collapse()")
             // 0110 -> 7
             // 1110 -> 8
             auto expected_amplitudes = get_normalized_amplitudes({3, 4, 7, 8});
-            const auto expected_state = ket::QuantumState {std::move(expected_amplitudes)};
+            const auto expected_state = ket::Statevector {std::move(expected_amplitudes)};
 
             const auto actual = ket::project_statevector(initial_state, {1, 3}, {1, 0});
 

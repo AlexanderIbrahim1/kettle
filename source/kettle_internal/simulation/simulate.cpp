@@ -8,7 +8,7 @@
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle/simulation/simulate.hpp"
 
@@ -38,7 +38,7 @@ constexpr inline auto MEASURING_THREAD_ID = int {0};
 
 template <ket::Gate GateType>
 void simulate_one_target_gate_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
 )
@@ -95,7 +95,7 @@ void simulate_one_target_gate_(
 template <ket::Gate GateType>
 void simulate_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
 )
@@ -131,7 +131,7 @@ void simulate_one_target_one_angle_gate_(
 
 
 void simulate_u_gate_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
     const ki::FlatIndexPair& pair
@@ -151,7 +151,7 @@ void simulate_u_gate_(
 
 template <ket::Gate GateType>
 void simulate_one_control_one_target_gate_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
 )
@@ -208,7 +208,7 @@ void simulate_one_control_one_target_gate_(
 template <ket::Gate GateType>
 void simulate_one_control_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ki::FlatIndexPair& pair
 )
@@ -244,7 +244,7 @@ void simulate_one_control_one_target_one_angle_gate_(
 
 
 void simulate_cu_gate_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
     const ki::FlatIndexPair& pair
@@ -264,7 +264,7 @@ void simulate_cu_gate_(
 
 void simulate_gate_info_(
     const kpi::MapVariant& parameter_values_map,
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ki::FlatIndexPair& single_pair,
     const ki::FlatIndexPair& double_pair,
     const ket::GateInfo& gate_info,
@@ -416,7 +416,7 @@ void simulate_gate_info_(
 
 auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-complexity)
     const ket::QuantumCircuit& circuit,
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ki::FlatIndexPair& single_pair,
     const ki::FlatIndexPair& double_pair,
     int thread_id,
@@ -520,7 +520,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
     return circuit_loggers;
 }
 
-void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::QuantumState& state)
+void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::Statevector& state)
 {
     if (circuit.n_qubits() != state.n_qubits()) {
         throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
@@ -536,7 +536,7 @@ void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket
 namespace ket
 {
 
-void StatevectorSimulator::run(const QuantumCircuit& circuit, QuantumState& state, std::optional<int> prng_seed)
+void StatevectorSimulator::run(const QuantumCircuit& circuit, Statevector& state, std::optional<int> prng_seed)
 {
     namespace ki = ket::internal;
 
@@ -590,7 +590,7 @@ auto StatevectorSimulator::circuit_loggers() const -> const std::vector<CircuitL
     return circuit_loggers_;
 }
 
-void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<int> prng_seed)
+void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<int> prng_seed)
 {
     auto simulator = StatevectorSimulator {};
     simulator.run(circuit, state, prng_seed);
@@ -603,7 +603,7 @@ void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<
 // void simulate_multithreaded_loop_(
 //     std::barrier<>& sync_point,
 //     const ket::QuantumCircuit& circuit,
-//     ket::QuantumState& state,
+//     ket::Statevector& state,
 //     const FlatIndexPair& single_pair,
 //     const FlatIndexPair& double_pair,
 //     int thread_id,
@@ -624,7 +624,7 @@ void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<
 // */
 // void simulate_multithreaded(
 //     const QuantumCircuit& circuit,
-//     QuantumState& state,
+//     Statevector& state,
 //     std::size_t n_threads,
 //     std::optional<int> prng_seed = std::nullopt
 // )

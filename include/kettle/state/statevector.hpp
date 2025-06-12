@@ -11,7 +11,7 @@
 namespace ket
 {
 
-class QuantumState
+class Statevector
 {
 public:
     /*
@@ -21,17 +21,17 @@ public:
         The 0 state is the same in both the little and big endian representations, so it isn't needed
         in this constructor.
     */
-    explicit QuantumState(std::size_t n_qubits);
+    explicit Statevector(std::size_t n_qubits);
 
-    explicit QuantumState(
+    explicit Statevector(
         std::vector<std::complex<double>> coefficients,
-        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE,
+        Endian input_endian = Endian::LITTLE,
         double normalization_tolerance = ket::CONSTRUCTION_NORMALIZATION_TOLERANCE
     );
 
-    explicit QuantumState(
+    explicit Statevector(
         const std::string& computational_state,
-        QuantumStateEndian input_endian = QuantumStateEndian::LITTLE
+        Endian input_endian = Endian::LITTLE
     );
 
     constexpr auto operator[](std::size_t index) const noexcept -> const std::complex<double>&
@@ -60,7 +60,7 @@ public:
     [[nodiscard]]
     auto at(
         const std::string& bitstring,
-        QuantumStateEndian endian = QuantumStateEndian::LITTLE
+        Endian endian = Endian::LITTLE
     ) const -> const std::complex<double>&
     {
         const auto state_index = bitstring_to_state_index(bitstring, endian);
@@ -70,7 +70,7 @@ public:
 
     auto at(
         const std::string& bitstring,
-        QuantumStateEndian endian = QuantumStateEndian::LITTLE
+        Endian endian = Endian::LITTLE
     ) -> std::complex<double>&
     {
         const auto state_index = bitstring_to_state_index(bitstring, endian);
@@ -107,17 +107,17 @@ private:
 };
 
 auto almost_eq(
-    const QuantumState& left,
-    const QuantumState& right,
+    const Statevector& left,
+    const Statevector& right,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;
 
-auto tensor_product(const QuantumState& left, const QuantumState& right) -> QuantumState;
+auto tensor_product(const Statevector& left, const Statevector& right) -> Statevector;
 
-auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state) -> std::complex<double>;
+auto inner_product(const Statevector& bra_state, const Statevector& ket_state) -> std::complex<double>;
 
-auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const QuantumState& state) -> std::complex<double>;
+auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const Statevector& state) -> std::complex<double>;
 
-auto inner_product_norm_squared(const QuantumState& left, const QuantumState& right) -> double;
+auto inner_product_norm_squared(const Statevector& left, const Statevector& right) -> double;
 
 }  // namespace ket

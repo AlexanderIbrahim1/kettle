@@ -8,20 +8,20 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/arange.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 TEST_CASE("Forward QFT on |0> state")
 {
     SECTION("1 qubit")
     {
-        auto state = ket::QuantumState {"0"};
+        auto state = ket::Statevector {"0"};
         auto circuit = ket::QuantumCircuit {1};
 
         circuit.add_qft_gate({0});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(2.0);
-        const auto expected = ket::QuantumState {
+        const auto expected = ket::Statevector {
             {
                 {norm, 0.0},
                 {norm, 0.0}
@@ -36,14 +36,14 @@ TEST_CASE("Forward QFT on |0> state")
 
     SECTION("2 qubits")
     {
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         auto circuit = ket::QuantumCircuit {2};
 
         circuit.add_qft_gate({0, 1});
 
         // clang-format off
         const auto norm = 1.0 / 2.0;
-        const auto expected = ket::QuantumState {
+        const auto expected = ket::Statevector {
             {
                 {norm, 0.0},
                 {norm, 0.0},
@@ -60,14 +60,14 @@ TEST_CASE("Forward QFT on |0> state")
 
     SECTION("3 qubits")
     {
-        auto state = ket::QuantumState {"000"};
+        auto state = ket::Statevector {"000"};
         auto circuit = ket::QuantumCircuit {3};
 
         circuit.add_qft_gate({0, 1, 2});
 
         // clang-format off
         const auto norm = 1.0 / std::sqrt(8.0);
-        const auto expected = ket::QuantumState {
+        const auto expected = ket::Statevector {
             {
                 {norm, 0.0},
                 {norm, 0.0},
@@ -92,21 +92,21 @@ TEST_CASE("basic Forward QFT on 2-qubit computational basis states")
     struct TestPair
     {
         std::string input;
-        ket::QuantumState expected;
+        ket::Statevector expected;
     };
 
     const auto norm = 1.0 / 2.0;
 
     // clang-format off
     auto pair = GENERATE_COPY(
-        TestPair {"00", ket::QuantumState { {{ norm,  0.0}, { norm,  0.0}, { norm,  0.0}, { norm,   0.0}} }},
-        TestPair {"10", ket::QuantumState { {{ norm,  0.0}, { norm,  0.0}, {-norm,  0.0}, {-norm,   0.0}} }},
-        TestPair {"01", ket::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0, norm}, {  0.0, -norm}} }},
-        TestPair {"11", ket::QuantumState { {{ norm,  0.0}, {-norm,  0.0}, {  0.0,-norm}, {  0.0,  norm}} }}
+        TestPair {"00", ket::Statevector { {{ norm,  0.0}, { norm,  0.0}, { norm,  0.0}, { norm,   0.0}} }},
+        TestPair {"10", ket::Statevector { {{ norm,  0.0}, { norm,  0.0}, {-norm,  0.0}, {-norm,   0.0}} }},
+        TestPair {"01", ket::Statevector { {{ norm,  0.0}, {-norm,  0.0}, {  0.0, norm}, {  0.0, -norm}} }},
+        TestPair {"11", ket::Statevector { {{ norm,  0.0}, {-norm,  0.0}, {  0.0,-norm}, {  0.0,  norm}} }}
     );
     // clang-format on
 
-    auto state = ket::QuantumState {pair.input};
+    auto state = ket::Statevector {pair.input};
     auto circuit = ket::QuantumCircuit {2};
 
     circuit.add_qft_gate({0, 1});
@@ -152,10 +152,10 @@ TEST_CASE("basic Forward QFT on 3-qubit computational basis states")
             coefficients.push_back({real, imag});
         }
 
-        return ket::QuantumState {coefficients, ket::QuantumStateEndian::BIG};
+        return ket::Statevector {coefficients, ket::Endian::BIG};
     };
 
-    auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+    auto state = ket::Statevector {pair.input, ket::Endian::LITTLE};
     auto circuit = ket::QuantumCircuit {3};
 
     circuit.add_qft_gate({0, 1, 2});
@@ -211,10 +211,10 @@ TEST_CASE("basic Forward QFT on 4-qubit computational basis states")
             coefficients.push_back({real, imag});
         }
 
-        return ket::QuantumState {coefficients, ket::QuantumStateEndian::BIG};
+        return ket::Statevector {coefficients, ket::Endian::BIG};
     };
 
-    auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+    auto state = ket::Statevector {pair.input, ket::Endian::LITTLE};
     auto circuit = ket::QuantumCircuit {4};
 
     circuit.add_qft_gate({0, 1, 2, 3});
@@ -238,8 +238,8 @@ TEST_CASE("inverse QFT after forward QFT")
         )};
         // clang-format on
 
-        auto state = ket::QuantumState {init_bitstring};
-        auto expected = ket::QuantumState {init_bitstring};
+        auto state = ket::Statevector {init_bitstring};
+        auto expected = ket::Statevector {init_bitstring};
 
         const auto qubit_indices = ket::arange(init_bitstring.size());
 

@@ -15,7 +15,7 @@ auto main() -> int
 
     // create the statevector; then
     // perform the simulation to make the state non-trivial
-    auto state = ket::QuantumState {3};
+    auto state = ket::Statevector {3};
     ket::simulate(circuit, state);
 
     // save the statevector to either a file or an output stream

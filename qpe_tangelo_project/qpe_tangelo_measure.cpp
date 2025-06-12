@@ -60,10 +60,10 @@ struct CommandLineArguments
     std::string statevector_filename;
 };
 
-auto create_original_state(const std::filesystem::path& abs_initial_circuit_filepath, std::size_t n_unitary_qubits) -> ket::QuantumState
+auto create_original_state(const std::filesystem::path& abs_initial_circuit_filepath, std::size_t n_unitary_qubits) -> ket::Statevector
 {
     const auto initial_circuit = ket::read_tangelo_circuit(n_unitary_qubits, abs_initial_circuit_filepath, 0);
-    auto statevector = ket::QuantumState {n_unitary_qubits};
+    auto statevector = ket::Statevector {n_unitary_qubits};
     ket::simulate(initial_circuit, statevector);
 
     return statevector;

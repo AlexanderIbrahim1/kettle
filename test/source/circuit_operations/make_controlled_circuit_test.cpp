@@ -3,7 +3,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
@@ -69,8 +69,8 @@ TEST_CASE("make_controlled_circuit()")
             GENERATE("000", "100", "010", "110", "001", "101", "011", "111")
         };
 
-        auto state0 = ket::QuantumState {init_bitstring};
-        auto state1 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
+        auto state1 = ket::Statevector {init_bitstring};
 
 
         // NOTE: for these cases, we generate two different circuits that both do the same thing to all
@@ -162,8 +162,8 @@ TEST_CASE("make_controlled_circuit()")
         expected.add_cu_gate(ket::rx_gate(angle), 0, 4);
         ket::apply_multiplicity_controlled_u_gate(expected, ket::x_gate(), 4, {0, 3});
 
-        auto state0 = ket::QuantumState {init_bitstring};
-        auto state1 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
+        auto state1 = ket::Statevector {init_bitstring};
 
         ket::simulate(new_circuit, state0);
         ket::simulate(expected, state1);
@@ -225,8 +225,8 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
             GENERATE("000", "100", "010", "110", "001", "101", "011", "111")
         };
 
-        auto state0 = ket::QuantumState {init_bitstring};
-        auto state1 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
+        auto state1 = ket::Statevector {init_bitstring};
 
         SECTION("single x-gate")
         {
@@ -294,8 +294,8 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
             )
         };
 
-        auto state0 = ket::QuantumState {init_bitstring};
-        auto state1 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
+        auto state1 = ket::Statevector {init_bitstring};
 
         // NOTE: for these cases, we generate two different circuits that both do the same thing to all
         // 8 possible initial computational basis states
@@ -386,8 +386,8 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         ket::apply_multiplicity_controlled_u_gate(expected, ket::rx_gate(angle), 4, {0, 1});
         ket::apply_multiplicity_controlled_u_gate(expected, ket::x_gate(), 4, {0, 1, 3});
 
-        auto state0 = ket::QuantumState {init_bitstring};
-        auto state1 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
+        auto state1 = ket::Statevector {init_bitstring};
 
         ket::simulate(new_circuit, state0);
         ket::simulate(expected, state1);

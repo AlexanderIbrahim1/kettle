@@ -12,7 +12,7 @@
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 /*
     Here are some commonly encountered trig function evaluations in the latter unit tests
@@ -38,9 +38,9 @@ static auto simulate_single_qubit_with_ugate(
     const std::string& initial_state,
     const std::vector<std::tuple<ket::Matrix2X2, std::size_t>>& matrices,
     std::size_t n_qubits
-) -> ket::QuantumState
+) -> ket::Statevector
 {
-    auto state = ket::QuantumState {initial_state};
+    auto state = ket::Statevector {initial_state};
 
     auto circuit = ket::QuantumCircuit {n_qubits};
 
@@ -58,9 +58,9 @@ static auto simulate_single_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t>>& gates_and_angles,
     std::size_t n_qubits
-) -> ket::QuantumState
+) -> ket::Statevector
 {
-    auto state = ket::QuantumState {initial_state};
+    auto state = ket::Statevector {initial_state};
 
     auto circuit = ket::QuantumCircuit {n_qubits};
 
@@ -112,9 +112,9 @@ static auto simulate_double_qubit_with_ugate(
     const std::string& initial_state,
     const std::vector<std::tuple<ket::Matrix2X2, std::size_t, std::size_t>>& matrices,
     std::size_t n_qubits
-) -> ket::QuantumState
+) -> ket::Statevector
 {
-    auto state = ket::QuantumState {initial_state};
+    auto state = ket::Statevector {initial_state};
 
     auto circuit = ket::QuantumCircuit {n_qubits};
 
@@ -132,9 +132,9 @@ static auto simulate_double_qubit_with_builtin(
     const std::string& initial_state,
     const std::vector<std::tuple<std::string, double, std::size_t, std::size_t>>& gates_and_angles,
     std::size_t n_qubits
-) -> ket::QuantumState
+) -> ket::Statevector
 {
-    auto state = ket::QuantumState {initial_state};
+    auto state = ket::Statevector {initial_state};
 
     auto circuit = ket::QuantumCircuit {n_qubits};
 
@@ -197,10 +197,10 @@ TEST_CASE("simulate X gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_x_gate(0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{0.0, 0.0}, {1.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -216,10 +216,10 @@ TEST_CASE("simulate X gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_x_gate(1);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -236,10 +236,10 @@ TEST_CASE("simulate X gate")
         circuit.add_x_gate(0);
         circuit.add_x_gate(1);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -258,10 +258,10 @@ TEST_CASE("simulate H gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -277,10 +277,10 @@ TEST_CASE("simulate H gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -296,10 +296,10 @@ TEST_CASE("simulate H gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_h_gate(1);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -317,10 +317,10 @@ TEST_CASE("simulate H gate")
         circuit.add_h_gate(0);
         circuit.add_h_gate(1);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -339,10 +339,10 @@ TEST_CASE("simulate RX gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rx_gate(0, M_PI / 4.0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{COS_PI_8, 0.0}, {0.0, -SIN_PI_8}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -358,10 +358,10 @@ TEST_CASE("simulate RX gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rx_gate(0, M_PI / 4.0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{COS_PI_8, 0.0}, {0.0, -SIN_PI_8}, {0.0, 0.0}, {0.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -385,10 +385,10 @@ TEST_CASE("simulate RX gate")
         circuit.add_rx_gate(0, M_PI / 4.0);
         circuit.add_rx_gate(1, M_PI / 8.0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{COS_PI_8 * COS_PI_16, 0.0},
              {0.0, -SIN_PI_8 * COS_PI_16},
              {0.0, -COS_PI_8 * SIN_PI_16},
@@ -410,10 +410,10 @@ TEST_CASE("simulate RY gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_ry_gate(0, M_PI / 4.0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{COS_PI_8, 0.0}, {SIN_PI_8, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -431,10 +431,10 @@ TEST_CASE("simulate RY gate")
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
             circuit.add_ry_gate(0, angle);
 
-            auto state = ket::QuantumState {n_qubits};
+            auto state = ket::Statevector {n_qubits};
             ket::simulate(circuit, state);
 
-            const auto expected_state = ket::QuantumState {
+            const auto expected_state = ket::Statevector {
                 {{std::cos(angle / 2.0), 0.0}, {std::sin(angle / 2.0), 0.0}}
             };
             REQUIRE(ket::almost_eq(state, expected_state));
@@ -454,10 +454,10 @@ TEST_CASE("simulate RZ gate")
         auto circuit = ket::QuantumCircuit {n_qubits};
         circuit.add_rz_gate(0, M_PI / 4.0);
 
-        auto state = ket::QuantumState {n_qubits};
+        auto state = ket::Statevector {n_qubits};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{COS_PI_8, -SIN_PI_8}, {0.0, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -475,10 +475,10 @@ TEST_CASE("simulate RZ gate")
             const auto angle = generate_random_double(-2.0 * M_PI, 2.0 * M_PI);
             circuit.add_rz_gate(0, angle);
 
-            auto state = ket::QuantumState {n_qubits};
+            auto state = ket::Statevector {n_qubits};
             ket::simulate(circuit, state);
 
-            const auto expected_state = ket::QuantumState {
+            const auto expected_state = ket::Statevector {
                 {{std::cos(angle / 2.0), -std::sin(angle / 2.0)}, {0.0, 0.0}}
             };
             REQUIRE(ket::almost_eq(state, expected_state));
@@ -499,16 +499,16 @@ TEST_CASE("simulate RZ gate")
             auto circuit0 = ket::QuantumCircuit {n_qubits};
             circuit0.add_rz_gate(0, angle);
 
-            auto state0 = ket::QuantumState {n_qubits};
+            auto state0 = ket::Statevector {n_qubits};
             ket::simulate(circuit0, state0);
 
             auto circuit1 = ket::QuantumCircuit {n_qubits};
             circuit1.add_rz_gate(1, angle);
 
-            auto state1 = ket::QuantumState {n_qubits};
+            auto state1 = ket::Statevector {n_qubits};
             ket::simulate(circuit1, state1);
 
-            const auto expected_state = ket::QuantumState {
+            const auto expected_state = ket::Statevector {
                 {{std::cos(angle / 2.0), -std::sin(angle / 2.0)}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}
             };
 
@@ -522,8 +522,8 @@ TEST_CASE("simulate CX gate")
 {
     struct InputAndOutput
     {
-        ket::QuantumState state;
-        ket::QuantumState expected;
+        ket::Statevector state;
+        ket::Statevector expected;
     };
 
     // expectation is that qubit 1 flips if qubit 0 is set
@@ -536,10 +536,10 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
-                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
-                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"11"}},
-                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {"10"}}
+                InputAndOutput {ket::Statevector {"00"}, ket::Statevector {"00"}},
+                InputAndOutput {ket::Statevector {"01"}, ket::Statevector {"01"}},
+                InputAndOutput {ket::Statevector {"10"}, ket::Statevector {"11"}},
+                InputAndOutput {ket::Statevector {"11"}, ket::Statevector {"10"}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -551,10 +551,10 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(1, 0);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
-                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"11"}},
-                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
-                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {"01"}}
+                InputAndOutput {ket::Statevector {"00"}, ket::Statevector {"00"}},
+                InputAndOutput {ket::Statevector {"01"}, ket::Statevector {"11"}},
+                InputAndOutput {ket::Statevector {"10"}, ket::Statevector {"10"}},
+                InputAndOutput {ket::Statevector {"11"}, ket::Statevector {"01"}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -571,14 +571,14 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
-                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"110"}},
-                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
-                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"100"}},
-                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
-                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"111"}},
-                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
-                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {"101"}}
+                InputAndOutput {ket::Statevector {"000"}, ket::Statevector {"000"}},
+                InputAndOutput {ket::Statevector {"100"}, ket::Statevector {"110"}},
+                InputAndOutput {ket::Statevector {"010"}, ket::Statevector {"010"}},
+                InputAndOutput {ket::Statevector {"110"}, ket::Statevector {"100"}},
+                InputAndOutput {ket::Statevector {"001"}, ket::Statevector {"001"}},
+                InputAndOutput {ket::Statevector {"101"}, ket::Statevector {"111"}},
+                InputAndOutput {ket::Statevector {"011"}, ket::Statevector {"011"}},
+                InputAndOutput {ket::Statevector {"111"}, ket::Statevector {"101"}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -590,14 +590,14 @@ TEST_CASE("simulate CX gate")
             circuit.add_cx_gate(0, 2);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
-                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"101"}},
-                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
-                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"111"}},
-                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
-                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"100"}},
-                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
-                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {"110"}}
+                InputAndOutput {ket::Statevector {"000"}, ket::Statevector {"000"}},
+                InputAndOutput {ket::Statevector {"100"}, ket::Statevector {"101"}},
+                InputAndOutput {ket::Statevector {"010"}, ket::Statevector {"010"}},
+                InputAndOutput {ket::Statevector {"110"}, ket::Statevector {"111"}},
+                InputAndOutput {ket::Statevector {"001"}, ket::Statevector {"001"}},
+                InputAndOutput {ket::Statevector {"101"}, ket::Statevector {"100"}},
+                InputAndOutput {ket::Statevector {"011"}, ket::Statevector {"011"}},
+                InputAndOutput {ket::Statevector {"111"}, ket::Statevector {"110"}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -610,8 +610,8 @@ TEST_CASE("simulate CZ gate")
 {
     struct InputAndOutput
     {
-        ket::QuantumState state;
-        ket::QuantumState expected;
+        ket::Statevector state;
+        ket::Statevector expected;
     };
 
     // expectation is that qubit 1 flips if qubit 0 is set
@@ -624,10 +624,10 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
-                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
-                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
-                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::Statevector {"00"}, ket::Statevector {"00"}},
+                InputAndOutput {ket::Statevector {"01"}, ket::Statevector {"01"}},
+                InputAndOutput {ket::Statevector {"10"}, ket::Statevector {"10"}},
+                InputAndOutput {ket::Statevector {"11"}, ket::Statevector {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -639,10 +639,10 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(1, 0);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"00"}, ket::QuantumState {"00"}},
-                InputAndOutput {ket::QuantumState {"01"}, ket::QuantumState {"01"}},
-                InputAndOutput {ket::QuantumState {"10"}, ket::QuantumState {"10"}},
-                InputAndOutput {ket::QuantumState {"11"}, ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::Statevector {"00"}, ket::Statevector {"00"}},
+                InputAndOutput {ket::Statevector {"01"}, ket::Statevector {"01"}},
+                InputAndOutput {ket::Statevector {"10"}, ket::Statevector {"10"}},
+                InputAndOutput {ket::Statevector {"11"}, ket::Statevector {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {-1.0, 0.0}}}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -659,14 +659,14 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(0, 1);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
-                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"100"}},
-                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
-                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {{{}, {}, {}, {-1.0, 0.0}, {}, {}, {}, {}}}},
-                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
-                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {"101"}},
-                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
-                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::Statevector {"000"}, ket::Statevector {"000"}},
+                InputAndOutput {ket::Statevector {"100"}, ket::Statevector {"100"}},
+                InputAndOutput {ket::Statevector {"010"}, ket::Statevector {"010"}},
+                InputAndOutput {ket::Statevector {"110"}, ket::Statevector {{{}, {}, {}, {-1.0, 0.0}, {}, {}, {}, {}}}},
+                InputAndOutput {ket::Statevector {"001"}, ket::Statevector {"001"}},
+                InputAndOutput {ket::Statevector {"101"}, ket::Statevector {"101"}},
+                InputAndOutput {ket::Statevector {"011"}, ket::Statevector {"011"}},
+                InputAndOutput {ket::Statevector {"111"}, ket::Statevector {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -678,14 +678,14 @@ TEST_CASE("simulate CZ gate")
             circuit.add_cz_gate(0, 2);
 
             auto pair = GENERATE(
-                InputAndOutput {ket::QuantumState {"000"}, ket::QuantumState {"000"}},
-                InputAndOutput {ket::QuantumState {"100"}, ket::QuantumState {"100"}},
-                InputAndOutput {ket::QuantumState {"010"}, ket::QuantumState {"010"}},
-                InputAndOutput {ket::QuantumState {"110"}, ket::QuantumState {"110"}},
-                InputAndOutput {ket::QuantumState {"001"}, ket::QuantumState {"001"}},
-                InputAndOutput {ket::QuantumState {"101"}, ket::QuantumState {{{}, {}, {}, {}, {}, {-1.0, 0.0}, {}, {}}}},
-                InputAndOutput {ket::QuantumState {"011"}, ket::QuantumState {"011"}},
-                InputAndOutput {ket::QuantumState {"111"}, ket::QuantumState {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
+                InputAndOutput {ket::Statevector {"000"}, ket::Statevector {"000"}},
+                InputAndOutput {ket::Statevector {"100"}, ket::Statevector {"100"}},
+                InputAndOutput {ket::Statevector {"010"}, ket::Statevector {"010"}},
+                InputAndOutput {ket::Statevector {"110"}, ket::Statevector {"110"}},
+                InputAndOutput {ket::Statevector {"001"}, ket::Statevector {"001"}},
+                InputAndOutput {ket::Statevector {"101"}, ket::Statevector {{{}, {}, {}, {}, {}, {-1.0, 0.0}, {}, {}}}},
+                InputAndOutput {ket::Statevector {"011"}, ket::Statevector {"011"}},
+                InputAndOutput {ket::Statevector {"111"}, ket::Statevector {{{}, {}, {}, {}, {}, {}, {}, {-1.0, 0.0}}}}
             );
 
             ket::simulate(circuit, pair.state);
@@ -705,12 +705,12 @@ TEST_CASE("simulate H and CX gates")
         circuit.add_h_gate(0);
         circuit.add_cx_gate(0, 1);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}},
-            ket::QuantumStateEndian::LITTLE
+            ket::Endian::LITTLE
         };
 
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -729,10 +729,10 @@ TEST_CASE("simulate H and CX gates")
         circuit.add_cx_gate(1, 0);
         circuit.add_cx_gate(0, 1);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         ket::simulate(circuit, state);
 
-        const auto expected_state = ket::QuantumState {"01"};
+        const auto expected_state = ket::Statevector {"01"};
 
         REQUIRE(ket::almost_eq(state, expected_state));
     }
@@ -745,7 +745,7 @@ TEST_CASE("simulate CRX gate")
         struct TestPair
         {
             std::string input;
-            ket::QuantumState expected;
+            ket::Statevector expected;
         };
 
         // clang-format off
@@ -755,17 +755,17 @@ TEST_CASE("simulate CRX gate")
         const auto sint = std::sin(angle / 2.0);
 
         auto pair = GENERATE_COPY(
-            TestPair {"00", ket::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"10", ket::QuantumState { {{0.0, 0.0}, {cost, 0.0}, {0.0, 0.0}, {0.0, -sint}} }},
-            TestPair {"01", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"11", ket::QuantumState { {{0.0, 0.0}, {0.0, -sint}, {0.0, 0.0}, {cost, 0.0}} }}
+            TestPair {"00", ket::Statevector { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"10", ket::Statevector { {{0.0, 0.0}, {cost, 0.0}, {0.0, 0.0}, {0.0, -sint}} }},
+            TestPair {"01", ket::Statevector { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"11", ket::Statevector { {{0.0, 0.0}, {0.0, -sint}, {0.0, 0.0}, {cost, 0.0}} }}
         );
         // clang-format on
 
         auto circuit = ket::QuantumCircuit {2};
         circuit.add_crx_gate(0, 1, angle);
 
-        auto state = ket::QuantumState {pair.input, ket::QuantumStateEndian::LITTLE};
+        auto state = ket::Statevector {pair.input, ket::Endian::LITTLE};
         ket::simulate(circuit, state);
 
         REQUIRE(ket::almost_eq(state, pair.expected));
@@ -782,15 +782,15 @@ TEST_CASE("simulate CRX gate")
         circuit.add_h_gate(0);
         circuit.add_crx_gate(0, 1, angle);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, 0.0}, {0.0, 0.0}, {0.0, -M_SQRT1_2 * sint}},
-            ket::QuantumStateEndian::LITTLE
+            ket::Endian::LITTLE
         };
 
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -810,15 +810,15 @@ TEST_CASE("simulate CRZ gate")
         circuit.add_h_gate(0);
         circuit.add_crz_gate(0, 1, angle);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{M_SQRT1_2, 0.0}, {M_SQRT1_2 * cost, -M_SQRT1_2 * sint}, {0.0, 0.0}, {0.0, 0.0}},
-            ket::QuantumStateEndian::LITTLE
+            ket::Endian::LITTLE
         };
 
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -837,15 +837,15 @@ TEST_CASE("simulate CRZ gate")
         circuit.add_h_gate(1);
         circuit.add_crz_gate(0, 1, angle);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         ket::simulate(circuit, state);
 
         const auto cost = std::cos(angle / 2.0);
         const auto sint = std::sin(angle / 2.0);
 
-        const auto expected_state = ket::QuantumState {
+        const auto expected_state = ket::Statevector {
             {{0.5, 0.0}, {0.5 * cost, -0.5 * sint}, {0.5, 0.0}, {0.5 * cost, 0.5 * sint}},
-            ket::QuantumStateEndian::LITTLE
+            ket::Endian::LITTLE
         };
 
         REQUIRE(ket::almost_eq(state, expected_state));
@@ -859,7 +859,7 @@ TEST_CASE("simulate CP gate")
         struct TestPair
         {
             std::string input;
-            ket::QuantumState expected;
+            ket::Statevector expected;
         };
 
         // clang-format off
@@ -869,17 +869,17 @@ TEST_CASE("simulate CP gate")
         const auto sint = std::sin(angle);
 
         auto pair = GENERATE_COPY(
-            TestPair {"00", ket::QuantumState { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"10", ket::QuantumState { {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"01", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
-            TestPair {"11", ket::QuantumState { {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {cost, sint}} }}
+            TestPair {"00", ket::Statevector { {{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"10", ket::Statevector { {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"01", ket::Statevector { {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}} }},
+            TestPair {"11", ket::Statevector { {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {cost, sint}} }}
         );
         // clang-format on
 
         auto circuit = ket::QuantumCircuit {2};
         circuit.add_cp_gate(0, 1, angle);
 
-        auto state = ket::QuantumState {pair.input};
+        auto state = ket::Statevector {pair.input};
         ket::simulate(circuit, state);
 
         REQUIRE(ket::almost_eq(state, pair.expected));
@@ -1214,7 +1214,7 @@ TEST_CASE("simulate CU gate")
 TEST_CASE("Invalid simulation; circuit and state have different numbers of qubits")
 {
     auto circuit = ket::QuantumCircuit {4};
-    auto state = ket::QuantumState {"000"};
+    auto state = ket::Statevector {"000"};
 
     REQUIRE_THROWS_AS(ket::simulate(circuit, state), std::runtime_error);
 }
@@ -1231,7 +1231,7 @@ TEST_CASE("simulate and get classical register")
         circuit.add_x_gate(0);
         circuit.add_m_gate({0, 1});
 
-        auto statevector = ket::QuantumState {"00"};
+        auto statevector = ket::Statevector {"00"};
         auto simulator = ket::StatevectorSimulator {};
 
         REQUIRE(!simulator.has_been_run());
@@ -1263,7 +1263,7 @@ TEST_CASE("simulate and get statevector loggers")
     circuit.add_h_gate({0, 1});
     circuit.add_statevector_circuit_logger();
 
-    auto statevector = ket::QuantumState {"00"};
+    auto statevector = ket::Statevector {"00"};
     auto simulator = ket::StatevectorSimulator {};
 
     simulator.run(circuit, statevector);
@@ -1275,18 +1275,18 @@ TEST_CASE("simulate and get statevector loggers")
     REQUIRE(loggers.size() == 4);
 
     const auto& logger0 = loggers[0].get_statevector_circuit_logger();
-    const auto expected0 = ket::QuantumState {"00"};
+    const auto expected0 = ket::Statevector {"00"};
     REQUIRE(ket::almost_eq(logger0.statevector(), expected0));
 
     const auto& logger1 = loggers[1].get_statevector_circuit_logger();
-    const auto expected1 = ket::QuantumState {"10"};
+    const auto expected1 = ket::Statevector {"10"};
     REQUIRE(ket::almost_eq(logger1.statevector(), expected1));
 
     const auto& logger2 = loggers[2].get_statevector_circuit_logger();
-    const auto expected2 = ket::QuantumState {"00"};
+    const auto expected2 = ket::Statevector {"00"};
     REQUIRE(ket::almost_eq(logger2.statevector(), expected2));
 
     const auto& logger3 = loggers[3].get_statevector_circuit_logger();
-    const auto expected3 = ket::QuantumState {{ {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0} }};
+    const auto expected3 = ket::Statevector {{ {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0} }};
     REQUIRE(ket::almost_eq(logger3.statevector(), expected3));
 }

@@ -71,7 +71,7 @@ void apply_deutsch_jozsa_function(ket::QuantumCircuit& circuit, QueryCase query)
     const auto sampled_states = sampled_indices_of_half_of_all_states(data_qubits.size());
 
     for (auto i_state : sampled_states) {
-        const auto bitset = ket::state_index_to_dynamic_bitset(i_state, data_qubits.size(), ket::QuantumStateEndian::LITTLE);
+        const auto bitset = ket::state_index_to_dynamic_bitset(i_state, data_qubits.size(), ket::Endian::LITTLE);
 
         add_x_gates_on_set_bits(bitset);
         ket::apply_multiplicity_controlled_u_gate(circuit, ket::x_gate(), i_ancilla, data_qubits);
@@ -85,7 +85,7 @@ auto main() -> int
     const auto query = QueryCase::BALANCED;
 
     // construct the initial state; we have 4 "data qubits" and 1 "ancilla qubit" (the last)
-    auto statevector = ket::QuantumState {"00001"};
+    auto statevector = ket::Statevector {"00001"};
 
     // create the circuit with the gates needed for the Deutsch-Jozsa algorithm
     auto circuit = ket::QuantumCircuit {5};

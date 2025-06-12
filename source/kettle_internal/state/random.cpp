@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "kettle_internal/common/prng.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/random.hpp"
 
 
@@ -15,9 +15,9 @@ namespace ket
 {
 
 /*
-    Generate a random `QuantumState` instance, taking the PRNG directly.
+    Generate a random `Statevector` instance, taking the PRNG directly.
 */
-auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> QuantumState
+auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> Statevector
 {
     if (n_qubits == 0) {
         throw std::runtime_error {"Cannot generate a quantum state with 0 qubits.\n"};
@@ -57,22 +57,22 @@ auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> QuantumS
         amplitudes.emplace_back(x, y);
     }
 
-    return QuantumState {amplitudes};
+    return Statevector {amplitudes};
 }
 
 /*
-    Generate a random `QuantumState` instance, generating a fresh PRNG using the provided seed.
+    Generate a random `Statevector` instance, generating a fresh PRNG using the provided seed.
 */
-auto generate_random_state(std::size_t n_qubits, int seed) -> QuantumState
+auto generate_random_state(std::size_t n_qubits, int seed) -> Statevector
 {
     auto prng = ket::internal::get_prng_(seed);
     return generate_random_state(n_qubits, prng);
 }
 
 /*
-    Generate a random `QuantumState` instance, generating the PRNG from the random device.
+    Generate a random `Statevector` instance, generating the PRNG from the random device.
 */
-auto generate_random_state(std::size_t n_qubits) -> QuantumState
+auto generate_random_state(std::size_t n_qubits) -> Statevector
 {
     // NOTE: creating a single function with the function signature
     //     `generate_random_state(std::size_t n_qubits, std::optional<int> seed = std::nullopt)`

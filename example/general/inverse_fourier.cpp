@@ -9,7 +9,7 @@ auto main() -> int
     circuit.add_qft_gate({0, 1, 3});
     circuit.add_iqft_gate({0, 1, 3});
 
-    auto state = ket::QuantumState {"0000"};
+    auto state = ket::Statevector {"0000"};
 
     ket::simulate(circuit, state);
 

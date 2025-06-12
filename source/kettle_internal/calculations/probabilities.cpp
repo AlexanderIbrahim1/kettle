@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle/calculations/probabilities.hpp"
@@ -13,7 +13,7 @@
 
 /*
     This file contains code components to calculate the probabilities of each of
-    the individual computational states in the overall QuantumState object.
+    the individual computational states in the overall Statevector object.
 
     It is also possible to add noise to the measurements.
 */
@@ -46,7 +46,7 @@ void QuantumNoise::check_index_(std::size_t index) const
     }
 }
 
-auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* noise)
+auto calculate_probabilities_raw(const Statevector& state, const QuantumNoise* noise)
     -> std::vector<double>
 {
     const auto n_states = state.n_states();
@@ -70,7 +70,7 @@ auto calculate_probabilities_raw(const QuantumState& state, const QuantumNoise* 
     return probabilities;
 }
 
-auto calculate_probabilities(const QuantumState& state, const QuantumNoise* noise)
+auto calculate_probabilities(const Statevector& state, const QuantumNoise* noise)
     -> std::map<std::string, double>
 {
     const auto n_states = state.n_states();
@@ -78,7 +78,7 @@ auto calculate_probabilities(const QuantumState& state, const QuantumNoise* nois
     auto probabilities = std::map<std::string, double> {};
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
-    const auto endian = ket::QuantumStateEndian::LITTLE;
+    const auto endian = ket::Endian::LITTLE;
 
     // applying noise involves generating the indices of pairs of states, and this is much more convenient
     // when done with indices rather than strings; so the downsides of using twice the memory don't seem

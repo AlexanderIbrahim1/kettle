@@ -57,7 +57,7 @@ auto main() -> int
     circuit.add_iqft_gate({2, 1, 0});
 
     // construct the statevector in the 0-state, and propagate it through the circuit
-    auto statevector = ket::QuantumState {"0000"};
+    auto statevector = ket::Statevector {"0000"};
     ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; in QPE, we are concerned with the output

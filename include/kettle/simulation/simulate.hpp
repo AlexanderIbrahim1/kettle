@@ -7,7 +7,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 namespace ket
@@ -16,7 +16,7 @@ namespace ket
 class StatevectorSimulator
 {
 public:
-    void run(const QuantumCircuit& circuit, QuantumState& state, std::optional<int> prng_seed = std::nullopt);
+    void run(const QuantumCircuit& circuit, Statevector& state, std::optional<int> prng_seed = std::nullopt);
 
     [[nodiscard]]
     auto has_been_run() const -> bool;
@@ -38,7 +38,7 @@ private:
 };
 
 
-void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<int> prng_seed = std::nullopt);
+void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<int> prng_seed = std::nullopt);
 
 }  // namespace ket
 
@@ -46,7 +46,7 @@ void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<
 // inline void simulate_multithreaded_loop_(
 //     std::barrier<>& sync_point,
 //     const ket::QuantumCircuit& circuit,
-//     ket::QuantumState& state,
+//     ket::Statevector& state,
 //     const FlatIndexPair& single_pair,
 //     const FlatIndexPair& double_pair,
 //     int thread_id,
@@ -67,7 +67,7 @@ void simulate(const QuantumCircuit& circuit, QuantumState& state, std::optional<
 // */
 // inline void simulate_multithreaded(
 //     const QuantumCircuit& circuit,
-//     QuantumState& state,
+//     Statevector& state,
 //     std::size_t n_threads,
 //     std::optional<int> prng_seed = std::nullopt
 // )

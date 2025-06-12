@@ -7,7 +7,7 @@
 #include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/simulation/simulate_pauli.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 /*
     This file contains the `PauliOperator` class for 
@@ -73,7 +73,7 @@ void PauliOperator::remove(std::size_t index)
 }
 
 
-auto expectation_value(const PauliOperator& pauli_op, const QuantumState& state) -> std::complex<double>
+auto expectation_value(const PauliOperator& pauli_op, const Statevector& state) -> std::complex<double>
 {
     auto expval = std::complex<double> {};
 
@@ -91,7 +91,7 @@ auto expectation_value(const PauliOperator& pauli_op, const QuantumState& state)
 }
 
 
-auto expectation_value(const SparsePauliString& sparse_pauli_string, const QuantumState& state) -> std::complex<double>
+auto expectation_value(const SparsePauliString& sparse_pauli_string, const Statevector& state) -> std::complex<double>
 {
     auto ket = state;
     simulate(sparse_pauli_string, ket);

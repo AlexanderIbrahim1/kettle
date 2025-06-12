@@ -2,7 +2,7 @@
 #include <type_traits>
 
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
@@ -20,7 +20,7 @@ struct state_collapse_always_false : std::false_type
 {};
 
 auto probabilities_of_collapsed_states_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info
 ) -> std::tuple<double, double>
 {
@@ -44,7 +44,7 @@ auto probabilities_of_collapsed_states_(
 
 template <int StateToCollapse>
 void collapse_and_renormalize_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     double norm_of_surviving_state
 )
@@ -72,13 +72,13 @@ void collapse_and_renormalize_(
 }
 template
 void collapse_and_renormalize_<0>(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     double norm_of_surviving_state
 );
 template
 void collapse_and_renormalize_<1>(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     double norm_of_surviving_state
 );

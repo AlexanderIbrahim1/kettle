@@ -8,14 +8,14 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 template <typename CircuitFunction>
 static auto create_state(CircuitFunction func, const std::string& init_bitstring, std::size_t n_qubits)
 {
     auto circuit = ket::QuantumCircuit {n_qubits};
     func(circuit);
-    auto state = ket::QuantumState {init_bitstring};
+    auto state = ket::Statevector {init_bitstring};
     ket::simulate(circuit, state);
 
     return state;
@@ -151,7 +151,7 @@ TEST_CASE("multiplicity-controlled X gate test")
 
         const auto state_from_mcu = create_state(modify_via_mcu, info.input_bitstring, 4);
 
-        const auto expected_state = ket::QuantumState {info.expected_output_bitstring};
+        const auto expected_state = ket::Statevector {info.expected_output_bitstring};
 
         REQUIRE(ket::almost_eq(state_from_mcu, expected_state));
     }

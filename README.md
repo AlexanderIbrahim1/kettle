@@ -10,7 +10,7 @@ Some of the main features:
     - general 2x2 unitary single-qubit or controlled gates: {`U`, `CU`}
     - measurement gates: `M`
     - control flow based on measured classical bits (if statements)
-  - create a statevector (`ket::QuantumState`) and propagate it through the circuit (`ket::simulate()`)
+  - create a statevector (`ket::Statevector`) and propagate it through the circuit (`ket::simulate()`)
   - perform measurements on the resulting statevector
 
 Other features:
@@ -31,7 +31,7 @@ auto main() -> int
     circuit.add_cx_gate(0, 1);
 
     // begin with a 2-qubit statevector in the |00> state
-    auto statevector = ket::QuantumState {"00"};
+    auto statevector = ket::Statevector {"00"};
 
     // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
     ket::simulate(circuit, statevector);

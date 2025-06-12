@@ -53,7 +53,7 @@ auto main() -> int
     const auto query = QueryCase::CONSTANT_1;
 
     // construct the initial state, in this case using a bitstring
-    auto statevector = ket::QuantumState {"01"};
+    auto statevector = ket::Statevector {"01"};
 
     // create the circuit with the gates needed for the Deutsch algorithm
     auto circuit = ket::QuantumCircuit {2};

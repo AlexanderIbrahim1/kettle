@@ -9,56 +9,56 @@
 #include "kettle/common/mathtools.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/marginal.hpp"
 #include "kettle_internal/state/marginal_internal.hpp"
 
-TEST_CASE("QuantumState endian representation")
+TEST_CASE("Statevector endian representation")
 {
     SECTION("2 qubits, state |10>")
     {
-        const auto state_via_little = ket::QuantumState {
+        const auto state_via_little = ket::Statevector {
             {{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
-            ket::QuantumStateEndian::LITTLE
+            ket::Endian::LITTLE
         };
 
-        const auto state_via_big = ket::QuantumState {
+        const auto state_via_big = ket::Statevector {
             {{0.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
-            ket::QuantumStateEndian::BIG
+            ket::Endian::BIG
         };
 
         REQUIRE(ket::almost_eq(state_via_little, state_via_big));
     }
 }
 
-TEST_CASE("QuantumState from string")
+TEST_CASE("Statevector from string")
 {
     SECTION("1 qubit")
     {
         SECTION("|0>, big endian")
         {
-            const auto state = ket::QuantumState {"0", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"0", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
         }
 
         SECTION("|1>, big endian")
         {
-            const auto state = ket::QuantumState {"1", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"1", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
         }
 
         SECTION("|0>, little endian")
         {
-            const auto state = ket::QuantumState {"0", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"0", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
         }
 
         SECTION("|1>, little endian")
         {
-            const auto state = ket::QuantumState {"1", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"1", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
         }
@@ -68,7 +68,7 @@ TEST_CASE("QuantumState from string")
     {
         SECTION("|00>, big endian")
         {
-            const auto state = ket::QuantumState {"00", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"00", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -77,7 +77,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|00>, little endian")
         {
-            const auto state = ket::QuantumState {"00", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"00", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -86,7 +86,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|01>, big endian")
         {
-            const auto state = ket::QuantumState {"01", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"01", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -95,7 +95,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|01>, little endian")
         {
-            const auto state = ket::QuantumState {"01", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"01", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {1.0, 0.0}));
@@ -104,7 +104,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|10>, big endian")
         {
-            const auto state = ket::QuantumState {"10", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"10", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {1.0, 0.0}));
@@ -113,7 +113,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|10>, little endian")
         {
-            const auto state = ket::QuantumState {"10", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"10", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {1.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -122,7 +122,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|11>, big endian")
         {
-            const auto state = ket::QuantumState {"11", ket::QuantumStateEndian::BIG};
+            const auto state = ket::Statevector {"11", ket::Endian::BIG};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -131,7 +131,7 @@ TEST_CASE("QuantumState from string")
 
         SECTION("|11>, little endian")
         {
-            const auto state = ket::QuantumState {"11", ket::QuantumStateEndian::LITTLE};
+            const auto state = ket::Statevector {"11", ket::Endian::LITTLE};
             REQUIRE(ket::almost_eq(state[0], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[1], {0.0, 0.0}));
             REQUIRE(ket::almost_eq(state[2], {0.0, 0.0}));
@@ -140,10 +140,10 @@ TEST_CASE("QuantumState from string")
     }
 }
 
-TEST_CASE("QuantumState with 3 qubits")
+TEST_CASE("Statevector with 3 qubits")
 {
     const auto n_qubits = 3;
-    const auto state = ket::QuantumState {n_qubits};
+    const auto state = ket::Statevector {n_qubits};
 
     // check that there are 8 states (2^3)
     REQUIRE(state.n_states() == 8);
@@ -159,7 +159,7 @@ TEST_CASE("QuantumState with 3 qubits")
     }
 }
 
-TEST_CASE("QuantumState with two coefficients")
+TEST_CASE("Statevector with two coefficients")
 {
     SECTION("One with {1.0, 0.0}, {0.0, 0.0}")
     {
@@ -167,7 +167,7 @@ TEST_CASE("QuantumState with two coefficients")
             {1.0, 0.0},
             {0.0, 0.0}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(1.0));
@@ -183,7 +183,7 @@ TEST_CASE("QuantumState with two coefficients")
             {coeff_val, 0.0},
             {coeff_val, 0.0}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(coeff_val));
@@ -199,7 +199,7 @@ TEST_CASE("QuantumState with two coefficients")
             {coeff_val, coeff_val},
             {coeff_val, coeff_val}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 2);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(coeff_val));
@@ -209,7 +209,7 @@ TEST_CASE("QuantumState with two coefficients")
     }
 }
 
-TEST_CASE("QuantumState with four coefficients")
+TEST_CASE("Statevector with four coefficients")
 {
     SECTION("One with {1.0, 0.0}, the rest {0.0, 0.0}")
     {
@@ -219,7 +219,7 @@ TEST_CASE("QuantumState with four coefficients")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 4);
         REQUIRE_THAT(state[0].real(), Catch::Matchers::WithinRel(1.0));
@@ -239,7 +239,7 @@ TEST_CASE("QuantumState with four coefficients")
             {coeff_val, 0.0},
             {coeff_val, 0.0}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 4);
         for (std::size_t i = 0; i < state.n_states(); ++i) {
@@ -257,7 +257,7 @@ TEST_CASE("QuantumState with four coefficients")
             {coeff_val, coeff_val},
             {coeff_val, coeff_val}
         };
-        const auto state = ket::QuantumState {coefficients};
+        const auto state = ket::Statevector {coefficients};
 
         REQUIRE(state.n_states() == 4);
         for (std::size_t i = 0; i < state.n_states(); ++i) {
@@ -267,7 +267,7 @@ TEST_CASE("QuantumState with four coefficients")
     }
 }
 
-TEST_CASE("Invalid QuantumState creation throws exceptions")
+TEST_CASE("Invalid Statevector creation throws exceptions")
 {
     SECTION("With coefficients {0.0, 0.0}, {0.0, 0.0}")
     {
@@ -275,7 +275,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::Statevector {coefficients}, std::runtime_error);
     }
 
     SECTION("With coefficients {2.0, 0.0}, {0.0, 0.0}")
@@ -284,7 +284,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {2.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::Statevector {coefficients}, std::runtime_error);
     }
 
     SECTION("With coefficients {1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}")
@@ -294,7 +294,7 @@ TEST_CASE("Invalid QuantumState creation throws exceptions")
             {0.0, 0.0},
             {0.0, 0.0}
         };
-        REQUIRE_THROWS_AS(ket::QuantumState {coefficients}, std::runtime_error);
+        REQUIRE_THROWS_AS(ket::Statevector {coefficients}, std::runtime_error);
     }
 }
 
@@ -623,9 +623,9 @@ TEST_CASE("tensor product")
 
     SECTION("direct 1-qubit x 1-qubit")
     {
-        const auto state0 = ket::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto state1 = ket::QuantumState {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto expected = ket::QuantumState {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
+        const auto state0 = ket::Statevector {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto state1 = ket::Statevector {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto expected = ket::Statevector {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
 
         const auto actual = ket::tensor_product(state0, state1);
 
@@ -640,9 +640,9 @@ TEST_CASE("tensor product")
             std::string message;
         };
 
-        auto state0 = ket::QuantumState {"0"};
-        auto state1 = ket::QuantumState {"0"};
-        auto product_state = ket::QuantumState {"00"};
+        auto state0 = ket::Statevector {"0"};
+        auto state1 = ket::Statevector {"0"};
+        auto product_state = ket::Statevector {"00"};
 
         auto circuit0 = ket::QuantumCircuit {1};
         auto circuit1 = ket::QuantumCircuit {1};
@@ -705,9 +705,9 @@ TEST_CASE("tensor product")
             std::string message;
         };
 
-        auto state0 = ket::QuantumState {"00"};
-        auto state1 = ket::QuantumState {"000"};
-        auto product_state = ket::QuantumState {"00000"};
+        auto state0 = ket::Statevector {"00"};
+        auto state1 = ket::Statevector {"000"};
+        auto product_state = ket::Statevector {"00000"};
 
         auto circuit0 = ket::QuantumCircuit {2};
         auto circuit1 = ket::QuantumCircuit {3};
@@ -757,7 +757,7 @@ TEST_CASE("access amplitudes via bitstring")
     circuit.add_x_gate(2);  //       -> (1/sqrt(2)) [|001> + |101>]
     circuit.add_h_gate(1);  //       -> (1/2)       [|001> + |011> + |101> + |111>]
 
-    auto state = ket::QuantumState {"000"};
+    auto state = ket::Statevector {"000"};
     ket::simulate(circuit, state);
 
     REQUIRE(ket::almost_eq(state.at("000"), {0.0, 0.0}));

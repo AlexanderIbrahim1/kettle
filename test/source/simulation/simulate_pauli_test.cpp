@@ -4,7 +4,7 @@
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/simulation/simulate_pauli.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 TEST_CASE("simulate pauli string")
@@ -13,10 +13,10 @@ TEST_CASE("simulate pauli string")
     {
         auto pauli_string = ket::SparsePauliString {3};
 
-        auto statevector = ket::QuantumState {"000"};
+        auto statevector = ket::Statevector {"000"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"000"};
+        auto expected = ket::Statevector {"000"};
         REQUIRE(ket::almost_eq(statevector, expected));
     }
     
@@ -25,10 +25,10 @@ TEST_CASE("simulate pauli string")
         auto pauli_string = ket::SparsePauliString {3};
         pauli_string.add(0, ket::PauliTerm::X);
 
-        auto statevector = ket::QuantumState {"000"};
+        auto statevector = ket::Statevector {"000"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"100"};
+        auto expected = ket::Statevector {"100"};
         REQUIRE(ket::almost_eq(statevector, expected));
     }
 
@@ -38,10 +38,10 @@ TEST_CASE("simulate pauli string")
         pauli_string.add(0, ket::PauliTerm::X);
         pauli_string.add(2, ket::PauliTerm::X);
 
-        auto statevector = ket::QuantumState {"000"};
+        auto statevector = ket::Statevector {"000"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"101"};
+        auto expected = ket::Statevector {"101"};
         REQUIRE(ket::almost_eq(statevector, expected));
     }
 
@@ -50,10 +50,10 @@ TEST_CASE("simulate pauli string")
         auto pauli_string = ket::SparsePauliString {3};
         pauli_string.add(1, ket::PauliTerm::Y);
 
-        auto statevector = ket::QuantumState {"000"};
+        auto statevector = ket::Statevector {"000"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"010"};
+        auto expected = ket::Statevector {"010"};
         expected.at("010") *= std::complex<double> {0.0, 1.0};
         REQUIRE(ket::almost_eq(statevector, expected));
     }
@@ -63,10 +63,10 @@ TEST_CASE("simulate pauli string")
         auto pauli_string = ket::SparsePauliString {3};
         pauli_string.add(1, ket::PauliTerm::Z);
 
-        auto statevector = ket::QuantumState {"010"};
+        auto statevector = ket::Statevector {"010"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"010"};
+        auto expected = ket::Statevector {"010"};
         expected.at("010") *= -1.0;
         REQUIRE(ket::almost_eq(statevector, expected));
     }
@@ -78,10 +78,10 @@ TEST_CASE("simulate pauli string")
         pauli_string.add(1, ket::PauliTerm::Y);
         pauli_string.add(2, ket::PauliTerm::Z);
 
-        auto statevector = ket::QuantumState {"011"};
+        auto statevector = ket::Statevector {"011"};
         ket::simulate(pauli_string, statevector);
 
-        auto expected = ket::QuantumState {"101"};
+        auto expected = ket::Statevector {"101"};
         expected.at("101") *= std::complex<double> {0.0, 1.0};
         REQUIRE(ket::almost_eq(statevector, expected));
     }

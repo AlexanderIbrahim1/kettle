@@ -8,7 +8,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include <kettle/circuit/circuit.hpp>
-#include <kettle/state/state.hpp>
+#include <kettle/state/statevector.hpp>
 #include <kettle/simulation/simulate.hpp>
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
@@ -58,7 +58,7 @@ static void normalize(std::vector<std::complex<double>>& values)
 }
 
 static void simulate_measurement_wrapper(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     int measured_state
 )
@@ -82,7 +82,7 @@ TEST_CASE("simulate_measurement_()")
     {
         std::size_t measured_qubit;
         int measured_state;
-        ket::QuantumState expected;
+        ket::Statevector expected;
     };
 
     SECTION("2 qubits; Hadamard on each")
@@ -91,29 +91,29 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=0,
-                .expected=ket::QuantumState {{{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}}
+                .expected=ket::Statevector {{{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}}
             },
             TestCase {
                 .measured_qubit=1,
                 .measured_state=0,
-                .expected=ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}}
+                .expected=ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}}
             },
             TestCase {
                 .measured_qubit=0,
                 .measured_state=1,
-                .expected=ket::QuantumState {{{0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}}}
+                .expected=ket::Statevector {{{0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}}}
             },
             TestCase {
                 .measured_qubit=1,
                 .measured_state=1,
-                .expected=ket::QuantumState {{{0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}
+                .expected=ket::Statevector {{{0.0, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}
             }
         );
 
         // the measured bit doesn't matter for now
         const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
-        auto state = ket::QuantumState {"00"};
+        auto state = ket::Statevector {"00"};
         auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate({0, 1});
         ket::simulate(circuit, state);
@@ -129,7 +129,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=0,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}
                 }}
@@ -137,7 +137,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=0,
                 .measured_state=1,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}
                 }}
@@ -145,7 +145,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=1,
                 .measured_state=0,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0}
                 }}
@@ -153,7 +153,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=1,
                 .measured_state=1,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.0, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.5, 0.0}
                 }}
@@ -161,7 +161,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=2,
                 .measured_state=0,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0},
                     {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}
                 }}
@@ -169,7 +169,7 @@ TEST_CASE("simulate_measurement_()")
             TestCase {
                 .measured_qubit=2,
                 .measured_state=1,
-                .expected=ket::QuantumState {{
+                .expected=ket::Statevector {{
                     {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
                     {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}
                 }}
@@ -179,7 +179,7 @@ TEST_CASE("simulate_measurement_()")
         // the measured bit doesn't matter for now
         const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
-        auto state = ket::QuantumState {"000"};
+        auto state = ket::Statevector {"000"};
         auto circuit = ket::QuantumCircuit {3};
         circuit.add_h_gate({0, 1, 2});
 
@@ -242,8 +242,8 @@ TEST_CASE("simulate_measurement_()")
             // the measured bit doesn't matter for now
             const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
-            auto state = ket::QuantumState {testcase.initial_amplitudes};
-            auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
+            auto state = ket::Statevector {testcase.initial_amplitudes};
+            auto expected_state = ket::Statevector {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 
@@ -306,8 +306,8 @@ TEST_CASE("simulate_measurement_()")
             // the measured bit doesn't matter for now
             const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
 
-            auto state = ket::QuantumState {testcase.initial_amplitudes};
-            auto expected_state = ket::QuantumState {testcase.expected_amplitudes};
+            auto state = ket::Statevector {testcase.initial_amplitudes};
+            auto expected_state = ket::Statevector {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
 

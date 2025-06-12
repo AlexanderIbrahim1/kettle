@@ -5,7 +5,7 @@
 namespace ket
 {
 
-enum class QuantumStateEndian : std::uint8_t
+enum class Endian : std::uint8_t
 {
     LITTLE,
     BIG

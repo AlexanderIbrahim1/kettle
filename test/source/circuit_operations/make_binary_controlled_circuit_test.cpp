@@ -4,7 +4,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/make_binary_controlled_circuit.hpp"
 
@@ -31,8 +31,8 @@ TEST_CASE("make_binary_controlled_circuit()")
     subcircuit.add_u_gate(t_gate, 0);
     auto binary_made_circuit = ket::make_binary_controlled_circuit_naive(subcircuit, 4, {0, 1, 2}, {3});
 
-    auto state0 = ket::QuantumState {init_bitstring};
-    auto state1 = ket::QuantumState {init_bitstring};
+    auto state0 = ket::Statevector {init_bitstring};
+    auto state1 = ket::Statevector {init_bitstring};
 
     ket::simulate(manual_circuit, state0);
     ket::simulate(binary_made_circuit, state1);
@@ -69,8 +69,8 @@ TEST_CASE("make_binary_controlled_circuit_from_binary_powers() for single qubit 
 
     auto binary_made_circuit = ket::make_binary_controlled_circuit_from_binary_powers(subcircuits, 4, {0, 1, 2}, {3});
 
-    auto state0 = ket::QuantumState {init_bitstring};
-    auto state1 = ket::QuantumState {init_bitstring};
+    auto state0 = ket::Statevector {init_bitstring};
+    auto state1 = ket::Statevector {init_bitstring};
 
     ket::simulate(manual_circuit, state0);
     ket::simulate(binary_made_circuit, state1);

@@ -5,7 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <kettle/state/state.hpp>
+#include <kettle/state/statevector.hpp>
 #include <kettle/io/numpy_statevector.hpp>
 
 
@@ -43,7 +43,7 @@ TEST_CASE("read_numpy_statevector()")
         return output;
     }();
 
-    const auto expected = ket::QuantumState {std::move(expected_amplitudes)};
+    const auto expected = ket::Statevector {std::move(expected_amplitudes)};
 
     REQUIRE(ket::almost_eq(actual, expected));
 }

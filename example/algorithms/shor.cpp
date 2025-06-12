@@ -172,7 +172,7 @@ auto main(int argc, char** argv) -> int
     circuit.add_iqft_gate(ket::revarange(n_counting_qubits));
 
     // create the statevector and evolve the quantum state
-    auto statevector = ket::QuantumState {n_total_qubits};
+    auto statevector = ket::Statevector {n_total_qubits};
     ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts; in Shor's algorithm, we are concerned

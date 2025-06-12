@@ -3,7 +3,7 @@
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/simulation/simulate_pauli.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
@@ -26,7 +26,7 @@ struct pauli_always_false : std::false_type
 
 template <ket::PauliTerm Pauli>
 void simulate_pauli_gate_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     std::size_t target_index,
     const ki::FlatIndexPair& pair
 )
@@ -56,7 +56,7 @@ void simulate_pauli_gate_(
 
 
 void simulate_pauli_gates_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ki::FlatIndexPair& single_pair,
     const ket::SparsePauliString& pauli_string
 )
@@ -85,7 +85,7 @@ void simulate_pauli_gates_(
     }
 }
 
-void check_valid_number_of_qubits_(const ket::SparsePauliString& pauli_string, const ket::QuantumState& state)
+void check_valid_number_of_qubits_(const ket::SparsePauliString& pauli_string, const ket::Statevector& state)
 {
     if (pauli_string.n_qubits() != state.n_qubits()) {
         throw std::runtime_error {"Invalid simulation; SparsePauliString and state have different number of qubits."};
@@ -101,7 +101,7 @@ void check_valid_number_of_qubits_(const ket::SparsePauliString& pauli_string, c
 namespace ket
 {
 
-void StatevectorPauliStringSimulator::run(const SparsePauliString& pauli_string, QuantumState& state)
+void StatevectorPauliStringSimulator::run(const SparsePauliString& pauli_string, Statevector& state)
 {
     namespace ki = ket::internal;
 
@@ -121,7 +121,7 @@ auto StatevectorPauliStringSimulator::has_been_run() const -> bool
     return has_been_run_;
 }
 
-void simulate(const SparsePauliString& pauli_string, QuantumState& state)
+void simulate(const SparsePauliString& pauli_string, Statevector& state)
 {
     auto simulator = StatevectorPauliStringSimulator {};
     simulator.run(pauli_string, state);

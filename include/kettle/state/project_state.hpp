@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "kettle/common/tolerance.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 namespace ket
@@ -16,10 +16,10 @@ namespace ket
     for which the qubits given by `qubit_indices` have bit values given by `expected_measurements`.
 */
 auto project_statevector(
-    const QuantumState& statevector,
+    const Statevector& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements,
     double minimum_norm_tol = ket::PROJECTION_NORMALIZATION_TOLERANCE
-) -> QuantumState;
+) -> Statevector;
 
 }  // namespace ket

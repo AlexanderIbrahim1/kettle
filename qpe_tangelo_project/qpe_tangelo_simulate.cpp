@@ -62,7 +62,7 @@ auto main(int argc, char** argv) -> int
     const auto n_total_qubits = arguments.n_ancilla_qubits + arguments.n_unitary_qubits;
     const auto circuit = ket::read_tangelo_circuit(n_total_qubits, arguments.abs_gate_filepath, 0);
 
-    auto statevector = ket::QuantumState {n_total_qubits};
+    auto statevector = ket::Statevector {n_total_qubits};
     ket::simulate(circuit, statevector);
 
     ket::save_statevector(arguments.abs_statevector_output_filepath, statevector);

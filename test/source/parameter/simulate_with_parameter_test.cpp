@@ -10,26 +10,26 @@
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
-static auto get_zero_state_result(double angle) -> ket::QuantumState {
+static auto get_zero_state_result(double angle) -> ket::Statevector {
     const auto real0 = std::cos(angle / 2.0);
     const auto imag0 = 0.0;
     const auto real1 = 0.0;
     const auto imag1 = - std::sin(angle / 2.0);
 
-    return ket::QuantumState {{ {real0, imag0}, {real1, imag1}}};
+    return ket::Statevector {{ {real0, imag0}, {real1, imag1}}};
 }
 
 
-static auto get_plus_state_result(double angle) -> ket::QuantumState {
+static auto get_plus_state_result(double angle) -> ket::Statevector {
     const auto real0 = std::cos(angle / 2.0) / M_SQRT2;
     const auto imag0 = - std::sin(angle / 2.0) / M_SQRT2;
     const auto real1 = real0;
     const auto imag1 = imag0;
 
-    return ket::QuantumState {{ {real0, imag0}, {real1, imag1}}};
+    return ket::Statevector {{ {real0, imag0}, {real1, imag1}}};
 }
 
 
@@ -37,13 +37,13 @@ TEST_CASE("simulate single RX gate with different angles")
 {
     struct TestCase
     {
-        ket::QuantumState input_statevector;
-        std::function<ket::QuantumState(double)> expected;
+        ket::Statevector input_statevector;
+        std::function<ket::Statevector(double)> expected;
     };
 
     const auto testcase = GENERATE(
-        TestCase {ket::QuantumState {{{1.0, 0.0}, {0.0, 0.0}}}, &get_zero_state_result},
-        TestCase {ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}, &get_plus_state_result}
+        TestCase {ket::Statevector {{{1.0, 0.0}, {0.0, 0.0}}}, &get_zero_state_result},
+        TestCase {ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}}, &get_plus_state_result}
     );
 
     const auto input_angle = 2.0 * M_PI * GENERATE(0.0, 0.1, 0.25, 0.4, 0.5, 0.8, 1.0);
@@ -69,7 +69,7 @@ TEST_CASE("manually set parameter of RX gate")
     const auto id = circuit.add_rx_gate(0, first_angle, ket::param::parameterized {});
 
     // make sure that the parameterized circuit works with the first angle
-    auto first_statevector = ket::QuantumState {"0"};
+    auto first_statevector = ket::Statevector {"0"};
     ket::simulate(circuit, first_statevector);
     const auto expected_first_statevector = get_zero_state_result(first_angle);
 
@@ -78,7 +78,7 @@ TEST_CASE("manually set parameter of RX gate")
     // make sure that the parameterized circuit works with the second angle, after changing to it
     circuit.set_parameter_value(id, second_angle);
 
-    auto second_statevector = ket::QuantumState {"0"};
+    auto second_statevector = ket::Statevector {"0"};
     ket::simulate(circuit, second_statevector);
     const auto expected_second_statevector = get_zero_state_result(second_angle);
 
@@ -166,14 +166,14 @@ TEST_CASE("simulate single-qubit gate with two identical parameters")
     auto circuit0 = ket::QuantumCircuit {1};
     testcase.unparam_circuit_changer(circuit0);
 
-    auto statevector0 = ket::QuantumState {"0"};
+    auto statevector0 = ket::Statevector {"0"};
     ket::simulate(circuit0, statevector0);
 
     // create a circuit with two RX gates with a parameterized angle, and propagate a statevector through it
     auto circuit1 = ket::QuantumCircuit {1};
     const auto id = testcase.param_circuit_changer(circuit1);
 
-    auto statevector1 = ket::QuantumState {"0"};
+    auto statevector1 = ket::Statevector {"0"};
     ket::simulate(circuit1, statevector1);
 
     REQUIRE(ket::almost_eq(statevector0, statevector1));
@@ -243,14 +243,14 @@ TEST_CASE("simulate double-qubit gate with two identical parameters")
     auto circuit0 = ket::QuantumCircuit {2};
     testcase.unparam_circuit_changer(circuit0);
 
-    auto statevector0 = ket::QuantumState {"00"};
+    auto statevector0 = ket::Statevector {"00"};
     ket::simulate(circuit0, statevector0);
 
     // create a circuit with two RX gates with a parameterized angle, and propagate a statevector through it
     auto circuit1 = ket::QuantumCircuit {2};
     const auto id = testcase.param_circuit_changer(circuit1);
 
-    auto statevector1 = ket::QuantumState {"00"};
+    auto statevector1 = ket::Statevector {"00"};
     ket::simulate(circuit1, statevector1);
 
     REQUIRE(ket::almost_eq(statevector0, statevector1));
@@ -293,7 +293,7 @@ TEST_CASE("parameters of control flow subcircuits")
 
         REQUIRE(circuit.parameter_data_map().contains(param_id0));
 
-        auto statevector = ket::QuantumState {"00"};
+        auto statevector = ket::Statevector {"00"};
         REQUIRE_NOTHROW(ket::simulate(circuit, statevector));
     }
 
@@ -307,7 +307,7 @@ TEST_CASE("parameters of control flow subcircuits")
             std::move(subcircuit)
         );
 
-        auto statevector = ket::QuantumState {"00"};
+        auto statevector = ket::Statevector {"00"};
         REQUIRE_THROWS_AS(ket::simulate(circuit, statevector), std::runtime_error);
     }
 }

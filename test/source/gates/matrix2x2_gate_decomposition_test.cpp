@@ -5,7 +5,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/random.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/gates/common_u_gates.hpp"

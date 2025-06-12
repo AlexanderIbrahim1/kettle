@@ -8,7 +8,7 @@
 
 #include "kettle/calculations/probabilities.hpp"
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 /*
     This file contains code components to perform measurements of the state.
@@ -22,9 +22,9 @@ auto memory_to_counts(const std::vector<std::size_t>& measurements) -> std::map<
 auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::map<std::size_t, double>;
 
 /*
-    Performs measurements of the QuantumState using its probabilities. The measurements
+    Performs measurements of the Statevector using its probabilities. The measurements
     are in the form of a vector of indices, each of which indicates the computational state
-    that the overall QuantumState collapsed to.
+    that the overall Statevector collapsed to.
 
     Measurements are performed by first calculating the cumulative probability distribution
     over the states, and sampling with a uniform distribution. This is faster than the method
@@ -46,7 +46,7 @@ auto perform_measurements_as_memory(
 ) -> std::vector<std::size_t>;
 
 auto perform_measurements_as_memory(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
@@ -59,7 +59,7 @@ auto perform_measurements_as_counts_raw(
 ) -> std::map<std::size_t, std::size_t>;
 
 auto perform_measurements_as_counts_raw(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
@@ -73,7 +73,7 @@ auto perform_measurements_as_counts_marginal(
 ) -> std::map<std::string, std::size_t>;
 
 auto perform_measurements_as_counts_marginal(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const std::vector<std::size_t>& marginal_qubits = {},
     const QuantumNoise* noise = nullptr,
@@ -82,7 +82,7 @@ auto perform_measurements_as_counts_marginal(
 
 auto perform_measurements_as_counts_marginal(
     const QuantumCircuit& circuit,
-    const QuantumState& original_state,
+    const Statevector& original_state,
     std::size_t n_shots,
     const std::vector<std::size_t>& marginal_qubits = {},
     const QuantumNoise* noise = nullptr,
@@ -90,7 +90,7 @@ auto perform_measurements_as_counts_marginal(
 ) -> std::map<std::string, std::size_t>;
 
 auto perform_measurements_as_counts(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise = nullptr,
     std::optional<int> seed = std::nullopt
