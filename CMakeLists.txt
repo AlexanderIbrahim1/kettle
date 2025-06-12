@@ -117,6 +117,7 @@ target_link_libraries(
     kettle_kettle
     PRIVATE
     nlopt::nlopt
+    Eigen3::Eigen
 )
 
 get_target_property(NLOPT_INCLUDES nlopt::nlopt INTERFACE_INCLUDE_DIRECTORIES)
