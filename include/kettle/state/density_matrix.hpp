@@ -97,6 +97,19 @@ public:
         return matrix_;
     }
 
+    [[nodiscard]]
+    auto trace() const -> std::complex<double>
+    {
+        return matrix_.trace();
+    }
+
+    [[nodiscard]]
+    auto trace_of_square() const -> std::complex<double>
+    {
+        const auto squared = matrix_ * matrix_;
+        return squared.trace();
+    }
+
 private:
     Eigen::MatrixXcd matrix_;
 };
