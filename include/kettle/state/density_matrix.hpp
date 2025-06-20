@@ -60,6 +60,20 @@ inline void check_is_positive_semi_definite_(const Eigen::MatrixXcd& matrix)
     }
 }
 
+inline void check_side_length_is_power_of_2_(const Eigen::MatrixXcd& matrix)
+{
+    const auto size = static_cast<std::size_t>(matrix.cols());
+    const auto is_positive = size > 0;
+    const auto has_one_bit_set = (size & (size - 1)) == 0;
+
+    if (!is_positive || !has_one_bit_set) {
+        auto err_msg = std::stringstream {};
+        err_msg << "The provided coefficients must have a size equal to a power of 2.\n";
+        err_msg << "Found size = " << matrix.cols();
+        throw std::runtime_error {err_msg.str()};
+    }
+}
+
 struct density_matrix_nocheck
 {
     explicit density_matrix_nocheck() = default;
@@ -73,13 +87,16 @@ public:
         double trace_tolerance = DENSITY_MATRIX_TRACE_TOLERANCE,
         double hermitian_tolerance = MATRIX_HERMITIAN_TOLERANCE
     )
-        : matrix_ {std::move(matrix)}
+        : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
+        , n_states_ {static_cast<std::size_t>(matrix.cols())}
+        , matrix_ {std::move(matrix)}
     {
         check_is_finite_size_(matrix_);
         check_is_square_matrix_(matrix_);
         check_has_trace_of_one_(matrix_, trace_tolerance);
         check_is_hermitian_(matrix_, hermitian_tolerance);
         check_is_positive_semi_definite_(matrix_);
+        check_side_length_is_power_of_2_(matrix_);
     }
 
     /*
@@ -90,7 +107,9 @@ public:
         Eigen::MatrixXcd matrix,  // NOLINT(modernize-pass-by-value) [reason: fails for Eigen] 
         [[maybe_unused]] const density_matrix_nocheck& key
     )
-        : matrix_ {std::move(matrix)}
+        : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
+        , n_states_ {static_cast<std::size_t>(matrix.cols())}
+        , matrix_ {std::move(matrix)}
     {}
 
     [[nodiscard]]
@@ -129,7 +148,21 @@ public:
         return squared.trace();
     }
 
+    [[nodiscard]]
+    constexpr auto n_states() const noexcept -> std::size_t
+    {
+        return n_states_;
+    }
+
+    [[nodiscard]]
+    constexpr auto n_qubits() const noexcept -> std::size_t
+    {
+        return n_qubits_;
+    }
+
 private:
+    std::size_t n_qubits_;
+    std::size_t n_states_;
     Eigen::MatrixXcd matrix_;
 };
 
