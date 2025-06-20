@@ -4,6 +4,7 @@
 #include <string>
 
 #include "kettle/common/mathtools.hpp"
+#include "kettle/state/density_matrix.hpp"
 #include "kettle/state/statevector.hpp"
 #include "kettle_internal/common/state_test_utils.hpp"
 
@@ -76,5 +77,31 @@ auto almost_eq_with_print_(
     return true;
 }
 
+auto almost_eq_with_print_(
+    const ket::DensityMatrix& left,
+    const ket::DensityMatrix& right,
+    PrintAlmostEq_ print_state,
+    double tolerance_sq
+) noexcept -> bool
+{
+    using PAE = PrintAlmostEq_;
+
+    if (left.n_qubits() != right.n_qubits()) {
+        if (print_state == PAE::PRINT) {
+            std::cout << ae_err_msg_diff_number_of_qubits_(left.n_qubits(), right.n_qubits());
+        }
+        return false;
+    }
+
+    if (!left.matrix().isApprox(right.matrix(), tolerance_sq)) {
+        std::cout << "LEFT: \n";
+        std::cout << left.matrix();
+        std::cout << "\nRIGHT: \n";
+        std::cout << right.matrix();
+        return false;
+    }
+
+    return true;
+}
 
 }  // namespace ket::internal

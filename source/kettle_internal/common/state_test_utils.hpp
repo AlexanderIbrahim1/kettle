@@ -3,6 +3,7 @@
 #include <string>
 
 #include "kettle/common/tolerance.hpp"
+#include "kettle/state/density_matrix.hpp"
 #include "kettle/state/statevector.hpp"
 
 
@@ -24,6 +25,13 @@ auto ae_err_msg_diff_states_(const ket::Statevector& left, const ket::Statevecto
 auto almost_eq_with_print_(
     const ket::Statevector& left,
     const ket::Statevector& right,
+    PrintAlmostEq_ print_state = PrintAlmostEq_::PRINT,
+    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
+) noexcept -> bool;
+
+auto almost_eq_with_print_(
+    const ket::DensityMatrix& left,
+    const ket::DensityMatrix& right,
     PrintAlmostEq_ print_state = PrintAlmostEq_::PRINT,
     double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) noexcept -> bool;

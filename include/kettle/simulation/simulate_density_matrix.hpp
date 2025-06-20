@@ -18,6 +18,8 @@ namespace ket
 class DensityMatrixSimulator
 {
 public:
+    explicit DensityMatrixSimulator(std::size_t n_qubits);
+
     void run(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed = std::nullopt);
 
     [[nodiscard]]

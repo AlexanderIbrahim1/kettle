@@ -60,6 +60,7 @@ add_library(
     source/kettle_internal/simulation/measure.cpp
     source/kettle_internal/simulation/multithread_simulate_utils.cpp
     source/kettle_internal/simulation/operations.cpp
+    source/kettle_internal/simulation/simulate_density_matrix.cpp
     source/kettle_internal/simulation/simulate_utils.cpp
     source/kettle_internal/simulation/simulate_pauli.cpp
     source/kettle_internal/simulation/simulate.cpp
@@ -121,10 +122,12 @@ target_link_libraries(
 )
 
 get_target_property(NLOPT_INCLUDES nlopt::nlopt INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(EIGEN_INCLUDES Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(
     kettle_kettle
     SYSTEM
     PUBLIC ${NLOPT_INCLUDES}
+    PRIVATE ${EIGEN_INCLUDES}
 )
 
 # ---- Install rules ----

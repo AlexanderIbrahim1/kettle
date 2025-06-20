@@ -63,7 +63,7 @@ function(add_test_target)
     if(add_test_target_USE_EIGEN)
         get_target_property(EIGEN_INCLUDES Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
         target_link_libraries(${add_test_target_TARGET} PRIVATE Eigen3::Eigen)
-        target_include_directories(${add_test_target_TARGET} SYSTEM PUBLIC ${EIGEN_INCLUDES})
+        target_include_directories(${add_test_target_TARGET} SYSTEM PRIVATE ${EIGEN_INCLUDES})
     endif()
 
     catch_discover_tests(${add_test_target_TARGET})
@@ -114,6 +114,7 @@ add_test_target(TARGET gate_pair_generator_test SOURCES "source/simulation/gate_
 add_test_target(TARGET measure_test SOURCES "source/simulation/measure_test.cpp")
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/simulation/operations_test.cpp")
+add_test_target(OPTIONS USE_EIGEN TARGET simulate_density_matrix_test SOURCES "source/simulation/simulate_density_matrix_test.cpp")
 add_test_target(TARGET simulate_test SOURCES "source/simulation/simulate_test.cpp")
 add_test_target(TARGET simulate_pauli_test SOURCES "source/simulation/simulate_pauli_test.cpp")
 

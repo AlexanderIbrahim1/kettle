@@ -16,6 +16,19 @@
 //       - for example, a function for probabilistic mixtures, another for doing something -> renormalizing
 //     - another is to just get rid of the invariant checking
 
+// TODO: remove this once I get it to work; I'll be doing the header/source split
+inline auto log_2_int(std::size_t power) noexcept -> std::size_t
+{
+    // assumes that power > 0
+    auto log2 = std::size_t {0};
+    while (power > 0) {
+        ++log2;
+        power = (power >> 1UL);
+    }
+
+    return log2 - 1;
+}
+
 
 namespace ket
 {
@@ -87,7 +100,7 @@ public:
         double trace_tolerance = DENSITY_MATRIX_TRACE_TOLERANCE,
         double hermitian_tolerance = MATRIX_HERMITIAN_TOLERANCE
     )
-        : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
+        : n_qubits_ {log_2_int(static_cast<std::size_t>(matrix.cols()))}
         , n_states_ {static_cast<std::size_t>(matrix.cols())}
         , matrix_ {std::move(matrix)}
     {
@@ -107,10 +120,22 @@ public:
         Eigen::MatrixXcd matrix,  // NOLINT(modernize-pass-by-value) [reason: fails for Eigen] 
         [[maybe_unused]] const density_matrix_nocheck& key
     )
-        : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
+        : n_qubits_ {log_2_int(static_cast<std::size_t>(matrix.cols()))}
         , n_states_ {static_cast<std::size_t>(matrix.cols())}
         , matrix_ {std::move(matrix)}
     {}
+
+    explicit DensityMatrix(
+        const std::string& computational_state,
+        Endian input_endian = Endian::LITTLE
+    )
+        : n_qubits_ {computational_state.size()}
+        , n_states_ {1UL << computational_state.size()}
+        , matrix_(Eigen::MatrixXcd::Zero(static_cast<Eigen::Index>(1UL << computational_state.size()), static_cast<Eigen::Index>(1UL << computational_state.size())).eval())  // TODO: CLEAN UP
+    {
+        const auto index = static_cast<Eigen::Index>(bitstring_to_state_index(computational_state, input_endian)); // TODO: CLEAN UP
+        matrix_(index, index) = 1.0;
+    }
 
     [[nodiscard]]
     auto is_pure(double tolerance = DENSITY_MATRIX_TRACE_TOLERANCE) const -> bool

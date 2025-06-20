@@ -3,6 +3,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <Eigen/Dense>
+
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
@@ -15,9 +17,12 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
-#include "kettle_internal/simulation/measure.hpp"
+// #include "kettle_internal/simulation/measure.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
-#include "kettle_internal/simulation/operations.hpp"
+// #include "kettle_internal/simulation/operations.hpp"
+
+
+// NOTE: default ordering in Eigen is column-major
 
 
 namespace ki = ket::internal;
@@ -134,17 +139,54 @@ void simulate_u_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair& pair,
+    Eigen::MatrixXcd& buffer
 )
 {
+    // TODO: create a templated version of the qubit gate pair generators that cast the indices
+    // to the proper expected type
     const auto target_index = ki::create::unpack_single_qubit_gate_index(info);
     const auto n_qubits = state.n_qubits();
     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-    pair_iterator.set_state(pair.i_lower);
 
-    for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
-        const auto [state0_index, state1_index] = pair_iterator.next();
-        ki::apply_u_gate(state, state0_index, state1_index, mat);
+    const auto n_states = static_cast<Eigen::Index>(state.n_states());
+
+    // perform the multiplication of U * rho
+    // fill the buffer
+    for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
+        pair_iterator.set_state(pair.i_lower);
+        for (std::size_t i_pair {0}; i_pair < state.n_states() / 2; ++i_pair) {
+            // TODO: change after creating templated SingleQubitGatePairIterator for proper types
+            const auto [state0_index_, state1_index_] = pair_iterator.next();
+            const auto state0_index = static_cast<Eigen::Index>(state0_index_);
+            const auto state1_index = static_cast<Eigen::Index>(state1_index_);
+
+            const auto rho_elem0 = state.matrix()(i_row, state0_index);
+            const auto rho_elem1 = state.matrix()(i_row, state1_index);
+
+            buffer(i_row, state0_index) = (mat.elem00 * rho_elem0) + (mat.elem01 * rho_elem1);
+            buffer(i_row, state1_index) = (mat.elem10 * rho_elem0) + (mat.elem11 * rho_elem1);
+        }
+    }
+
+    const auto mat_adj = ket::conjugate_transpose(mat);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
+        // TODO: change after creating templated SingleQubitGatePairIterator for proper types
+        pair_iterator.set_state(pair.i_lower);
+        for (std::size_t i_pair {0}; i_pair < state.n_states() / 2; ++i_pair) {
+            const auto [state0_index_, state1_index_] = pair_iterator.next();
+            const auto state0_index = static_cast<Eigen::Index>(state0_index_);
+            const auto state1_index = static_cast<Eigen::Index>(state1_index_);
+
+            const auto buf_elem0 = buffer(state0_index, i_col);
+            const auto buf_elem1 = buffer(state1_index, i_col);
+
+            state.matrix()(state0_index, i_col) = (mat_adj.elem00 * buf_elem0) + (mat_adj.elem10 * buf_elem1);
+            state.matrix()(state1_index, i_col) = (mat_adj.elem01 * buf_elem0) + (mat_adj.elem11 * buf_elem1);
+        }
     }
 }
 
@@ -270,7 +312,8 @@ void simulate_gate_info_(
     const ket::GateInfo& gate_info,
     [[maybe_unused]] int thread_id,
     [[maybe_unused]] std::optional<int> prng_seed,
-    [[maybe_unused]] ket::ClassicalRegister& c_register
+    [[maybe_unused]] ket::ClassicalRegister& c_register,
+    Eigen::MatrixXcd& buffer
 )
 {
     namespace cre = ki::create;
@@ -391,7 +434,7 @@ void simulate_gate_info_(
 //         }
         case G::U : {
             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
-            simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair);
+            simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair, buffer);
             break;
         }
 //         case G::CU : {
@@ -424,7 +467,8 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
     const ki::FlatIndexPair& double_pair,
     int thread_id,
     std::optional<int> prng_seed,
-    ket::ClassicalRegister& cregister
+    ket::ClassicalRegister& cregister,
+    Eigen::MatrixXcd& buffer
 ) -> std::vector<ket::CircuitLogger>
 {
     using Elements = std::reference_wrapper<const std::vector<ket::CircuitElement>>;
@@ -513,7 +557,8 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
                 gate_info,
                 thread_id,
                 prng_seed,
-                cregister
+                cregister,
+                buffer
             );
         }
         else {
@@ -540,6 +585,17 @@ void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket
 namespace ket
 {
 
+DensityMatrixSimulator::DensityMatrixSimulator(std::size_t n_qubits)
+{
+    if (n_qubits == 0) {
+        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
+    }
+
+    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
+
+    buffer_ = Eigen::MatrixXcd(n_states, n_states);
+}
+
 void DensityMatrixSimulator::run(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed)
 {
     namespace ki = ket::internal;
@@ -558,7 +614,7 @@ void DensityMatrixSimulator::run(const QuantumCircuit& circuit, DensityMatrix& s
     // code, and certain operations are only done on the thread with thread id 0
     const auto thread_id = MEASURING_THREAD_ID;
 
-    circuit_loggers_ = simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_);
+    circuit_loggers_ = simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_, buffer_);
 
     has_been_run_ = true;
 }
@@ -596,7 +652,7 @@ auto DensityMatrixSimulator::circuit_loggers() const -> const std::vector<Circui
 
 void simulate(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed)
 {
-    auto simulator = DensityMatrixSimulator {};
+    auto simulator = DensityMatrixSimulator {state.n_qubits()};
     simulator.run(circuit, state, prng_seed);
 }
 

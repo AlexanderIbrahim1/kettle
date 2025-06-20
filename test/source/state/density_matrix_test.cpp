@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -10,23 +8,39 @@
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/statevector.hpp"
 #include "kettle/state/density_matrix.hpp"
-
-
-static auto almost_eq_with_print(const Eigen::MatrixXcd& left, const Eigen::MatrixXcd& right) {
-    if (left.isApprox(right)) {
-        return true;
-    } else {
-        std::cout << "LEFT: \n";
-        std::cout << left;
-        std::cout << "\nRIGHT: \n";
-        std::cout << right;
-        return false;
-    }
-}
+#include "kettle_internal/common/state_test_utils.hpp"
 
 
 TEST_CASE("statevector_to_density_matrix()")
 {
+    SECTION("single computational basis state, 2 qubits")
+    {
+        struct TestCase
+        {
+            std::string basis_state;
+            Eigen::Index idx;
+        };
+
+        const auto testcase = GENERATE(
+            TestCase {"00", 0},
+            TestCase {"10", 1},
+            TestCase {"01", 2},
+            TestCase {"11", 3}
+        );
+
+        auto statevector = ket::Statevector {testcase.basis_state};
+        const auto density_matrix = ket::statevector_to_density_matrix(statevector);
+
+        const auto expected = [&]() {
+            auto matrix = Eigen::MatrixXcd::Zero(4, 4).eval();
+            matrix(testcase.idx, testcase.idx) = 1.0;
+
+            return ket::DensityMatrix {std::move(matrix)};
+        }();
+
+        REQUIRE(ket::internal::almost_eq_with_print_(density_matrix, expected));
+    }
+
     SECTION("bell_state(00+)")
     {
         auto circuit = ket::QuantumCircuit {2};
@@ -48,6 +62,6 @@ TEST_CASE("statevector_to_density_matrix()")
             return ket::DensityMatrix {std::move(matrix)};
         }();
 
-        REQUIRE(almost_eq_with_print(density_matrix.matrix(), expected.matrix()));
+        REQUIRE(ket::internal::almost_eq_with_print_(density_matrix, expected));
     }
 }
