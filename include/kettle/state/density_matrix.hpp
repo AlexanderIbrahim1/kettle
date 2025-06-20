@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 
 #include "kettle/common/tolerance.hpp"
+#include "kettle/state/statevector.hpp"
 
 // TODO: to implement;
 //   - multiplying by a scalar
@@ -20,7 +21,7 @@ namespace ket
 {
 
 inline void check_is_hermitian_(const Eigen::MatrixXcd& matrix, double tolerance = MATRIX_HERMITIAN_TOLERANCE) {
-    if ((matrix - matrix.adjoint()).norm() > tolerance) {
+    if (!matrix.isApprox(matrix.adjoint(), tolerance)) {
         throw std::runtime_error {"ERROR: provided matrix is not Hermitian.\n"};
     }
 }
@@ -45,23 +46,30 @@ inline void check_has_trace_of_one_(const Eigen::MatrixXcd& matrix, double toler
     const auto unity = std::complex<double> {1.0, 0.0};
 
     if (std::norm(trace - unity) > tolerance) {
-        throw std::runtime_error {"ERROR: provided matrix has a size of 0 x 0.\n"};
+        throw std::runtime_error {"ERROR: provided matrix does not have a trace of 1.\n"};
     }
 }
 
 inline void check_is_positive_semi_definite_(const Eigen::MatrixXcd& matrix)
 {
+    // perform the LDL^T decomposition, which should be faster than finding all the eigenvalues
+    // an earlier check should have determined if the matrix is Hermitian
     const auto ldlt = Eigen::LDLT<Eigen::MatrixXcd> {matrix};
     if (!ldlt.isPositive() || (ldlt.info() != Eigen::Success)) {
-        throw std::runtime_error {"ERROR: provided matrix is not positive semidefinite\n."};
+        throw std::runtime_error {"ERROR: provided matrix is not positive semidefinite.\n"};
     }
 }
+
+struct density_matrix_nocheck
+{
+    explicit density_matrix_nocheck() = default;
+};
 
 class DensityMatrix
 {
 public:
     explicit DensityMatrix(
-        Eigen::MatrixXcd matrix,
+        Eigen::MatrixXcd matrix,  // NOLINT(modernize-pass-by-value) [reason: fails for Eigen]
         double trace_tolerance = DENSITY_MATRIX_TRACE_TOLERANCE,
         double hermitian_tolerance = MATRIX_HERMITIAN_TOLERANCE
     )
@@ -73,6 +81,17 @@ public:
         check_is_hermitian_(matrix_, hermitian_tolerance);
         check_is_positive_semi_definite_(matrix_);
     }
+
+    /*
+        A version of the constructor where the checks that determine if a density matrix is valid, are
+        all skipped.
+    */
+    explicit DensityMatrix(
+        Eigen::MatrixXcd matrix,  // NOLINT(modernize-pass-by-value) [reason: fails for Eigen] 
+        [[maybe_unused]] const density_matrix_nocheck& key
+    )
+        : matrix_ {std::move(matrix)}
+    {}
 
     [[nodiscard]]
     auto is_pure(double tolerance = DENSITY_MATRIX_TRACE_TOLERANCE) const -> bool
@@ -113,5 +132,24 @@ public:
 private:
     Eigen::MatrixXcd matrix_;
 };
+
+
+inline auto statevector_to_density_matrix(const Statevector& statevector) -> DensityMatrix
+{
+    const auto n_states = statevector.n_states();
+
+    auto dens_mat = Eigen::MatrixXcd(n_states, n_states);
+
+    for (std::size_t i0 {0}; i0 < n_states; ++i0) {
+        const auto idx0 = static_cast<Eigen::Index>(i0);
+        for (std::size_t i1 {0}; i1 < n_states; ++i1) {
+            const auto idx1 = static_cast<Eigen::Index>(i1);
+            dens_mat(idx0, idx1) = statevector[i0] * std::conj(statevector[i1]);
+        }
+    }
+
+    return DensityMatrix {std::move(dens_mat), density_matrix_nocheck {}};
+}
+
 
 }  // namespace ket
