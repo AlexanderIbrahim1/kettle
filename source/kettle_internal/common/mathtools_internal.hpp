@@ -28,19 +28,14 @@ auto log_2_int(T power) noexcept -> std::size_t;
     Given a grid of side lengths (size0, size1), find (i0, i1), where
         `i_flat = i1 + i0 * size1`
 */
-auto flat_index_to_grid_indices_2d(
-    std::size_t i_flat,
-    std::size_t size1
-) -> std::tuple<std::size_t, std::size_t>;
+template <typename T>
+auto flat_index_to_grid_indices_2d(T i_flat, T size1) -> std::tuple<T, T>;
 
 /*
     Given a grid of side lengths (size0, size1, size2), find (i0, i1, i2), where
         `i_flat = i2 + i1 * size2 + i0 * size1 * size2`
 */
-auto flat_index_to_grid_indices_3d(
-    std::size_t i_flat,
-    std::size_t size1,
-    std::size_t size2
-) -> std::tuple<std::size_t, std::size_t, std::size_t>;
+template <typename T>
+auto flat_index_to_grid_indices_3d(T i_flat, T size1, T size2) -> std::tuple<T, T, T>;
 
 }  // namespace ket::internal

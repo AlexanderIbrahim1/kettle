@@ -46,10 +46,8 @@ auto log_2_int(T power) noexcept -> std::size_t
 template auto log_2_int<std::size_t>(std::size_t power) noexcept -> std::size_t;
 template auto log_2_int<std::ptrdiff_t>(std::ptrdiff_t power) noexcept -> std::size_t;
 
-auto flat_index_to_grid_indices_2d(
-    std::size_t i_flat,
-    std::size_t size1
-) -> std::tuple<std::size_t, std::size_t>
+template <typename T>
+auto flat_index_to_grid_indices_2d(T i_flat, T size1) -> std::tuple<T, T>
 {
     const auto i0 = i_flat / size1;
     i_flat -= (i0 * size1);
@@ -58,12 +56,11 @@ auto flat_index_to_grid_indices_2d(
 
     return {i0, i1};
 }
+template auto flat_index_to_grid_indices_2d<std::size_t>(std::size_t i_flat, std::size_t size1) -> std::tuple<std::size_t, std::size_t>;
+template auto flat_index_to_grid_indices_2d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
 
-auto flat_index_to_grid_indices_3d(
-    std::size_t i_flat,
-    std::size_t size1,
-    std::size_t size2
-) -> std::tuple<std::size_t, std::size_t, std::size_t>
+template <typename T>
+auto flat_index_to_grid_indices_3d(T i_flat, T size1, T size2) -> std::tuple<T, T, T>
 {
     const auto i0 = i_flat / (size1 * size2);
     i_flat -= (i0 * size1 * size2);
@@ -75,6 +72,8 @@ auto flat_index_to_grid_indices_3d(
 
     return {i0, i1, i2};
 }
+template auto flat_index_to_grid_indices_3d<std::size_t>(std::size_t i_flat, std::size_t size1, std::size_t size2) -> std::tuple<std::size_t, std::size_t, std::size_t>;
+template auto flat_index_to_grid_indices_3d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1, std::ptrdiff_t size2) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t, std::ptrdiff_t>;
 
 }  // namespace ket::internal
 
