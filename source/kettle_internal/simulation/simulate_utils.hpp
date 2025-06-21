@@ -11,10 +11,11 @@
 namespace ket::internal
 {
 
+template <typename T>
 struct FlatIndexPair
 {
-    std::size_t i_lower;
-    std::size_t i_upper;
+    T i_lower;
+    T i_upper;
 
     friend constexpr auto operator==(const FlatIndexPair& left, const FlatIndexPair& right) noexcept -> bool
     {

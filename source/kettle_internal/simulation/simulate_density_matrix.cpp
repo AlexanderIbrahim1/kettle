@@ -139,13 +139,13 @@ void apply_u_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     ki::SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     const ket::Matrix2X2& mat,
     Eigen::Index i_row
 )
 {
-    pair_iterator.set_state(static_cast<Eigen::Index>(pair.i_lower));
-    for (auto i_pair {static_cast<Eigen::Index>(pair.i_lower)}; i_pair < static_cast<Eigen::Index>(pair.i_upper); ++i_pair) {
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
         const auto rho_elem0 = state.matrix()(i_row, state0_index);
@@ -161,13 +161,13 @@ void apply_u_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     ki::SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     const ket::Matrix2X2& mat_adj,
     Eigen::Index i_col
 )
 {
-    pair_iterator.set_state(static_cast<Eigen::Index>(pair.i_lower));
-    for (auto i_pair {static_cast<Eigen::Index>(pair.i_lower)}; i_pair < static_cast<Eigen::Index>(pair.i_upper); ++i_pair) {
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
         const auto [state0_index, state1_index] = pair_iterator.next();
 
         const auto buf_elem0 = buffer(state0_index, i_col);
@@ -183,7 +183,7 @@ void simulate_u_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     Eigen::MatrixXcd& buffer
 )
 {
@@ -326,13 +326,13 @@ void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     ki::DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     const ket::Matrix2X2& mat,
     Eigen::Index i_row
 )
 {
-    pair_iterator.set_state(static_cast<Eigen::Index>(pair.i_lower));
-    for (auto i_pair {static_cast<Eigen::Index>(pair.i_lower)}; i_pair < static_cast<Eigen::Index>(pair.i_upper); ++i_pair) {
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
         const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
 
         const auto rho_elem0 = state.matrix()(i_row, index_c1_t0);
@@ -350,13 +350,13 @@ void apply_cu_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     ki::DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     const ket::Matrix2X2& mat_adj,
     Eigen::Index i_col
 )
 {
-    pair_iterator.set_state(static_cast<Eigen::Index>(pair.i_lower));
-    for (auto i_pair {static_cast<Eigen::Index>(pair.i_lower)}; i_pair < static_cast<Eigen::Index>(pair.i_upper); ++i_pair) {
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
         const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
 
         const auto buf_elem0 = buffer(index_c1_t0, i_col);
@@ -374,7 +374,7 @@ void simulate_cu_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair& pair,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
     Eigen::MatrixXcd& buffer
 )
 {
@@ -406,8 +406,8 @@ void simulate_cu_gate_(
 void simulate_gate_info_(
     [[maybe_unused]] const kpi::MapVariant& parameter_values_map,
     ket::DensityMatrix& state,
-    const ki::FlatIndexPair& single_pair,
-    [[maybe_unused]] const ki::FlatIndexPair& double_pair,
+    const ki::FlatIndexPair<Eigen::Index>& single_pair,
+    [[maybe_unused]] const ki::FlatIndexPair<Eigen::Index>& double_pair,
     const ket::GateInfo& gate_info,
     [[maybe_unused]] int thread_id,
     [[maybe_unused]] std::optional<int> prng_seed,
@@ -562,8 +562,8 @@ void simulate_gate_info_(
 auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-complexity)
     const ket::QuantumCircuit& circuit,
     ket::DensityMatrix& state,
-    const ki::FlatIndexPair& single_pair,
-    const ki::FlatIndexPair& double_pair,
+    const ki::FlatIndexPair<Eigen::Index>& single_pair,
+    const ki::FlatIndexPair<Eigen::Index>& double_pair,
     int thread_id,
     std::optional<int> prng_seed,
     ket::ClassicalRegister& cregister,
@@ -701,11 +701,11 @@ void DensityMatrixSimulator::run(const QuantumCircuit& circuit, DensityMatrix& s
 
     check_valid_number_of_qubits_(circuit, state);
 
-    const auto n_single_gate_pairs = ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
-    const auto single_pair = ki::FlatIndexPair {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits()));
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
 
-    const auto n_double_gate_pairs = ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
-    const auto double_pair = ki::FlatIndexPair {.i_lower=0, .i_upper=n_double_gate_pairs};
+    const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits()));
+    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
 
     cregister_ = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 

@@ -40,7 +40,7 @@ template <ket::Gate GateType>
 void simulate_one_target_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     namespace cre = ki::create;
@@ -97,7 +97,7 @@ void simulate_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
     ket::Statevector& state,
     const ket::GateInfo& info,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     using Gate = ket::Gate;
@@ -134,7 +134,7 @@ void simulate_u_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     const auto target_index = ki::create::unpack_single_qubit_gate_index(info);
@@ -153,7 +153,7 @@ template <ket::Gate GateType>
 void simulate_one_control_one_target_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     namespace cre = ki::create;
@@ -210,7 +210,7 @@ void simulate_one_control_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
     ket::Statevector& state,
     const ket::GateInfo& info,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     using Gate = ket::Gate;
@@ -247,7 +247,7 @@ void simulate_cu_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
     const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair& pair
+    const ki::FlatIndexPair<std::size_t>& pair
 )
 {
     const auto [control_index, target_index] = ki::create::unpack_double_qubit_gate_indices(info);
@@ -265,8 +265,8 @@ void simulate_cu_gate_(
 void simulate_gate_info_(
     const kpi::MapVariant& parameter_values_map,
     ket::Statevector& state,
-    const ki::FlatIndexPair& single_pair,
-    const ki::FlatIndexPair& double_pair,
+    const ki::FlatIndexPair<std::size_t>& single_pair,
+    const ki::FlatIndexPair<std::size_t>& double_pair,
     const ket::GateInfo& gate_info,
     int thread_id,
     std::optional<int> prng_seed,
@@ -417,8 +417,8 @@ void simulate_gate_info_(
 auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-complexity)
     const ket::QuantumCircuit& circuit,
     ket::Statevector& state,
-    const ki::FlatIndexPair& single_pair,
-    const ki::FlatIndexPair& double_pair,
+    const ki::FlatIndexPair<std::size_t>& single_pair,
+    const ki::FlatIndexPair<std::size_t>& double_pair,
     int thread_id,
     std::optional<int> prng_seed,
     ket::ClassicalRegister& cregister
@@ -543,10 +543,10 @@ void StatevectorSimulator::run(const QuantumCircuit& circuit, Statevector& state
     check_valid_number_of_qubits_(circuit, state);
 
     const auto n_single_gate_pairs = ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
-    const auto single_pair = ki::FlatIndexPair {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<std::size_t> {.i_lower=0, .i_upper=n_single_gate_pairs};
 
     const auto n_double_gate_pairs = ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
-    const auto double_pair = ki::FlatIndexPair {.i_lower=0, .i_upper=n_double_gate_pairs};
+    const auto double_pair = ki::FlatIndexPair<std::size_t> {.i_lower=0, .i_upper=n_double_gate_pairs};
 
     cregister_ = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 
@@ -604,8 +604,8 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 //     std::barrier<>& sync_point,
 //     const ket::QuantumCircuit& circuit,
 //     ket::Statevector& state,
-//     const FlatIndexPair& single_pair,
-//     const FlatIndexPair& double_pair,
+//     const FlatIndexPair<std::size_t>& single_pair,
+//     const FlatIndexPair<std::size_t>& double_pair,
 //     int thread_id,
 //     std::optional<int> prng_seed,
 //     ket::ClassicalRegister& c_register

@@ -41,11 +41,11 @@ auto partial_sums_from_zero_(const std::vector<std::size_t>& values) -> std::vec
     return output;
 }
 
-auto partial_sum_pairs_(std::size_t n_gate_pairs, std::size_t n_threads) -> std::vector<FlatIndexPair>
+auto partial_sum_pairs_(std::size_t n_gate_pairs, std::size_t n_threads) -> std::vector<FlatIndexPair<std::size_t>>
 {
     const auto gate_splits = load_balanced_division_(n_gate_pairs, n_threads);
 
-    auto output = std::vector<FlatIndexPair> {};
+    auto output = std::vector<FlatIndexPair<std::size_t>> {};
     output.reserve(gate_splits.size());
     output.emplace_back(0, gate_splits[0]);
 
