@@ -65,6 +65,7 @@ add_library(
     source/kettle_internal/simulation/simulate_pauli.cpp
     source/kettle_internal/simulation/simulate.cpp
     source/kettle_internal/state/bitstring_utils.cpp
+    source/kettle_internal/state/density_matrix.cpp
     source/kettle_internal/state/marginal.cpp
     source/kettle_internal/state/project_state.cpp
     source/kettle_internal/state/qubit_state_conversion.cpp
