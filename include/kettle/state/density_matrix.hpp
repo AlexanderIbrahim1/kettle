@@ -50,13 +50,13 @@ public:
 
     /*
         Construct the `DensityMatrix` type for a single computational basis state, represented by
-        the bitstring `computational_state`. The endianness of the input is provided by `input_endian`.
+        the bitstring `bistring`. The endianness of the input is provided by `input_endian`.
 
         The resulting density matrix will have a 0 for every entry, except for the diagonal element
         given by the index calculated from the bistring.
     */
     explicit DensityMatrix(
-        const std::string& computational_state,
+        const std::string& bitstring,
         Endian input_endian = Endian::LITTLE
     );
 

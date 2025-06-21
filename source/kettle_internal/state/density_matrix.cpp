@@ -54,11 +54,7 @@ void check_is_positive_semi_definite_(const Eigen::MatrixXcd& matrix)
 
 void check_side_length_is_power_of_2_(const Eigen::MatrixXcd& matrix)
 {
-    const auto size = static_cast<std::size_t>(matrix.cols());
-    const auto is_positive = size > 0;
-    const auto has_one_bit_set = (size & (size - 1)) == 0;
-
-    if (!is_positive || !has_one_bit_set) {
+    if (!ki::is_power_of_2(matrix.cols())) {
         auto err_msg = std::stringstream {};
         err_msg << "The provided coefficients must have a size equal to a power of 2.\n";
         err_msg << "Found size = " << matrix.cols();
@@ -73,7 +69,7 @@ namespace ket
 {
 
 DensityMatrix::DensityMatrix(Eigen::MatrixXcd matrix, double trace_tolerance, double hermitian_tolerance)
-    : n_qubits_ {ki::log_2_int(static_cast<std::size_t>(matrix.cols()))}
+    : n_qubits_ {ki::log_2_int(matrix.cols())}
     , n_states_ {static_cast<std::size_t>(matrix.cols())}
     , matrix_ {std::move(matrix)}
 {
@@ -86,17 +82,19 @@ DensityMatrix::DensityMatrix(Eigen::MatrixXcd matrix, double trace_tolerance, do
 }
 
 DensityMatrix::DensityMatrix(Eigen::MatrixXcd matrix, [[maybe_unused]] const density_matrix_nocheck& key)
-    : n_qubits_ {ki::log_2_int(static_cast<std::size_t>(matrix.cols()))}
+    : n_qubits_ {ki::log_2_int(matrix.cols())}
     , n_states_ {static_cast<std::size_t>(matrix.cols())}
     , matrix_ {std::move(matrix)}
 {}
 
-DensityMatrix::DensityMatrix(const std::string& computational_state, Endian input_endian)
-    : n_qubits_ {computational_state.size()}
-    , n_states_ {1UL << computational_state.size()}
-    , matrix_(Eigen::MatrixXcd::Zero(static_cast<Eigen::Index>(1UL << computational_state.size()), static_cast<Eigen::Index>(1UL << computational_state.size())).eval())  // TODO: CLEAN UP
+DensityMatrix::DensityMatrix(const std::string& bitstring, Endian input_endian)
+    : n_qubits_ {bitstring.size()}
+    , n_states_ {ki::pow_2_int(bitstring.size())}
 {
-    const auto index = static_cast<Eigen::Index>(bitstring_to_state_index(computational_state, input_endian)); // TODO: CLEAN UP
+    const auto index = static_cast<Eigen::Index>(bitstring_to_state_index(bitstring, input_endian));
+
+    const auto size = static_cast<Eigen::Index>(n_states_);
+    matrix_ = Eigen::MatrixXcd::Zero(size, size).eval();
     matrix_(index, index) = 1.0;
 }
 
