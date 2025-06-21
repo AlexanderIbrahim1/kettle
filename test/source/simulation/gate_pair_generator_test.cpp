@@ -78,7 +78,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = ket::internal::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {0UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -98,7 +98,7 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = ket::internal::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {1UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -135,7 +135,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 0")
     {
-        auto generator = ket::internal::SingleQubitGatePairGenerator {0, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {0UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -157,7 +157,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 1")
     {
-        auto generator = ket::internal::SingleQubitGatePairGenerator {1, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {1UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -179,7 +179,7 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
 
     SECTION("loop over qubit at index 2")
     {
-        auto generator = ket::internal::SingleQubitGatePairGenerator {2, n_qubits};
+        auto generator = ket::internal::SingleQubitGatePairGenerator {2UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
@@ -214,7 +214,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("control is 0, target is 1")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0UL, 1UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -233,7 +233,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
 
     SECTION("control is 1, target is 0")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1UL, 0UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -269,7 +269,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0UL, 1UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -289,7 +289,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (1, 0)")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 0, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1UL, 0UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -309,7 +309,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (0, 2)")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 2, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0UL, 2UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -329,7 +329,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
 
     SECTION("(control, target) = (1, 2)")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {1, 2, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {1UL, 2UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
@@ -376,7 +376,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with four qubits")
 
     SECTION("(control, target) = (0, 1)")
     {
-        auto generator = ket::internal::DoubleQubitGatePairGenerator {0, 1, n_qubits};
+        auto generator = ket::internal::DoubleQubitGatePairGenerator {0UL, 1UL, n_qubits};
 
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 

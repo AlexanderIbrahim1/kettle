@@ -145,21 +145,19 @@ void simulate_u_gate_(
 {
     // TODO: create a templated version of the qubit gate pair generators that cast the indices
     // to the proper expected type
-    const auto target_index = ki::create::unpack_single_qubit_gate_index(info);
-    const auto n_qubits = state.n_qubits();
+    const auto target_index = static_cast<Eigen::Index>(ki::create::unpack_single_qubit_gate_index(info));
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+    const auto i_lower = static_cast<Eigen::Index>(pair.i_lower);
     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
 
     const auto n_states = static_cast<Eigen::Index>(state.n_states());
 
-    // perform the multiplication of U * rho
+    // perform the multiplication of U * rho;
     // fill the buffer
     for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
-        pair_iterator.set_state(pair.i_lower);
+        pair_iterator.set_state(i_lower);
         for (std::size_t i_pair {0}; i_pair < state.n_states() / 2; ++i_pair) {
-            // TODO: change after creating templated SingleQubitGatePairIterator for proper types
-            const auto [state0_index_, state1_index_] = pair_iterator.next();
-            const auto state0_index = static_cast<Eigen::Index>(state0_index_);
-            const auto state1_index = static_cast<Eigen::Index>(state1_index_);
+            const auto [state0_index, state1_index] = pair_iterator.next();
 
             const auto rho_elem0 = state.matrix()(i_row, state0_index);
             const auto rho_elem1 = state.matrix()(i_row, state1_index);
@@ -174,12 +172,9 @@ void simulate_u_gate_(
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
     for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
-        // TODO: change after creating templated SingleQubitGatePairIterator for proper types
-        pair_iterator.set_state(pair.i_lower);
+        pair_iterator.set_state(i_lower);
         for (std::size_t i_pair {0}; i_pair < state.n_states() / 2; ++i_pair) {
-            const auto [state0_index_, state1_index_] = pair_iterator.next();
-            const auto state0_index = static_cast<Eigen::Index>(state0_index_);
-            const auto state1_index = static_cast<Eigen::Index>(state1_index_);
+            const auto [state0_index, state1_index] = pair_iterator.next();
 
             const auto buf_elem0 = buffer(state0_index, i_col);
             const auto buf_elem1 = buffer(state1_index, i_col);
