@@ -123,6 +123,27 @@ public:
         return {state0_index, state1_index};
     }
 
+    constexpr auto next_unset_and_set() noexcept -> std::tuple<T, T, T, T>
+    {
+        const auto index_c0_t0 = i0_ + (i1_ * lower_shift_) + (i2_ * upper_shift_);
+        const auto index_c0_t1 = index_c0_t0 + target_shift_;
+        const auto index_c1_t0 = index_c0_t0 + control_shift_;
+        const auto index_c1_t1 = index_c0_t1 + control_shift_;
+
+        ++i2_;
+        if (i2_ == i2_max_) {
+            ++i1_;
+            i2_ = 0;
+
+            if (i1_ == i1_max_) {
+                ++i0_;
+                i1_ = 0;
+            }
+        }
+
+        return {index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1};
+    }
+
 private:
     T lower_index_;
     T upper_index_;

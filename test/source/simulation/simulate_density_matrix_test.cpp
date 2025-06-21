@@ -24,8 +24,8 @@ TEST_CASE("...")
     SECTION("bell_state(00+)")
     {
         auto sv_circuit = ket::QuantumCircuit {2};
-        sv_circuit.add_h_gate({0, 1});
-        sv_circuit.add_x_gate(1);
+        sv_circuit.add_h_gate(0);
+        sv_circuit.add_cx_gate(0, 1);
 
         auto statevector = ket::Statevector {"00"};
         ket::simulate(sv_circuit, statevector);
@@ -33,8 +33,8 @@ TEST_CASE("...")
         const auto from_statevector = ket::statevector_to_density_matrix(statevector);
 
         auto dm_circuit = ket::QuantumCircuit {2};
-        dm_circuit.add_u_gate(ket::h_gate(), {0, 1});
-        dm_circuit.add_u_gate(ket::x_gate(), 0);
+        dm_circuit.add_u_gate(ket::h_gate(), 0);
+        dm_circuit.add_cu_gate(ket::x_gate(), 0, 1);
 
         auto direct = ket::DensityMatrix {"00"};
         ket::simulate(dm_circuit, direct);

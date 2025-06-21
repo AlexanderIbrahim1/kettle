@@ -143,20 +143,22 @@ void simulate_u_gate_(
     Eigen::MatrixXcd& buffer
 )
 {
-    // TODO: create a templated version of the qubit gate pair generators that cast the indices
-    // to the proper expected type
+    // TODO: if these simulation functions work, then pull out the left multiplication and right multiplications
+    // to avoid code duplication with the cu gate simulations
+
     const auto target_index = static_cast<Eigen::Index>(ki::create::unpack_single_qubit_gate_index(info));
     const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
     const auto i_lower = static_cast<Eigen::Index>(pair.i_lower);
     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
 
     const auto n_states = static_cast<Eigen::Index>(state.n_states());
+    const auto n_single_qubit_pairs = n_states / 2;
 
     // perform the multiplication of U * rho;
     // fill the buffer
     for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
         pair_iterator.set_state(i_lower);
-        for (std::size_t i_pair {0}; i_pair < state.n_states() / 2; ++i_pair) {
+        for (auto i_pair {0}; i_pair < n_single_qubit_pairs; ++i_pair) {
             const auto [state0_index, state1_index] = pair_iterator.next();
 
             const auto rho_elem0 = state.matrix()(i_row, state0_index);
@@ -298,6 +300,62 @@ void simulate_u_gate_(
 //     }
 // }
 
+void simulate_cu_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const ket::Matrix2X2& mat,
+    const ki::FlatIndexPair& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    const auto [control_index_st, target_index_st] = ki::create::unpack_double_qubit_gate_indices(info);
+    const auto control_index = static_cast<Eigen::Index>(control_index_st);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+    const auto i_lower = static_cast<Eigen::Index>(pair.i_lower);
+    auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+
+    const auto n_states = static_cast<Eigen::Index>(state.n_states());
+    const auto n_double_qubit_pairs = n_states / 4;
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
+        pair_iterator.set_state(i_lower);
+        for (auto i_pair {0}; i_pair < n_double_qubit_pairs; ++i_pair) {
+            const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
+
+            const auto rho_elem0 = state.matrix()(i_row, index_c1_t0);
+            const auto rho_elem1 = state.matrix()(i_row, index_c1_t1);
+
+            buffer(i_row, index_c0_t0) = state.matrix()(i_row, index_c0_t0);
+            buffer(i_row, index_c0_t1) = state.matrix()(i_row, index_c0_t1);
+            buffer(i_row, index_c1_t0) = (mat.elem00 * rho_elem0) + (mat.elem01 * rho_elem1);
+            buffer(i_row, index_c1_t1) = (mat.elem10 * rho_elem0) + (mat.elem11 * rho_elem1);
+        }
+    }
+
+    const auto mat_adj = ket::conjugate_transpose(mat);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
+        pair_iterator.set_state(i_lower);
+        for (auto i_pair {0}; i_pair < n_double_qubit_pairs; ++i_pair) {
+            const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
+
+            const auto buf_elem0 = buffer(index_c1_t0, i_col);
+            const auto buf_elem1 = buffer(index_c1_t1, i_col);
+
+            state.matrix()(index_c0_t0, i_col) = buffer(index_c0_t0, i_col);
+            state.matrix()(index_c0_t1, i_col) = buffer(index_c0_t1, i_col);
+            state.matrix()(index_c1_t0, i_col) = (mat_adj.elem00 * buf_elem0) + (mat_adj.elem10 * buf_elem1);
+            state.matrix()(index_c1_t1, i_col) = (mat_adj.elem01 * buf_elem0) + (mat_adj.elem11 * buf_elem1);
+        }
+    }
+}
+
 
 void simulate_gate_info_(
     [[maybe_unused]] const kpi::MapVariant& parameter_values_map,
@@ -432,11 +490,11 @@ void simulate_gate_info_(
             simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair, buffer);
             break;
         }
-//         case G::CU : {
-//             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
-//             simulate_cu_gate_(state, gate_info, *unitary_ptr, double_pair);
-//             break;
-//         }
+        case G::CU : {
+            const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
+            simulate_cu_gate_(state, gate_info, *unitary_ptr, double_pair, buffer);
+            break;
+        }
 //         case G::M : {
 //             // this operation is more complicated to make multithreaded because the threads have already been
 //             // spawned before entering the simulation loop; thus, it is easier to just make the measurement
