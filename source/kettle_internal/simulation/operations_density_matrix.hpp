@@ -16,6 +16,13 @@
 namespace ket::internal
 {
 
+void apply_h_gate_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    Eigen::Index i_row
+);
+
 void apply_u_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,

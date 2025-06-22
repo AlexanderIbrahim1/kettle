@@ -12,8 +12,8 @@ namespace ket::internal
 
 void apply_h_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto real_add = M_SQRT1_2 * (state0.real() + state1.real());
     const auto imag_add = M_SQRT1_2 * (state0.imag() + state1.imag());
@@ -31,8 +31,8 @@ void apply_x_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 
 void apply_y_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto real0 = state1.imag();
     const auto imag0 = -state1.real();
@@ -82,8 +82,8 @@ void apply_tdag_gate(ket::Statevector& state, std::size_t i1)
 
 void apply_sx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
     const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
@@ -96,8 +96,8 @@ void apply_sx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 
 void apply_sxdag_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto real0 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
     const auto imag0 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
@@ -110,8 +110,8 @@ void apply_sxdag_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 
 void apply_rx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto cost = std::cos(theta / 2.0);
     const auto sint = std::sin(theta / 2.0);
@@ -127,8 +127,8 @@ void apply_rx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, doub
 
 void apply_ry_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto cost = std::cos(theta / 2.0);
     const auto sint = std::sin(theta / 2.0);
@@ -144,8 +144,8 @@ void apply_ry_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, doub
 
 void apply_rz_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto cost = std::cos(theta / 2.0);
     const auto sint = std::sin(theta / 2.0);
@@ -161,7 +161,7 @@ void apply_rz_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, doub
 
 void apply_p_gate(ket::Statevector& state, std::size_t i1, double theta)
 {
-    const auto& state1 = state[i1];
+    const auto state1 = state[i1];
 
     const auto cost = std::cos(theta);
     const auto sint = std::sin(theta);
@@ -174,8 +174,8 @@ void apply_p_gate(ket::Statevector& state, std::size_t i1, double theta)
 
 void apply_u_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, const ket::Matrix2X2& mat)
 {
-    const auto& state0 = state[i0];
-    const auto& state1 = state[i1];
+    const auto state0 = state[i0];
+    const auto state1 = state[i1];
 
     const auto new_state0 = state0 * mat.elem00 + state1 * mat.elem01;
     const auto new_state1 = state0 * mat.elem10 + state1 * mat.elem11;

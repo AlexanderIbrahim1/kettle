@@ -43,9 +43,10 @@ constexpr inline auto MEASURING_THREAD_ID = int {0};
 
 // template <ket::Gate GateType>
 // void simulate_one_target_gate_(
-//     ket::Statevector& state,
+//     ket::DensityMatrix& state,
 //     const ket::GateInfo& info,
-//     const ki::FlatIndexPair& pair
+//     const ki::FlatIndexPair<Eigen::Index>& pair,
+//     Eigen::MatrixXcd& buffer
 // )
 // {
 //     namespace cre = ki::create;

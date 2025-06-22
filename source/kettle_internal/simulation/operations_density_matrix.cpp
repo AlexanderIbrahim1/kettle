@@ -2,12 +2,21 @@
 #include <complex>
 
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
 
 
 namespace ket::internal
 {
+
+/*
+    Helper struct for the static_assert(), to see what ket::Gate instance is passed that causes
+    the template instantiation to fail.
+*/
+template <ket::Gate GateType>
+struct gate_always_false : std::false_type
+{};
 
 // void apply_h_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
 // {
@@ -183,6 +192,42 @@ namespace ket::internal
 //     state[i1] = new_state1;
 // }
 
+template <ket::Gate GateType>
+void apply_1t_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::Index i_row
+)
+{
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+        [[maybe_unused]]
+        const auto [state0_index, state1_index] = pair_iterator.next();
+
+        if constexpr (GateType == ket::Gate::H) {
+            const auto rho_elem0 = state.matrix()(i_row, state0_index);
+            const auto rho_elem1 = state.matrix()(i_row, state1_index);
+
+            buffer(i_row, state0_index) = M_SQRT1_2 * (rho_elem0 + rho_elem1);
+            buffer(i_row, state1_index) = M_SQRT1_2 * (rho_elem0 - rho_elem1);
+        }
+        else if constexpr (GateType == ket::Gate::X) {
+            std::swap(state.matrix()(i_row, state0_index), state.matrix()(i_row, state1_index));
+        }
+        else if constexpr (GateType == ket::Gate::Y) {
+            const auto rho_elem0 = state.matrix()(i_row, state0_index);
+            const auto rho_elem1 = state.matrix()(i_row, state1_index);
+
+            buffer(i_row, state0_index) = {rho_elem1.imag(), -rho_elem1.real()};
+            buffer(i_row, state1_index) = {-rho_elem0.imag(), rho_elem0.real()};
+        }
+        else if constexpr (GateType == ket::Gate::Z) {
+            state.matrix()(i_row, state1_index) *= -1.0;
+        }
+    }
+}
 
 void apply_u_gate_first_(
     ket::DensityMatrix& state,
