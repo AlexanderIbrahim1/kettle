@@ -278,54 +278,6 @@ void simulate_u_gate_(
 // }
 
 
-void apply_cu_gate_first_(
-    ket::DensityMatrix& state,
-    Eigen::MatrixXcd& buffer,
-    ki::DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat,
-    Eigen::Index i_row
-)
-{
-    pair_iterator.set_state(pair.i_lower);
-    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
-        const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
-
-        const auto rho_elem0 = state.matrix()(i_row, index_c1_t0);
-        const auto rho_elem1 = state.matrix()(i_row, index_c1_t1);
-
-        buffer(i_row, index_c0_t0) = state.matrix()(i_row, index_c0_t0);
-        buffer(i_row, index_c0_t1) = state.matrix()(i_row, index_c0_t1);
-        buffer(i_row, index_c1_t0) = (mat.elem00 * rho_elem0) + (mat.elem01 * rho_elem1);
-        buffer(i_row, index_c1_t1) = (mat.elem10 * rho_elem0) + (mat.elem11 * rho_elem1);
-    }
-}
-
-
-void apply_cu_gate_second_(
-    ket::DensityMatrix& state,
-    Eigen::MatrixXcd& buffer,
-    ki::DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
-    const ki::FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat_adj,
-    Eigen::Index i_col
-)
-{
-    pair_iterator.set_state(pair.i_lower);
-    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
-        const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
-
-        const auto buf_elem0 = buffer(index_c1_t0, i_col);
-        const auto buf_elem1 = buffer(index_c1_t1, i_col);
-
-        state.matrix()(index_c0_t0, i_col) = buffer(index_c0_t0, i_col);
-        state.matrix()(index_c0_t1, i_col) = buffer(index_c0_t1, i_col);
-        state.matrix()(index_c1_t0, i_col) = (mat_adj.elem00 * buf_elem0) + (mat_adj.elem10 * buf_elem1);
-        state.matrix()(index_c1_t1, i_col) = (mat_adj.elem01 * buf_elem0) + (mat_adj.elem11 * buf_elem1);
-    }
-}
-
-
 void simulate_cu_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
@@ -346,7 +298,7 @@ void simulate_cu_gate_(
     // perform the multiplication of U * rho;
     // fill the buffer
     for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
-        apply_cu_gate_first_(state, buffer, pair_iterator, pair, mat, i_row);
+        ki::apply_cu_gate_first_(state, buffer, pair_iterator, pair, mat, i_row);
     }
 
     const auto mat_adj = ket::conjugate_transpose(mat);
@@ -354,7 +306,7 @@ void simulate_cu_gate_(
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
     for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
-        apply_cu_gate_second_(state, buffer, pair_iterator, pair, mat_adj, i_col);
+        ki::apply_cu_gate_second_(state, buffer, pair_iterator, pair, mat_adj, i_col);
     }
 }
 

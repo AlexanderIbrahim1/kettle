@@ -228,5 +228,53 @@ void apply_u_gate_second_(
 }
 
 
+void apply_cu_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    const FlatIndexPair<Eigen::Index>& pair,
+    const ket::Matrix2X2& mat,
+    Eigen::Index i_row
+)
+{
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+        const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
+
+        const auto rho_elem0 = state.matrix()(i_row, index_c1_t0);
+        const auto rho_elem1 = state.matrix()(i_row, index_c1_t1);
+
+        buffer(i_row, index_c0_t0) = state.matrix()(i_row, index_c0_t0);
+        buffer(i_row, index_c0_t1) = state.matrix()(i_row, index_c0_t1);
+        buffer(i_row, index_c1_t0) = (mat.elem00 * rho_elem0) + (mat.elem01 * rho_elem1);
+        buffer(i_row, index_c1_t1) = (mat.elem10 * rho_elem0) + (mat.elem11 * rho_elem1);
+    }
+}
+
+
+void apply_cu_gate_second_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    const FlatIndexPair<Eigen::Index>& pair,
+    const ket::Matrix2X2& mat_adj,
+    Eigen::Index i_col
+)
+{
+    pair_iterator.set_state(pair.i_lower);
+    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+        const auto [index_c0_t0, index_c0_t1, index_c1_t0, index_c1_t1] = pair_iterator.next_unset_and_set();
+
+        const auto buf_elem0 = buffer(index_c1_t0, i_col);
+        const auto buf_elem1 = buffer(index_c1_t1, i_col);
+
+        state.matrix()(index_c0_t0, i_col) = buffer(index_c0_t0, i_col);
+        state.matrix()(index_c0_t1, i_col) = buffer(index_c0_t1, i_col);
+        state.matrix()(index_c1_t0, i_col) = (mat_adj.elem00 * buf_elem0) + (mat_adj.elem10 * buf_elem1);
+        state.matrix()(index_c1_t1, i_col) = (mat_adj.elem01 * buf_elem0) + (mat_adj.elem11 * buf_elem1);
+    }
+}
+
+
 
 }  // namespace ket::internal

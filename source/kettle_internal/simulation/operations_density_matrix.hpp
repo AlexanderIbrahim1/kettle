@@ -34,6 +34,24 @@ void apply_u_gate_second_(
     Eigen::Index i_col
 );
 
+void apply_cu_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    const FlatIndexPair<Eigen::Index>& pair,
+    const ket::Matrix2X2& mat,
+    Eigen::Index i_row
+);
+
+void apply_cu_gate_second_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    const FlatIndexPair<Eigen::Index>& pair,
+    const ket::Matrix2X2& mat_adj,
+    Eigen::Index i_col
+);
+
 // void apply_h_gate(ket::DensityMatrix& state, std::size_t i0, std::size_t i1);
 // 
 // void apply_x_gate(ket::Statevector& state, std::size_t i0, std::size_t i1);
