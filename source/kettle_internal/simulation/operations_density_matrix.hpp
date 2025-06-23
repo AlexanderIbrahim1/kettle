@@ -25,6 +25,14 @@ template <ket::Gate GateType>
 struct dm_gate_always_false : std::false_type
 {};
 
+struct ElementPair
+{
+    std::complex<double> x0;
+    std::complex<double> x1;
+};
+
+auto dot(const ElementPair& left, const ElementPair& right) -> std::complex<double>;
+
 template <ket::Gate GateType>
 void apply_1t_gate_first_(
     ket::DensityMatrix& state,
@@ -239,19 +247,19 @@ void apply_u_gate_second_(
 void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat,
-    Eigen::Index i_row
+    const ket::Matrix2X2& mat
 );
 
 void apply_cu_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat_adj,
-    Eigen::Index i_col
+    const ket::Matrix2X2& mat
 );
 
 // void apply_h_gate(ket::DensityMatrix& state, std::size_t i0, std::size_t i1);

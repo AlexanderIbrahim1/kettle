@@ -85,46 +85,46 @@ TEST_CASE("compare density matrix u-gate simulations with statevector u-gate sim
             [](ket::QuantumCircuit& circ) {
                 circ.add_u_gate(ket::h_gate(), 2);
             }
-        }
-//         TestCase {
-//             "bell(00+)",
-//             "00",
-//             [](ket::QuantumCircuit& circ) {
-//             circ.add_u_gate(ket::h_gate(), 0);
-//             circ.add_cu_gate(ket::x_gate(), 0, 1);
-//         }},
-//         TestCase {
-//             "bell(00-)",
-//             "00",
-//             [](ket::QuantumCircuit& circ) {
-//             circ.add_u_gate(ket::x_gate(), 0);
-//             circ.add_u_gate(ket::h_gate(), 0);
-//             circ.add_cu_gate(ket::x_gate(), 0, 1);
-//         }},
-//         TestCase {
-//             "bell(01+)",
-//             "00",
-//             [](ket::QuantumCircuit& circ) {
-//             circ.add_u_gate(ket::x_gate(), 1);
-//             circ.add_u_gate(ket::h_gate(), 0);
-//             circ.add_cu_gate(ket::x_gate(), 0, 1);
-//         }},
-//         TestCase {
-//             "bell(01-)",
-//             "00",
-//             [](ket::QuantumCircuit& circ) {
-//             circ.add_u_gate(ket::x_gate(), {0, 1});
-//             circ.add_u_gate(ket::h_gate(), 0);
-//             circ.add_cu_gate(ket::x_gate(), 0, 1);
-//         }},
-//         TestCase {
-//             "GHZ",
-//             "000",
-//             [](ket::QuantumCircuit& circ) {
-//             circ.add_u_gate(ket::h_gate(), 0);
-//             circ.add_cu_gate(ket::x_gate(), 0, 1);
-//             circ.add_cu_gate(ket::x_gate(), 0, 2);
-//         }}
+        },
+        TestCase {
+            "bell(00+)",
+            "00",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::h_gate(), 0);
+            circ.add_cu_gate(ket::x_gate(), 0, 1);
+        }},
+        TestCase {
+            "bell(00-)",
+            "00",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::x_gate(), 0);
+            circ.add_u_gate(ket::h_gate(), 0);
+            circ.add_cu_gate(ket::x_gate(), 0, 1);
+        }},
+        TestCase {
+            "bell(01+)",
+            "00",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::x_gate(), 1);
+            circ.add_u_gate(ket::h_gate(), 0);
+            circ.add_cu_gate(ket::x_gate(), 0, 1);
+        }},
+        TestCase {
+            "bell(01-)",
+            "00",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::x_gate(), {0, 1});
+            circ.add_u_gate(ket::h_gate(), 0);
+            circ.add_cu_gate(ket::x_gate(), 0, 1);
+        }},
+        TestCase {
+            "GHZ",
+            "000",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::h_gate(), 0);
+            circ.add_cu_gate(ket::x_gate(), 0, 1);
+            circ.add_cu_gate(ket::x_gate(), 0, 2);
+        }}
     );
 
     auto circuit = ket::QuantumCircuit {testcase.init_bitstring.size()};
