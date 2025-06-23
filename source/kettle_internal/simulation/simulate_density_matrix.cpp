@@ -41,61 +41,34 @@ struct gate_always_false : std::false_type
 
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
-// template <ket::Gate GateType>
-// void simulate_one_target_gate_(
-//     ket::DensityMatrix& state,
-//     const ket::GateInfo& info,
-//     const ki::FlatIndexPair<Eigen::Index>& pair,
-//     Eigen::MatrixXcd& buffer
-// )
-// {
-//     namespace cre = ki::create;
-//     using Gate = ket::Gate;
-// 
-//     const auto target_index = cre::unpack_single_qubit_gate_index(info);
-//     const auto n_qubits = state.n_qubits();
-// 
-//     auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-//     pair_iterator.set_state(pair.i_lower);
-// 
-//     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
-//         const auto [state0_index, state1_index] = pair_iterator.next();
-// 
-//         if constexpr (GateType == Gate::H) {
-//             ki::apply_h_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::X) {
-//             ki::apply_x_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::Y) {
-//             ki::apply_y_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::Z) {
-//             ki::apply_z_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::S) {
-//             ki::apply_s_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::SDAG) {
-//             ki::apply_sdag_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::T) {
-//             ki::apply_t_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::TDAG) {
-//             ki::apply_tdag_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::SX) {
-//             ki::apply_sx_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::SXDAG) {
-//             ki::apply_sxdag_gate(state, state0_index, state1_index);
-//         }
-//         else {
-//             static_assert(gate_always_false<GateType>::value, "Invalid one target gate.");
-//         }
-//     }
-// }
+template <ket::Gate GateType>
+void simulate_one_target_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    namespace cre = ki::create;
+
+    const auto target_index = static_cast<Eigen::Index>(cre::unpack_single_qubit_gate_index(info));
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+    auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+
+    const auto n_states = static_cast<Eigen::Index>(state.n_states());
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
+        ki::apply_1t_gate_first_<GateType>(state, buffer, pair_iterator, pair, i_row);
+    }
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
+        ki::apply_1t_gate_second_<GateType>(state, buffer, pair_iterator, pair, i_col);
+    }
+}
 
 
 // template <ket::Gate GateType>
@@ -146,22 +119,25 @@ void simulate_u_gate_(
 {
     const auto target_index = static_cast<Eigen::Index>(ki::create::unpack_single_qubit_gate_index(info));
     const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
-    auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-
-    const auto n_states = static_cast<Eigen::Index>(state.n_states());
+    auto pair_iterator_outer = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
 
     // perform the multiplication of U * rho;
     // fill the buffer
-    for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
-        ki::apply_u_gate_first_(state, buffer, pair_iterator, pair, mat, i_row);
+    pair_iterator_outer.set_state(0);
+    for (auto i {pair.i_lower}; i < pair.i_upper; ++i) {
+        const auto [i_row0, i_row1] = pair_iterator_outer.next();
+        ki::apply_u_gate_first_(state, buffer, pair_iterator_inner, pair, mat, i_row0, i_row1);
     }
 
     const auto mat_adj = ket::conjugate_transpose(mat);
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
-        ki::apply_u_gate_second_(state, buffer, pair_iterator, pair, mat_adj, i_col);
+    pair_iterator_outer.set_state(0);
+    for (auto i {pair.i_lower}; i < pair.i_upper; ++i) {
+        const auto [i_col0, i_col1] = pair_iterator_outer.next();
+        ki::apply_u_gate_second_(state, buffer, pair_iterator_inner, pair, mat_adj, i_col0, i_col1);
     }
 }
 
@@ -328,46 +304,46 @@ void simulate_gate_info_(
     using G = ket::Gate;
 
     switch (gate_info.gate) {
-//         case G::H : {
-//             simulate_one_target_gate_<G::H>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::X : {
-//             simulate_one_target_gate_<G::X>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::Y : {
-//             simulate_one_target_gate_<G::Y>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::Z : {
-//             simulate_one_target_gate_<G::Z>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::S : {
-//             simulate_one_target_gate_<G::S>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::SDAG : {
-//             simulate_one_target_gate_<G::SDAG>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::T : {
-//             simulate_one_target_gate_<G::T>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::TDAG : {
-//             simulate_one_target_gate_<G::TDAG>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::SX : {
-//             simulate_one_target_gate_<G::SX>(state, gate_info, single_pair);
-//             break;
-//         }
-//         case G::SXDAG : {
-//             simulate_one_target_gate_<G::SXDAG>(state, gate_info, single_pair);
-//             break;
-//         }
+        case G::H : {
+            simulate_one_target_gate_<G::H>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::X : {
+            simulate_one_target_gate_<G::X>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::Y : {
+            simulate_one_target_gate_<G::Y>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::Z : {
+            simulate_one_target_gate_<G::Z>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::S : {
+            simulate_one_target_gate_<G::S>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::SDAG : {
+            simulate_one_target_gate_<G::SDAG>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::T : {
+            simulate_one_target_gate_<G::T>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::TDAG : {
+            simulate_one_target_gate_<G::TDAG>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::SX : {
+            simulate_one_target_gate_<G::SX>(state, gate_info, single_pair, buffer);
+            break;
+        }
+        case G::SXDAG : {
+            simulate_one_target_gate_<G::SXDAG>(state, gate_info, single_pair, buffer);
+            break;
+        }
 //         case G::RX : {
 //             simulate_one_target_one_angle_gate_<G::RX>(parameter_values_map, state, gate_info, single_pair);
 //             break;
