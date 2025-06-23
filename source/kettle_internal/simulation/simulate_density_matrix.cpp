@@ -53,21 +53,22 @@ void simulate_one_target_gate_(
 
     const auto target_index = static_cast<Eigen::Index>(cre::unpack_single_qubit_gate_index(info));
     const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
-    auto pair_iterator = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_outer = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
 
     const auto n_states = static_cast<Eigen::Index>(state.n_states());
 
     // perform the multiplication of U * rho;
     // fill the buffer
     for (Eigen::Index i_row {0}; i_row < n_states; ++i_row) {
-        ki::apply_1t_gate_first_<GateType>(state, buffer, pair_iterator, pair, i_row);
+        ki::apply_1t_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
     }
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
-        ki::apply_1t_gate_second_<GateType>(state, buffer, pair_iterator, pair, i_col);
-    }
+//     for (Eigen::Index i_col {0}; i_col < n_states; ++i_col) {
+//         ki::apply_1t_gate_second_<GateType>(state, buffer, pair_iterator, pair, i_col);
+//     }
 }
 
 
