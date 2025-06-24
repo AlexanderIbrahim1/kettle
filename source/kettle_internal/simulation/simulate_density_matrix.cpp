@@ -107,21 +107,13 @@ void simulate_u_gate_(
 
     // perform the multiplication of U * rho;
     // fill the buffer
-    pair_iterator_outer.set_state(0);
-    for (auto i {pair.i_lower}; i < pair.i_upper; ++i) {
-        const auto [i_row0, i_row1] = pair_iterator_outer.next();
-        ki::apply_u_gate_first_(state, buffer, pair_iterator_inner, pair, mat, i_row0, i_row1);
-    }
+    ki::apply_u_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
 
     const auto mat_adj = ket::conjugate_transpose(mat);
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    pair_iterator_outer.set_state(0);
-    for (auto i {pair.i_lower}; i < pair.i_upper; ++i) {
-        const auto [i_col0, i_col1] = pair_iterator_outer.next();
-        ki::apply_u_gate_second_(state, buffer, pair_iterator_inner, pair, mat_adj, i_col0, i_col1);
-    }
+    ki::apply_u_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
 }
 
 

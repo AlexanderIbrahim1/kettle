@@ -375,21 +375,19 @@ void apply_1t1a_gate_second_(
 void apply_u_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat,
-    Eigen::Index i_row0,
-    Eigen::Index i_row1
+    const ket::Matrix2X2& mat
 );
 
 void apply_u_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat_adj,
-    Eigen::Index i_col0,
-    Eigen::Index i_col1
+    const ket::Matrix2X2& mat_adj
 );
 
 void apply_cu_gate_first_(

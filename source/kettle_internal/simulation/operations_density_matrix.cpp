@@ -193,26 +193,30 @@ auto dot(const ElementPair& left, const ElementPair& right) -> std::complex<doub
 void apply_u_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat,
-    Eigen::Index i_row0,
-    Eigen::Index i_row1
+    const ket::Matrix2X2& mat
 )
 {
-    pair_iterator.set_state(pair.i_lower);
-    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
-        const auto [i_col0, i_col1] = pair_iterator.next();
+    pair_iterator_outer.set_state(0);
+    for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
+        const auto [i_row0, i_row1] = pair_iterator_outer.next();
 
-        const auto rho00 = state.matrix()(i_row0, i_col0);
-        const auto rho10 = state.matrix()(i_row1, i_col0);
-        const auto rho01 = state.matrix()(i_row0, i_col1);
-        const auto rho11 = state.matrix()(i_row1, i_col1);
+        pair_iterator_inner.set_state(pair.i_lower);
+        for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+            const auto [i_col0, i_col1] = pair_iterator_inner.next();
 
-        buffer(i_row0, i_col0) = (rho00 * mat.elem00) + (rho10 * mat.elem01);
-        buffer(i_row1, i_col0) = (rho00 * mat.elem10) + (rho10 * mat.elem11);
-        buffer(i_row0, i_col1) = (rho01 * mat.elem00) + (rho11 * mat.elem01);
-        buffer(i_row1, i_col1) = (rho01 * mat.elem10) + (rho11 * mat.elem11);
+            const auto rho00 = state.matrix()(i_row0, i_col0);
+            const auto rho10 = state.matrix()(i_row1, i_col0);
+            const auto rho01 = state.matrix()(i_row0, i_col1);
+            const auto rho11 = state.matrix()(i_row1, i_col1);
+
+            buffer(i_row0, i_col0) = (rho00 * mat.elem00) + (rho10 * mat.elem01);
+            buffer(i_row1, i_col0) = (rho00 * mat.elem10) + (rho10 * mat.elem11);
+            buffer(i_row0, i_col1) = (rho01 * mat.elem00) + (rho11 * mat.elem01);
+            buffer(i_row1, i_col1) = (rho01 * mat.elem10) + (rho11 * mat.elem11);
+        }
     }
 }
 
@@ -220,26 +224,30 @@ void apply_u_gate_first_(
 void apply_u_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    const ket::Matrix2X2& mat_adj,
-    Eigen::Index i_col0,
-    Eigen::Index i_col1
+    const ket::Matrix2X2& mat_adj
 )
 {
-    pair_iterator.set_state(pair.i_lower);
-    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
-        const auto [i_row0, i_row1] = pair_iterator.next();
+    pair_iterator_outer.set_state(0);
+    for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
+        const auto [i_col0, i_col1] = pair_iterator_outer.next();
 
-        const auto buf00 = buffer(i_row0, i_col0);
-        const auto buf10 = buffer(i_row1, i_col0);
-        const auto buf01 = buffer(i_row0, i_col1);
-        const auto buf11 = buffer(i_row1, i_col1);
+        pair_iterator_inner.set_state(pair.i_lower);
+        for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+            const auto [i_row0, i_row1] = pair_iterator_inner.next();
 
-        state.matrix()(i_row0, i_col0) = (buf00 * mat_adj.elem00) + (buf01 * mat_adj.elem10);
-        state.matrix()(i_row1, i_col0) = (buf10 * mat_adj.elem00) + (buf11 * mat_adj.elem10);
-        state.matrix()(i_row0, i_col1) = (buf00 * mat_adj.elem01) + (buf01 * mat_adj.elem11);
-        state.matrix()(i_row1, i_col1) = (buf10 * mat_adj.elem01) + (buf11 * mat_adj.elem11);
+            const auto buf00 = buffer(i_row0, i_col0);
+            const auto buf10 = buffer(i_row1, i_col0);
+            const auto buf01 = buffer(i_row0, i_col1);
+            const auto buf11 = buffer(i_row1, i_col1);
+
+            state.matrix()(i_row0, i_col0) = (buf00 * mat_adj.elem00) + (buf01 * mat_adj.elem10);
+            state.matrix()(i_row1, i_col0) = (buf10 * mat_adj.elem00) + (buf11 * mat_adj.elem10);
+            state.matrix()(i_row0, i_col1) = (buf00 * mat_adj.elem01) + (buf01 * mat_adj.elem11);
+            state.matrix()(i_row1, i_col1) = (buf10 * mat_adj.elem01) + (buf11 * mat_adj.elem11);
+        }
     }
 }
 
