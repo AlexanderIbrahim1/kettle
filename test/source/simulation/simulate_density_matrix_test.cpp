@@ -11,6 +11,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/gates/common_u_gates.hpp"
+#include "kettle/gates/random_u_gates.hpp"
 #include "kettle/state/density_matrix.hpp"
 #include "kettle/state/statevector.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
@@ -140,39 +141,69 @@ TEST_CASE("compare density matrix u-gate simulations with statevector u-gate sim
     REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
 }
 
-// TEST_CASE("compare density matrix 1T-gate simulations with statevector 1T-gate simulations")
-// {
-//     SECTION("1-qubit circuit")
-//     {
-//         struct TestCase {
-//             std::string message;
-//             std::function<void(ket::QuantumCircuit&)> circ_func;
-//         };
-// 
-//         const auto testcase = GENERATE(
-//             TestCase { "H, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); }}
-//             // TestCase { "X, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); }},
-//             // TestCase { "Y, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_y_gate(0); }},
-//             // TestCase { "Z, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_z_gate(0); }},
-//             // TestCase { "S, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_s_gate(0); }},
-//             // TestCase { "SDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sdag_gate(0); }},
-//             // TestCase { "T, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_t_gate(0); }},
-//             // TestCase { "TDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_tdag_gate(0); }}
-//             // TestCase { "SX, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sx_gate(0); }},
-//             // TestCase { "SXDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sxdag_gate(0); }}
-//         );
-// 
-//         auto circuit = ket::QuantumCircuit {1};
-//         circuit.add_u_gate(ket::generate_random_unitary2x2(), 0);
-//         testcase.circ_func(circuit);
-// 
-//         auto statevector = ket::Statevector {"0"};
-//         ket::simulate(circuit, statevector);
-//         const auto from_statevector = ket::statevector_to_density_matrix(statevector);
-// 
-//         auto direct = ket::DensityMatrix {"0"};
-//         ket::simulate(circuit, direct);
-// 
-//         REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
-//     }
-// }
+TEST_CASE("compare density matrix primitive-gate simulations with statevector primitive-gate simulations")
+{
+    SECTION("1-qubit circuit, 1T gates")
+    {
+        struct TestCase {
+            std::string message;
+            std::function<void(ket::QuantumCircuit&)> circ_func;
+        };
+
+        const auto testcase = GENERATE(
+            TestCase { "H, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); }},
+            TestCase { "X, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); }},
+            TestCase { "Y, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_y_gate(0); }},
+            TestCase { "Z, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_z_gate(0); }},
+            TestCase { "S, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_s_gate(0); }},
+            TestCase { "SDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sdag_gate(0); }},
+            TestCase { "T, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_t_gate(0); }},
+            TestCase { "TDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_tdag_gate(0); }},
+            TestCase { "SX, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sx_gate(0); }},
+            TestCase { "SXDAG, 1-qubit", [](ket::QuantumCircuit& circ) { circ.add_sxdag_gate(0); }}
+        );
+
+        auto circuit = ket::QuantumCircuit {1};
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 0);
+        testcase.circ_func(circuit);
+
+        auto statevector = ket::Statevector {"0"};
+        ket::simulate(circuit, statevector);
+        const auto from_statevector = ket::statevector_to_density_matrix(statevector);
+
+        auto direct = ket::DensityMatrix {"0"};
+        ket::simulate(circuit, direct);
+
+        REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
+    }
+
+    SECTION("1-qubit circuit, 1T1A gates")
+    {
+        struct TestCase {
+            std::string message;
+            std::function<void(ket::QuantumCircuit&, double)> circ_func;
+        };
+
+        const auto testcase = GENERATE(
+            TestCase { "RX, 1-qubit", [](ket::QuantumCircuit& circ, double angle) { circ.add_rx_gate(0, angle); }},
+            TestCase { "RY, 1-qubit", [](ket::QuantumCircuit& circ, double angle) { circ.add_ry_gate(0, angle); }},
+            TestCase { "RZ, 1-qubit", [](ket::QuantumCircuit& circ, double angle) { circ.add_rz_gate(0, angle); }},
+            TestCase { "P, 1-qubit", [](ket::QuantumCircuit& circ, double angle) { circ.add_p_gate(0, angle); }}
+        );
+
+        const auto angle = 2.0 * M_PI * GENERATE(0.0, 0.2, 0.4, 0.6, 0.8, 0.98);
+
+        auto circuit = ket::QuantumCircuit {1};
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 0);
+        testcase.circ_func(circuit, angle);
+
+        auto statevector = ket::Statevector {"0"};
+        ket::simulate(circuit, statevector);
+        const auto from_statevector = ket::statevector_to_density_matrix(statevector);
+
+        auto direct = ket::DensityMatrix {"0"};
+        ket::simulate(circuit, direct);
+
+        REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
+    }
+}

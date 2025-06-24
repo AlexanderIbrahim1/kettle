@@ -43,7 +43,10 @@ void apply_1t_gate_first_(
     const FlatIndexPair<Eigen::Index>& pair
 )
 {
-    constexpr auto rt2 = M_SQRT1_2;
+    constexpr auto plus_half = std::complex<double> {0.5, 0.5};
+    constexpr auto minus_half = std::complex<double> {0.5, -0.5};
+    constexpr auto plus_rt2 = std::complex<double> {M_SQRT1_2, M_SQRT1_2};
+    constexpr auto minus_rt2 = std::complex<double> {M_SQRT1_2, -M_SQRT1_2};
 
     using G = ket::Gate;
 
@@ -60,16 +63,11 @@ void apply_1t_gate_first_(
             const auto rho01 = state.matrix()(i_row0, i_col1);
             const auto rho11 = state.matrix()(i_row1, i_col1);
 
-            // buffer(i_row0, i_col0) = (rho00 * mat.elem00) + (rho10 * mat.elem01);
-            // buffer(i_row1, i_col0) = (rho00 * mat.elem10) + (rho10 * mat.elem11);
-            // buffer(i_row0, i_col1) = (rho01 * mat.elem00) + (rho11 * mat.elem01);
-            // buffer(i_row1, i_col1) = (rho01 * mat.elem10) + (rho11 * mat.elem11);
-
             if constexpr (GateType == G::H) {
-                buffer(i_row0, i_col0) = rho00 + rho10;
-                buffer(i_row1, i_col0) = rho00 - rho10;
-                buffer(i_row0, i_col1) = rho01 + rho11;
-                buffer(i_row1, i_col1) = rho01 - rho11;
+                buffer(i_row0, i_col0) = M_SQRT1_2 * (rho00 + rho10);
+                buffer(i_row1, i_col0) = M_SQRT1_2 * (rho00 - rho10);
+                buffer(i_row0, i_col1) = M_SQRT1_2 * (rho01 + rho11);
+                buffer(i_row1, i_col1) = M_SQRT1_2 * (rho01 - rho11);
             }
             else if constexpr (GateType == G::X) {
                 buffer(i_row0, i_col0) = rho10;
@@ -103,192 +101,272 @@ void apply_1t_gate_first_(
             }
             else if constexpr (GateType == Gate::T) {
                 buffer(i_row0, i_col0) = rho00;
-                buffer(i_row1, i_col0) = {rt2 * (rho10.real() - rho10.imag()), rt2 * (rho10.real() + rho10.imag())};
+                buffer(i_row1, i_col0) = rho10 * plus_rt2;
                 buffer(i_row0, i_col1) = rho01;
-                buffer(i_row1, i_col1) = {rt2 * (rho11.real() - rho11.imag()), rt2 * (rho11.real() + rho11.imag())};
+                buffer(i_row1, i_col1) = rho11 * plus_rt2;
             }
             else if constexpr (GateType == Gate::TDAG) {
                 buffer(i_row0, i_col0) = rho00;
-                buffer(i_row1, i_col0) = {rt2 * (rho10.real() + rho10.imag()), rt2 * (-rho10.real() + rho10.imag())};
+                buffer(i_row1, i_col0) = rho10 * minus_rt2;
                 buffer(i_row0, i_col1) = rho01;
-                buffer(i_row1, i_col1) = {rt2 * (rho11.real() + rho11.imag()), rt2 * (-rho11.real() + rho11.imag())};
+                buffer(i_row1, i_col1) = rho11 * minus_rt2;
+            }
+            else if constexpr (GateType == Gate::SX) {
+                buffer(i_row0, i_col0) = (rho00 * plus_half) + (rho10 * minus_half);
+                buffer(i_row1, i_col0) = (rho00 * minus_half) + (rho10 * plus_half);
+                buffer(i_row0, i_col1) = (rho01 * plus_half) + (rho11 * minus_half);
+                buffer(i_row1, i_col1) = (rho01 * minus_half) + (rho11 * plus_half);
+            }
+            else if constexpr (GateType == Gate::SXDAG) {
+                buffer(i_row0, i_col0) = (rho00 * minus_half) + (rho10 * plus_half);
+                buffer(i_row1, i_col0) = (rho00 * plus_half) + (rho10 * minus_half);
+                buffer(i_row0, i_col1) = (rho01 * minus_half) + (rho11 * plus_half);
+                buffer(i_row1, i_col1) = (rho01 * plus_half) + (rho11 * minus_half);
             }
             else {
                 static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of first multiplication.");
             }
         }
-
-//         if constexpr (GateType == G::H) {
-//             const auto amplitude0 = state.matrix()(i_row, i0);
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             buffer(i_row, i0) = M_SQRT1_2 * (amplitude0 + amplitude1);
-//             buffer(i_row, i1) = M_SQRT1_2 * (amplitude0 - amplitude1);
-//         }
-//         else if constexpr (GateType == G::X) {
-//             buffer(i_row, i0) = state.matrix()(i_row, i1);
-//             buffer(i_row, i1) = state.matrix()(i_row, i0);
-//         }
-//         else if constexpr (GateType == G::Y) {
-//             const auto amplitude0 = state.matrix()(i_row, i0);
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             buffer(i_row, i0) = {amplitude1.imag(), -amplitude1.real()};
-//             buffer(i_row, i1) = {-amplitude0.imag(), amplitude0.real()};
-//         }
-//         else if constexpr (GateType == G::Z) {
-//             buffer(i_row, i1) = -1.0 * state.matrix()(i_row, i1);
-//         }
-//         else if constexpr (GateType == G::S) {
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-//             buffer(i_row, i1) = {-amplitude1.imag(), amplitude1.real()};
-//         }
-//         else if constexpr (GateType == Gate::SDAG) {
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-//             buffer(i_row, i1) = {amplitude1.imag(), -amplitude1.real()};
-//         }
-//         else if constexpr (GateType == Gate::T) {
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             const auto real1 = M_SQRT1_2 * (amplitude1.real() - amplitude1.imag());
-//             const auto imag1 = M_SQRT1_2 * (amplitude1.real() + amplitude1.imag());
-// 
-//             buffer(i_row, i1) = {real1, imag1};
-//         }
-//         else if constexpr (GateType == Gate::TDAG) {
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             const auto real1 = M_SQRT1_2 * (amplitude1.real() + amplitude1.imag());
-//             const auto imag1 = - M_SQRT1_2 * (amplitude1.real() - amplitude1.imag());
-// 
-//             buffer(i_row, i1) = {real1, imag1};
-//         }
-
-//         else if constexpr (GateType == Gate::SX) {
-//             const auto amplitude0 = state.matrix()(i_row, i0);
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             const auto real0 = 0.5 * (  amplitude0.real() - amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-//             const auto imag0 = 0.5 * (  amplitude0.real() + amplitude0.imag() - amplitude1.real() + amplitude1.imag());
-//             const auto real1 = 0.5 * (  amplitude0.real() + amplitude0.imag() + amplitude1.real() - amplitude1.imag());
-//             const auto imag1 = 0.5 * (- amplitude0.real() + amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-// 
-//             buffer(i_row, i0) = {real0, imag0};
-//             buffer(i_row, i1) = {real1, imag1};
-//         }
-//         else if constexpr (GateType == Gate::SXDAG) {
-//             const auto amplitude0 = state.matrix()(i_row, i0);
-//             const auto amplitude1 = state.matrix()(i_row, i1);
-// 
-//             const auto real0 = 0.5 * (  amplitude0.real() + amplitude0.imag() + amplitude1.real() - amplitude1.imag());
-//             const auto imag0 = 0.5 * (- amplitude0.real() + amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-//             const auto real1 = 0.5 * (  amplitude0.real() - amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-//             const auto imag1 = 0.5 * (  amplitude0.real() + amplitude0.imag() - amplitude1.real() + amplitude1.imag());
-// 
-//             buffer(i_row, i0) = {real0, imag0};
-//             buffer(i_row, i1) = {real1, imag1};
-//         }
-//         else {
-//             static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of first multiplication.");
-//         }
     }
 }
+
 
 template <ket::Gate GateType>
 void apply_1t_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
-    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair
+)
+{
+    constexpr auto plus_half = std::complex<double> {0.5, 0.5};
+    constexpr auto minus_half = std::complex<double> {0.5, -0.5};
+    constexpr auto plus_rt2 = std::complex<double> {M_SQRT1_2, M_SQRT1_2};
+    constexpr auto minus_rt2 = std::complex<double> {M_SQRT1_2, -M_SQRT1_2};
+
+    using G = ket::Gate;
+
+    pair_iterator_outer.set_state(0);
+    for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
+        const auto [i_col0, i_col1] = pair_iterator_outer.next();
+
+        pair_iterator_inner.set_state(pair.i_lower);
+        for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+            const auto [i_row0, i_row1] = pair_iterator_inner.next();
+
+            const auto buf00 = buffer(i_row0, i_col0);
+            const auto buf10 = buffer(i_row1, i_col0);
+            const auto buf01 = buffer(i_row0, i_col1);
+            const auto buf11 = buffer(i_row1, i_col1);
+
+            if constexpr (GateType == G::H) {
+                state.matrix()(i_row0, i_col0) = M_SQRT1_2 * (buf00 + buf01);
+                state.matrix()(i_row1, i_col0) = M_SQRT1_2 * (buf10 + buf11);
+                state.matrix()(i_row0, i_col1) = M_SQRT1_2 * (buf00 - buf01);
+                state.matrix()(i_row1, i_col1) = M_SQRT1_2 * (buf10 - buf11);
+            }
+            else if constexpr (GateType == G::X) {
+                state.matrix()(i_row0, i_col0) = buf01;
+                state.matrix()(i_row1, i_col0) = buf11;
+                state.matrix()(i_row0, i_col1) = buf00;
+                state.matrix()(i_row1, i_col1) = buf10;
+            }
+            else if constexpr (GateType == G::Y) {
+                state.matrix()(i_row0, i_col0) = {-buf01.imag(),  buf01.real()};
+                state.matrix()(i_row1, i_col0) = {-buf11.imag(),  buf11.real()};
+                state.matrix()(i_row0, i_col1) = { buf00.imag(), -buf00.real()};
+                state.matrix()(i_row1, i_col1) = { buf10.imag(), -buf10.real()};
+            }
+            else if constexpr (GateType == G::Z) {
+                state.matrix()(i_row0, i_col0) =  buf00;
+                state.matrix()(i_row1, i_col0) =  buf10;
+                state.matrix()(i_row0, i_col1) = -buf01;
+                state.matrix()(i_row1, i_col1) = -buf11;
+            }
+            else if constexpr (GateType == G::S) {
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
+                state.matrix()(i_row0, i_col1) = { buf01.imag(), -buf01.real()};
+                state.matrix()(i_row1, i_col1) = { buf11.imag(), -buf11.real()};
+            }
+            else if constexpr (GateType == Gate::SDAG) {
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
+                state.matrix()(i_row0, i_col1) = {-buf01.imag(),  buf01.real()};
+                state.matrix()(i_row1, i_col1) = {-buf11.imag(),  buf11.real()};
+            }
+            else if constexpr (GateType == Gate::T) {
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
+                state.matrix()(i_row0, i_col1) = buf01 * minus_rt2;
+                state.matrix()(i_row1, i_col1) = buf11 * minus_rt2;
+            }
+            else if constexpr (GateType == Gate::TDAG) {
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
+                state.matrix()(i_row0, i_col1) = buf01 * plus_rt2;
+                state.matrix()(i_row1, i_col1) = buf11 * plus_rt2;
+            }
+            else if constexpr (GateType == Gate::SX) {
+                state.matrix()(i_row0, i_col0) = (buf00 * minus_half) + (buf01 * plus_half);
+                state.matrix()(i_row1, i_col0) = (buf10 * minus_half) + (buf11 * plus_half);
+                state.matrix()(i_row0, i_col1) = (buf00 * plus_half) + (buf01 * minus_half);
+                state.matrix()(i_row1, i_col1) = (buf10 * plus_half) + (buf11 * minus_half);
+            }
+            else if constexpr (GateType == Gate::SXDAG) {
+                state.matrix()(i_row0, i_col0) = (buf00 * plus_half) + (buf01 * minus_half);
+                state.matrix()(i_row1, i_col0) = (buf10 * plus_half) + (buf11 * minus_half);
+                state.matrix()(i_row0, i_col1) = (buf00 * minus_half) + (buf01 * plus_half);
+                state.matrix()(i_row1, i_col1) = (buf10 * minus_half) + (buf11 * plus_half);
+            }
+            else {
+                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of second multiplication.");
+            }
+        }
+    }
+}
+
+
+template <ket::Gate GateType>
+void apply_1t1a_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
-    Eigen::Index i_col
+    double angle
 )
 {
     using G = ket::Gate;
 
-    pair_iterator.set_state(pair.i_lower);
-    for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
-        [[maybe_unused]]
-        const auto [i0, i1] = pair_iterator.next();
+    pair_iterator_outer.set_state(0);
+    for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
+        const auto [i_row0, i_row1] = pair_iterator_outer.next();
 
-        if constexpr (GateType == G::H) {
-            const auto amplitude0 = buffer(i0, i_col);
-            const auto amplitude1 = buffer(i1, i_col);
+        pair_iterator_inner.set_state(pair.i_lower);
+        for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+            const auto [i_col0, i_col1] = pair_iterator_inner.next();
 
-            // H-gate is Hermitian, no need to change assignment
-            state.matrix()(i0, i_col) = M_SQRT1_2 * (amplitude0 + amplitude1);
-            state.matrix()(i1, i_col) = M_SQRT1_2 * (amplitude0 - amplitude1);
+            const auto rho00 = state.matrix()(i_row0, i_col0);
+            const auto rho10 = state.matrix()(i_row1, i_col0);
+            const auto rho01 = state.matrix()(i_row0, i_col1);
+            const auto rho11 = state.matrix()(i_row1, i_col1);
+
+            if constexpr (GateType == G::RX) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto neg_i_sint = std::complex<double> {0.0, -std::sin(angle / 2.0)};
+
+                buffer(i_row0, i_col0) = (rho00 * cost) + (rho10 * neg_i_sint);
+                buffer(i_row1, i_col0) = (rho00 * neg_i_sint) + (rho10 * cost);
+                buffer(i_row0, i_col1) = (rho01 * cost) + (rho11 * neg_i_sint);
+                buffer(i_row1, i_col1) = (rho01 * neg_i_sint) + (rho11 * cost);
+            }
+            else if constexpr (GateType == G::RY) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto sint = std::sin(angle / 2.0);
+
+                buffer(i_row0, i_col0) = (rho00 * cost) - (rho10 * sint);
+                buffer(i_row1, i_col0) = (rho00 * sint) + (rho10 * cost);
+                buffer(i_row0, i_col1) = (rho01 * cost) - (rho11 * sint);
+                buffer(i_row1, i_col1) = (rho01 * sint) + (rho11 * cost);
+            }
+            else if constexpr (GateType == G::RZ) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto sint = std::sin(angle / 2.0);
+                const auto plus = std::complex<double> {cost, sint};
+                const auto minus = std::complex<double> {cost, -sint};
+
+                buffer(i_row0, i_col0) = rho00 * minus;
+                buffer(i_row1, i_col0) = rho10 * plus;
+                buffer(i_row0, i_col1) = rho01 * minus;
+                buffer(i_row1, i_col1) = rho11 * plus;
+            }
+            else if constexpr (GateType == G::P) {
+                const auto cost = std::cos(angle);
+                const auto sint = std::sin(angle);
+                const auto plus = std::complex<double> {cost, sint};
+
+                buffer(i_row0, i_col0) = rho00;
+                buffer(i_row1, i_col0) = rho10 * plus;
+                buffer(i_row0, i_col1) = rho01;
+                buffer(i_row1, i_col1) = rho11 * plus;
+            }
+            else {
+                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of first multiplication.");
+            }
         }
-        else if constexpr (GateType == G::X) {
-            // X-gate is Hermitian, no need to change assignment
-            state.matrix()(i0, i_col) = buffer(i1, i_col);
-            state.matrix()(i1, i_col) = buffer(i0, i_col);
-        }
-        else if constexpr (GateType == G::Y) {
-            const auto amplitude0 = buffer(i0, i_col);
-            const auto amplitude1 = buffer(i1, i_col);
+    }
+}
 
-            // Y-gate is Hermitian, no need to change assignment
-            buffer(i0, i_col) = {amplitude1.imag(), -amplitude1.real()};
-            buffer(i1, i_col) = {-amplitude0.imag(), amplitude0.real()};
-        }
-        else if constexpr (GateType == G::Z) {
-            // Z-gate is Hermitian, no need to change assignment
-            buffer(i1, i_col) = -1.0 * state.matrix()(i1, i_col);
-        }
-        else if constexpr (GateType == G::S) {
-            // swapped the actions of S and SDAG
-            const auto amplitude1 = buffer(i1, i_col);
-            buffer(i1, i_col) = {amplitude1.imag(), -amplitude1.real()};
-        }
-        else if constexpr (GateType == Gate::SDAG) {
-            // swapped the actions of S and SDAG
-            const auto amplitude1 = buffer(i1, i_col);
-            buffer(i1, i_col) = {-amplitude1.imag(), amplitude1.real()};
-        }
-        else if constexpr (GateType == Gate::T) {
-            // swapped the actions of T and TDAG
-            const auto amplitude1 = buffer(i1, i_col);
 
-            const auto real1 = M_SQRT1_2 * (amplitude1.real() + amplitude1.imag());
-            const auto imag1 = - M_SQRT1_2 * (amplitude1.real() - amplitude1.imag());
+template <ket::Gate GateType>
+void apply_1t1a_gate_second_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair,
+    double angle
+)
+{
+    using G = ket::Gate;
 
-            buffer(i1, i_col) = {real1, imag1};
-        }
-        else if constexpr (GateType == Gate::TDAG) {
-            // swapped the actions of T and TDAG
-            const auto amplitude1 = buffer(i1, i_col);
+    pair_iterator_outer.set_state(0);
+    for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
+        const auto [i_col0, i_col1] = pair_iterator_outer.next();
 
-            const auto real1 = M_SQRT1_2 * (amplitude1.real() - amplitude1.imag());
-            const auto imag1 = M_SQRT1_2 * (amplitude1.real() + amplitude1.imag());
+        pair_iterator_inner.set_state(pair.i_lower);
+        for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
+            const auto [i_row0, i_row1] = pair_iterator_inner.next();
 
-            buffer(i1, i_col) = {real1, imag1};
-        }
-        else if constexpr (GateType == Gate::SX) {
-            const auto amplitude0 = buffer(i0, i_col);
-            const auto amplitude1 = buffer(i1, i_col);
+            const auto buf00 = buffer(i_row0, i_col0);
+            const auto buf10 = buffer(i_row1, i_col0);
+            const auto buf01 = buffer(i_row0, i_col1);
+            const auto buf11 = buffer(i_row1, i_col1);
 
-            const auto real0 = 0.5 * (  amplitude0.real() + amplitude0.imag() + amplitude1.real() - amplitude1.imag());
-            const auto imag0 = 0.5 * (- amplitude0.real() + amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-            const auto real1 = 0.5 * (  amplitude0.real() - amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-            const auto imag1 = 0.5 * (  amplitude0.real() + amplitude0.imag() - amplitude1.real() + amplitude1.imag());
+            if constexpr (GateType == G::RX) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto i_sint = std::complex<double> {0.0, std::sin(angle / 2.0)};
 
-            buffer(i0, i_col) = {real0, imag0};
-            buffer(i1, i_col) = {real1, imag1};
-        }
-        else if constexpr (GateType == Gate::SXDAG) {
-            const auto amplitude0 = buffer(i0, i_col);
-            const auto amplitude1 = buffer(i1, i_col);
+                state.matrix()(i_row0, i_col0) = (buf00 * cost) + (buf01 * i_sint);
+                state.matrix()(i_row1, i_col0) = (buf10 * cost) + (buf11 * i_sint);
+                state.matrix()(i_row0, i_col1) = (buf00 * i_sint) + (buf01 * cost);
+                state.matrix()(i_row1, i_col1) = (buf10 * i_sint) + (buf11 * cost);
+            }
+            else if constexpr (GateType == G::RY) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto sint = std::sin(angle / 2.0);
 
-            const auto real0 = 0.5 * (  amplitude0.real() - amplitude0.imag() + amplitude1.real() + amplitude1.imag());
-            const auto imag0 = 0.5 * (  amplitude0.real() + amplitude0.imag() - amplitude1.real() + amplitude1.imag());
-            const auto real1 = 0.5 * (  amplitude0.real() + amplitude0.imag() + amplitude1.real() - amplitude1.imag());
-            const auto imag1 = 0.5 * (- amplitude0.real() + amplitude0.imag() + amplitude1.real() + amplitude1.imag());
+                state.matrix()(i_row0, i_col0) = (buf00 * cost) - (buf01 * sint);
+                state.matrix()(i_row1, i_col0) = (buf10 * cost) - (buf11 * sint);
+                state.matrix()(i_row0, i_col1) = (buf00 * sint) + (buf01 * cost);
+                state.matrix()(i_row1, i_col1) = (buf10 * sint) + (buf11 * cost);
+            }
+            else if constexpr (GateType == G::RZ) {
+                const auto cost = std::cos(angle / 2.0);
+                const auto sint = std::sin(angle / 2.0);
+                const auto plus = std::complex<double> {cost, sint};
+                const auto minus = std::complex<double> {cost, -sint};
 
-            buffer(i0, i_col) = {real0, imag0};
-            buffer(i1, i_col) = {real1, imag1};
-        }
-        else {
-            static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of second multiplication.");
+                state.matrix()(i_row0, i_col0) = (buf00 * plus);
+                state.matrix()(i_row1, i_col0) = (buf10 * plus);
+                state.matrix()(i_row0, i_col1) = (buf01 * minus);
+                state.matrix()(i_row1, i_col1) = (buf11 * minus);
+            }
+            else if constexpr (GateType == G::P) {
+                const auto cost = std::cos(angle);
+                const auto sint = std::sin(angle);
+                const auto minus = std::complex<double> {cost, -sint};
+
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
+                state.matrix()(i_row0, i_col1) = buf01 * minus;
+                state.matrix()(i_row1, i_col1) = buf11 * minus;
+            }
+            else {
+                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of second multiplication.");
+            }
         }
     }
 }
