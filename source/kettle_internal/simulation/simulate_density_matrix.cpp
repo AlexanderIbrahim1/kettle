@@ -117,62 +117,61 @@ void simulate_u_gate_(
 }
 
 
-// template <ket::Gate GateType>
-// void simulate_one_control_one_target_gate_(
-//     ket::Statevector& state,
-//     const ket::GateInfo& info,
-//     const ki::FlatIndexPair& pair
-// )
-// {
-//     namespace cre = ki::create;
-//     using Gate = ket::Gate;
-// 
-//     const auto [control_index, target_index] = cre::unpack_double_qubit_gate_indices(info);
-//     const auto n_qubits = state.n_qubits();
-// 
-//     auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
-//     pair_iterator.set_state(pair.i_lower);
-// 
-//     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
-//         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
-// 
-//         if constexpr (GateType == Gate::CH) {
-//             ki::apply_h_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CX) {
-//             ki::apply_x_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CY) {
-//             ki::apply_y_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CZ) {
-//             ki::apply_z_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CS) {
-//             ki::apply_s_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CSDAG) {
-//             ki::apply_sdag_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CT) {
-//             ki::apply_t_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CTDAG) {
-//             ki::apply_tdag_gate(state, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CSX) {
-//             ki::apply_sx_gate(state, state0_index, state1_index);
-//         }
-//         else if constexpr (GateType == Gate::CSXDAG) {
-//             ki::apply_sxdag_gate(state, state0_index, state1_index);
-//         }
-//         else {
-//             static_assert(gate_always_false<GateType>::value, "Invalid one control one target gate.");
-//         }
-//     }
-// }
-// 
-// 
+template <ket::Gate GateType>
+void simulate_one_control_one_target_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    namespace cre = ki::create;
+
+    const auto [control_index_st, target_index_st] = cre::unpack_double_qubit_gate_indices(info);
+    const auto control_index = static_cast<Eigen::Index>(control_index_st);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    auto pair_iterator_outer = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto pair_iterator_inner = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    ki::apply_1c1t_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    ki::apply_1c1t_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+}
+
+
+template <ket::Gate GateType>
+void simulate_one_control_one_target_one_angle_gate_(
+    const kpi::MapVariant& parameter_values_map,
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const ki::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    const auto [control_index_st, target_index_st, theta] = kpi::unpack_control_target_and_angle(parameter_values_map, info);
+    const auto control_index = static_cast<Eigen::Index>(control_index_st);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    auto pair_iterator_outer = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto pair_iterator_inner = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    ki::apply_1c1t1a_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    ki::apply_1c1t1a_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+}
+
+
 // template <ket::Gate GateType>
 // void simulate_one_control_one_target_one_angle_gate_(
 //     const kpi::MapVariant& parameter_values_map,
@@ -328,62 +327,62 @@ void simulate_gate_info_(
             simulate_one_target_one_angle_gate_<G::P>(parameter_values_map, state, gate_info, single_pair, buffer);
             break;
         }
-//         case G::CH : {
-//             simulate_one_control_one_target_gate_<G::CH>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CX : {
-//             simulate_one_control_one_target_gate_<G::CX>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CY : {
-//             simulate_one_control_one_target_gate_<G::CY>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CZ : {
-//             simulate_one_control_one_target_gate_<G::CZ>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CS : {
-//             simulate_one_control_one_target_gate_<G::CS>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CSDAG : {
-//             simulate_one_control_one_target_gate_<G::CSDAG>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CT : {
-//             simulate_one_control_one_target_gate_<G::CT>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CTDAG : {
-//             simulate_one_control_one_target_gate_<G::CTDAG>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CSX : {
-//             simulate_one_control_one_target_gate_<G::CSX>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CSXDAG : {
-//             simulate_one_control_one_target_gate_<G::CSXDAG>(state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CRX : {
-//             simulate_one_control_one_target_one_angle_gate_<G::CRX>(parameter_values_map, state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CRY : {
-//             simulate_one_control_one_target_one_angle_gate_<G::CRY>(parameter_values_map, state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CRZ : {
-//             simulate_one_control_one_target_one_angle_gate_<G::CRZ>(parameter_values_map, state, gate_info, double_pair);
-//             break;
-//         }
-//         case G::CP : {
-//             simulate_one_control_one_target_one_angle_gate_<G::CP>(parameter_values_map, state, gate_info, double_pair);
-//             break;
-//         }
+        case G::CH : {
+            simulate_one_control_one_target_gate_<G::CH>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CX : {
+            simulate_one_control_one_target_gate_<G::CX>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CY : {
+            simulate_one_control_one_target_gate_<G::CY>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CZ : {
+            simulate_one_control_one_target_gate_<G::CZ>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CS : {
+            simulate_one_control_one_target_gate_<G::CS>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CSDAG : {
+            simulate_one_control_one_target_gate_<G::CSDAG>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CT : {
+            simulate_one_control_one_target_gate_<G::CT>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CTDAG : {
+            simulate_one_control_one_target_gate_<G::CTDAG>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CSX : {
+            simulate_one_control_one_target_gate_<G::CSX>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CSXDAG : {
+            simulate_one_control_one_target_gate_<G::CSXDAG>(state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CRX : {
+            simulate_one_control_one_target_one_angle_gate_<G::CRX>(parameter_values_map, state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CRY : {
+            simulate_one_control_one_target_one_angle_gate_<G::CRY>(parameter_values_map, state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CRZ : {
+            simulate_one_control_one_target_one_angle_gate_<G::CRZ>(parameter_values_map, state, gate_info, double_pair, buffer);
+            break;
+        }
+        case G::CP : {
+            simulate_one_control_one_target_one_angle_gate_<G::CP>(parameter_values_map, state, gate_info, double_pair, buffer);
+            break;
+        }
         case G::U : {
             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
             simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair, buffer);

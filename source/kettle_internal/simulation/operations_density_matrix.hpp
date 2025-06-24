@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/density_matrix.hpp"
 
@@ -371,7 +372,6 @@ void apply_1t1a_gate_second_(
     }
 }
 
-
 void apply_u_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
@@ -408,34 +408,195 @@ void apply_cu_gate_second_(
     const ket::Matrix2X2& mat
 );
 
-// void apply_h_gate(ket::DensityMatrix& state, std::size_t i0, std::size_t i1);
-// 
-// void apply_x_gate(ket::Statevector& state, std::size_t i0, std::size_t i1);
-// 
-// void apply_y_gate(ket::Statevector& state, std::size_t i0, std::size_t i1);
-// 
-// void apply_z_gate(ket::Statevector& state, std::size_t i1);
-// 
-// void apply_s_gate(ket::Statevector& state, std::size_t i1);
-// 
-// void apply_sdag_gate(ket::Statevector& state, std::size_t i1);
-// 
-// void apply_t_gate(ket::Statevector& state, std::size_t i1);
-// 
-// void apply_tdag_gate(ket::Statevector& state, std::size_t i1);
-// 
-// void apply_sx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1);
-// 
-// void apply_sxdag_gate(ket::Statevector& state, std::size_t i0, std::size_t i1);
-// 
-// void apply_rx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta);
-// 
-// void apply_ry_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta);
-// 
-// void apply_rz_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, double theta);
-// 
-// void apply_p_gate(ket::Statevector& state, std::size_t i1, double theta);
-// 
-// void apply_u_gate(ket::Statevector& state, std::size_t i0, std::size_t i1, const ket::Matrix2X2& mat);
-// 
+template <ket::Gate GateType>
+void apply_1c1t_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair
+)
+{
+    using G = ket::Gate;
+
+    // TODO: because we know the matrices beforehand, we can cut down on the number of calculations
+    // needed for specific gates; but this requires a lot of repetition and a bunch of handwritten
+    // calculations, and is just a performance enhancement, so it isn't the biggest priority right now
+    if constexpr (GateType == G::CH) {
+        const auto mat = ket::h_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CX) {
+        const auto mat = ket::x_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CY) {
+        const auto mat = ket::y_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CZ) {
+        const auto mat = ket::z_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CS) {
+        const auto mat = ket::s_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSDAG) {
+        const auto mat = ket::sdag_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CT) {
+        const auto mat = ket::t_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CTDAG) {
+        const auto mat = ket::tdag_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSX) {
+        const auto mat = ket::sx_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSXDAG) {
+        const auto mat = ket::sxdag_gate();
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else {
+        static_assert(dm_gate_always_false<GateType>::value, "Invalid 1C1T gate for density matrix simulation of first multiplication.");
+    }
+}
+
+template <ket::Gate GateType>
+void apply_1c1t_gate_second_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair
+)
+{
+    using G = ket::Gate;
+
+    // TODO: because we know the matrices beforehand, we can cut down on the number of calculations
+    // needed for specific gates; but this requires a lot of repetition and a bunch of handwritten
+    // calculations, and is just a performance enhancement, so it isn't the biggest priority right now
+    if constexpr (GateType == G::CH) {
+        const auto mat = ket::h_gate();
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CX) {
+        const auto mat = ket::x_gate();
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CY) {
+        const auto mat = ket::y_gate();
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CZ) {
+        const auto mat = ket::z_gate();
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CS) {
+        const auto mat = ket::conjugate_transpose(ket::s_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSDAG) {
+        const auto mat = ket::conjugate_transpose(ket::sdag_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CT) {
+        const auto mat = ket::conjugate_transpose(ket::t_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CTDAG) {
+        const auto mat = ket::conjugate_transpose(ket::tdag_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSX) {
+        const auto mat = ket::conjugate_transpose(ket::sx_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CSXDAG) {
+        const auto mat = ket::conjugate_transpose(ket::sxdag_gate());
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else {
+        static_assert(dm_gate_always_false<GateType>::value, "Invalid 1C1T gate for density matrix simulation of second multiplication.");
+    }
+}
+
+
+template <ket::Gate GateType>
+void apply_1c1t1a_gate_first_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair,
+    double angle
+)
+{
+    using G = ket::Gate;
+
+    // TODO: because we know the matrices beforehand, we can cut down on the number of calculations
+    // needed for specific gates; but this requires a lot of repetition and a bunch of handwritten
+    // calculations, and is just a performance enhancement, so it isn't the biggest priority right now
+    if constexpr (GateType == G::CRX) {
+        const auto mat = ket::rx_gate(angle);
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CRY) {
+        const auto mat = ket::ry_gate(angle);
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CRZ) {
+        const auto mat = ket::rz_gate(angle);
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CP) {
+        const auto mat = ket::p_gate(angle);
+        apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else {
+        static_assert(dm_gate_always_false<GateType>::value, "Invalid 1C1T1A gate for density matrix simulation of first multiplication.");
+    }
+}
+
+template <ket::Gate GateType>
+void apply_1c1t1a_gate_second_(
+    ket::DensityMatrix& state,
+    Eigen::MatrixXcd& buffer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
+    DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
+    const FlatIndexPair<Eigen::Index>& pair,
+    double angle
+)
+{
+    using G = ket::Gate;
+
+    // TODO: because we know the matrices beforehand, we can cut down on the number of calculations
+    // needed for specific gates; but this requires a lot of repetition and a bunch of handwritten
+    // calculations, and is just a performance enhancement, so it isn't the biggest priority right now
+    if constexpr (GateType == G::CRX) {
+        const auto mat = ket::conjugate_transpose(ket::rx_gate(angle));
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CRY) {
+        const auto mat = ket::conjugate_transpose(ket::ry_gate(angle));
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CRZ) {
+        const auto mat = ket::conjugate_transpose(ket::rz_gate(angle));
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else if constexpr (GateType == G::CP) {
+        const auto mat = ket::conjugate_transpose(ket::p_gate(angle));
+        apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    }
+    else {
+        static_assert(dm_gate_always_false<GateType>::value, "Invalid 1C1T1A gate for density matrix simulation of second multiplication.");
+    }
+}
+
 }  // namespace ket::internal

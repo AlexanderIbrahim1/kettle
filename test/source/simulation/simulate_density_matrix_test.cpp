@@ -18,6 +18,7 @@
 #include "kettle/simulation/simulate.hpp"
 
 #include "kettle_internal/common/state_test_utils.hpp"
+#include "kettle_internal/gates/primitive_gate_map.hpp"
 
 
 TEST_CASE("compare density matrix u-gate simulations with statevector u-gate simulations")
@@ -202,6 +203,92 @@ TEST_CASE("compare density matrix primitive-gate simulations with statevector pr
         const auto from_statevector = ket::statevector_to_density_matrix(statevector);
 
         auto direct = ket::DensityMatrix {"0"};
+        ket::simulate(circuit, direct);
+
+        REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
+    }
+
+    SECTION("2-qubit circuit, 1C1T gates")
+    {
+        struct TestCase {
+            std::string message;
+            ket::Gate gate;
+        };
+
+        const auto add_gates = [](ket::QuantumCircuit& circ, ket::Gate gate, std::size_t ic, std::size_t it) {
+            const auto func = ket::internal::GATE_TO_FUNCTION_1C1T.at(gate);
+            (circ.*func)(ic, it);
+        };
+
+        const auto testcase = GENERATE(
+            TestCase { "CH, 2-qubit", ket::Gate::CH },
+            TestCase { "CX, 2-qubit", ket::Gate::CX },
+            TestCase { "CY, 2-qubit", ket::Gate::CY },
+            TestCase { "CZ, 2-qubit", ket::Gate::CZ },
+            TestCase { "CS, 2-qubit", ket::Gate::CS },
+            TestCase { "CSDAG, 2-qubit", ket::Gate::CSDAG },
+            TestCase { "CT, 2-qubit", ket::Gate::CT },
+            TestCase { "CTDAG, 2-qubit", ket::Gate::CTDAG },
+            TestCase { "CSX, 2-qubit", ket::Gate::CSX},
+            TestCase { "CSXDAG, 2-qubit", ket::Gate::CSXDAG }
+        );
+
+        const auto pair = GENERATE(
+            std::pair<std::size_t, std::size_t> {0, 1},
+            std::pair<std::size_t, std::size_t> {1, 0}
+        );
+
+        auto circuit = ket::QuantumCircuit {2};
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 0);
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 1);
+        add_gates(circuit, testcase.gate, pair.first, pair.second);
+
+        auto statevector = ket::Statevector {"00"};
+        ket::simulate(circuit, statevector);
+        const auto from_statevector = ket::statevector_to_density_matrix(statevector);
+
+        auto direct = ket::DensityMatrix {"00"};
+        ket::simulate(circuit, direct);
+
+        REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
+    }
+
+    SECTION("2-qubit circuit, 1C1T1A gates")
+    {
+        struct TestCase {
+            std::string message;
+            ket::Gate gate;
+        };
+
+        const auto add_gates = [](ket::QuantumCircuit& circ, ket::Gate gate, std::size_t ic, std::size_t it, double angle) {
+            const auto func = ket::internal::GATE_TO_FUNCTION_1C1T1A.at(gate);
+            (circ.*func)(ic, it, angle);
+        };
+
+        const auto testcase = GENERATE(
+            TestCase { "CRX, 2-qubit", ket::Gate::CRX },
+            TestCase { "CRY, 2-qubit", ket::Gate::CRY },
+            TestCase { "CRZ, 2-qubit", ket::Gate::CRZ },
+            TestCase { "CP, 2-qubit", ket::Gate::CP }
+        );
+
+        const auto pair = GENERATE(
+            std::pair<std::size_t, std::size_t> {0, 1},
+            std::pair<std::size_t, std::size_t> {1, 0}
+        );
+
+        const auto angle = 2.0 * M_PI * GENERATE(0.0, 0.2, 0.4, 0.6, 0.8, 0.98);
+
+        auto circuit = ket::QuantumCircuit {2};
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 0);
+        circuit.add_u_gate(ket::generate_random_unitary2x2(), 1);
+        add_gates(circuit, testcase.gate, pair.first, pair.second, angle);
+
+        auto statevector = ket::Statevector {"00"};
+        ket::simulate(circuit, statevector);
+        const auto from_statevector = ket::statevector_to_density_matrix(statevector);
+
+        auto direct = ket::DensityMatrix {"00"};
         ket::simulate(circuit, direct);
 
         REQUIRE_MSG(ket::internal::almost_eq_with_print_(direct, from_statevector), testcase.message);
