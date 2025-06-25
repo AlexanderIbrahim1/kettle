@@ -390,21 +390,21 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
 
         if (element.is_circuit_logger()) {
             throw std::runtime_error {"DEV ERROR: loggers haven't been implemented yet for the density matrix simulator.\n"};
-//             const auto& logger = element.get_circuit_logger();
-// 
-//             if (logger.is_classical_register_circuit_logger()) {
-//                 auto cregister_logger = logger.get_classical_register_circuit_logger();
-//                 cregister_logger.add_classical_register(cregister);
-//                 circuit_loggers.emplace_back(std::move(cregister_logger));
-//             }
-//             else if (logger.is_statevector_circuit_logger()) {
-//                 auto statevector_logger = logger.get_statevector_circuit_logger();
-//                 statevector_logger.add_statevector(state);
-//                 circuit_loggers.emplace_back(std::move(statevector_logger));
-//             }
-//             else {
-//                 throw std::runtime_error {"DEV ERROR: unimplemented circuit logger in `simulate_loop_body_iterative_()`\n"};
-//             }
+            const auto& logger = element.get_circuit_logger();
+
+            if (logger.is_classical_register_circuit_logger()) {
+                auto cregister_logger = logger.get_classical_register_circuit_logger();
+                cregister_logger.add_classical_register(cregister);
+                circuit_loggers.emplace_back(std::move(cregister_logger));
+            }
+            else if (logger.is_density_matrix_circuit_logger()) {
+                auto density_matrix_logger = logger.get_density_matrix_circuit_logger();
+                density_matrix_logger.add_density_matrix(state);
+                circuit_loggers.emplace_back(std::move(density_matrix_logger));
+            }
+            else {
+                throw std::runtime_error {"DEV ERROR: unimplemented circuit logger in `simulate_loop_body_iterative_()`\n"};
+            }
         }
         else if (element.is_control_flow()) {
             const auto& control_flow = element.get_control_flow();
