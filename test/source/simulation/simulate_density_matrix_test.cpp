@@ -89,6 +89,12 @@ TEST_CASE("compare density matrix u-gate simulations with statevector u-gate sim
             }
         },
         TestCase {
+            "H on each qubit, 3 qubits",
+            "000",
+            [](ket::QuantumCircuit& circ) {
+            circ.add_u_gate(ket::h_gate(), {0, 1, 2});
+        }},
+        TestCase {
             "bell(00+)",
             "00",
             [](ket::QuantumCircuit& circ) {

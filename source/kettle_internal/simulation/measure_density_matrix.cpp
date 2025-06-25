@@ -77,12 +77,12 @@ void collapse_and_renormalize_(
             state.matrix()(i_inner0, i_outer1) = {0.0, 0.0};
 
             if constexpr (StateToCollapse == 0) {
-                state.matrix()(i_inner0, i_outer0) *= norm_of_surviving_state;
-                state.matrix()(i_inner1, i_outer1) = {0.0, 0.0};
-            }
-            else if constexpr (StateToCollapse == 1) {
                 state.matrix()(i_inner0, i_outer0) = {0.0, 0.0};
                 state.matrix()(i_inner1, i_outer1) *= norm_of_surviving_state;
+            }
+            else if constexpr (StateToCollapse == 1) {
+                state.matrix()(i_inner0, i_outer0) *= norm_of_surviving_state;
+                state.matrix()(i_inner1, i_outer1) = {0.0, 0.0};
             }
             else {
                 static_assert(

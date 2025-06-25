@@ -112,6 +112,7 @@ add_test_target(TARGET simulate_with_parameter_test SOURCES "source/parameter/si
 add_test_target(TARGET control_flow_test SOURCES "source/simulation/control_flow_test.cpp")
 add_test_target(TARGET gate_pair_generator_test SOURCES "source/simulation/gate_pair_generator_test.cpp")
 add_test_target(TARGET measure_test SOURCES "source/simulation/measure_test.cpp")
+add_test_target(OPTIONS USE_EIGEN TARGET measure_density_matrix_test SOURCES "source/simulation/measure_density_matrix_test.cpp")
 add_test_target(TARGET multithread_simulate_utils_test SOURCES "source/simulation/multithread_simulate_utils_test.cpp")
 add_test_target(TARGET operations_test SOURCES "source/simulation/operations_test.cpp")
 add_test_target(OPTIONS USE_EIGEN TARGET simulate_density_matrix_test SOURCES "source/simulation/simulate_density_matrix_test.cpp")

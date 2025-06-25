@@ -57,6 +57,7 @@ add_library(
     source/kettle_internal/optimize/n_local.cpp
     source/kettle_internal/parameter/parameter.cpp
     source/kettle_internal/parameter/parameter_expression.cpp
+    source/kettle_internal/simulation/measure_density_matrix.cpp
     source/kettle_internal/simulation/measure.cpp
     source/kettle_internal/simulation/multithread_simulate_utils.cpp
     source/kettle_internal/simulation/operations_density_matrix.cpp

@@ -17,12 +17,9 @@
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
-// #include "kettle_internal/simulation/measure.hpp"
+#include "kettle_internal/simulation/measure_density_matrix.hpp"
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
-
-
-// NOTE: default ordering in Eigen is column-major
 
 
 namespace ki = ket::internal;
@@ -170,63 +167,6 @@ void simulate_one_control_one_target_one_angle_gate_(
     // write the result to the density matrix itself
     ki::apply_1c1t1a_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
 }
-
-
-// template <ket::Gate GateType>
-// void simulate_one_control_one_target_one_angle_gate_(
-//     const kpi::MapVariant& parameter_values_map,
-//     ket::Statevector& state,
-//     const ket::GateInfo& info,
-//     const ki::FlatIndexPair& pair
-// )
-// {
-//     using Gate = ket::Gate;
-// 
-//     const auto [control_index, target_index, theta] = kpi::unpack_control_target_and_angle(parameter_values_map, info);
-//     const auto n_qubits = state.n_qubits();
-// 
-//     auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
-//     pair_iterator.set_state(pair.i_lower);
-// 
-//     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
-//         [[maybe_unused]] const auto [state0_index, state1_index] = pair_iterator.next();
-// 
-//         if constexpr (GateType == Gate::CRX) {
-//             ki::apply_rx_gate(state, state0_index, state1_index, theta);
-//         }
-//         else if constexpr (GateType == Gate::CRY) {
-//             ki::apply_ry_gate(state, state0_index, state1_index, theta);
-//         }
-//         else if constexpr (GateType == Gate::CRZ) {
-//             ki::apply_rz_gate(state, state0_index, state1_index, theta);
-//         }
-//         else if constexpr (GateType == Gate::CP) {
-//             ki::apply_p_gate(state, state1_index, theta);
-//         }
-//         else {
-//             static_assert(gate_always_false<GateType>::value, "Invalid one control one target one angle gate.");
-//         }
-//     }
-// }
-// 
-// 
-// void simulate_cu_gate_(
-//     ket::Statevector& state,
-//     const ket::GateInfo& info,
-//     const ket::Matrix2X2& mat,
-//     const ki::FlatIndexPair& pair
-// )
-// {
-//     const auto [control_index, target_index] = ki::create::unpack_double_qubit_gate_indices(info);
-//     const auto n_qubits = state.n_qubits();
-//     auto pair_iterator = ki::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
-//     pair_iterator.set_state(pair.i_lower);
-// 
-//     for (std::size_t i {pair.i_lower}; i < pair.i_upper; ++i) {
-//         const auto [state0_index, state1_index] = pair_iterator.next();
-//         ki::apply_u_gate(state, state0_index, state1_index, mat);
-//     }
-// }
 
 
 void simulate_cu_gate_(
@@ -393,18 +333,18 @@ void simulate_gate_info_(
             simulate_cu_gate_(state, gate_info, *unitary_ptr, double_pair, buffer);
             break;
         }
-//         case G::M : {
-//             // this operation is more complicated to make multithreaded because the threads have already been
-//             // spawned before entering the simulation loop; thus, it is easier to just make the measurement
-//             // a single-threaded operation
-//             if (thread_id == MEASURING_THREAD_ID) {
-//                 [[maybe_unused]]
-//                 const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
-//                 const auto measured = ki::simulate_measurement_(state, gate_info, prng_seed);
-//                 c_register.set(bit_index, measured);
-//             }
-//             break;
-//         }
+        case G::M : {
+            // this operation is more complicated to make multithreaded because the threads have already been
+            // spawned before entering the simulation loop; thus, it is easier to just make the measurement
+            // a single-threaded operation
+            if (thread_id == MEASURING_THREAD_ID) {
+                [[maybe_unused]]
+                const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
+                const auto measured = ki::simulate_measurement_(state, gate_info, prng_seed);
+                c_register.set(bit_index, measured);
+            }
+            break;
+        }
         default : {
             break;
         }
