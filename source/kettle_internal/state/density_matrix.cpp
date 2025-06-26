@@ -6,6 +6,7 @@
 #include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
+#include "kettle_internal/simulation/gate_pair_generator.hpp"
 
 namespace ki = ket::internal;
 
@@ -133,6 +134,79 @@ auto statevector_to_density_matrix(const Statevector& statevector) -> DensityMat
     }
 
     return DensityMatrix {std::move(dens_mat), density_matrix_nocheck {}};
+}
+
+auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> DensityMatrix
+{
+    const auto a_rows = left.matrix().rows();
+    const auto a_cols = left.matrix().cols();
+    const auto b_rows = right.matrix().rows();
+    const auto b_cols = right.matrix().cols();
+
+    auto result = Eigen::MatrixXcd{a_rows * b_rows, a_cols * b_cols};
+
+    for (Eigen::Index i_col_left = 0; i_col_left < a_cols; ++i_col_left) {
+        for (Eigen::Index i_row_left = 0; i_row_left < a_rows; ++i_row_left) {
+            const auto left_val = left.matrix()(i_row_left, i_col_left);
+            for (Eigen::Index i_col_right = 0; i_col_right < b_cols; ++i_col_right) {
+                for (Eigen::Index i_row_right = 0; i_row_right < b_rows; ++i_row_right) {
+                    const auto right_val = right.matrix()(i_row_right, i_col_right);
+
+                    const auto i_result_row = (i_row_right * a_rows) + i_row_left;
+                    const auto i_result_col = (i_col_right * a_cols) + i_col_left;
+
+                    result(i_result_row, i_result_col) = left_val * right_val;
+                }
+            }
+        }
+    }
+
+    return DensityMatrix {result};
+}
+
+auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t> qubit_indices) -> DensityMatrix
+{
+    // NOTE: the qubit indices *could* be passed in as `Eigen::Index` to avoid the casting, but since qubit
+    // indices are passed as type `std::size_t` everywhere else, we'll just deal with it to avoid annoying
+    // the user; not a big deal anyways
+
+    const auto is_out_of_range = [n_qubits=density_matrix.n_qubits()](auto index) { return index >= n_qubits; };
+    if (std::ranges::any_of(qubit_indices, is_out_of_range)) {
+        throw std::runtime_error {"ERROR: Cannot take partial trace; found qubit index out of bounds\n"};
+    }
+
+    const auto rev_sort_predicate = [](auto x, auto y) { return x > y; };
+    std::ranges::sort(qubit_indices, rev_sort_predicate);
+
+    auto current = density_matrix.matrix();
+    const auto n_qubits = static_cast<Eigen::Index>(density_matrix.n_qubits());
+
+    // TODO: this can be parallelized
+    for (std::size_t i {0}; i < qubit_indices.size(); ++i) {
+        const auto i_qubit = static_cast<Eigen::Index>(qubit_indices[i]);
+        const auto n_qubits_new = n_qubits - static_cast<Eigen::Index>(i) - 1;
+        const auto new_size = ki::pow_2_int(n_qubits_new);
+
+        auto col_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_new};
+        col_pair_iter.set_state(0);
+
+        auto row_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_new};
+        row_pair_iter.set_state(0);
+
+        auto reduced = Eigen::MatrixXcd {new_size, new_size};
+        for (Eigen::Index i_col {0}; i_col < col_pair_iter.size(); ++i_col) {
+            const auto [i_col0, i_col1] = col_pair_iter.next();
+            for (Eigen::Index i_row {0}; i_row < row_pair_iter.size(); ++i_row) {
+                const auto [i_row0, i_row1] = row_pair_iter.next();
+
+                reduced(i_row, i_col) = current(i_col0, i_row0) + current(i_col1, i_row1);
+            }
+        }
+
+        current = reduced;
+    }
+
+    return DensityMatrix {current};
 }
 
 }  // namespace ket

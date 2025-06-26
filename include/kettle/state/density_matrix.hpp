@@ -114,4 +114,26 @@ private:
 */
 auto statevector_to_density_matrix(const Statevector& statevector) -> DensityMatrix;
 
+/*
+    Calculate the tensor product of two `DensityMatrix` instances.
+*/
+auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> DensityMatrix;
+
+/*
+    Calculate the partial trace of a `DensityMatrix` instance over the qubits in `qubit_indices`.
+
+    If all qubits are traced over, this function returns the trace of the `DensityMatrix` as a 1x1 matrix.
+*/
+auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t> qubit_indices) -> DensityMatrix;
+
+// /*
+//     Calculate the tensor product of a sequence of `DensityMatrix` instances.
+// */
+// auto tensor_product(const std::vector<DensityMatrix>& density_matrices) -> DensityMatrix;
+
+// /*
+//     Calculate the Hilbert-Schmidt inner product between two density matrices.
+// */
+// auto inner_product(const DensityMatrix& left, const DensityMatrix& right) -> std::complex<double>;
+
 }  // namespace ket
