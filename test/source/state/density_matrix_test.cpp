@@ -14,6 +14,9 @@
 #include "kettle_internal/common/state_test_utils.hpp"
 
 
+namespace ki = ket::internal;
+
+
 TEST_CASE("statevector_to_density_matrix()")
 {
     SECTION("single computational basis state, 2 qubits")
@@ -41,7 +44,7 @@ TEST_CASE("statevector_to_density_matrix()")
             return ket::DensityMatrix {std::move(matrix)};
         }();
 
-        REQUIRE(ket::internal::almost_eq_with_print_(density_matrix, expected));
+        REQUIRE(ki::almost_eq_with_print_(density_matrix, expected));
     }
 
     SECTION("bell_state(00+)")
@@ -65,7 +68,7 @@ TEST_CASE("statevector_to_density_matrix()")
             return ket::DensityMatrix {std::move(matrix)};
         }();
 
-        REQUIRE(ket::internal::almost_eq_with_print_(density_matrix, expected));
+        REQUIRE(ki::almost_eq_with_print_(density_matrix, expected));
     }
 }
 
@@ -137,7 +140,7 @@ TEST_CASE("density matrix tensor product")
         ket::simulate(circuit1, density_matrix1);
         const auto result_dm_then_tp = ket::tensor_product(density_matrix0, density_matrix1);
 
-        REQUIRE_MSG(ket::internal::almost_eq_with_print_(result_tp_then_dm, result_dm_then_tp), testcase.message);
+        REQUIRE_MSG(ki::almost_eq_with_print_(result_tp_then_dm, result_dm_then_tp), testcase.message);
     }
 
     SECTION("2 qubit systems")
@@ -192,6 +195,33 @@ TEST_CASE("density matrix tensor product")
         ket::simulate(circuit1, density_matrix1);
         const auto result_dm_then_tp = ket::tensor_product(density_matrix0, density_matrix1);
 
-        REQUIRE_MSG(ket::internal::almost_eq_with_print_(result_tp_then_dm, result_dm_then_tp), testcase.message);
+        REQUIRE_MSG(ki::almost_eq_with_print_(result_tp_then_dm, result_dm_then_tp), testcase.message);
+    }
+}
+
+TEST_CASE("partial trace [take tensor product, then partial trace, and check for match]")
+{
+    SECTION("tensor product of two 1-qubit systems")
+    {
+        auto dens_mat0 = ket::DensityMatrix {"0"};
+        auto dens_mat1 = ket::DensityMatrix {"0"};
+
+        auto circuit = ket::QuantumCircuit {1};
+        circuit.add_h_gate(0);
+        ket::simulate(circuit, dens_mat1);
+
+        const auto tensor_product = ket::tensor_product(dens_mat0, dens_mat1);
+
+        SECTION("partial trace over qubit 0")
+        {
+            const auto traced1 = ket::partial_trace(tensor_product, {0});
+            REQUIRE(ki::almost_eq_with_print_(traced1, dens_mat1));
+        }
+
+        SECTION("partial trace over qubit 1")
+        {
+            const auto traced0 = ket::partial_trace(tensor_product, {1});
+            REQUIRE(ki::almost_eq_with_print_(traced0, dens_mat0));
+        }
     }
 }

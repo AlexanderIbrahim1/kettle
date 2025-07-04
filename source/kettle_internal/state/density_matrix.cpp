@@ -184,22 +184,23 @@ auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t>
     // TODO: this can be parallelized
     for (std::size_t i {0}; i < qubit_indices.size(); ++i) {
         const auto i_qubit = static_cast<Eigen::Index>(qubit_indices[i]);
-        const auto n_qubits_new = n_qubits - static_cast<Eigen::Index>(i) - 1;
-        const auto new_size = ki::pow_2_int(n_qubits_new);
 
-        auto col_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_new};
-        col_pair_iter.set_state(0);
+        const auto n_qubits_current = n_qubits - static_cast<Eigen::Index>(i);
+        auto col_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_current};
+        auto row_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_current};
 
-        auto row_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_new};
-        row_pair_iter.set_state(0);
-
+        const auto n_qubits_next = n_qubits_current - 1;
+        const auto new_size = ki::pow_2_int(n_qubits_next);
         auto reduced = Eigen::MatrixXcd {new_size, new_size};
-        for (Eigen::Index i_col {0}; i_col < col_pair_iter.size(); ++i_col) {
+
+        col_pair_iter.set_state(0);
+        for (Eigen::Index i_col {0}; i_col < new_size; ++i_col) {
             const auto [i_col0, i_col1] = col_pair_iter.next();
-            for (Eigen::Index i_row {0}; i_row < row_pair_iter.size(); ++i_row) {
+            row_pair_iter.set_state(0);
+            for (Eigen::Index i_row {0}; i_row < new_size; ++i_row) {
                 const auto [i_row0, i_row1] = row_pair_iter.next();
 
-                reduced(i_row, i_col) = current(i_col0, i_row0) + current(i_col1, i_row1);
+                reduced(i_row, i_col) = current(i_row0, i_col0) + current(i_row1, i_col1);
             }
         }
 
