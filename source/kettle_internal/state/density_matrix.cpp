@@ -1,3 +1,6 @@
+// TODO: remove
+#include <iostream>
+
 #include <stdexcept>
 
 #include <Eigen/Dense>
@@ -177,6 +180,10 @@ auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t>
 
     const auto rev_sort_predicate = [](auto x, auto y) { return x > y; };
     std::ranges::sort(qubit_indices, rev_sort_predicate);
+
+    for (auto elem : qubit_indices) {
+        std::cout << "elem : " << elem << '\n';
+    }
 
     auto current = density_matrix.matrix();
     const auto n_qubits = static_cast<Eigen::Index>(density_matrix.n_qubits());

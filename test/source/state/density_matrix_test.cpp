@@ -201,27 +201,177 @@ TEST_CASE("density matrix tensor product")
 
 TEST_CASE("partial trace [take tensor product, then partial trace, and check for match]")
 {
-    SECTION("tensor product of two 1-qubit systems")
+    // SECTION("tensor product of two 1-qubit systems")
+    // {
+    //     struct TestCase
+    //     {
+    //         std::string message;
+    //         std::function<void(ket::QuantumCircuit&)> func0;
+    //         std::function<void(ket::QuantumCircuit&)> func1;
+    //     };
+
+    //     const auto testcase = GENERATE(
+    //         TestCase {
+    //             "I on 0, H on 1",
+    //             []([[maybe_unused]] ket::QuantumCircuit& circ) {},
+    //             [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
+    //         },
+    //         TestCase {
+    //             "X on 0, H on 1",
+    //             [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); },
+    //             [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
+    //         },
+    //         TestCase {
+    //             "X, Y on 0, H, Z on 1",
+    //             [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); },
+    //             [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+    //         }
+    //     );
+
+    //     auto dens_mat0 = ket::DensityMatrix {"0"};
+    //     auto dens_mat1 = ket::DensityMatrix {"0"};
+
+    //     auto circuit0 = ket::QuantumCircuit {1};
+    //     testcase.func0(circuit0);
+
+    //     auto circuit1 = ket::QuantumCircuit {1};
+    //     testcase.func1(circuit1);
+
+    //     ket::simulate(circuit0, dens_mat0);
+    //     ket::simulate(circuit1, dens_mat1);
+
+    //     const auto tensor_product = ket::tensor_product(dens_mat0, dens_mat1);
+
+    //     SECTION("partial trace over qubit 0")
+    //     {
+    //         const auto traced1 = ket::partial_trace(tensor_product, {0});
+    //         REQUIRE_MSG(ki::almost_eq_with_print_(traced1, dens_mat1), testcase.message);
+    //     }
+
+    //     SECTION("partial trace over qubit 1")
+    //     {
+    //         const auto traced0 = ket::partial_trace(tensor_product, {1});
+    //         REQUIRE_MSG(ki::almost_eq_with_print_(traced0, dens_mat0), testcase.message);
+    //     }
+    // }
+
+    SECTION("tensor product of three 1-qubit systems")
     {
+        struct TestCase
+        {
+            std::string message;
+            std::function<void(ket::QuantumCircuit&)> func0;
+            std::function<void(ket::QuantumCircuit&)> func1;
+            std::function<void(ket::QuantumCircuit&)> func2;
+        };
+
+        const auto testcase = GENERATE(
+            TestCase {
+                "T on 0, H on 1, X on 2",
+                [](ket::QuantumCircuit& circ) { circ.add_t_gate(0); },
+                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
+                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); },
+            }
+        );
+
         auto dens_mat0 = ket::DensityMatrix {"0"};
         auto dens_mat1 = ket::DensityMatrix {"0"};
+        auto dens_mat2 = ket::DensityMatrix {"0"};
 
-        auto circuit = ket::QuantumCircuit {1};
-        circuit.add_h_gate(0);
-        ket::simulate(circuit, dens_mat1);
+        auto circuit0 = ket::QuantumCircuit {1};
+        testcase.func0(circuit0);
 
-        const auto tensor_product = ket::tensor_product(dens_mat0, dens_mat1);
+        auto circuit1 = ket::QuantumCircuit {1};
+        testcase.func1(circuit1);
+
+        auto circuit2 = ket::QuantumCircuit {1};
+        testcase.func2(circuit2);
+
+        ket::simulate(circuit0, dens_mat0);
+        ket::simulate(circuit1, dens_mat1);
+        ket::simulate(circuit2, dens_mat2);
+
+        const auto tensor01 = ket::tensor_product(dens_mat0, dens_mat1);
+        const auto tensor02 = ket::tensor_product(dens_mat0, dens_mat2);
+        const auto tensor12 = ket::tensor_product(dens_mat1, dens_mat2);
+        const auto tensor_product = ket::tensor_product(tensor01, dens_mat2);
 
         SECTION("partial trace over qubit 0")
         {
-            const auto traced1 = ket::partial_trace(tensor_product, {0});
-            REQUIRE(ki::almost_eq_with_print_(traced1, dens_mat1));
+            const auto traced = ket::partial_trace(tensor_product, {0});
+            REQUIRE_MSG(ki::almost_eq_with_print_(traced, tensor12), testcase.message);
         }
 
         SECTION("partial trace over qubit 1")
         {
-            const auto traced0 = ket::partial_trace(tensor_product, {1});
-            REQUIRE(ki::almost_eq_with_print_(traced0, dens_mat0));
+            const auto traced = ket::partial_trace(tensor_product, {1});
+            REQUIRE_MSG(ki::almost_eq_with_print_(traced, tensor02), testcase.message);
         }
     }
+
+    //     SECTION("partial trace over qubit 1")
+    //     {
+    //         const auto traced0 = ket::partial_trace(tensor_product, {1});
+    //         REQUIRE_MSG(ki::almost_eq_with_print_(traced0, dens_mat0), testcase.message);
+    //     }
+    // }
+
+    // SECTION("tensor product of one 2-qubit system and one 1-qubit system")
+    // {
+    //     struct TestCase
+    //     {
+    //         std::string message;
+    //         std::function<void(ket::QuantumCircuit&)> func0;
+    //         std::function<void(ket::QuantumCircuit&)> func1;
+    //     };
+
+    //     const auto testcase = GENERATE(
+    //         // TestCase {
+    //         //     "I on 0, 1 (left) | H on 0 (right)",
+    //         //     []([[maybe_unused]] ket::QuantumCircuit& circ) {},
+    //         //     [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
+    //         // }
+    //         TestCase {
+    //             "X on 0, Y on 1 (left) | H on 0 (right)",
+    //             [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); },
+    //             [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
+    //         }
+    //         // TestCase {
+    //         //     "X, Y on 0, Z on 1 (left) | H, Z on 0 (right)",
+    //         //     [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); circ.add_z_gate(1); },
+    //         //     [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+    //         // },
+    //         // TestCase {
+    //         //     "X, Y on 0, CX on (0, 1) (left) | H, Z on 0 (right)",
+    //         //     [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); circ.add_cx_gate(0, 1); },
+    //         //     [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+    //         // }
+    //     );
+
+    //     auto dens_mat0 = ket::DensityMatrix {"00"};
+    //     auto dens_mat1 = ket::DensityMatrix {"0"};
+
+    //     auto circuit0 = ket::QuantumCircuit {2};
+    //     testcase.func0(circuit0);
+
+    //     auto circuit1 = ket::QuantumCircuit {1};
+    //     testcase.func1(circuit1);
+
+    //     ket::simulate(circuit0, dens_mat0);
+    //     ket::simulate(circuit1, dens_mat1);
+
+    //     const auto tensor_product = ket::tensor_product(dens_mat0, dens_mat1);
+
+    //     SECTION("partial trace over left")
+    //     {
+    //         const auto traced = ket::partial_trace(tensor_product, {0, 1});
+    //         REQUIRE_MSG(ki::almost_eq_with_print_(traced, dens_mat1), testcase.message);
+    //     }
+
+    //     SECTION("partial trace over right")
+    //     {
+    //         const auto traced = ket::partial_trace(tensor_product, {2});
+    //         REQUIRE_MSG(ki::almost_eq_with_print_(traced, dens_mat0), testcase.message);
+    //     }
+    // }
 }
