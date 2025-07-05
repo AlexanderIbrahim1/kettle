@@ -8,7 +8,7 @@ auto main() -> int
     circuit.add_cx_gate(0, 1);
 
     // begin with a 2-qubit statevector in the |00> state
-    auto statevector = ket::QuantumState {"00"};
+    auto statevector = ket::Statevector {"00"};
 
     // propagate the state through the circuit, creating the (|00> + |11>) / sqrt(2) state
     auto simulator = ket::StatevectorSimulator {};

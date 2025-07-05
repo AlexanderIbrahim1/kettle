@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 namespace ket::internal
@@ -36,7 +36,7 @@ private:
     Copy the amplitudes from the old statevector to the new statevector in the project-onto subspace.
 */
 auto copy_projected_amplitudes_(
-    const ket::QuantumState& statevector,
+    const ket::Statevector& statevector,
     const std::vector<std::size_t>& qubit_indices,
     const std::vector<std::uint8_t>& expected_measurements
 ) -> std::vector<std::complex<double>>;

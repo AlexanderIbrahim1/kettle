@@ -6,15 +6,15 @@
 #include <vector>
 
 #include "kettle/common/mathtools.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/io/statevector.hpp"
 
 namespace
 {
 
-auto endian_to_string_(ket::QuantumStateEndian endian) -> std::string
+auto endian_to_string_(ket::Endian endian) -> std::string
 {
-    using QSE = ket::QuantumStateEndian;
+    using QSE = ket::Endian;
 
     if (endian == QSE::BIG) {
         return "BIG";
@@ -27,9 +27,9 @@ auto endian_to_string_(ket::QuantumStateEndian endian) -> std::string
     }
 }
 
-auto string_to_endian_(const std::string& endian) -> ket::QuantumStateEndian
+auto string_to_endian_(const std::string& endian) -> ket::Endian
 {
-    using QSE = ket::QuantumStateEndian;
+    using QSE = ket::Endian;
 
     if (endian == "BIG") {
         return QSE::BIG;
@@ -73,11 +73,11 @@ namespace ket
 
 void save_statevector(
     std::ostream& outstream,
-    const QuantumState& state,
-    QuantumStateEndian endian
+    const Statevector& state,
+    Endian endian
 )
 {
-    using QSE = QuantumStateEndian;
+    using QSE = Endian;
 
     outstream << "ENDIANNESS: " << endian_to_string_(endian) << '\n';
     outstream << "NUMBER OF STATES: " << state.n_states() << '\n';
@@ -93,8 +93,8 @@ void save_statevector(
 
 void save_statevector(
     const std::filesystem::path& filepath,
-    const QuantumState& state,
-    QuantumStateEndian endian
+    const Statevector& state,
+    Endian endian
 )
 {
     auto outstream = std::ofstream {filepath};
@@ -110,7 +110,7 @@ void save_statevector(
     save_statevector(outstream, state, endian);
 }
 
-auto load_statevector(std::istream& instream) -> QuantumState
+auto load_statevector(std::istream& instream) -> Statevector
 {
     // the first line contains the endianness
     const auto endian = [&]() {
@@ -150,10 +150,10 @@ auto load_statevector(std::istream& instream) -> QuantumState
         amplitudes.emplace_back(real, imag);
     }
 
-    return QuantumState {amplitudes, endian};
+    return Statevector {amplitudes, endian};
 }
 
-auto load_statevector(const std::filesystem::path& filepath) -> QuantumState
+auto load_statevector(const std::filesystem::path& filepath) -> Statevector
 {
     auto instream = std::ifstream {filepath};
 

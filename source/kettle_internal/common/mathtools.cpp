@@ -1,46 +1,53 @@
 #include <complex>
 #include <cstddef>
 
+#include <Eigen/Dense>
+
 #include "kettle/common/mathtools.hpp"
 #include "kettle_internal/common/mathtools_internal.hpp"
 
 namespace ket::internal
 {
 
-auto pow_2_int(std::size_t exponent) noexcept -> std::size_t
+template <typename T>
+auto pow_2_int(T exponent) noexcept -> T
 {
-    return std::size_t {1} << exponent;
+    return static_cast<T>(1UL << static_cast<std::size_t>(exponent));
 }
+template auto pow_2_int<std::size_t>(std::size_t exponent) noexcept -> std::size_t;
+template auto pow_2_int<std::ptrdiff_t>(std::ptrdiff_t exponent) noexcept -> std::ptrdiff_t;
 
-auto is_power_of_2(std::size_t value) noexcept -> bool
+template <typename T>
+auto is_power_of_2(T value) noexcept -> bool
 {
     const auto is_positive = value > 0;
-    const auto has_one_bit_set = (value & (value - 1)) == 0;
+    const auto size_t_value = static_cast<std::size_t>(value);
+    const auto has_one_bit_set = (size_t_value & (size_t_value - 1)) == 0;
 
     return is_positive && has_one_bit_set;
 }
+template auto is_power_of_2<std::size_t>(std::size_t value) noexcept -> bool;
+template auto is_power_of_2<std::ptrdiff_t>(std::ptrdiff_t value) noexcept -> bool;
 
-auto log_2_int(std::size_t power) noexcept -> std::size_t
+template <typename T>
+auto log_2_int(T power) noexcept -> std::size_t 
 {
+    auto size_t_power = static_cast<std::size_t>(power);
+
     // assumes that power > 0
     auto log2 = std::size_t {0};
-    while (power > 0) {
+    while (size_t_power > 0) {
         ++log2;
-        power = (power >> 1UL);
+        size_t_power = (size_t_power >> 1UL);
     }
 
-    return log2 - 1;
+    return log2 - 1UL;
 }
+template auto log_2_int<std::size_t>(std::size_t power) noexcept -> std::size_t;
+template auto log_2_int<std::ptrdiff_t>(std::ptrdiff_t power) noexcept -> std::size_t;
 
-/*
-    given a grid of side lengths (size0, size1), find (i0, i1), where
-    
-        i_flat = i1 + i0 * size1
-*/
-auto flat_index_to_grid_indices_2d(
-    std::size_t i_flat,
-    std::size_t size1
-) -> std::tuple<std::size_t, std::size_t>
+template <typename T>
+auto flat_index_to_grid_indices_2d(T i_flat, T size1) -> std::tuple<T, T>
 {
     const auto i0 = i_flat / size1;
     i_flat -= (i0 * size1);
@@ -49,17 +56,11 @@ auto flat_index_to_grid_indices_2d(
 
     return {i0, i1};
 }
+template auto flat_index_to_grid_indices_2d<std::size_t>(std::size_t i_flat, std::size_t size1) -> std::tuple<std::size_t, std::size_t>;
+template auto flat_index_to_grid_indices_2d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
 
-/*
-    given a grid of side lengths (size0, size1, size2), find (i0, i1, i2), where
-    
-        i_flat = i2 + i1 * size2 + i0 * size1 * size2
-*/
-auto flat_index_to_grid_indices_3d(
-    std::size_t i_flat,
-    std::size_t size1,
-    std::size_t size2
-) -> std::tuple<std::size_t, std::size_t, std::size_t>
+template <typename T>
+auto flat_index_to_grid_indices_3d(T i_flat, T size1, T size2) -> std::tuple<T, T, T>
 {
     const auto i0 = i_flat / (size1 * size2);
     i_flat -= (i0 * size1 * size2);
@@ -71,6 +72,8 @@ auto flat_index_to_grid_indices_3d(
 
     return {i0, i1, i2};
 }
+template auto flat_index_to_grid_indices_3d<std::size_t>(std::size_t i_flat, std::size_t size1, std::size_t size2) -> std::tuple<std::size_t, std::size_t, std::size_t>;
+template auto flat_index_to_grid_indices_3d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1, std::ptrdiff_t size2) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t, std::ptrdiff_t>;
 
 }  // namespace ket::internal
 

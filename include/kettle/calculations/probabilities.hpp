@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 /*
     This file contains code components to calculate the probabilities of each of
-    the individual computational states in the overall QuantumState object.
+    the individual computational states in the overall Statevector object.
 
     It is also possible to add noise to the measurements.
 */
@@ -18,7 +18,7 @@ namespace ket
 
 /*
     The QuantumNoise class holds the noise applied to the probabilities calculated
-    from the QuantumState object.
+    from the Statevector object.
 
     This is basically a thin wrapper around a `std::vector<double>` that checks if
     the noise satisfies certain conditions.
@@ -41,12 +41,12 @@ private:
 };
 
 auto calculate_probabilities_raw(
-    const QuantumState& state,
+    const Statevector& state,
     const QuantumNoise* noise = nullptr
 ) -> std::vector<double>;
 
 auto calculate_probabilities(
-    const QuantumState& state,
+    const Statevector& state,
     const QuantumNoise* noise = nullptr
 ) -> std::map<std::string, double>;
 

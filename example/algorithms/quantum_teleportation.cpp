@@ -13,7 +13,7 @@ auto main() -> int
     const auto alice_qubit = ket::generate_random_state(1);
 
     // now we create the two resource qubits
-    const auto resource_qubits = ket::QuantumState {"00"};
+    const auto resource_qubits = ket::Statevector {"00"};
 
     // the input to the circuit is the tensor product of these states
     auto input = ket::tensor_product(alice_qubit, resource_qubits);

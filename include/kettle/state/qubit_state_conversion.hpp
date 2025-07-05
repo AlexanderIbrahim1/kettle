@@ -13,13 +13,13 @@ namespace ket
 
 auto bitstring_to_state_index(
     const std::string& bitstring,
-    ket::QuantumStateEndian input_endian
+    ket::Endian input_endian
 ) -> std::size_t;
 
 auto state_index_to_dynamic_bitset(
     std::size_t i_state,
     std::size_t n_qubits,
-    ket::QuantumStateEndian input_endian
+    ket::Endian input_endian
 ) -> std::vector<std::uint8_t>;
 
 auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits) -> std::string;
@@ -27,12 +27,12 @@ auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits) -> std::
 auto state_index_to_bitstring(
     std::size_t i_state,
     std::size_t n_qubits,
-    ket::QuantumStateEndian input_endian
+    ket::Endian input_endian
 ) -> std::string;
 
 auto dynamic_bitset_to_state_index(
     const std::vector<std::uint8_t>& dyn_bitset,
-    ket::QuantumStateEndian input_endian
+    ket::Endian input_endian
 ) -> std::size_t;
 
 auto bitstring_to_dynamic_bitset(
@@ -57,7 +57,7 @@ auto dynamic_bitset_to_state_index_big_endian(const std::vector<std::uint8_t>& d
 
 auto binary_fraction_expansion(
     const std::string& bitstring,
-    QuantumStateEndian endian = QuantumStateEndian::LITTLE
+    Endian endian = Endian::LITTLE
 ) -> double;
 
 }  // namespace ket

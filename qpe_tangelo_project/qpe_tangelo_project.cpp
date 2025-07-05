@@ -86,7 +86,7 @@ auto main(int argc, char** argv) -> int
             throw std::ios::failure {std::format("ERROR: cannot open output file '{}'", output_filepath.c_str())};
         }
 
-        ket::save_statevector(outstream, projected, ket::QuantumStateEndian::BIG);
+        ket::save_statevector(outstream, projected, ket::Endian::BIG);
     }
 
     return 0;

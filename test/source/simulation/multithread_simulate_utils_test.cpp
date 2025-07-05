@@ -64,7 +64,7 @@ TEST_CASE("partial_sum_pairs_()")
     {
         std::size_t n_gate_pairs;
         std::size_t n_threads;
-        std::vector<ket::internal::FlatIndexPair> expected;
+        std::vector<ket::internal::FlatIndexPair<std::size_t>> expected;
     };
 
     const auto testcase = GENERATE(

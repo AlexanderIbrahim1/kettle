@@ -9,7 +9,7 @@
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 using PT = ket::PauliTerm;
@@ -20,16 +20,16 @@ TEST_CASE("expectation value of SparsePauliString, 1-qubit")
     struct TestCase
     {
         PT term;
-        ket::QuantumState statevector;
+        ket::Statevector statevector;
         std::complex<double> expected;
     };
 
-    const auto x_plus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-    const auto x_minus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {-M_SQRT1_2, 0.0}}};
-    const auto y_plus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {0.0, M_SQRT1_2}}};
-    const auto y_minus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {0.0, -M_SQRT1_2}}};
-    const auto z_plus = ket::QuantumState {"0"};
-    const auto z_minus = ket::QuantumState {"1"};
+    const auto x_plus = ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+    const auto x_minus = ket::Statevector {{{M_SQRT1_2, 0.0}, {-M_SQRT1_2, 0.0}}};
+    const auto y_plus = ket::Statevector {{{M_SQRT1_2, 0.0}, {0.0, M_SQRT1_2}}};
+    const auto y_minus = ket::Statevector {{{M_SQRT1_2, 0.0}, {0.0, -M_SQRT1_2}}};
+    const auto z_plus = ket::Statevector {"0"};
+    const auto z_minus = ket::Statevector {"1"};
 
     auto testcase = GENERATE_COPY(
         TestCase(PT::X, x_plus, 1.0),
@@ -67,14 +67,14 @@ TEST_CASE("expectation value of SparsePauliString, 2-qubit")
     {
         PT term0;
         PT term1;
-        ket::QuantumState statevector;
+        ket::Statevector statevector;
         std::complex<double> expected;
     };
 
-    const auto x_plus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-    const auto x_minus = ket::QuantumState {{{M_SQRT1_2, 0.0}, {-M_SQRT1_2, 0.0}}};
-    const auto z_plus = ket::QuantumState {"0"};
-    const auto z_minus = ket::QuantumState {"1"};
+    const auto x_plus = ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+    const auto x_minus = ket::Statevector {{{M_SQRT1_2, 0.0}, {-M_SQRT1_2, 0.0}}};
+    const auto z_plus = ket::Statevector {"0"};
+    const auto z_minus = ket::Statevector {"1"};
 
     auto testcase = GENERATE_COPY(
         TestCase(PT::Z, PT::Z, ket::tensor_product(z_plus, z_plus), 1.0),
@@ -109,7 +109,7 @@ TEST_CASE("expectation value of PauliOperator")
             {.coefficient={1.0, 0.0}, .pauli_string={PT::X}},
         };
 
-        const auto statevector = ket::QuantumState {"0"};
+        const auto statevector = ket::Statevector {"0"};
 
         const auto expval = ket::expectation_value(pauli_op, statevector);
 
@@ -123,7 +123,7 @@ TEST_CASE("expectation value of PauliOperator")
             {.coefficient={-2.0, 0.0}, .pauli_string={PT::X}},
         };
 
-        const auto statevector = ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
+        const auto statevector = ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
 
         const auto expval = ket::expectation_value(pauli_op, statevector);
 
@@ -142,7 +142,7 @@ TEST_CASE("expectation value of PauliOperator")
             circuit.add_h_gate(0);
             circuit.add_cx_gate(0, 1);
 
-            auto state = ket::QuantumState {"00"};
+            auto state = ket::Statevector {"00"};
             ket::simulate(circuit, state);
 
             return state;
@@ -166,7 +166,7 @@ TEST_CASE("expectation value of PauliOperator")
             circuit.add_cx_gate(0, 1);
             circuit.add_cx_gate(0, 2);
 
-            auto state = ket::QuantumState {"000"};
+            auto state = ket::Statevector {"000"};
             ket::simulate(circuit, state);
 
             return state;
@@ -188,7 +188,7 @@ TEST_CASE("expectation value of PauliOperator")
             auto circuit = ket::QuantumCircuit {2};
             circuit.add_h_gate({0, 1});
 
-            auto state = ket::QuantumState {"00"};
+            auto state = ket::Statevector {"00"};
             ket::simulate(circuit, state);
 
             return state;

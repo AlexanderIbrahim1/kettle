@@ -56,7 +56,7 @@ struct CommandLineArguments
 
 void simulate_subcircuit(
     const std::filesystem::path& circuit_filepath,
-    ket::QuantumState& statevector,
+    ket::Statevector& statevector,
     std::size_t n_total_qubits
 )
 {

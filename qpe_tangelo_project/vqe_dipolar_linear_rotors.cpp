@@ -217,7 +217,7 @@ auto main(int argc, char** argv) -> int
             ctx->circuit.set_parameter_value(ctx->parameter_ids[i], parameters[i]);
         }
 
-        auto statevector = ket::QuantumState {ctx->n_qubits};
+        auto statevector = ket::Statevector {ctx->n_qubits};
         ket::simulate(ctx->circuit, statevector);
 
         const auto exp_value = ket::expectation_value(ctx->pauli_op, statevector);

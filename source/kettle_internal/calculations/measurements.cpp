@@ -11,7 +11,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle_internal/common/prng.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle_internal/state/marginal_internal.hpp"
 
 #include "kettle/calculations/measurements.hpp"
@@ -57,9 +57,9 @@ auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::m
 }
 
 /*
-    Performs measurements of the QuantumState using its probabilities. The measurements
+    Performs measurements of the Statevector using its probabilities. The measurements
     are in the form of a vector of indices, each of which indicates the computational state
-    that the overall QuantumState collapsed to.
+    that the overall Statevector collapsed to.
 
     Measurements are performed by first calculating the cumulative probability distribution
     over the states, and sampling with a uniform distribution. This is faster than the method
@@ -94,7 +94,7 @@ auto perform_measurements_as_memory(
 }
 
 auto perform_measurements_as_memory(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise,
     std::optional<int> seed
@@ -123,7 +123,7 @@ auto perform_measurements_as_counts_raw(
 }
 
 auto perform_measurements_as_counts_raw(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise,
     std::optional<int> seed
@@ -151,7 +151,7 @@ auto perform_measurements_as_counts_marginal(
     auto measurements = std::map<std::string, std::size_t> {};
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
-    const auto endian = ket::QuantumStateEndian::LITTLE;
+    const auto endian = ket::Endian::LITTLE;
 
     // REMINDER: if the entry does not exist, `std::map` will first initialize it to 0
     for (std::size_t i_shot {0}; i_shot < n_shots; ++i_shot) {
@@ -164,7 +164,7 @@ auto perform_measurements_as_counts_marginal(
 }
 
 auto perform_measurements_as_counts_marginal(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const std::vector<std::size_t>& marginal_qubits,
     const QuantumNoise* noise,
@@ -177,7 +177,7 @@ auto perform_measurements_as_counts_marginal(
 
 auto perform_measurements_as_counts_marginal(
     const QuantumCircuit& circuit,
-    const QuantumState& original_state,
+    const Statevector& original_state,
     std::size_t n_shots,
     const std::vector<std::size_t>& marginal_qubits,
     const QuantumNoise* noise,
@@ -188,7 +188,7 @@ auto perform_measurements_as_counts_marginal(
     const auto marginal_bitmask = ket::internal::build_marginal_bitmask_(marginal_qubits, n_qubits);
 
     // the internal layout of the quantum state is little endian, so the probabilities are as well
-    const auto endian = ket::QuantumStateEndian::LITTLE;
+    const auto endian = ket::Endian::LITTLE;
 
     auto measurements = std::map<std::string, std::size_t> {};
 
@@ -208,7 +208,7 @@ auto perform_measurements_as_counts_marginal(
 }
 
 auto perform_measurements_as_counts(
-    const QuantumState& state,
+    const Statevector& state,
     std::size_t n_shots,
     const QuantumNoise* noise,
     std::optional<int> seed

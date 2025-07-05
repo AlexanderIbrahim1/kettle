@@ -111,7 +111,7 @@ auto multiply(const SquareMatrix2D& matrix, const Vector& amplitudes) -> Vector
 }
 
 
-auto extract_amplitudes(const ket::QuantumState& state) -> Vector
+auto extract_amplitudes(const ket::Statevector& state) -> Vector
 {
     auto output = Vector {};
     output.reserve(state.n_states());
@@ -135,7 +135,7 @@ void endian_flip(Vector& data, std::size_t n_relevant_bits)
 }
 
 
-auto expectation_value(const SquareMatrix2D& hamiltonian, const ket::QuantumState& state) -> std::complex<double>
+auto expectation_value(const SquareMatrix2D& hamiltonian, const ket::Statevector& state) -> std::complex<double>
 {
     // the state stores data in little-endian format, but the hamiltonian is in big-endian format
     auto amplitudes = extract_amplitudes(state);
@@ -146,7 +146,7 @@ auto expectation_value(const SquareMatrix2D& hamiltonian, const ket::QuantumStat
 
     // we need to swap back to get the inner product
     endian_flip(product, state.n_qubits());  // now in LITTLE-format
-    const auto product_state = ket::QuantumState {product, ket::QuantumStateEndian::LITTLE, 1.0e30};
+    const auto product_state = ket::Statevector {product, ket::Endian::LITTLE, 1.0e30};
 
     return ket::inner_product(state, product_state);
 }

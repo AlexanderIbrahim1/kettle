@@ -42,7 +42,7 @@ void apply_balanced_deutsch_jozsa_from_ibm_example(ket::QuantumCircuit& circuit)
 auto main() -> int
 {
     // construct the initial state; we have 3 "data qubits" and 1 "ancilla qubit" (the last)
-    auto statevector = ket::QuantumState {"0001"};
+    auto statevector = ket::Statevector {"0001"};
 
     // create the circuit with the gates needed for the Deutsch-Jozsa algorithm
     auto circuit = ket::QuantumCircuit {4};

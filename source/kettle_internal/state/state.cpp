@@ -9,7 +9,7 @@
 
 #include "kettle/common/mathtools.hpp"
 #include "kettle/state/endian.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
@@ -18,7 +18,7 @@
 namespace ket
 {
 
-QuantumState::QuantumState(std::size_t n_qubits)
+Statevector::Statevector(std::size_t n_qubits)
     : n_qubits_ {n_qubits}
     , n_states_ {ket::internal::pow_2_int(n_qubits)}
     , coefficients_(n_states_, {0.0, 0.0})
@@ -27,9 +27,9 @@ QuantumState::QuantumState(std::size_t n_qubits)
     coefficients_[0] = {1, 0};
 }
 
-QuantumState::QuantumState(
+Statevector::Statevector(
     std::vector<std::complex<double>> coefficients,
-    QuantumStateEndian input_endian,
+    Endian input_endian,
     double normalization_tolerance
 )
     : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
@@ -45,14 +45,14 @@ QuantumState::QuantumState(
     // the user passed the vector of coefficients in big endian format, but the
     // internal mapping of the indices to the states is in little endian format,
     // so we need to perform a conversion
-    if (input_endian == QuantumStateEndian::BIG) {
+    if (input_endian == Endian::BIG) {
         perform_endian_flip_on_coefficients_();
     }
 }
 
-QuantumState::QuantumState(
+Statevector::Statevector(
     const std::string& computational_state,
-    QuantumStateEndian input_endian
+    Endian input_endian
 )
     : n_qubits_ {computational_state.size()}
     , n_states_ {ket::internal::pow_2_int(computational_state.size())}
@@ -64,7 +64,7 @@ QuantumState::QuantumState(
     coefficients_[index] = {1.0, 0.0};
 }
 
-void QuantumState::check_power_of_2_with_at_least_one_qubit_() const
+void Statevector::check_power_of_2_with_at_least_one_qubit_() const
 {
     if (coefficients_.size() < 2) {
         throw std::runtime_error {
@@ -79,7 +79,7 @@ void QuantumState::check_power_of_2_with_at_least_one_qubit_() const
     }
 }
 
-void QuantumState::check_normalization_of_coefficients_(double normalization_tolerance) const
+void Statevector::check_normalization_of_coefficients_(double normalization_tolerance) const
 {
     auto sum_of_squared_norms = double {0.0};
     for (const auto& elem : coefficients_) {
@@ -98,21 +98,21 @@ void QuantumState::check_normalization_of_coefficients_(double normalization_tol
     }
 }
 
-void QuantumState::check_index_(std::size_t index) const
+void Statevector::check_index_(std::size_t index) const
 {
     if (index >= n_states_) {
         throw std::runtime_error {"Out-of-bounds access for the quantum state.\n"};
     }
 }
 
-void QuantumState::check_at_least_one_qubit_() const
+void Statevector::check_at_least_one_qubit_() const
 {
     if (n_qubits_ == 0) {
-        throw std::runtime_error {"There must be at least 1 qubit in the QuantumState.\n"};
+        throw std::runtime_error {"There must be at least 1 qubit in the Statevector.\n"};
     }
 }
 
-void QuantumState::perform_endian_flip_on_coefficients_() noexcept
+void Statevector::perform_endian_flip_on_coefficients_() noexcept
 {
     for (std::size_t i {0}; i < n_states_; ++i) {
         const auto i_flip = ket::endian_flip(i, n_qubits_);
@@ -123,8 +123,8 @@ void QuantumState::perform_endian_flip_on_coefficients_() noexcept
 }
 
 auto almost_eq(
-    const QuantumState& left,
-    const QuantumState& right,
+    const Statevector& left,
+    const Statevector& right,
     double tolerance_sq
 ) noexcept -> bool
 {
@@ -141,7 +141,7 @@ auto almost_eq(
     return true;
 }
 
-auto tensor_product(const QuantumState& left, const QuantumState& right) -> QuantumState
+auto tensor_product(const Statevector& left, const Statevector& right) -> Statevector
 {
     const auto n_states = left.n_states() * right.n_states();
     auto new_coefficients = std::vector<std::complex<double>> {};
@@ -153,10 +153,10 @@ auto tensor_product(const QuantumState& left, const QuantumState& right) -> Quan
         }
     }
 
-    return QuantumState {std::move(new_coefficients)};
+    return Statevector {std::move(new_coefficients)};
 }
 
-auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state) -> std::complex<double>
+auto inner_product(const Statevector& bra_state, const Statevector& ket_state) -> std::complex<double>
 {
     if (bra_state.n_states() != ket_state.n_states()) {
         throw std::runtime_error {"ERROR: cannot calculate inner product between two states of different sizes.\n"};
@@ -171,7 +171,7 @@ auto inner_product(const QuantumState& bra_state, const QuantumState& ket_state)
     return inner_product;
 }
 
-auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const QuantumState& state) -> std::complex<double>
+auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const Statevector& state) -> std::complex<double>
 {
     if (eigenvalues.size() != state.n_states()) {
         throw std::runtime_error {
@@ -187,7 +187,7 @@ auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenva
     return output;
 }
 
-auto inner_product_norm_squared(const QuantumState& left, const QuantumState& right) -> double
+auto inner_product_norm_squared(const Statevector& left, const Statevector& right) -> double
 {
     const auto inner_product_ = inner_product(left, right);
 

@@ -4,7 +4,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/simulation/simulate.hpp"
 
 TEST_CASE("control swap gate on 3-qubit circuit")
@@ -30,8 +30,8 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = ket::QuantumState {info.input_bitstring};
-        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto state = ket::Statevector {info.input_bitstring};
+        auto expected = ket::Statevector {info.expected_bitstring};
         auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 1 and 2")
@@ -64,8 +64,8 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = ket::QuantumState {info.input_bitstring};
-        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto state = ket::Statevector {info.input_bitstring};
+        auto expected = ket::Statevector {info.expected_bitstring};
         auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 0 and 2")
@@ -98,8 +98,8 @@ TEST_CASE("control swap gate on 3-qubit circuit")
         );
         // clang-format on
 
-        auto state = ket::QuantumState {info.input_bitstring};
-        auto expected = ket::QuantumState {info.expected_bitstring};
+        auto state = ket::Statevector {info.input_bitstring};
+        auto expected = ket::Statevector {info.expected_bitstring};
         auto circuit = ket::QuantumCircuit {3};
 
         SECTION("swap qubits are 0 and 1")
@@ -147,8 +147,8 @@ TEST_CASE("control swap gate on 4-qubit circuit")
     );
     // clang-format on
  
-    auto state = ket::QuantumState {info.input_bitstring};
-    auto expected = ket::QuantumState {info.expected_bitstring};
+    auto state = ket::Statevector {info.input_bitstring};
+    auto expected = ket::Statevector {info.expected_bitstring};
     auto circuit = ket::QuantumCircuit {4};
  
     circuit.add_cswap_gate(0, 1, 3);

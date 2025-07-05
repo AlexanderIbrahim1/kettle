@@ -19,7 +19,7 @@ enum class MarginalBitsSide : std::uint8_t
 auto state_index_to_bitstring_marginal_(
     std::size_t i_state,
     const std::vector<std::uint8_t>& marginal_bitmask,
-    ket::QuantumStateEndian input_endian
+    ket::Endian input_endian
 ) -> std::string;
 
 template <MarginalBitsSide Side>

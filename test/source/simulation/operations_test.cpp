@@ -4,7 +4,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle_internal/simulation/operations.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 constexpr static auto ABS_TOL = double {1.0e-6};
 
@@ -21,7 +21,7 @@ constexpr static auto ABS_TOL = double {1.0e-6};
 TEST_CASE("Swap states operation")
 {
     // Initial state: |00> = {{1.0, 0.0}, {0.0, 0.0}}
-    auto quantum_state = ket::QuantumState {
+    auto quantum_state = ket::Statevector {
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
@@ -39,7 +39,7 @@ TEST_CASE("Swap states operation")
 TEST_CASE("Superpose states operation")
 {
     // Initial state: superposition: |+> = {{1.0/sqrt2, 0.0}, {1.0/sqrt2, 0.0}}
-    auto quantum_state = ket::QuantumState {
+    auto quantum_state = ket::Statevector {
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 
@@ -57,7 +57,7 @@ TEST_CASE("Superpose states operation")
 TEST_CASE("Turn states operation")
 {
     // Initial state: |00> = {{1.0, 0.0}, {0.0, 0.0}}
-    auto quantum_state = ket::QuantumState {
+    auto quantum_state = ket::Statevector {
         {{1.0, 0.0}, {0.0, 0.0}}
     };
 
@@ -75,7 +75,7 @@ TEST_CASE("Turn states operation")
 TEST_CASE("Phase turn states operation")
 {
     // Initial state: |+> = {{1.0/sqrt2, 0.0}, {1.0/sqrt2, 0.0}}
-    auto quantum_state = ket::QuantumState {
+    auto quantum_state = ket::Statevector {
         {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
     };
 

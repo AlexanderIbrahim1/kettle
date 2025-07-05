@@ -75,7 +75,7 @@ struct CommandLineArguments
 
 void simulate_subcircuit(
     const std::filesystem::path& circuit_filepath,
-    ket::QuantumState& statevector,
+    ket::Statevector& statevector,
     std::size_t n_total_qubits
 )
 {
@@ -90,7 +90,7 @@ auto statevector_filename(int i) -> std::string
 
 void simulate_unitary(
     const CommandLineArguments& args,
-    ket::QuantumState& statevector,
+    ket::Statevector& statevector,
     std::size_t i_control,
     int& count
 )
@@ -139,7 +139,7 @@ auto main(int argc, char** argv) -> int
 
     auto statevector = [&]() {
         if (args.i_continue == RUN_FROM_START_KEY) {
-            return ket::QuantumState {n_total_qubits};
+            return ket::Statevector {n_total_qubits};
         } else {
             return ket::load_statevector(args.abs_input_dirpath / statevector_filename(args.i_continue));
         }

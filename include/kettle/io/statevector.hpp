@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <iostream>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 namespace ket
@@ -11,18 +11,18 @@ namespace ket
 
 void save_statevector(
     std::ostream& outstream,
-    const QuantumState& state,
-    QuantumStateEndian endian = QuantumStateEndian::LITTLE
+    const Statevector& state,
+    Endian endian = Endian::LITTLE
 );
 
 void save_statevector(
     const std::filesystem::path& filepath,
-    const QuantumState& state,
-    QuantumStateEndian endian = QuantumStateEndian::LITTLE
+    const Statevector& state,
+    Endian endian = Endian::LITTLE
 );
 
-auto load_statevector(std::istream& instream) -> QuantumState;
+auto load_statevector(std::istream& instream) -> Statevector;
 
-auto load_statevector(const std::filesystem::path& filepath) -> QuantumState;
+auto load_statevector(const std::filesystem::path& filepath) -> Statevector;
 
 }  // namespace ket

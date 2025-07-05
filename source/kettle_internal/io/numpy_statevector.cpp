@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle/io/numpy_statevector.hpp"
 
 namespace
@@ -34,8 +34,8 @@ namespace ket
 
 auto read_numpy_statevector(
     std::istream& instream,
-    QuantumStateEndian input_endian
-) -> QuantumState
+    Endian input_endian
+) -> Statevector
 {
     // the very first line contains the number of qubits
     const auto n_qubits = [&]() {
@@ -54,13 +54,13 @@ auto read_numpy_statevector(
         amplitudes.push_back(read_complex_numpy_format_(instream));
     }
 
-    return QuantumState {std::move(amplitudes), input_endian};
+    return Statevector {std::move(amplitudes), input_endian};
 }
 
 auto read_numpy_statevector(
     const std::filesystem::path& filepath,
-    QuantumStateEndian input_endian
-) -> QuantumState
+    Endian input_endian
+) -> Statevector
 {
     auto instream = std::ifstream {filepath};
 

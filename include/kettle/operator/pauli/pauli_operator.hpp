@@ -6,7 +6,7 @@
 
 #include "kettle/common/tolerance.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 /*
     This file contains the `PauliOperator` class for 
@@ -79,8 +79,8 @@ auto almost_eq(
     double coeff_tolerance = COMPLEX_ALMOST_EQ_TOLERANCE_SQ
 ) -> bool;
 
-auto expectation_value(const PauliOperator& pauli_op, const QuantumState& state) -> std::complex<double>;
+auto expectation_value(const PauliOperator& pauli_op, const Statevector& state) -> std::complex<double>;
 
-auto expectation_value(const SparsePauliString& sparse_pauli_string, const QuantumState& state) -> std::complex<double>;
+auto expectation_value(const SparsePauliString& sparse_pauli_string, const Statevector& state) -> std::complex<double>;
 
 }  // namespace ket

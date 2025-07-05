@@ -35,7 +35,7 @@ auto main() -> int
     circuit.add_h_gate({0, 1});
 
     // create the initial statevector, and propagate it through the circuit
-    auto statevector = ket::QuantumState {"00"};
+    auto statevector = ket::Statevector {"00"};
     ket::simulate(circuit, statevector);
 
     // get a map of the bitstrings to the counts

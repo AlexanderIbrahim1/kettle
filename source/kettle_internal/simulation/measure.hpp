@@ -5,20 +5,20 @@
 
 #include "kettle_internal/common/prng.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/state/state.hpp"
+#include "kettle/state/statevector.hpp"
 
 
 namespace ket::internal
 {
 
 auto probabilities_of_collapsed_states_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info
 ) -> std::tuple<double, double>;
 
 template <int StateToCollapse>
 void collapse_and_renormalize_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     double norm_of_surviving_state
 );
@@ -32,7 +32,7 @@ void collapse_and_renormalize_(
 */
 template <ket::internal::DiscreteDistribution Distribution = std::discrete_distribution<int>>
 auto simulate_measurement_(
-    ket::QuantumState& state,
+    ket::Statevector& state,
     const ket::GateInfo& info,
     std::optional<int> seed = std::nullopt
 ) -> Distribution::result_type

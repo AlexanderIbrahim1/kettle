@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 
+# for linking against Eigen
+set(CMAKE_POLICY_DEFAULT_CMP0111 OLD)
+
 include(cmake/prelude.cmake)
 
 project(
@@ -14,6 +17,7 @@ include(cmake/project-is-top-level.cmake)
 include(cmake/variables.cmake)
 
 # ---- Add Dependencies ----
+include(cmake/eigen_external.cmake)
 include(cmake/nlopt_external.cmake)
 
 # ---- Declare library ----
@@ -56,13 +60,17 @@ add_library(
     source/kettle_internal/optimize/n_local.cpp
     source/kettle_internal/parameter/parameter.cpp
     source/kettle_internal/parameter/parameter_expression.cpp
+    source/kettle_internal/simulation/measure_density_matrix.cpp
     source/kettle_internal/simulation/measure.cpp
     source/kettle_internal/simulation/multithread_simulate_utils.cpp
+    source/kettle_internal/simulation/operations_density_matrix.cpp
     source/kettle_internal/simulation/operations.cpp
+    source/kettle_internal/simulation/simulate_density_matrix.cpp
     source/kettle_internal/simulation/simulate_utils.cpp
     source/kettle_internal/simulation/simulate_pauli.cpp
     source/kettle_internal/simulation/simulate.cpp
     source/kettle_internal/state/bitstring_utils.cpp
+    source/kettle_internal/state/density_matrix.cpp
     source/kettle_internal/state/marginal.cpp
     source/kettle_internal/state/project_state.cpp
     source/kettle_internal/state/qubit_state_conversion.cpp
@@ -116,13 +124,16 @@ target_link_libraries(
     kettle_kettle
     PRIVATE
     nlopt::nlopt
+    Eigen3::Eigen
 )
 
 get_target_property(NLOPT_INCLUDES nlopt::nlopt INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(EIGEN_INCLUDES Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(
     kettle_kettle
     SYSTEM
     PUBLIC ${NLOPT_INCLUDES}
+    PUBLIC ${EIGEN_INCLUDES}
 )
 
 # ---- Install rules ----

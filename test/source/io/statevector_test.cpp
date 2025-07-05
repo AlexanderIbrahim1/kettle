@@ -4,7 +4,7 @@
 
 #include <kettle/circuit/circuit.hpp>
 #include <kettle/simulation/simulate.hpp>
-#include <kettle/state/state.hpp>
+#include <kettle/state/statevector.hpp>
 #include <kettle/io/statevector.hpp>
 
 
@@ -18,7 +18,7 @@ TEST_CASE("read_numpy_statevector()")
         circuit.add_y_gate({1, 2});
         circuit.add_rx_gate({{0, M_PI_4}, {2, M_PI_2}});
 
-        auto state_ = ket::QuantumState {3};
+        auto state_ = ket::Statevector {3};
         ket::simulate(circuit, state_);
 
         return state_;

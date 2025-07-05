@@ -87,11 +87,11 @@ TEST_CASE("transpile_to_primitive()")
         );
 
         auto state0 = GENERATE(
-            ket::QuantumState {"0"},
-            ket::QuantumState {"1"},
-            ket::QuantumState {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}},
-            ket::QuantumState {{{0.0, M_SQRT1_2}, {0.0, M_SQRT1_2}}},
-            ket::QuantumState {{{0.0, 1.0}, {0.0, 0.0}}}
+            ket::Statevector {"0"},
+            ket::Statevector {"1"},
+            ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}},
+            ket::Statevector {{{0.0, M_SQRT1_2}, {0.0, M_SQRT1_2}}},
+            ket::Statevector {{{0.0, 1.0}, {0.0, 0.0}}}
         );
 
         // create the original circuit
@@ -152,7 +152,7 @@ TEST_CASE("transpile_to_primitive() with control flow if_statement()")
         const auto transpiled = ket::transpile_to_primitive(original);
 
         // create a state and propagate it through both circuits
-        auto state0 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
         auto state1 = state0;
 
         ket::simulate(original, state0);
@@ -227,7 +227,7 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
         const auto transpiled = ket::transpile_to_primitive(original);
 
         // create a state and propagate it through both circuits
-        auto state0 = ket::QuantumState {init_bitstring};
+        auto state0 = ket::Statevector {init_bitstring};
         auto state1 = state0;
 
         ket::simulate(original, state0);
