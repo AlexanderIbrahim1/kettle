@@ -126,10 +126,10 @@ auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> De
 */
 auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t> qubit_indices) -> DensityMatrix;
 
-// /*
-//     Calculate the tensor product of a sequence of `DensityMatrix` instances.
-// */
-// auto tensor_product(const std::vector<DensityMatrix>& density_matrices) -> DensityMatrix;
+/*
+    Calculate the tensor product of a sequence of `DensityMatrix` instances.
+*/
+auto tensor_product(const std::vector<DensityMatrix>& density_matrices) -> DensityMatrix;
 
 // /*
 //     Calculate the Hilbert-Schmidt inner product between two density matrices.

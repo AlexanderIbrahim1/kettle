@@ -1,6 +1,3 @@
-// TODO: remove
-#include <iostream>
-
 #include <stdexcept>
 
 #include <Eigen/Dense>
@@ -9,7 +6,6 @@
 #include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
-#include "kettle_internal/simulation/gate_pair_generator.hpp"
 
 namespace ki = ket::internal;
 
@@ -65,6 +61,55 @@ void check_side_length_is_power_of_2_(const Eigen::MatrixXcd& matrix)
         throw std::runtime_error {err_msg.str()};
     }
 }
+
+/*
+    The `PartialTraceIndexGenerator_` iterates over the indices need to perform a partial
+    trace over the qubit at index `i_qubit`.
+
+    Right now, it's only built for single-threaded use.
+*/
+class PartialTraceIndexGenerator_
+{
+public:
+    PartialTraceIndexGenerator_(Eigen::Index n_qubits, Eigen::Index i_qubit)
+        : n_blocks_ {ki::pow_2_int(n_qubits - i_qubit - 1)}
+        , n_steps_per_block_ {ki::pow_2_int(i_qubit)}
+        , block_size_ {ki::pow_2_int(i_qubit + 1)}
+    {}
+
+    constexpr auto reset() -> void
+    {
+        i_block_ = 0;
+        i_step_ = 0;
+    }
+
+    [[nodiscard]]
+    constexpr auto size() const -> Eigen::Index
+    {
+        return n_blocks_ * n_steps_per_block_;
+    }
+
+    constexpr auto next() -> Eigen::Index
+    {
+        const auto return_value = (i_block_ * block_size_) + i_step_;
+
+        ++i_step_;
+        if (i_step_ == n_steps_per_block_) {
+            i_step_ = 0;
+            ++i_block_;
+        }
+
+        return return_value;
+    }
+
+private:
+    Eigen::Index n_blocks_;
+    Eigen::Index n_steps_per_block_;
+    Eigen::Index block_size_;
+
+    Eigen::Index i_block_ {};
+    Eigen::Index i_step_ {};
+};
 
 }  // namespace
 
@@ -164,7 +209,23 @@ auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> De
         }
     }
 
-    return DensityMatrix {result};
+    return DensityMatrix {result, density_matrix_nocheck{}};
+}
+
+auto tensor_product(const std::vector<DensityMatrix>& density_matrices) -> DensityMatrix
+{
+    // TODO: I'm very sure that the performance here can be improved; but it just isn't the priority right now
+    if (density_matrices.size() < 2) {
+        throw std::runtime_error {"Cannot take tensor product of 0 or 1 matrices.\n"};
+    }
+
+    auto output = tensor_product(density_matrices[0], density_matrices[1]);
+
+    for (std::size_t i {2}; i < density_matrices.size(); ++i) {
+        output = tensor_product(output, density_matrices[i]);
+    }
+
+    return output;
 }
 
 auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t> qubit_indices) -> DensityMatrix
@@ -181,40 +242,39 @@ auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t>
     const auto rev_sort_predicate = [](auto x, auto y) { return x > y; };
     std::ranges::sort(qubit_indices, rev_sort_predicate);
 
-    for (auto elem : qubit_indices) {
-        std::cout << "elem : " << elem << '\n';
-    }
-
     auto current = density_matrix.matrix();
     const auto n_qubits = static_cast<Eigen::Index>(density_matrix.n_qubits());
 
-    // TODO: this can be parallelized
     for (std::size_t i {0}; i < qubit_indices.size(); ++i) {
         const auto i_qubit = static_cast<Eigen::Index>(qubit_indices[i]);
+        const auto row_step = ki::pow_2_int(i_qubit);
+        const auto col_step = row_step;
 
         const auto n_qubits_current = n_qubits - static_cast<Eigen::Index>(i);
-        auto col_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_current};
-        auto row_pair_iter = ki::SingleQubitGatePairGenerator {i_qubit, n_qubits_current};
+
+        auto col_index_generator = PartialTraceIndexGenerator_ {n_qubits_current, i_qubit};
+        auto row_index_generator = PartialTraceIndexGenerator_ {n_qubits_current, i_qubit};
 
         const auto n_qubits_next = n_qubits_current - 1;
         const auto new_size = ki::pow_2_int(n_qubits_next);
         auto reduced = Eigen::MatrixXcd {new_size, new_size};
 
-        col_pair_iter.set_state(0);
-        for (Eigen::Index i_col {0}; i_col < new_size; ++i_col) {
-            const auto [i_col0, i_col1] = col_pair_iter.next();
-            row_pair_iter.set_state(0);
-            for (Eigen::Index i_row {0}; i_row < new_size; ++i_row) {
-                const auto [i_row0, i_row1] = row_pair_iter.next();
+        col_index_generator.reset();
+        for (auto ic_red {0}; ic_red < col_index_generator.size(); ++ic_red) {
+            const auto ic_cur = col_index_generator.next();
 
-                reduced(i_row, i_col) = current(i_row0, i_col0) + current(i_row1, i_col1);
+            row_index_generator.reset();
+            for (auto ir_red {0}; ir_red < row_index_generator.size(); ++ir_red) {
+                const auto ir_cur = row_index_generator.next();
+
+                reduced(ir_red, ic_red) = current(ir_cur, ic_cur) + current(ir_cur + row_step, ic_cur + col_step);
             }
         }
 
         current = reduced;
     }
 
-    return DensityMatrix {current};
+    return DensityMatrix {current, density_matrix_nocheck{}};
 }
 
 }  // namespace ket
