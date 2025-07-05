@@ -1,23 +1,31 @@
 # kettle
 
 Kettle is a C++20 library for simulating quantum circuits.
-No external dependencies are needed, although Catch2 is used for unit testing in the `dev` build.
+
+There are a few required dependencies, all of which are automatically installed with CMake:
+  - nlopt (for VQE)
+  - Eigen (for density matrices and matrix-related operations)
+  - Catch2 (for unit testing in the `dev` build)
 
 Some of the main features:
   - create a quantum circuit (`ket::QuantumCircuit`) and add a variety of gates
-    - the supported single-qubit gates: {`H`, `X`, `Y`, `Z`, `SX`, `RX`, `RY`, `RZ`, `P`}
-    - the supported contolled gates: {`CH`, `CX`, `CY`, `CZ`, `CSX`, `CRX`, `CRY`, `CRZ`, `CP`}
+    - the supported single-qubit gates: {`H`, `X`, `Y`, `Z`, `S`, `SDAG`, `T`, `TDAG`, `SX`, `SXDAG`, `RX`, `RY`, `RZ`, `P`}
+    - the supported controlled gates: {`CH`, `CX`, `CY`, `CZ`, `CS`, `CSDAG`, `CT`, `CTDAG`, `CSX`, `CSXDAG`, `CRX`, `CRY`, `CRZ`, `CP`}
     - general 2x2 unitary single-qubit or controlled gates: {`U`, `CU`}
     - measurement gates: `M`
-    - control flow based on measured classical bits (if statements)
-  - create a statevector (`ket::Statevector`) and propagate it through the circuit (`ket::simulate()`)
-  - perform measurements on the resulting statevector
+    - control flow based on measured classical bits (if and if-else statements)
+  - create a statevector (`ket::Statevector`) or density matrix (`ket::DensityMatrix`) and propagate it through the circuit (`ket::simulate()`)
+  - perform measurements on the resulting state
+  - evaluate Hamiltonians in the form of linear combinations of Pauli strings
+  - create parameterized circuits
+  - perform VQE with these parameterized circuits
 
 Other features:
   - appending/extending circuits
   - turning an existing circuit into a controlled subcircuit of another circuit
   - transpiling a circuit with `U` and `CU` gates into more primitive gates
   - create non-primitive gates (quantum fourier transform, swaps, toffoli, etc.)
+  - taking tensor products and partial traces of states
 
 Here's an example where we create one of the Bell states, and perform measurements on it:
 ```cpp
@@ -55,11 +63,15 @@ auto main() -> int
 Some commonly explored quantum algorithms are presented in `/examples/algorithms`, with detailed explanations.
 There are also other examples in `/examples/general` to show off other features.
 
-## Limitations
-Currently, only noiseless statevector simulations are supported.
+## Future Plans
+In the near future, I plan to add:
+  - Kraus channels and other channels in the near future
+  - other channels, and conversions between these channels
+  - functions for collecting quantum information (fidelity, etc.)
 
-This project is still a work-in-progress, and the API is subject to further changes
-as the project develops.
+See the GitHub issues section for more details.
+
+This project is still a work-in-progress, and the API is subject to further changes as the project develops.
 
 ## Building as the top level project
 This project uses CMake presets for building.
