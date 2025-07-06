@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <numeric>
 #include <stdexcept>
 #include <variant>
 #include <vector>
@@ -9,6 +10,7 @@
 #include <Eigen/Dense>
 
 #include <kettle/common/matrix2x2.hpp>
+#include "kettle/gates/common_u_gates.hpp"
 
 /*
     Implement a KrausChannel object
@@ -25,6 +27,10 @@
 
 namespace ket
 {
+
+template <typename T>
+struct kraus_matrix_type_always_false: std::false_type
+{};
 
 class OneQubitKrausMatrix
 {
@@ -150,21 +156,19 @@ auto all_same(const std::vector<Element>& elements, Function function) -> bool
     return std::all_of(it1, elements.end(), [&](const auto& elem) { return function(elem) == value0; });
 }
 
-inline auto are_all_variants_the_same_(const std::vector<KrausMatrixInfo>& matrices) -> bool
+
+inline auto is_valid_kraus_channel(
+    const std::vector<OneQubitKrausMatrix>& matrices,
+    double tolerance
+) -> bool
 {
-    if (matrices.empty()) {
-        return true;
-    }
+    const auto product = [](const Matrix2X2& current, const OneQubitKrausMatrix& mat) -> Matrix2X2 {
+        return current + (ket::conjugate_transpose(mat.matrix()) * mat.matrix());
+    };
 
-    const auto index0 = matrices[0].index();
+    const auto total = std::accumulate(matrices.begin(), matrices.end(), Matrix2X2 {}, product);
 
-    for (std::size_t i {1}; i < matrices.size(); ++i) {
-        if (matrices[i].index() != index0) {
-            return false;
-        }
-    }
-
-    return true;
+    return ket::almost_eq(total, ket::i_gate(), tolerance);
 }
 
 /*
@@ -178,47 +182,69 @@ inline auto are_all_variants_the_same_(const std::vector<KrausMatrixInfo>& matri
 
     I can remove these restrictions at a later time.
 */
+template <typename KrausMatrixType>
 class KrausChannel
 {
 public:
-    explicit KrausChannel(std::vector<KrausMatrixInfo> kraus_matrices)
+    explicit KrausChannel(
+        std::vector<KrausMatrixType> kraus_matrices,
+        double tolerance = 1.0e-6
+    )
         : kraus_matrices_ {std::move(kraus_matrices)}
     {
         if (kraus_matrices_.empty()) {
             throw std::runtime_error {"ERROR: cannot create a Kraus channel with no Kraus matrices.\n"};
         }
 
-        const auto get_variant_index = [&](const KrausMatrixInfo& info) { return info.index(); };
-        if (!all_same(kraus_matrices_, get_variant_index)) {
-            throw std::runtime_error {"ERROR: all Kraus matrices must have the same internal representation.\n"};
-        }
-
-        if (std::holds_alternative<OneQubitKrausMatrix>(kraus_matrices_[0])) {
+        if constexpr (std::is_same_v<KrausMatrixType, OneQubitKrausMatrix>) {
             const auto get_target_index = [&](const auto& elem) {
-                return std::get<OneQubitKrausMatrix>(elem).target_index();
+                return elem.target_index();
             };
 
             if (!all_same(kraus_matrices_, get_target_index)) {
                 throw std::runtime_error {"ERROR: all OneQubitKrausMatrix instances must have the same target index.\n"};
             }
         }
-
-        if (std::holds_alternative<ControlledQubitKrausMatrix>(kraus_matrices_[0])) {
-            const auto get_both_indices = [&](const auto& elem) -> std::pair<std::size_t, std::size_t> {
-                const auto& mat = std::get<ControlledQubitKrausMatrix>(elem);
-                return {mat.control_index(), mat.target_index()};
+        else if constexpr (std::is_same_v<KrausMatrixType, ControlledQubitKrausMatrix>) {
+            const auto get_both_indices = [&](const auto& elem) {
+                return std::pair {elem.control_index(), elem.target_index()};
             };
 
             if (!all_same(kraus_matrices_, get_both_indices )) {
                 throw std::runtime_error {"ERROR: all ControlledQubitKrausMatrix instances must have matching indices.\n"};
             }
         }
+        else if constexpr (std::is_same_v<KrausMatrixType, FullKrausMatrix>) {
+            const auto get_both_indices = [&](const auto& elem) {
+                return std::pair {elem.n_input_qubits(), elem.n_output_qubits()};
+            };
+
+            if (!all_same(kraus_matrices_, get_both_indices )) {
+                throw std::runtime_error {"ERROR: all FullKrausMatrix instances must have matching input and output qubit sizes.\n"};
+            }
+        }
+        else {
+            static_assert(kraus_matrix_type_always_false<void>::value, "Invalid KrausMatrixType provided.");
+        }
+
+        // NOTE: focus on the 1-qubit Kraus matrices for now
+        // TODO: implement this function for the other Kraus matrix types
+        if (!is_valid_kraus_channel(kraus_matrices_, tolerance)) {
+            throw std::runtime_error {"ERROR: sum of products of Kraus matrices do not give the identity matrix.\n"};
+        }
+    }
+
+    [[nodiscard]]
+    constexpr auto matrices() const -> const std::vector<KrausMatrixType>& {
+        return kraus_matrices_;
     }
 
 private:
-    std::vector<KrausMatrixInfo> kraus_matrices_;
+    std::vector<KrausMatrixType> kraus_matrices_;
+//         const auto get_variant_index = [&](const KrausMatrixInfo& info) { return info.index(); };
+//         if (!all_same(kraus_matrices_, get_variant_index)) {
+//             throw std::runtime_error {"ERROR: all Kraus matrices must have the same internal representation.\n"};
+//         }
 };
-
-// TODO: add function that checks if a Kraus channel is valid
 
 }  // namespace ket
