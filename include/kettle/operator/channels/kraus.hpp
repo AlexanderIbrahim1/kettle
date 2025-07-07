@@ -247,4 +247,30 @@ private:
 //         }
 };
 
+// TEMPORARY FUNCTION: I plan to use a QuantumNoise instance to wrap around the channels and error models
+/*
+    The symmetric depolarizing error channel applied to a single qubit.
+
+    Kraus channels are not unique, and there are multiple definitions in the literature.
+    For this definition:
+      - p = 0 gives a noiseless channel
+      - p = 3/4 gives a full depolarized channel, and the output will be proportional to the identity matrix
+      - p = 1 gives the uniform Pauli error channel, where X, Y, and Z are applied equally to the 1-qubit density matrix
+*/
+inline auto depolarizing_noise(double parameter, std::size_t target_index) -> KrausChannel<OneQubitKrausMatrix>
+{
+    if (parameter < 0.0 || parameter > 1.0) {
+        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
+    }
+
+    const auto coeff0 = std::sqrt(1.0 - parameter);
+    const auto coeff123 = std::sqrt(parameter / 3.0);
+    const auto mat0 = OneQubitKrausMatrix {coeff0 * ket::i_gate(), target_index};
+    const auto mat1 = OneQubitKrausMatrix {coeff123 * ket::x_gate(), target_index};
+    const auto mat2 = OneQubitKrausMatrix {coeff123 * ket::y_gate(), target_index};
+    const auto mat3 = OneQubitKrausMatrix {coeff123 * ket::z_gate(), target_index};
+
+    return KrausChannel<OneQubitKrausMatrix> {{mat0, mat1, mat2, mat3}};
+}
+
 }  // namespace ket

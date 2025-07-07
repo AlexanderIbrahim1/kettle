@@ -99,6 +99,7 @@ add_test_target(TARGET read_pauli_operator_test SOURCES "source/io/read_pauli_op
 add_test_target(TARGET read_tangelo_file_test SOURCES "source/io/read_tangelo_file_test.cpp")
 add_test_target(TARGET write_tangelo_file_test SOURCES "source/io/write_tangelo_file_test.cpp")
 
+add_test_target(TARGET kraus_test SOURCES "source/operator/channels/kraus_test.cpp")
 add_test_target(TARGET sparse_pauli_string_test SOURCES "source/operator/pauli/sparse_pauli_string_test.cpp")
 add_test_target(TARGET pauli_operator_test SOURCES "source/operator/pauli/pauli_operator_test.cpp")
 
