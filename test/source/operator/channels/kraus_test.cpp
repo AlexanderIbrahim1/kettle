@@ -3,7 +3,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/operator/channels/kraus.hpp"
+#include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
 
@@ -25,12 +25,11 @@ auto result_depolarizing_noise_1qubit(
 
 auto apply_depolarizing_noise_1qubit(
     const ket::Matrix2X2& dens_mat,
-    const ket::KrausChannel<ket::OneQubitKrausMatrix>& channel
+    const ket::OneQubitKrausChannel& channel
 ) -> ket::Matrix2X2
 {
     auto output = ket::Matrix2X2 {};
-    for (const auto& kmat : channel.matrices()) {
-        const auto& mat = kmat.matrix();
+    for (const auto& mat : channel.matrices()) {
         output += (mat * dens_mat * ket::conjugate_transpose(mat));
     }
 

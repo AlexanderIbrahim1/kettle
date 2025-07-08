@@ -55,6 +55,8 @@ add_library(
     source/kettle_internal/io/read_tangelo_file.cpp
     source/kettle_internal/io/statevector.cpp
     source/kettle_internal/io/write_tangelo_file.cpp
+    source/kettle_internal/operator/channels/multi_qubit_kraus_channel.cpp
+    source/kettle_internal/operator/channels/one_qubit_kraus_channel.cpp
     source/kettle_internal/operator/pauli/pauli_operator.cpp
     source/kettle_internal/operator/pauli/sparse_pauli_string.cpp
     source/kettle_internal/optimize/n_local.cpp
