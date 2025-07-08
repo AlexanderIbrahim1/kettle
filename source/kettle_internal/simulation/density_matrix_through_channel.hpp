@@ -99,9 +99,9 @@ inline void simulate_one_qubit_kraus_channel(
     DensityMatrix& state,
     const OneQubitKrausChannel& channel,
     const internal::FlatIndexPair<Eigen::Index>& pair,
-    Eigen::MatrixXcd& output_buffer,
-    Eigen::MatrixXcd& buffer0,
-    Eigen::MatrixXcd& buffer1
+    Eigen::MatrixXcd& writing_buffer,
+    Eigen::MatrixXcd& left_mul_buffer,
+    Eigen::MatrixXcd& right_mul_buffer
 )
 {
     const auto target_index = static_cast<Eigen::Index>(channel.target_index());
@@ -113,24 +113,24 @@ inline void simulate_one_qubit_kraus_channel(
 
     // function reference to reduce line length
     const auto& left_mul = internal::apply_left_multiplication_;
-    const auto& right_mul = internal::apply_left_multiplication_;
+    const auto& right_mul = internal::apply_right_multiplication_;
 
     for (std::size_t i {0}; i < n_kraus_matrices; ++i) {
         const auto mat = channel.matrices()[i];
         const auto mat_adj = ket::conjugate_transpose(mat);
 
-        left_mul(state.matrix(), buffer0, pair_iterator_outer, pair_iterator_inner, pair, mat);
-        right_mul(buffer0, buffer1, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
+        left_mul(state.matrix(), left_mul_buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+        right_mul(left_mul_buffer, right_mul_buffer, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
 
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
-            output_buffer = buffer1;
+            writing_buffer = right_mul_buffer;
         } else {
-            output_buffer += buffer1;
+            writing_buffer += right_mul_buffer;
         }
     }
 
-    state.matrix() = output_buffer;
+    state.matrix() = writing_buffer;
 }
 
 }  // namespace ket
