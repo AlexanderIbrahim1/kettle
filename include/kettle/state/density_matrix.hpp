@@ -35,7 +35,8 @@ public:
     explicit DensityMatrix(
         Eigen::MatrixXcd matrix,
         double trace_tolerance = DENSITY_MATRIX_TRACE_TOLERANCE,
-        double hermitian_tolerance = MATRIX_HERMITIAN_TOLERANCE
+        double hermitian_tolerance = MATRIX_HERMITIAN_TOLERANCE,
+        double positive_semidefinite_tolerance = POSITIVE_SEMIDEFINITE_TOLERANCE
     );
 
     /*
