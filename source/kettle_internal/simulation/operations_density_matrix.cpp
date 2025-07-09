@@ -2,7 +2,6 @@
 #include <complex>
 
 #include "kettle/common/matrix2x2.hpp"
-// #include "kettle/gates/primitive_gate.hpp"
 
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
 
