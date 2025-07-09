@@ -15,9 +15,17 @@ auto dot(const ElementPair& left, const ElementPair& right) -> std::complex<doub
     return (left.x0 * right.x0) + (left.x1 * right.x1);
 }
 
-void apply_u_gate_first_(
-    ket::DensityMatrix& state,
-    Eigen::MatrixXcd& buffer,
+/*
+    Perform the multiplcation of `K * rho`, where:
+      - `K` is a `Matrix2X2` instance representing a single-qubit operator, which we refer to
+        as `original_state`
+      - `rho` is the density matrix
+    
+    The output is written to `output_buffer`.
+*/
+void apply_left_one_qubit_matrix_(
+    const Eigen::MatrixXcd& original_state,
+    Eigen::MatrixXcd& output_buffer,
     SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
     SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
@@ -32,23 +40,32 @@ void apply_u_gate_first_(
         for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
             const auto [i_col0, i_col1] = pair_iterator_inner.next();
 
-            const auto rho00 = state.matrix()(i_row0, i_col0);
-            const auto rho10 = state.matrix()(i_row1, i_col0);
-            const auto rho01 = state.matrix()(i_row0, i_col1);
-            const auto rho11 = state.matrix()(i_row1, i_col1);
+            const auto rho00 = original_state(i_row0, i_col0);
+            const auto rho10 = original_state(i_row1, i_col0);
+            const auto rho01 = original_state(i_row0, i_col1);
+            const auto rho11 = original_state(i_row1, i_col1);
 
-            buffer(i_row0, i_col0) = (rho00 * mat.elem00) + (rho10 * mat.elem01);
-            buffer(i_row1, i_col0) = (rho00 * mat.elem10) + (rho10 * mat.elem11);
-            buffer(i_row0, i_col1) = (rho01 * mat.elem00) + (rho11 * mat.elem01);
-            buffer(i_row1, i_col1) = (rho01 * mat.elem10) + (rho11 * mat.elem11);
+            output_buffer(i_row0, i_col0) = (rho00 * mat.elem00) + (rho10 * mat.elem01);
+            output_buffer(i_row1, i_col0) = (rho00 * mat.elem10) + (rho10 * mat.elem11);
+            output_buffer(i_row0, i_col1) = (rho01 * mat.elem00) + (rho11 * mat.elem01);
+            output_buffer(i_row1, i_col1) = (rho01 * mat.elem10) + (rho11 * mat.elem11);
         }
     }
 }
 
 
-void apply_u_gate_second_(
-    ket::DensityMatrix& state,
-    Eigen::MatrixXcd& buffer,
+/*
+    Perform the multiplcation of `(K * rho) * K^t`, where:
+      - `(K * rho)` is the product of the 1-qubit operator `K` and the density matrix `rho`,
+        which was calculated earlier in the `apply_left_one_qubit_matrix_()` function,
+        and which we refer to as `left_product`
+      - `K^t` is the adjoint of the 1-qubit operator
+    
+    The output is written to `output_buffer`.
+*/
+void apply_right_one_qubit_matrix_(
+    const Eigen::MatrixXcd& left_product,
+    Eigen::MatrixXcd& output_buffer,
     SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
     SingleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
@@ -63,15 +80,15 @@ void apply_u_gate_second_(
         for (auto i_pair {pair.i_lower}; i_pair < pair.i_upper; ++i_pair) {
             const auto [i_row0, i_row1] = pair_iterator_inner.next();
 
-            const auto buf00 = buffer(i_row0, i_col0);
-            const auto buf10 = buffer(i_row1, i_col0);
-            const auto buf01 = buffer(i_row0, i_col1);
-            const auto buf11 = buffer(i_row1, i_col1);
+            const auto buf00 = left_product(i_row0, i_col0);
+            const auto buf10 = left_product(i_row1, i_col0);
+            const auto buf01 = left_product(i_row0, i_col1);
+            const auto buf11 = left_product(i_row1, i_col1);
 
-            state.matrix()(i_row0, i_col0) = (buf00 * mat_adj.elem00) + (buf01 * mat_adj.elem10);
-            state.matrix()(i_row1, i_col0) = (buf10 * mat_adj.elem00) + (buf11 * mat_adj.elem10);
-            state.matrix()(i_row0, i_col1) = (buf00 * mat_adj.elem01) + (buf01 * mat_adj.elem11);
-            state.matrix()(i_row1, i_col1) = (buf10 * mat_adj.elem01) + (buf11 * mat_adj.elem11);
+            output_buffer(i_row0, i_col0) = (buf00 * mat_adj.elem00) + (buf01 * mat_adj.elem10);
+            output_buffer(i_row1, i_col0) = (buf10 * mat_adj.elem00) + (buf11 * mat_adj.elem10);
+            output_buffer(i_row0, i_col1) = (buf00 * mat_adj.elem01) + (buf01 * mat_adj.elem11);
+            output_buffer(i_row1, i_col1) = (buf10 * mat_adj.elem01) + (buf11 * mat_adj.elem11);
         }
     }
 }

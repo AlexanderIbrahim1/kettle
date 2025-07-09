@@ -104,13 +104,13 @@ void simulate_u_gate_(
 
     // perform the multiplication of U * rho;
     // fill the buffer
-    ki::apply_u_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+    ki::apply_left_one_qubit_matrix_(state.matrix(), buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
 
     const auto mat_adj = ket::conjugate_transpose(mat);
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    ki::apply_u_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
+    ki::apply_right_one_qubit_matrix_(buffer, state.matrix(), pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
 }
 
 
