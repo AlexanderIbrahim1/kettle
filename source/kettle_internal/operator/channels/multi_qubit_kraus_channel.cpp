@@ -27,9 +27,12 @@ auto is_valid_multi_qubit_kraus_channel(
         return current + (mat.adjoint() * mat);
     };
 
-    const auto total = std::accumulate(matrices.begin(), matrices.end(), Eigen::MatrixXcd {}, product);
+    const auto n_states = ki::pow_2_int(n_input_qubits);
 
-    const auto expected = Eigen::MatrixXcd::Identity(n_input_qubits, n_input_qubits).derived();
+    auto initial = Eigen::MatrixXcd::Zero(n_states, n_states).eval();
+    const auto total = std::accumulate(matrices.begin(), matrices.end(), initial, product);
+
+    const auto expected = Eigen::MatrixXcd::Identity(n_states, n_states).eval();
 
     return total.isApprox(expected, tolerance);
 }
