@@ -4,6 +4,7 @@
 
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/state/density_matrix.hpp"
+#include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 
 #include "kettle_internal/simulation/simulate_utils.hpp"
@@ -50,6 +51,27 @@ inline void simulate_one_qubit_kraus_channel(
             writing_buffer = right_mul_buffer;
         } else {
             writing_buffer += right_mul_buffer;
+        }
+    }
+
+    state.matrix() = writing_buffer;
+}
+
+
+inline void simulate_multi_qubit_kraus_channel(
+    DensityMatrix& state,
+    const MultiQubitKrausChannel& channel,
+    Eigen::MatrixXcd& writing_buffer
+)
+{
+    const auto n_kraus_matrices = channel.matrices().size();
+
+    for (std::size_t i {0}; i < n_kraus_matrices; ++i) {
+        const auto& matrix = channel.matrices()[i];
+        if (i == 0) {
+            writing_buffer = matrix * state.matrix() * matrix.adjoint();
+        } else {
+            writing_buffer += matrix * state.matrix() * matrix.adjoint();
         }
     }
 
