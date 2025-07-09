@@ -59,7 +59,7 @@ auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
 
 TEST_CASE("Kraus channel depolarizing noise")
 {
-    const auto parameter = 0.0; // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+    const auto parameter = GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
 
     SECTION("manual application of Matrix2X2 instances above")
     {
