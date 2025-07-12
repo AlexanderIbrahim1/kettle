@@ -12,7 +12,7 @@
 namespace
 {
 
-auto check_nonempty_(const std::vector<ket::ProbabilisticPauliString>& weighted_pauli_strings)
+void check_nonempty_(const std::vector<ket::ProbabilisticPauliString>& weighted_pauli_strings)
 {
     if (weighted_pauli_strings.size() == 0) {
         throw std::runtime_error {
@@ -22,7 +22,7 @@ auto check_nonempty_(const std::vector<ket::ProbabilisticPauliString>& weighted_
     }
 }
 
-auto check_all_strings_same_length_(const std::vector<ket::ProbabilisticPauliString>& strings)
+void check_all_strings_same_length_(const std::vector<ket::ProbabilisticPauliString>& strings)
 {
     const auto has_nonequal_n_qubits = [](const auto& left, const auto& right) -> bool {
         return left.pauli_string.n_qubits() != right.pauli_string.n_qubits();
@@ -37,7 +37,7 @@ auto check_all_strings_same_length_(const std::vector<ket::ProbabilisticPauliStr
 
 }
 
-auto check_probabilities_add_up_to_1_(const std::vector<ket::ProbabilisticPauliString>& strings, double tolerance)
+void check_probabilities_add_up_to_1_(const std::vector<ket::ProbabilisticPauliString>& strings, double tolerance)
 {
     const auto add_string_prob = [](double summ, const auto& string) { return summ + string.coefficient; };
     const auto total_probability = std::accumulate(strings.begin(), strings.end(), 0.0, add_string_prob);
@@ -46,6 +46,13 @@ auto check_probabilities_add_up_to_1_(const std::vector<ket::ProbabilisticPauliS
         throw std::runtime_error {
             "ERROR: the sum of all coefficients for Pauli strings in the PauliChannel must add up to 1.\n"
         };
+    }
+}
+
+void check_number_of_qubits_is_nonzero_(std::size_t n_qubits)
+{
+    if (n_qubits == 0) {
+        throw std::runtime_error {"ERROR: the number of qubits in the PauliChannel cannot be zero.\n"};
     }
 }
 
@@ -68,6 +75,8 @@ PauliChannel::PauliChannel(
     check_probabilities_add_up_to_1_(weighted_pauli_strings_, tolerance);
 
     n_qubits_ = weighted_pauli_strings_[0].pauli_string.n_qubits();
+
+    check_number_of_qubits_is_nonzero_(n_qubits_);
 }
 
 PauliChannel::PauliChannel(
@@ -96,8 +105,8 @@ auto depolarizing_noise_pauli_1qubit(double parameter) -> PauliChannel
         throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
     }
 
-    const auto coeff0 = std::sqrt(1.0 - parameter);
-    const auto coeff123 = std::sqrt(parameter / 3.0);
+    const auto coeff0 = 1.0 - parameter;
+    const auto coeff123 = parameter / 3.0;
 
     return PauliChannel {
         {.coefficient=coeff0,   .pauli_string={PT::I}},

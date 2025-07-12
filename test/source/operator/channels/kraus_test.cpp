@@ -7,6 +7,7 @@
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
+#include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
 
@@ -116,48 +117,38 @@ TEST_CASE("Kraus channel depolarizing noise")
 {
     const auto parameter = GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
 
-    SECTION("manual application of Matrix2X2 instances above")
-    {
-        const auto depol_channel = ket::depolarizing_noise(parameter, 0);
-
+    // state should be simple but not completely arbitrary, so we don't use a random state
+    auto state = [&]() {
         auto circuit = ket::QuantumCircuit {1};
         circuit.add_h_gate(0);
         circuit.add_ry_gate(0, 0.15 * M_PI);
         circuit.add_rx_gate(0, 0.25 * M_PI);
 
-        auto state = ket::DensityMatrix {"0"};
-        ket::simulate(circuit, state);
+        auto state_ = ket::DensityMatrix {"0"};
+        ket::simulate(circuit, state_);
 
-        const auto matrix = ket::Matrix2X2 {
-            .elem00=state.matrix()(0, 0),
-            .elem01=state.matrix()(0, 1),
-            .elem10=state.matrix()(1, 0),
-            .elem11=state.matrix()(1, 1),
-        };
+        return state_;
+    }();
 
+    const auto matrix = ket::Matrix2X2 {
+        .elem00=state.matrix()(0, 0),
+        .elem01=state.matrix()(0, 1),
+        .elem10=state.matrix()(1, 0),
+        .elem11=state.matrix()(1, 1),
+    };
+
+    const auto expected = result_depolarizing_noise_1qubit(matrix, parameter);
+
+    SECTION("manual application of Matrix2X2 instances above")
+    {
+        const auto depol_channel = ket::depolarizing_noise(parameter, 0);
         const auto actual = apply_depolarizing_noise_1qubit(matrix, depol_channel);
-        const auto expected = result_depolarizing_noise_1qubit(matrix, parameter);
 
         REQUIRE(ket::almost_eq(actual, expected));
     }
 
-    SECTION("using `simulate_one_qubit_kraus_channel()`")
+    SECTION("using channels")
     {
-        const auto depol_channel = ket::depolarizing_noise(parameter, 0);
-
-        // state should be simple but not completely arbitrary, so we don't use a random state
-        auto state = [&]() {
-            auto circuit = ket::QuantumCircuit {1};
-            circuit.add_h_gate(0);
-            circuit.add_ry_gate(0, 0.15 * M_PI);
-            circuit.add_rx_gate(0, 0.25 * M_PI);
-
-            auto state_ = ket::DensityMatrix {"0"};
-            ket::simulate(circuit, state_);
-
-            return state_;
-        }();
-
         // naming doesn't matter; buffers play different roles within the function
         auto buffer0 = Eigen::MatrixXcd(2, 2);
         auto buffer1 = Eigen::MatrixXcd(2, 2);
@@ -167,19 +158,24 @@ TEST_CASE("Kraus channel depolarizing noise")
         const auto n_single_gate_pairs = Eigen::Index {1};
         const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
 
-        const auto matrix = ket::Matrix2X2 {
-            .elem00=state.matrix()(0, 0),
-            .elem01=state.matrix()(0, 1),
-            .elem10=state.matrix()(1, 0),
-            .elem11=state.matrix()(1, 1),
-        };
+        SECTION("using `simulate_one_qubit_kraus_channel()`")
+        {
+            const auto depol_channel = ket::depolarizing_noise(parameter, 0);
+            ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
-        ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+            const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
 
-        const auto expected_mat = result_depolarizing_noise_1qubit(matrix, parameter);
-        const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected_mat)};
+            REQUIRE(ki::almost_eq_with_print_(state, expected_state));
+        }
 
-        REQUIRE(ki::almost_eq_with_print_(state, expected_state));
+        SECTION("using `simulate_pauli_channel()`")
+        {
+            const auto depol_channel = ket::depolarizing_noise_pauli_1qubit(parameter);
+            ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+
+            const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
+            REQUIRE(ki::almost_eq_with_print_(state, expected_state));
+        }
     }
 }
 

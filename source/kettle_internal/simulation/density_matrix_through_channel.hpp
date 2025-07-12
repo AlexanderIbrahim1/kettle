@@ -3,9 +3,12 @@
 #include <Eigen/Dense>
 
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
+#include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/state/density_matrix.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
+#include "kettle/operator/channels/pauli_channel.hpp"
 
 #include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
@@ -18,6 +21,13 @@
 
 namespace ket
 {
+
+// NOLINTNEXTLINE(cert-err58-cpp)
+const auto MAP_PAULI_TERM_TO_PAULI_MATRIX2X2 = std::unordered_map<PauliTerm, Matrix2X2> {
+    {PauliTerm::X, x_gate()},
+    {PauliTerm::Y, y_gate()},
+    {PauliTerm::Z, z_gate()}
+};
 
 inline void simulate_one_qubit_kraus_channel(
     DensityMatrix& state,
@@ -76,6 +86,87 @@ inline void simulate_multi_qubit_kraus_channel(
     }
 
     state.matrix() = writing_buffer;
+}
+
+
+/*
+    TODO: this function is taken directly from the `simulate_density_matrix.cpp` file; once I get this
+    to work I should refactor to remove the duplication
+*/
+inline void simulate_u_gate_helper_(
+    Eigen::MatrixXcd& state,
+    Eigen::Index n_qubits,
+    Eigen::Index target_index,
+    const ket::Matrix2X2& gate_mat,
+    const ket::internal::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    namespace ki = ket::internal;
+
+    auto pair_iterator_outer = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
+
+    // function reference to reduce line length
+    const auto& left_mul = ki::apply_left_one_qubit_matrix_;
+    const auto& right_mul = ki::apply_right_one_qubit_matrix_;
+
+    // perform the multiplication of U * rho;
+    // fill the left buffer
+    left_mul(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, gate_mat);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result back to the state
+    right_mul(buffer, state, pair_iterator_outer, pair_iterator_inner, pair, gate_mat);
+}
+
+
+inline void apply_pauli_string_(
+    Eigen::Index n_qubits,
+    const SparsePauliString& pauli_string,
+    const internal::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& multiplication_buffer,
+    Eigen::MatrixXcd& state_buffer
+)
+{
+    for (const auto& [target_index, pauli_term] : pauli_string.terms()) {
+        if (pauli_term == PauliTerm::I) {
+            continue;
+        }
+
+        const auto target_qubit = static_cast<Eigen::Index>(target_index);
+        const auto gate = MAP_PAULI_TERM_TO_PAULI_MATRIX2X2.at(pauli_term);
+        simulate_u_gate_helper_(state_buffer, n_qubits, target_qubit, gate, pair, multiplication_buffer);
+    }
+}
+
+
+inline void simulate_pauli_channel(
+    DensityMatrix& state,
+    const PauliChannel& channel,
+    const internal::FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& accumulation_buffer,
+    Eigen::MatrixXcd& multiplication_buffer,
+    Eigen::MatrixXcd& state_buffer
+)
+{
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    for (std::size_t i {0}; i < channel.size(); ++i) {
+        const auto& [coefficient, pauli_string] = channel.weighted_pauli_strings()[i];
+
+        state_buffer = state.matrix();
+        apply_pauli_string_(n_qubits, pauli_string, pair, multiplication_buffer, state_buffer);
+
+        // skip setting all elements in the buffer to 0, by overwriting on the first iteration
+        if (i == 0) {
+            accumulation_buffer = (coefficient * state_buffer);
+        } else {
+            accumulation_buffer += (coefficient * state_buffer);
+        }
+    }
+
+    state.matrix() = accumulation_buffer;
 }
 
 }  // namespace ket
