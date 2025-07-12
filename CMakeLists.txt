@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 # for linking against Eigen
-set(CMAKE_POLICY_DEFAULT_CMP0111 OLD)
+# set(CMAKE_POLICY_DEFAULT_CMP0111 OLD)
 
 include(cmake/prelude.cmake)
 
@@ -137,10 +137,10 @@ target_include_directories(
 )
 
 # ---- Install rules ----
-
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-    include(cmake/install-rules.cmake)
-endif()
+# 
+# if(NOT CMAKE_SKIP_INSTALL_RULES)
+#     include(cmake/install-rules.cmake)
+# endif()
 
 # ---- Examples ----
 
