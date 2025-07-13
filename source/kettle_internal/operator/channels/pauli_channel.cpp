@@ -17,7 +17,7 @@ PauliChannel::PauliChannel(
     double tolerance
 )
     : n_qubits_ {0}
-    , weighted_pauli_strings_ {std::move(weighted_pauli_strings)}
+    , weighted_unitaries_ {std::move(weighted_pauli_strings)}
 {
     namespace ki = ket::internal;
     const auto name = std::string {"PauliChannel"};
@@ -25,11 +25,11 @@ PauliChannel::PauliChannel(
     const auto n_qubits_getter = [](const auto& elem) { return elem.pauli_string.n_qubits(); };
     const auto coefficient_getter = [](const auto& elem) { return elem.coefficient; };
 
-    ki::check_nonempty_(weighted_pauli_strings_, name);
-    ki::check_unitaries_have_same_n_qubits_(weighted_pauli_strings_, n_qubits_getter, name);
-    ki::check_probabilities_add_up_to_1_(weighted_pauli_strings_, coefficient_getter, tolerance, name);
+    ki::check_nonempty_(weighted_unitaries_, name);
+    ki::check_unitaries_have_same_n_qubits_(weighted_unitaries_, n_qubits_getter, name);
+    ki::check_probabilities_add_up_to_1_(weighted_unitaries_, coefficient_getter, tolerance, name);
 
-    n_qubits_ = weighted_pauli_strings_[0].pauli_string.n_qubits();
+    n_qubits_ = weighted_unitaries_[0].pauli_string.n_qubits();
 
     ki::check_number_of_qubits_is_nonzero_(n_qubits_, name);
 }

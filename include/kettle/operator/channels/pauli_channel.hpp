@@ -42,30 +42,30 @@ public:
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
-        return weighted_pauli_strings_.size();
+        return weighted_unitaries_.size();
     }
 
     [[nodiscard]]
-    constexpr auto weighted_pauli_strings() const noexcept -> const std::vector<ProbabilisticPauliString>&
+    constexpr auto weighted_unitaries() const noexcept -> const std::vector<ProbabilisticPauliString>&
     {
-        return weighted_pauli_strings_;
+        return weighted_unitaries_;
     }
 
     [[nodiscard]]
     auto at(std::size_t index) const -> const ProbabilisticPauliString&
     {
-        return weighted_pauli_strings_[index];
+        return weighted_unitaries_[index];
     }
 
     [[nodiscard]]
     auto at(std::size_t index) -> ProbabilisticPauliString&
     {
-        return weighted_pauli_strings_[index];
+        return weighted_unitaries_[index];
     }
 
 private:
     std::size_t n_qubits_;
-    std::vector<ProbabilisticPauliString> weighted_pauli_strings_;
+    std::vector<ProbabilisticPauliString> weighted_unitaries_;
 };
 
 

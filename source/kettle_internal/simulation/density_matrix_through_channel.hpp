@@ -153,7 +153,7 @@ inline void simulate_pauli_channel(
     const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
 
     for (std::size_t i {0}; i < channel.size(); ++i) {
-        const auto& [coefficient, pauli_string] = channel.weighted_pauli_strings()[i];
+        const auto& [coefficient, pauli_string] = channel.weighted_unitaries()[i];
 
         state_buffer = state.matrix();
         apply_pauli_string_(n_qubits, pauli_string, pair, multiplication_buffer, state_buffer);
