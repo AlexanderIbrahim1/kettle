@@ -89,31 +89,6 @@ void simulate_one_target_one_angle_gate_(
 }
 
 
-void simulate_u_gate_(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info,
-    const ket::Matrix2X2& mat,
-    const ki::FlatIndexPair<Eigen::Index>& pair,
-    Eigen::MatrixXcd& buffer
-)
-{
-    const auto target_index = static_cast<Eigen::Index>(ki::create::unpack_single_qubit_gate_index(info));
-    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
-    auto pair_iterator_outer = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-    auto pair_iterator_inner = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-
-    // perform the multiplication of U * rho;
-    // fill the buffer
-    ki::apply_left_one_qubit_matrix_(state.matrix(), buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
-
-    const auto mat_adj = ket::conjugate_transpose(mat);
-
-    // perform the multiplication of (U * rho) * U^t
-    // write the result to the density matrix itself
-    ki::apply_right_one_qubit_matrix_(buffer, state.matrix(), pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
-}
-
-
 template <ket::Gate GateType>
 void simulate_one_control_one_target_gate_(
     ket::DensityMatrix& state,
@@ -209,6 +184,8 @@ void simulate_gate_info_(
 {
     namespace cre = ki::create;
     using G = ket::Gate;
+
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
 
     switch (gate_info.gate) {
         case G::H : {
@@ -325,7 +302,8 @@ void simulate_gate_info_(
         }
         case G::U : {
             const auto& unitary_ptr = cre::unpack_unitary_matrix(gate_info);
-            simulate_u_gate_(state, gate_info, *unitary_ptr, single_pair, buffer);
+            const auto target_index = static_cast<Eigen::Index>(cre::unpack_single_qubit_gate_index(gate_info));
+            simulate_u_gate_(state.matrix(), buffer, target_index, n_qubits, *unitary_ptr, single_pair);
             break;
         }
         case G::CU : {

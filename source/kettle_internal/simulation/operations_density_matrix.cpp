@@ -93,6 +93,40 @@ void apply_right_one_qubit_matrix_(
 }
 
 
+/*
+    Perform the full multiplcation of `((K * rho) * K^t)`, where:
+      - `(K * rho)` is the product of the 1-qubit operator `K` and the density matrix `rho`,
+        which was calculated earlier in the `apply_left_one_qubit_matrix_()` function,
+        and which we refer to as `left_product`
+      - `K^t` is the adjoint of the 1-qubit operator
+    
+    The output is written to `output_buffer`.
+*/
+void simulate_u_gate_(
+    Eigen::MatrixXcd& state,
+    Eigen::MatrixXcd& buffer,
+    Eigen::Index target_index,
+    Eigen::Index n_qubits,
+    const ket::Matrix2X2& mat,
+    const FlatIndexPair<Eigen::Index>& pair
+)
+{
+    auto pair_iterator_outer = SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = SingleQubitGatePairGenerator {target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    apply_left_one_qubit_matrix_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
+
+    const auto mat_adj = ket::conjugate_transpose(mat);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    // NOLINTNEXTLINE(readability-suspicious-call-argument)
+    apply_right_one_qubit_matrix_(buffer, state, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
+}
+
+
 void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
@@ -190,6 +224,5 @@ void apply_cu_gate_second_(
         }
     }
 }
-
 
 }  // namespace ket::internal

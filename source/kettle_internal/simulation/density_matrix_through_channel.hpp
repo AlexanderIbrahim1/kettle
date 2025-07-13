@@ -90,38 +90,6 @@ inline void simulate_multi_qubit_kraus_channel(
 }
 
 
-/*
-    TODO: this function is taken directly from the `simulate_density_matrix.cpp` file; once I get this
-    to work I should refactor to remove the duplication
-*/
-inline void simulate_u_gate_helper_(
-    Eigen::MatrixXcd& state,
-    Eigen::Index n_qubits,
-    Eigen::Index target_index,
-    const ket::Matrix2X2& gate_mat,
-    const ket::internal::FlatIndexPair<Eigen::Index>& pair,
-    Eigen::MatrixXcd& buffer
-)
-{
-    namespace ki = ket::internal;
-
-    auto pair_iterator_outer = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-    auto pair_iterator_inner = ki::SingleQubitGatePairGenerator {target_index, n_qubits};
-
-    // function reference to reduce line length
-    const auto& left_mul = ki::apply_left_one_qubit_matrix_;
-    const auto& right_mul = ki::apply_right_one_qubit_matrix_;
-
-    // perform the multiplication of U * rho;
-    // fill the left buffer
-    left_mul(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, gate_mat);
-
-    // perform the multiplication of (U * rho) * U^t
-    // write the result back to the state
-    right_mul(buffer, state, pair_iterator_outer, pair_iterator_inner, pair, gate_mat);
-}
-
-
 inline void apply_pauli_string_(
     Eigen::Index n_qubits,
     const SparsePauliString& pauli_string,
@@ -137,7 +105,8 @@ inline void apply_pauli_string_(
 
         const auto target_qubit = static_cast<Eigen::Index>(target_index);
         const auto gate = MAP_PAULI_TERM_TO_PAULI_MATRIX2X2.at(pauli_term);
-        simulate_u_gate_helper_(state_buffer, n_qubits, target_qubit, gate, pair, multiplication_buffer);
+
+        simulate_u_gate_(state_buffer, multiplication_buffer, target_qubit, n_qubits, gate, pair);
     }
 }
 

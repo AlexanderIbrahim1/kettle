@@ -390,6 +390,15 @@ void apply_right_one_qubit_matrix_(
     const ket::Matrix2X2& mat_adj
 );
 
+void simulate_u_gate_(
+    Eigen::MatrixXcd& state,
+    Eigen::MatrixXcd& buffer,
+    Eigen::Index target_index,
+    Eigen::Index n_qubits,
+    const ket::Matrix2X2& mat,
+    const FlatIndexPair<Eigen::Index>& pair
+);
+
 void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
