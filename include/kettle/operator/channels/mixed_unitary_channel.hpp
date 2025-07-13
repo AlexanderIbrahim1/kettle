@@ -51,30 +51,43 @@ public:
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
-        return weighted_pauli_strings_.size();
+        return weighted_unitaries_.size();
     }
 
     [[nodiscard]]
-    constexpr auto weighted_pauli_strings() const noexcept -> const std::vector<ProbabilisticUnitary>&
+    constexpr auto weighted_unitaries() const noexcept -> const std::vector<ProbabilisticUnitary>&
     {
-        return weighted_pauli_strings_;
+        return weighted_unitaries_;
     }
 
     [[nodiscard]]
     auto at(std::size_t index) const -> const ProbabilisticUnitary&
     {
-        return weighted_pauli_strings_[index];
+        return weighted_unitaries_[index];
     }
 
     [[nodiscard]]
     auto at(std::size_t index) -> ProbabilisticUnitary&
     {
-        return weighted_pauli_strings_[index];
+        return weighted_unitaries_[index];
     }
 
 private:
     std::size_t n_qubits_;
-    std::vector<ProbabilisticUnitary> weighted_pauli_strings_;
+    std::vector<ProbabilisticUnitary> weighted_unitaries_;
 };
+
+auto almost_eq(
+    const MixedUnitaryChannel& left_op,
+    const MixedUnitaryChannel& right_op,
+    double coeff_tolerance
+) -> bool;
+
+/*
+    The MixedUnitaryChannel version for depolarizing noise.
+
+    NOTE: this function will be replaced by the Kraus channel version.
+*/
+auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> MixedUnitaryChannel;
 
 }  // namespace ket

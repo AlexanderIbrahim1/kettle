@@ -6,6 +6,7 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/state/density_matrix.hpp"
+// #include "kettle/operator/channels/mixed_unitary_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
