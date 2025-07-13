@@ -171,14 +171,14 @@ void simulate_cu_gate_(
 
 
 void simulate_gate_info_(
-    [[maybe_unused]] const kpi::MapVariant& parameter_values_map,
+    const kpi::MapVariant& parameter_values_map,
     ket::DensityMatrix& state,
     const ki::FlatIndexPair<Eigen::Index>& single_pair,
-    [[maybe_unused]] const ki::FlatIndexPair<Eigen::Index>& double_pair,
+    const ki::FlatIndexPair<Eigen::Index>& double_pair,
     const ket::GateInfo& gate_info,
-    [[maybe_unused]] int thread_id,
-    [[maybe_unused]] std::optional<int> prng_seed,
-    [[maybe_unused]] ket::ClassicalRegister& c_register,
+    int thread_id,
+    std::optional<int> prng_seed,
+    ket::ClassicalRegister& c_register,
     Eigen::MatrixXcd& buffer
 )
 {
