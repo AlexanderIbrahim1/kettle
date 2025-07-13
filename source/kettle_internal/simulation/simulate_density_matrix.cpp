@@ -109,11 +109,11 @@ void simulate_one_control_one_target_gate_(
 
     // perform the multiplication of U * rho;
     // fill the buffer
-    ki::apply_1c1t_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+    ki::apply_1c1t_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, info.gate);
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    ki::apply_1c1t_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+    ki::apply_1c1t_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, info.gate);
 }
 
 
@@ -136,11 +136,11 @@ void simulate_one_control_one_target_one_angle_gate_(
 
     // perform the multiplication of U * rho;
     // fill the buffer
-    ki::apply_1c1t1a_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+    ki::apply_1c1t1a_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta, info.gate);
 
     // perform the multiplication of (U * rho) * U^t
     // write the result to the density matrix itself
-    ki::apply_1c1t1a_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+    ki::apply_1c1t1a_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta, info.gate);
 }
 
 
