@@ -1,62 +1,11 @@
-#include <algorithm>
 #include <initializer_list>
-#include <numeric>
 #include <vector>
 
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
 #include "kettle_internal/operator/pauli/pauli_common.hpp"
-
-
-namespace
-{
-
-void check_nonempty_(const std::vector<ket::ProbabilisticPauliString>& weighted_pauli_strings)
-{
-    if (weighted_pauli_strings.size() == 0) {
-        throw std::runtime_error {
-            "ERROR: construction of `PauliChannel` with only ProbabilisticPauliString instances requires\n"
-            "a non-empty vector.\n"
-        };
-    }
-}
-
-void check_all_strings_same_length_(const std::vector<ket::ProbabilisticPauliString>& strings)
-{
-    const auto has_nonequal_n_qubits = [](const auto& left, const auto& right) -> bool {
-        return left.pauli_string.n_qubits() != right.pauli_string.n_qubits();
-    };
-
-    if (std::ranges::adjacent_find(strings, has_nonequal_n_qubits) != strings.end()) {
-        throw std::runtime_error {
-            "ERROR: construction of `PauliChannel` with ProbabilisticPauliString instances requires\n"
-            "all pauli strings to have the same number of qubits.\n"
-        };
-    }
-
-}
-
-void check_probabilities_add_up_to_1_(const std::vector<ket::ProbabilisticPauliString>& strings, double tolerance)
-{
-    const auto add_string_prob = [](double summ, const auto& string) { return summ + string.coefficient; };
-    const auto total_probability = std::accumulate(strings.begin(), strings.end(), 0.0, add_string_prob);
-
-    if (std::abs(total_probability - 1.0) > tolerance) {
-        throw std::runtime_error {
-            "ERROR: the sum of all coefficients for Pauli strings in the PauliChannel must add up to 1.\n"
-        };
-    }
-}
-
-void check_number_of_qubits_is_nonzero_(std::size_t n_qubits)
-{
-    if (n_qubits == 0) {
-        throw std::runtime_error {"ERROR: the number of qubits in the PauliChannel cannot be zero.\n"};
-    }
-}
-
-}  // namespace
+#include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
 
 namespace ket
@@ -70,14 +19,21 @@ PauliChannel::PauliChannel(
     : n_qubits_ {0}
     , weighted_pauli_strings_ {std::move(weighted_pauli_strings)}
 {
-    check_nonempty_(weighted_pauli_strings_);
-    check_all_strings_same_length_(weighted_pauli_strings_);
-    check_probabilities_add_up_to_1_(weighted_pauli_strings_, tolerance);
+    namespace ki = ket::internal;
+    const auto name = std::string {"PauliChannel"};
+
+    const auto n_qubits_getter = [](const auto& elem) { return elem.pauli_string.n_qubits(); };
+    const auto coefficient_getter = [](const auto& elem) { return elem.coefficient; };
+
+    ki::check_nonempty_(weighted_pauli_strings_, name);
+    ki::check_unitaries_have_same_n_qubits_(weighted_pauli_strings_, n_qubits_getter, name);
+    ki::check_probabilities_add_up_to_1_(weighted_pauli_strings_, coefficient_getter, tolerance, name);
 
     n_qubits_ = weighted_pauli_strings_[0].pauli_string.n_qubits();
 
-    check_number_of_qubits_is_nonzero_(n_qubits_);
+    ki::check_number_of_qubits_is_nonzero_(n_qubits_, name);
 }
+
 
 PauliChannel::PauliChannel(
     const std::initializer_list<ProbabilisticPauliString>& weighted_pauli_strings,
