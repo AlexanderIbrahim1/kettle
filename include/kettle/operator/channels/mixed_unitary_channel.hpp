@@ -83,11 +83,4 @@ auto almost_eq(
     double coeff_tolerance
 ) -> bool;
 
-/*
-    The MixedUnitaryChannel version for depolarizing noise.
-
-    NOTE: this function will be replaced by the Kraus channel version.
-*/
-auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> MixedUnitaryChannel;
-
 }  // namespace ket

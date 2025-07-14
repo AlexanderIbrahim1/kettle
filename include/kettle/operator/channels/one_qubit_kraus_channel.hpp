@@ -40,19 +40,4 @@ private:
     std::size_t target_index_;
 };
 
-
-/*
-    The symmetric depolarizing error channel applied to a single qubit.
-
-    Kraus channels are not unique, and there are multiple definitions in the literature.
-    For this definition:
-      - p = 0 gives a noiseless channel
-      - p = 3/4 gives a full depolarized channel, and the output will be proportional to the identity matrix
-      - p = 1 gives the uniform Pauli error channel, where X, Y, and Z are applied equally to the 1-qubit density matrix
-    
-    NOTE: replace this function with the Pauli gate implementation at some point in the future
-      - because that one naturally extends to multiple qubits
-*/
-auto depolarizing_noise(double parameter, std::size_t target_index) -> OneQubitKrausChannel;
-
 }  // namespace ket

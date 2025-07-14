@@ -5,6 +5,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/operator/channels/mixed_unitary_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
@@ -31,30 +32,6 @@ auto result_depolarizing_noise_1qubit(
     const auto elem11 = dens_mat.elem11 * (1.0 - (4.0 * parameter / 3.0)) + (2.0 * parameter / 3.0);
 
     return {.elem00=elem00, .elem01=elem01, .elem10=elem10, .elem11=elem11};
-}
-
-auto apply_depolarizing_noise_1qubit(
-    const ket::Matrix2X2& dens_mat,
-    const ket::OneQubitKrausChannel& channel
-) -> ket::Matrix2X2
-{
-    auto output = ket::Matrix2X2 {};
-    for (const auto& mat : channel.matrices()) {
-        output += (mat * dens_mat * ket::conjugate_transpose(mat));
-    }
-
-    return output;
-}
-
-auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
-{
-    auto output = Eigen::MatrixXcd(2, 2);
-    output(0, 0) = matrix.elem00;
-    output(0, 1) = matrix.elem01;
-    output(1, 0) = matrix.elem10;
-    output(1, 1) = matrix.elem11;
-
-    return output;
 }
 
 auto result_amplitude_damping_2qubit(
@@ -111,6 +88,115 @@ auto result_amplitude_damping_2qubit(
     return ket::DensityMatrix {densmat_after};
 }
 
+/*
+    Apply the depolarizing noise to a 1-qubit system manually, in the Kraus manner.
+*/
+auto depolarizing_noise_manual_1qubit(
+    const ket::Matrix2X2& dens_mat,
+    const ket::OneQubitKrausChannel& channel
+) -> ket::Matrix2X2
+{
+    auto output = ket::Matrix2X2 {};
+    for (const auto& mat : channel.matrices()) {
+        output += (mat * dens_mat * ket::conjugate_transpose(mat));
+    }
+
+    return output;
+}
+
+/*
+    The MixedUnitaryChannel version for depolarizing noise.
+
+    This is only used for unit testing purposes. By default, the implementation for applying
+    depolarizing noise uses a Kraus channel.
+*/
+auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedUnitaryChannel
+{
+    if (parameter < 0.0 || parameter > 1.0) {
+        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
+    }
+
+    const auto coeff0 = 1.0 - parameter;
+    const auto coeff123 = parameter / 3.0;
+
+    auto circuit0 = ket::QuantumCircuit {1};
+
+    auto circuit1 = ket::QuantumCircuit {1};
+    circuit1.add_x_gate(0);
+
+    auto circuit2 = ket::QuantumCircuit {1};
+    circuit2.add_y_gate(0);
+
+    auto circuit3 = ket::QuantumCircuit {1};
+    circuit3.add_z_gate(0);
+
+    return ket::MixedUnitaryChannel {
+        {.coefficient=coeff0,   .unitary=std::move(circuit0)},
+        {.coefficient=coeff123, .unitary=std::move(circuit1)},
+        {.coefficient=coeff123, .unitary=std::move(circuit2)},
+        {.coefficient=coeff123, .unitary=std::move(circuit3)},
+    };
+}
+
+auto depolarizing_noise_pauli_1qubit(double parameter) -> ket::PauliChannel
+{
+    using PT = ket::PauliTerm;
+
+    if (parameter < 0.0 || parameter > 1.0) {
+        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
+    }
+
+    const auto coeff0 = 1.0 - parameter;
+    const auto coeff123 = parameter / 3.0;
+
+    return ket::PauliChannel {
+        {.coefficient=coeff0,   .pauli_string={PT::I}},
+        {.coefficient=coeff123, .pauli_string={PT::X}},
+        {.coefficient=coeff123, .pauli_string={PT::Y}},
+        {.coefficient=coeff123, .pauli_string={PT::Z}},
+    };
+}
+
+/*
+    The symmetric depolarizing error channel applied to a single qubit.
+
+    Kraus channels are not unique, and there are multiple definitions in the literature.
+    For this definition:
+      - p = 0 gives a noiseless channel
+      - p = 3/4 gives a full depolarized channel, and the output will be proportional to the identity matrix
+      - p = 1 gives the uniform Pauli error channel, where X, Y, and Z are applied equally to the 1-qubit density matrix
+    
+    NOTE: replace this function with the Pauli gate implementation at some point in the future
+      - because that one naturally extends to multiple qubits
+*/
+auto depolarizing_noise_kraus_1qubit(double parameter, std::size_t target_index) -> ket::OneQubitKrausChannel
+{
+    if (parameter < 0.0 || parameter > 1.0) {
+        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
+    }
+
+    const auto coeff0 = std::sqrt(1.0 - parameter);
+    const auto coeff123 = std::sqrt(parameter / 3.0);
+    const auto mat0 = coeff0 * ket::i_gate();
+    const auto mat1 = coeff123 * ket::x_gate();
+    const auto mat2 = coeff123 * ket::y_gate();
+    const auto mat3 = coeff123 * ket::z_gate();
+
+    return ket::OneQubitKrausChannel {{mat0, mat1, mat2, mat3}, target_index};
+}
+
+
+auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
+{
+    auto output = Eigen::MatrixXcd(2, 2);
+    output(0, 0) = matrix.elem00;
+    output(0, 1) = matrix.elem01;
+    output(1, 0) = matrix.elem10;
+    output(1, 1) = matrix.elem11;
+
+    return output;
+}
+
 }  // namespace
 
 
@@ -142,8 +228,8 @@ TEST_CASE("Kraus channel depolarizing noise")
 
     SECTION("manual application of Matrix2X2 instances above")
     {
-        const auto depol_channel = ket::depolarizing_noise(parameter, 0);
-        const auto actual = apply_depolarizing_noise_1qubit(matrix, depol_channel);
+        const auto depol_channel = depolarizing_noise_kraus_1qubit(parameter, 0);
+        const auto actual = depolarizing_noise_manual_1qubit(matrix, depol_channel);
 
         REQUIRE(ket::almost_eq(actual, expected));
     }
@@ -161,7 +247,7 @@ TEST_CASE("Kraus channel depolarizing noise")
 
         SECTION("using `simulate_one_qubit_kraus_channel()`")
         {
-            const auto depol_channel = ket::depolarizing_noise(parameter, 0);
+            const auto depol_channel = depolarizing_noise_kraus_1qubit(parameter, 0);
             ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
@@ -170,7 +256,7 @@ TEST_CASE("Kraus channel depolarizing noise")
 
         SECTION("using `simulate_pauli_channel()`")
         {
-            const auto depol_channel = ket::depolarizing_noise_pauli_1qubit(parameter);
+            const auto depol_channel = depolarizing_noise_pauli_1qubit(parameter);
             ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
@@ -182,7 +268,7 @@ TEST_CASE("Kraus channel depolarizing noise")
             const auto n_double_gate_pairs = Eigen::Index {0};
             const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
 
-            const auto depol_channel = ket::depolarizing_noise_mixed_unitary_1qubit(parameter);
+            const auto depol_channel = depolarizing_noise_mixed_unitary_1qubit(parameter);
             ket::simulate_mixed_unitary_channel(state, depol_channel, single_pair, double_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};

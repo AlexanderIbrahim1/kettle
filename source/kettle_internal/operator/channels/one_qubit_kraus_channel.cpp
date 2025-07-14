@@ -66,20 +66,4 @@ OneQubitKrausChannel::OneQubitKrausChannel(
     }
 }
 
-auto depolarizing_noise(double parameter, std::size_t target_index) -> OneQubitKrausChannel
-{
-    if (parameter < 0.0 || parameter > 1.0) {
-        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
-    }
-
-    const auto coeff0 = std::sqrt(1.0 - parameter);
-    const auto coeff123 = std::sqrt(parameter / 3.0);
-    const auto mat0 = coeff0 * ket::i_gate();
-    const auto mat1 = coeff123 * ket::x_gate();
-    const auto mat2 = coeff123 * ket::y_gate();
-    const auto mat3 = coeff123 * ket::z_gate();
-
-    return OneQubitKrausChannel {{mat0, mat1, mat2, mat3}, target_index};
-}
-
 }  // namespace ket

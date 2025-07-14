@@ -68,19 +68,11 @@ private:
     std::vector<ProbabilisticPauliString> weighted_unitaries_;
 };
 
-
 // TODO: replace magic number
 auto almost_eq(
     const PauliChannel& left_op,
     const PauliChannel& right_op,
     double coeff_tolerance = 1.0e-6
 ) -> bool;
-
-/*
-    The Pauli channel version for depolarizing noise.
-
-    NOTE: this function will replace the Kraus channel version.
-*/
-auto depolarizing_noise_pauli_1qubit(double parameter) -> PauliChannel;
 
 }  // namespace ket

@@ -53,23 +53,4 @@ auto almost_eq(
 }
 
 
-auto depolarizing_noise_pauli_1qubit(double parameter) -> PauliChannel
-{
-    using PT = ket::PauliTerm;
-
-    if (parameter < 0.0 || parameter > 1.0) {
-        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
-    }
-
-    const auto coeff0 = 1.0 - parameter;
-    const auto coeff123 = parameter / 3.0;
-
-    return PauliChannel {
-        {.coefficient=coeff0,   .pauli_string={PT::I}},
-        {.coefficient=coeff123, .pauli_string={PT::X}},
-        {.coefficient=coeff123, .pauli_string={PT::Y}},
-        {.coefficient=coeff123, .pauli_string={PT::Z}},
-    };
-}
-
 }  // namespace ket

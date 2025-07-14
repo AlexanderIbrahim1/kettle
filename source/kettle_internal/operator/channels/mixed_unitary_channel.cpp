@@ -84,38 +84,4 @@ auto almost_eq(
     return true;
 }
 
-/*
-    The MixedUnitaryChannel version for depolarizing noise.
-
-    NOTE: this function will be replaced by the Kraus channel version; I'm just writing it right
-    now so I have something to unit test
-*/
-auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> MixedUnitaryChannel
-{
-    if (parameter < 0.0 || parameter > 1.0) {
-        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
-    }
-
-    const auto coeff0 = 1.0 - parameter;
-    const auto coeff123 = parameter / 3.0;
-
-    auto circuit0 = ket::QuantumCircuit {1};
-
-    auto circuit1 = ket::QuantumCircuit {1};
-    circuit1.add_x_gate(0);
-
-    auto circuit2 = ket::QuantumCircuit {1};
-    circuit2.add_y_gate(0);
-
-    auto circuit3 = ket::QuantumCircuit {1};
-    circuit3.add_z_gate(0);
-
-    return MixedUnitaryChannel {
-        {.coefficient=coeff0,   .unitary=std::move(circuit0)},
-        {.coefficient=coeff123, .unitary=std::move(circuit1)},
-        {.coefficient=coeff123, .unitary=std::move(circuit2)},
-        {.coefficient=coeff123, .unitary=std::move(circuit3)},
-    };
-}
-
 }  // namespace ket
