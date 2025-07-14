@@ -1,17 +1,15 @@
 #pragma once
 
-#include "kettle/common/mathtools.hpp"
-
 #include <cstddef>
 
 namespace ket::internal
 {
 
-template <typename T>
-auto almost_eq_pauli_helper_(
+template <typename T, typename F>
+auto almost_eq_helper_(
     const T& left_op,
     const T& right_op,
-    double coeff_tolerance
+    F almost_eq_func
 ) -> bool
 {
     if (left_op.size() != right_op.size()) {
@@ -23,11 +21,7 @@ auto almost_eq_pauli_helper_(
         const auto& left = left_op.at(i);
         const auto& right = right_op.at(i);
 
-        if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
-            return false;
-        }
-
-        if (left.pauli_string != right.pauli_string) {
+        if (!almost_eq_func(left, right)) {
             return false;
         }
     }

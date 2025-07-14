@@ -1,10 +1,11 @@
 #include <initializer_list>
 #include <vector>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
-#include "kettle_internal/operator/pauli/pauli_common.hpp"
+#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
 
@@ -49,7 +50,16 @@ auto almost_eq(
     double coeff_tolerance
 ) -> bool
 {
-    return ket::internal::almost_eq_pauli_helper_(left_op, right_op, coeff_tolerance);
+    using PPS = ProbabilisticPauliString;
+    const auto almost_eq = [coeff_tolerance](const PPS& left, const PPS& right) {
+        if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
+            return false;
+        }
+
+        return left.pauli_string == right.pauli_string;
+    };
+
+    return ket::internal::almost_eq_helper_(left_op, right_op, almost_eq);
 }
 
 

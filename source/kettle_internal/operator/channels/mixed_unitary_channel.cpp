@@ -7,7 +7,9 @@
 #include "kettle/operator/channels/mixed_unitary_channel.hpp"
 
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
+#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
 
+namespace ki = ket::internal;
 
 namespace
 {
@@ -63,25 +65,16 @@ auto almost_eq(
     double coeff_tolerance
 ) -> bool
 {
-    if (left_op.size() != right_op.size()) {
-        return false;
-    }
-
-    const auto size = left_op.size();
-    for (std::size_t i {0}; i < size; ++i) {
-        const auto& left = left_op.at(i);
-        const auto& right = right_op.at(i);
-
+    using PU = ProbabilisticUnitary;
+    const auto almost_eq = [coeff_tolerance](const PU& left, const PU& right) {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
         }
 
-        if (!ket::almost_eq(left.unitary, right.unitary, coeff_tolerance)) {
-            return false;
-        }
-    }
+        return ket::almost_eq(left.unitary, right.unitary, coeff_tolerance);
+    };
 
-    return true;
+    return ki::almost_eq_helper_(left_op, right_op, almost_eq);
 }
 
 }  // namespace ket

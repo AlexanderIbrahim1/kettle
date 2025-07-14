@@ -3,12 +3,13 @@
 #include <initializer_list>
 #include <vector>
 
+#include "kettle/common/mathtools.hpp"
 #include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/simulation/simulate_pauli.hpp"
 #include "kettle/state/statevector.hpp"
 
-#include "kettle_internal/operator/pauli/pauli_common.hpp"
+#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
 
 /*
     This file contains the `PauliOperator` class for 
@@ -111,7 +112,16 @@ auto almost_eq(
     double coeff_tolerance
 ) -> bool
 {
-    return ket::internal::almost_eq_pauli_helper_(left_op, right_op, coeff_tolerance);
+    using WPS = WeightedPauliString;
+    const auto almost_eq = [coeff_tolerance](const WPS& left, const WPS& right) {
+        if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
+            return false;
+        }
+
+        return left.pauli_string == right.pauli_string;
+    };
+
+    return ket::internal::almost_eq_helper_(left_op, right_op, almost_eq);
 }
 
 }  // namespace ket
