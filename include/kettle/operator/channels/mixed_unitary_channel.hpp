@@ -77,10 +77,11 @@ private:
     std::vector<ProbabilisticUnitary> weighted_unitaries_;
 };
 
+// TODO: replace magic number
 auto almost_eq(
     const MixedUnitaryChannel& left_op,
     const MixedUnitaryChannel& right_op,
-    double coeff_tolerance
+    double coeff_tolerance = 1.0e-6
 ) -> bool;
 
 }  // namespace ket

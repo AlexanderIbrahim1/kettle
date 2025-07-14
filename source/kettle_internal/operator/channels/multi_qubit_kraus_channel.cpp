@@ -93,4 +93,27 @@ MultiQubitKrausChannel::MultiQubitKrausChannel(
     , n_output_qubits_ {ki::log_2_int(kraus_matrices_[0].rows())}
 {}
 
+auto almost_eq(
+    const MultiQubitKrausChannel& left_op,
+    const MultiQubitKrausChannel& right_op,
+    double coeff_tolerance
+) -> bool
+{
+    if (left_op.size() != right_op.size()) {
+        return false;
+    }
+
+    const auto size = left_op.size();
+    for (std::size_t i {0}; i < size; ++i) {
+        const auto& left = left_op.at(i);
+        const auto& right = right_op.at(i);
+
+        if (!left.isApprox(right, coeff_tolerance)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 }  // namespace ket

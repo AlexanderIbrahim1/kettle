@@ -26,6 +26,12 @@ public:
     );
 
     [[nodiscard]]
+    constexpr auto size() const noexcept -> std::size_t
+    {
+        return kraus_matrices_.size();
+    }
+
+    [[nodiscard]]
     constexpr auto matrices() const -> const std::vector<Eigen::MatrixXcd>& {
         return kraus_matrices_;
     }
@@ -42,10 +48,29 @@ public:
         return n_output_qubits_;
     }
 
+    [[nodiscard]]
+    auto at(std::size_t index) const -> const Eigen::MatrixXcd&
+    {
+        return kraus_matrices_[index];
+    }
+
+    [[nodiscard]]
+    auto at(std::size_t index) -> Eigen::MatrixXcd&
+    {
+        return kraus_matrices_[index];
+    }
+
 private:
     std::vector<Eigen::MatrixXcd> kraus_matrices_;
     std::size_t n_input_qubits_ {};
     std::size_t n_output_qubits_ {};
 };
+
+// TODO: replace magic number
+auto almost_eq(
+    const MultiQubitKrausChannel& left_op,
+    const MultiQubitKrausChannel& right_op,
+    double coeff_tolerance = 1.0e-6
+) -> bool;
 
 }  // namespace ket
