@@ -163,10 +163,14 @@ inline void simulate_mixed_unitary_channel(
 
     auto eval_param_map = param_map.value_or(ket::param::EvaluatedParameterDataMap {});
 
+    state_buffer = state.matrix();
+
     for (std::size_t i {0}; i < channel.size(); ++i) {
         const auto& [coefficient, unitary] = channel.weighted_unitaries()[i];
 
-        state_buffer = state.matrix();
+        if (i != 0) {
+            state.matrix() = state_buffer;
+        }
 
         for (const auto& circ_element : unitary) {
             if (!circ_element.is_gate()) {
@@ -191,9 +195,9 @@ inline void simulate_mixed_unitary_channel(
 
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
-            accumulation_buffer = (coefficient * state_buffer);
+            accumulation_buffer = (coefficient * state.matrix());
         } else {
-            accumulation_buffer += (coefficient * state_buffer);
+            accumulation_buffer += (coefficient * state.matrix());
         }
     }
 

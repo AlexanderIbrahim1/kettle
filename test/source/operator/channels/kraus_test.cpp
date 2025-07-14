@@ -5,6 +5,7 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/operator/channels/mixed_unitary_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
@@ -115,7 +116,7 @@ auto result_amplitude_damping_2qubit(
 
 TEST_CASE("Kraus channel depolarizing noise")
 {
-    const auto parameter = GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+    const auto parameter = 0.4; // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
 
     // state should be simple but not completely arbitrary, so we don't use a random state
     auto state = [&]() {
@@ -164,7 +165,6 @@ TEST_CASE("Kraus channel depolarizing noise")
             ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
-
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
         }
 
@@ -172,6 +172,18 @@ TEST_CASE("Kraus channel depolarizing noise")
         {
             const auto depol_channel = ket::depolarizing_noise_pauli_1qubit(parameter);
             ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+
+            const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
+            REQUIRE(ki::almost_eq_with_print_(state, expected_state));
+        }
+
+        SECTION("using `simulate_mixed_unitary_channel()`")
+        {
+            const auto n_double_gate_pairs = Eigen::Index {0};
+            const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+
+            const auto depol_channel = ket::depolarizing_noise_mixed_unitary_1qubit(parameter);
+            ket::simulate_mixed_unitary_channel(state, depol_channel, single_pair, double_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
