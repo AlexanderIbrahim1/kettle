@@ -7,7 +7,6 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/density_matrix.hpp"
 
-#include "kettle_internal/gates/primitive_gate_map.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
 
@@ -430,37 +429,25 @@ void apply_cu_gate_second_(
     const ket::Matrix2X2& mat
 );
 
-inline void apply_1c1t_gate_first_(
+void apply_1c1t_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
     ket::Gate gate
-)
-{
-    // TODO: maybe specialize in the future like all other simulation functions
-    const auto mat_func = GATE_TO_MATRIX_FUNCTION_NO_PARAM.at(gate);
-    const auto mat = mat_func();
-    apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
-}
+);
 
-inline void apply_1c1t_gate_second_(
+void apply_1c1t_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_inner,
     const FlatIndexPair<Eigen::Index>& pair,
     ket::Gate gate
-)
-{
-    // TODO: maybe specialize in the future like all other simulation functions
-    const auto mat_func = GATE_TO_MATRIX_FUNCTION_NO_PARAM.at(gate);
-    const auto mat = ket::conjugate_transpose(mat_func());
-    apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
-}
+);
 
-inline void apply_1c1t1a_gate_first_(
+void apply_1c1t1a_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
@@ -468,15 +455,9 @@ inline void apply_1c1t1a_gate_first_(
     const FlatIndexPair<Eigen::Index>& pair,
     double angle,
     ket::Gate gate
-)
-{
-    // TODO: maybe specialize in the future like all other simulation functions
-    const auto mat_func = GATE_TO_MATRIX_FUNCTION_PARAM.at(gate);
-    const auto mat = mat_func(angle);
-    apply_cu_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
-}
+);
 
-inline void apply_1c1t1a_gate_second_(
+void apply_1c1t1a_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
     DoubleQubitGatePairGenerator<Eigen::Index>& pair_iterator_outer,
@@ -484,12 +465,6 @@ inline void apply_1c1t1a_gate_second_(
     const FlatIndexPair<Eigen::Index>& pair,
     double angle,
     ket::Gate gate
-)
-{
-    // TODO: maybe specialize in the future like all other simulation functions
-    const auto mat_func = GATE_TO_MATRIX_FUNCTION_PARAM.at(gate);
-    const auto mat = ket::conjugate_transpose(mat_func(angle));
-    apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat);
-}
+);
 
 }  // namespace ket::internal
