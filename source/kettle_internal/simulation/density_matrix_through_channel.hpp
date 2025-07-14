@@ -2,15 +2,17 @@
 
 #include <Eigen/Dense>
 
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/state/density_matrix.hpp"
-// #include "kettle/operator/channels/mixed_unitary_channel.hpp"
+#include "kettle/operator/channels/mixed_unitary_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 
+#include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
@@ -127,6 +129,60 @@ inline void simulate_pauli_channel(
 
         state_buffer = state.matrix();
         apply_pauli_string_(n_qubits, pauli_string, pair, multiplication_buffer, state_buffer);
+
+        // skip setting all elements in the buffer to 0, by overwriting on the first iteration
+        if (i == 0) {
+            accumulation_buffer = (coefficient * state_buffer);
+        } else {
+            accumulation_buffer += (coefficient * state_buffer);
+        }
+    }
+
+    state.matrix() = accumulation_buffer;
+}
+
+inline void simulate_mixed_unitary_channel(
+    DensityMatrix& state,
+    const MixedUnitaryChannel& channel,
+    const internal::FlatIndexPair<Eigen::Index>& single_pair,
+    const internal::FlatIndexPair<Eigen::Index>& double_pair,
+    Eigen::MatrixXcd& accumulation_buffer,
+    Eigen::MatrixXcd& multiplication_buffer,
+    Eigen::MatrixXcd& state_buffer
+)
+{
+    const auto n_qubits = state.n_qubits();
+
+    const auto dummy_map = ket::param::EvaluatedParameterDataMap {};
+    const auto dummy_thread_id = std::size_t {0};
+    const auto dummy_prng_seed = std::size_t {0};
+    auto dummy_classical_register = ket::ClassicalRegister {n_qubits};
+
+    for (std::size_t i {0}; i < channel.size(); ++i) {
+        const auto& [coefficient, unitary] = channel.weighted_unitaries()[i];
+
+        state_buffer = state.matrix();
+
+        for (const auto& circ_element : unitary) {
+            if (!circ_element.is_gate()) {
+                throw std::runtime_error {"ERROR: the MixedUnitaryChannel only supports gate simulation.\n"};
+            }
+
+            const auto& gate_info = circ_element.get_gate();
+
+            // TODO: maybe make multithreaded later when this all works
+            simulate_gate_info_(
+                dummy_map,
+                state,
+                single_pair,
+                double_pair,
+                gate_info,
+                dummy_thread_id,
+                dummy_prng_seed,
+                dummy_classical_register,
+                multiplication_buffer
+            );
+        }
 
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
