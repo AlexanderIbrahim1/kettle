@@ -3,10 +3,13 @@
 #include <Eigen/Dense>
 #include <cmath>
 
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/density_matrix.hpp"
 
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
 
@@ -30,6 +33,8 @@
 
 namespace ket::internal
 {
+
+constexpr static auto MEASURING_THREAD_ID = int {0};
 
 /*
     Helper struct for the static_assert(), to see what ket::Gate instance is passed that causes
@@ -402,15 +407,6 @@ void apply_right_one_qubit_matrix_(
     const ket::Matrix2X2& mat_adj
 );
 
-void simulate_u_gate_(
-    Eigen::MatrixXcd& state,
-    Eigen::MatrixXcd& buffer,
-    Eigen::Index target_index,
-    Eigen::Index n_qubits,
-    const ket::Matrix2X2& mat,
-    const FlatIndexPair<Eigen::Index>& pair
-);
-
 void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
@@ -465,6 +461,140 @@ void apply_1c1t1a_gate_second_(
     const FlatIndexPair<Eigen::Index>& pair,
     double angle,
     ket::Gate gate
+);
+
+void simulate_u_gate_(
+    Eigen::MatrixXcd& state,
+    Eigen::MatrixXcd& buffer,
+    Eigen::Index target_index,
+    Eigen::Index n_qubits,
+    const ket::Matrix2X2& mat,
+    const FlatIndexPair<Eigen::Index>& pair
+);
+
+template <ket::Gate GateType>
+void simulate_one_target_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    const auto target_index = static_cast<Eigen::Index>(create::unpack_single_qubit_gate_index(info));
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+    auto pair_iterator_outer = SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = SingleQubitGatePairGenerator {target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    apply_1t_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    apply_1t_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair);
+}
+
+template <ket::Gate GateType>
+void simulate_one_target_one_angle_gate_(
+    const ket::param::internal::MapVariant& parameter_values_map,
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    namespace kpi = ket::param::internal;
+
+    const auto [target_index_st, theta] = kpi::unpack_target_and_angle(parameter_values_map, info);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    auto pair_iterator_outer = SingleQubitGatePairGenerator {target_index, n_qubits};
+    auto pair_iterator_inner = SingleQubitGatePairGenerator {target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    apply_1t1a_gate_first_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    apply_1t1a_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
+}
+
+
+void simulate_cu_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const ket::Matrix2X2& mat,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+);
+
+
+template <ket::Gate GateType>
+void simulate_one_control_one_target_gate_(
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    const auto [control_index_st, target_index_st] = create::unpack_double_qubit_gate_indices(info);
+    const auto control_index = static_cast<Eigen::Index>(control_index_st);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    auto pair_iterator_outer = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto pair_iterator_inner = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    apply_1c1t_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, info.gate);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    apply_1c1t_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, info.gate);
+}
+
+
+template <ket::Gate GateType>
+void simulate_one_control_one_target_one_angle_gate_(
+    const ket::param::internal::MapVariant& parameter_values_map,
+    ket::DensityMatrix& state,
+    const ket::GateInfo& info,
+    const FlatIndexPair<Eigen::Index>& pair,
+    Eigen::MatrixXcd& buffer
+)
+{
+    namespace kpi = ket::param::internal;
+
+    const auto [control_index_st, target_index_st, theta] = kpi::unpack_control_target_and_angle(parameter_values_map, info);
+    const auto control_index = static_cast<Eigen::Index>(control_index_st);
+    const auto target_index = static_cast<Eigen::Index>(target_index_st);
+    const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
+
+    auto pair_iterator_outer = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+    auto pair_iterator_inner = DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
+
+    // perform the multiplication of U * rho;
+    // fill the buffer
+    apply_1c1t1a_gate_first_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta, info.gate);
+
+    // perform the multiplication of (U * rho) * U^t
+    // write the result to the density matrix itself
+    apply_1c1t1a_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta, info.gate);
+}
+
+void simulate_gate_info_(
+    const ket::param::internal::MapVariant& parameter_values_map,
+    ket::DensityMatrix& state,
+    const FlatIndexPair<Eigen::Index>& single_pair,
+    const FlatIndexPair<Eigen::Index>& double_pair,
+    const ket::GateInfo& gate_info,
+    int thread_id,
+    std::optional<int> prng_seed,
+    ket::ClassicalRegister& c_register,
+    Eigen::MatrixXcd& buffer
 );
 
 }  // namespace ket::internal
