@@ -37,10 +37,10 @@ class MixedUnitaryChannel
 public:
     // TODO: get rid of magic number
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    MixedUnitaryChannel(std::vector<ProbabilisticUnitary> weighted_pauli_strings, double tolerance = 1.0e-6);
+    MixedUnitaryChannel(std::vector<ProbabilisticUnitary> weighted_unitaries, double tolerance = 1.0e-6);
 
     // TODO: get rid of magic number
-    MixedUnitaryChannel(const std::initializer_list<ProbabilisticUnitary>& weighted_pauli_strings, double tolerance = 1.0e-6);
+    MixedUnitaryChannel(const std::initializer_list<ProbabilisticUnitary>& weighted_unitaries, double tolerance = 1.0e-6);
 
     [[nodiscard]]
     constexpr auto n_qubits() const noexcept -> std::size_t

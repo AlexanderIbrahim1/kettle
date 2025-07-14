@@ -349,3 +349,16 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
 
     REQUIRE(ki::almost_eq_with_print_(state, expected));
 }
+
+
+TEST_CASE("Cannot construct MixedUnitaryChannel with measurement gate")
+{
+    auto prob_unitary = []() {
+        auto circuit = ket::QuantumCircuit {1};
+        circuit.add_m_gate(0);
+
+        return ket::ProbabilisticUnitary {.coefficient=1.0, .unitary=circuit};
+    }();
+
+    REQUIRE_THROWS_AS(ket::MixedUnitaryChannel {{prob_unitary}}, std::runtime_error);
+}
