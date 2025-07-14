@@ -1,11 +1,14 @@
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Dense>
 
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
+#include "kettle/parameter/parameter.hpp"
 #include "kettle/state/density_matrix.hpp"
 #include "kettle/operator/channels/mixed_unitary_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
@@ -148,15 +151,17 @@ inline void simulate_mixed_unitary_channel(
     const internal::FlatIndexPair<Eigen::Index>& double_pair,
     Eigen::MatrixXcd& accumulation_buffer,
     Eigen::MatrixXcd& multiplication_buffer,
-    Eigen::MatrixXcd& state_buffer
+    Eigen::MatrixXcd& state_buffer,
+    const std::optional<ket::param::EvaluatedParameterDataMap>& param_map = std::nullopt
 )
 {
     const auto n_qubits = state.n_qubits();
 
-    const auto dummy_map = ket::param::EvaluatedParameterDataMap {};
     const auto dummy_thread_id = std::size_t {0};
     const auto dummy_prng_seed = std::size_t {0};
     auto dummy_classical_register = ket::ClassicalRegister {n_qubits};
+
+    auto eval_param_map = param_map.value_or(ket::param::EvaluatedParameterDataMap {});
 
     for (std::size_t i {0}; i < channel.size(); ++i) {
         const auto& [coefficient, unitary] = channel.weighted_unitaries()[i];
@@ -172,7 +177,7 @@ inline void simulate_mixed_unitary_channel(
 
             // TODO: maybe make multithreaded later when this all works
             simulate_gate_info_(
-                dummy_map,
+                eval_param_map,
                 state,
                 single_pair,
                 double_pair,

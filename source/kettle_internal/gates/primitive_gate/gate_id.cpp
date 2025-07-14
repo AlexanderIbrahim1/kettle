@@ -63,5 +63,10 @@ auto is_primitive_gate(ket::Gate gate) -> bool
     return is_non_angle_transform_gate(gate) || is_angle_transform_gate(gate);
 }
 
+auto is_unitary_gate(ket::Gate gate) -> bool
+{
+    return gate != ket::Gate::M;
+}
+
 }  // namespace ket::internal::gate_id
 

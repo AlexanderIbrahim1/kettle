@@ -9,6 +9,19 @@
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
 
+namespace
+{
+
+/*
+    Each unitary in the MixedUnitaryChannel must:
+      - have no measurement gates
+      - have no classical control flow
+      - no circuit loggers
+*/
+
+}  // namespace
+
+
 namespace ket
 {
 
