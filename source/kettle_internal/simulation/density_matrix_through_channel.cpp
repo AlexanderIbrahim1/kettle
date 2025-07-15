@@ -8,7 +8,7 @@
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/state/density_matrix.hpp"
-#include "kettle/operator/channels/mixed_unitary_channel.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
@@ -150,9 +150,9 @@ void simulate_pauli_channel(
     state.matrix() = accumulation_buffer;
 }
 
-void simulate_mixed_unitary_channel(
+void simulate_mixed_circuit_channel(
     DensityMatrix& state,
-    const MixedUnitaryChannel& channel,
+    const MixedCircuitChannel& channel,
     const internal::FlatIndexPair<Eigen::Index>& single_pair,
     const internal::FlatIndexPair<Eigen::Index>& double_pair,
     Eigen::MatrixXcd& accumulation_buffer,
@@ -180,7 +180,7 @@ void simulate_mixed_unitary_channel(
 
         for (const auto& circ_element : unitary) {
             if (!circ_element.is_gate()) {
-                throw std::runtime_error {"ERROR: the MixedUnitaryChannel only supports gate simulation.\n"};
+                throw std::runtime_error {"ERROR: the MixedCircuitChannel only supports gate simulation.\n"};
             }
 
             const auto& gate_info = circ_element.get_gate();

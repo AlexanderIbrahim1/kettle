@@ -6,7 +6,7 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
-#include "kettle/operator/channels/mixed_unitary_channel.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
@@ -105,12 +105,12 @@ auto depolarizing_noise_manual_1qubit(
 }
 
 /*
-    The MixedUnitaryChannel version for depolarizing noise.
+    The MixedCircuitChannel version for depolarizing noise.
 
     This is only used for unit testing purposes. By default, the implementation for applying
     depolarizing noise uses a Kraus channel.
 */
-auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedUnitaryChannel
+auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedCircuitChannel
 {
     if (parameter < 0.0 || parameter > 1.0) {
         throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
@@ -130,7 +130,7 @@ auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedUnit
     auto circuit3 = ket::QuantumCircuit {1};
     circuit3.add_z_gate(0);
 
-    return ket::MixedUnitaryChannel {
+    return ket::MixedCircuitChannel {
         {.coefficient=coeff0,   .unitary=std::move(circuit0)},
         {.coefficient=coeff123, .unitary=std::move(circuit1)},
         {.coefficient=coeff123, .unitary=std::move(circuit2)},
@@ -263,13 +263,13 @@ TEST_CASE("Kraus channel depolarizing noise")
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
         }
 
-        SECTION("using `simulate_mixed_unitary_channel()`")
+        SECTION("using `simulate_mixed_circuit_channel()`")
         {
             const auto n_double_gate_pairs = Eigen::Index {0};
             const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
 
             const auto depol_channel = depolarizing_noise_mixed_unitary_1qubit(parameter);
-            ket::simulate_mixed_unitary_channel(state, depol_channel, single_pair, double_pair, buffer0, buffer1, buffer2);
+            ket::simulate_mixed_circuit_channel(state, depol_channel, single_pair, double_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -348,17 +348,4 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
     ket::simulate_multi_qubit_kraus_channel(state, channel, buffer);
 
     REQUIRE(ki::almost_eq_with_print_(state, expected));
-}
-
-
-TEST_CASE("Cannot construct MixedUnitaryChannel with measurement gate")
-{
-    auto prob_unitary = []() {
-        auto circuit = ket::QuantumCircuit {1};
-        circuit.add_m_gate(0);
-
-        return ket::ProbabilisticUnitary {.coefficient=1.0, .unitary=circuit};
-    }();
-
-    REQUIRE_THROWS_AS(ket::MixedUnitaryChannel {{prob_unitary}}, std::runtime_error);
 }

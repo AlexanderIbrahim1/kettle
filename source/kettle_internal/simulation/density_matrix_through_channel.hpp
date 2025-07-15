@@ -6,7 +6,7 @@
 
 #include "kettle/parameter/parameter.hpp"
 #include "kettle/state/density_matrix.hpp"
-#include "kettle/operator/channels/mixed_unitary_channel.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
@@ -45,9 +45,9 @@ void simulate_pauli_channel(
     Eigen::MatrixXcd& state_buffer
 );
 
-void simulate_mixed_unitary_channel(
+void simulate_mixed_circuit_channel(
     DensityMatrix& state,
-    const MixedUnitaryChannel& channel,
+    const MixedCircuitChannel& channel,
     const internal::FlatIndexPair<Eigen::Index>& single_pair,
     const internal::FlatIndexPair<Eigen::Index>& double_pair,
     Eigen::MatrixXcd& accumulation_buffer,

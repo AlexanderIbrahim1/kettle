@@ -4,9 +4,8 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
 #include "kettle/common/mathtools.hpp"
-#include "kettle/operator/channels/mixed_unitary_channel.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 #include "kettle_internal/operator/channels/almost_eq_helper.hpp"
 
@@ -15,20 +14,16 @@ namespace ki = ket::internal;
 namespace
 {
 
-auto check_only_unitaries_(const std::vector<ket::ProbabilisticUnitary>& weighted_unitaries)
+/*
+    Channels that are probabilistic linear combinations of quantum circuits can only have unitary gates
+    and non-unitary gates (M, RESET). However, they cannot have classical control flow.
+*/
+auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_unitaries)
 {
-    namespace gid = ket::internal::gate_id;
-
     for ([[maybe_unused]] const auto& [ignore, unitary] : weighted_unitaries) {
         for (const auto& circ_element : unitary) {
-            if (!circ_element.is_gate()) {
-                throw std::runtime_error{"ERROR: MixedUnitaryChannel only allows gates as circuit elements.\n"};
-            }
-
-            const auto& gate_info = circ_element.get_gate();
-
-            if (!gid::is_unitary_gate(gate_info.gate)) {
-                throw std::runtime_error{"ERROR: gates in MixedUnitaryChannel must be unitary.\n"};
+            if (!circ_element.is_gate() && !circ_element.is_circuit_logger()) {
+                throw std::runtime_error{"ERROR: MixedCircuitChannel only allows gates and loggers as circuit elements.\n"};
             }
         }
     }
@@ -41,15 +36,15 @@ namespace ket
 {
 
 // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-MixedUnitaryChannel::MixedUnitaryChannel(
-    std::vector<ProbabilisticUnitary> weighted_unitaries,
+MixedCircuitChannel::MixedCircuitChannel(
+    std::vector<WeightedCircuit> weighted_unitaries,
     double tolerance
 )
     : n_qubits_ {0}
     , weighted_unitaries_ {std::move(weighted_unitaries)}
 {
     namespace ki = ket::internal;
-    const auto name = std::string {"MixedUnitaryChannel"};
+    const auto name = std::string {"MixedCircuitChannel"};
 
     const auto n_qubits_getter = [](const auto& elem) { return elem.unitary.n_qubits(); };
     const auto coefficient_getter = [](const auto& elem) { return elem.coefficient; };
@@ -60,25 +55,25 @@ MixedUnitaryChannel::MixedUnitaryChannel(
 
     ki::check_unitaries_have_same_n_qubits_(weighted_unitaries_, n_qubits_getter, name);
     ki::check_probabilities_add_up_to_1_(weighted_unitaries_, coefficient_getter, tolerance, name);
-    check_only_unitaries_(weighted_unitaries_);
+    check_only_gates_(weighted_unitaries_);
 }
 
 
-MixedUnitaryChannel::MixedUnitaryChannel(
-    const std::initializer_list<ProbabilisticUnitary>& weighted_unitaries,
+MixedCircuitChannel::MixedCircuitChannel(
+    const std::initializer_list<WeightedCircuit>& weighted_unitaries,
     double tolerance
 )
-    : MixedUnitaryChannel {std::vector<ProbabilisticUnitary> {weighted_unitaries}, tolerance}
+    : MixedCircuitChannel {std::vector<WeightedCircuit> {weighted_unitaries}, tolerance}
 {}
 
 
 auto almost_eq(
-    const MixedUnitaryChannel& left_op,
-    const MixedUnitaryChannel& right_op,
+    const MixedCircuitChannel& left_op,
+    const MixedCircuitChannel& right_op,
     double coeff_tolerance
 ) -> bool
 {
-    using PU = ProbabilisticUnitary;
+    using PU = WeightedCircuit;
     const auto almost_eq = [coeff_tolerance](const PU& left, const PU& right) {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
