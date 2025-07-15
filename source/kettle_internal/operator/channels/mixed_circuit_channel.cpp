@@ -7,7 +7,7 @@
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
-#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
+#include "kettle_internal/operator/channels/channel_helper.hpp"
 
 namespace ki = ket::internal;
 

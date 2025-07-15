@@ -5,7 +5,7 @@
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
-#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
+#include "kettle_internal/operator/channels/channel_helper.hpp"
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
 

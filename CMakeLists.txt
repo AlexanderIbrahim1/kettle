@@ -58,6 +58,7 @@ add_library(
     source/kettle_internal/operator/channels/multi_qubit_kraus_channel.cpp
     source/kettle_internal/operator/channels/one_qubit_kraus_channel.cpp
     source/kettle_internal/operator/channels/pauli_channel.cpp
+    source/kettle_internal/operator/noise/standard_errors.cpp
     source/kettle_internal/operator/pauli/pauli_operator.cpp
     source/kettle_internal/operator/pauli/sparse_pauli_string.cpp
     source/kettle_internal/optimize/n_local.cpp

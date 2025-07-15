@@ -9,7 +9,7 @@
 #include "kettle/simulation/simulate_pauli.hpp"
 #include "kettle/state/statevector.hpp"
 
-#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
+#include "kettle_internal/operator/channels/channel_helper.hpp"
 
 /*
     This file contains the `PauliOperator` class for 

@@ -8,7 +8,7 @@
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/common/utils_internal.hpp"
-#include "kettle_internal/operator/channels/almost_eq_helper.hpp"
+#include "kettle_internal/operator/channels/channel_helper.hpp"
 
 namespace ki = ket::internal;
 

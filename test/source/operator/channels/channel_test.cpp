@@ -10,12 +10,12 @@
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
-#include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/operator/noise/standard_errors.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
 
 #include "kettle_internal/common/state_test_utils.hpp"
+#include "kettle_internal/operator/channels/channel_helper.hpp"
 #include "kettle_internal/simulation/density_matrix_through_channel.hpp"
 
 namespace ki = ket::internal;
