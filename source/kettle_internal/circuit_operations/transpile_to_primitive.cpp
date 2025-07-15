@@ -64,7 +64,7 @@ auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq) 
         else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();
 
-            if (gid::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M) {
+            if (gid::is_primitive_gate(gate_info.gate) || gate_info.gate == Gate::M || gate_info.gate == Gate::RESET) {
                 new_circuit.elements_.emplace_back(gate_info);
             }
             else if (gate_info.gate == Gate::U) {

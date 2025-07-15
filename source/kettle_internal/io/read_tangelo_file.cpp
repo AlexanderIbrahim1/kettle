@@ -66,8 +66,12 @@ void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::s
     stream >> target_qubit; // target qubit
     stream >> dummy_ch;     // ']'
 
-    const auto func = ket::internal::GATE_TO_FUNCTION_1T.at(gate);
-    (circuit.*func)(target_qubit);
+    if (gate == ket::Gate::RESET) {
+        circuit.add_reset_gate(target_qubit);
+    } else {
+        const auto func = ket::internal::GATE_TO_FUNCTION_1T.at(gate);
+        (circuit.*func)(target_qubit);
+    }
 }
 
 void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
@@ -326,7 +330,7 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
             }
         }();
 
-        if (gid::is_one_target_transform_gate(gate)) {
+        if (gid::is_one_target_transform_gate(gate) || gate == G::RESET) {
             parse_one_target_gate_(gate, circuit, gatestream);
         }
         else if (gid::is_one_control_one_target_transform_gate(gate)) {

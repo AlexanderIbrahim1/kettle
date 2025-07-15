@@ -160,7 +160,7 @@ void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-c
         else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();
 
-            if (gid::is_one_target_transform_gate(gate_info.gate)) {
+            if (gid::is_one_target_transform_gate(gate_info.gate) || gate_info.gate == G::RESET) {
                 stream << whitespace << ket::internal::format_one_target_gate_(gate_info);
             }
             else if (gid::is_one_control_one_target_transform_gate(gate_info.gate)) {

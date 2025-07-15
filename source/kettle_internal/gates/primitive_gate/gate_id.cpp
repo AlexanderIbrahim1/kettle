@@ -65,7 +65,7 @@ auto is_primitive_gate(ket::Gate gate) -> bool
 
 auto is_unitary_gate(ket::Gate gate) -> bool
 {
-    return gate != ket::Gate::M;
+    return gate != ket::Gate::M && gate != ket::Gate::RESET;
 }
 
 }  // namespace ket::internal::gate_id

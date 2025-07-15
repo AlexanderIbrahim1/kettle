@@ -33,7 +33,7 @@ const LinearBijectiveMap<G, G, 15> UNCONTROLLED_TO_CONTROLLED_GATE = {
 };
 
 // NOLINTNEXTLINE(cert-err58-cpp)
-const LinearBijectiveMap<G, std::string, 31> PRIMITIVE_GATES_TO_STRING = {
+const LinearBijectiveMap<G, std::string, 32> PRIMITIVE_GATES_TO_STRING = {
     std::pair {G::H, "H"},
     std::pair {G::X, "X"},
     std::pair {G::Y, "Y"},
@@ -65,6 +65,7 @@ const LinearBijectiveMap<G, std::string, 31> PRIMITIVE_GATES_TO_STRING = {
     std::pair {G::U, "U"},
     std::pair {G::CU, "CU"},
     std::pair {G::M, "M"},
+    std::pair {G::RESET, "RESET"},
 };
 
 const LinearBijectiveMap<G, GateFuncPtr1T, 10> GATE_TO_FUNCTION_1T = {

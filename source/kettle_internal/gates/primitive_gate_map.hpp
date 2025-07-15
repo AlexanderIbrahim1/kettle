@@ -27,7 +27,7 @@ using GateFuncPtr1C1T1A_init_param = ket::param::ParameterID(ket::QuantumCircuit
 
 extern const LinearBijectiveMap<ket::Gate, ket::Gate, 15> UNCONTROLLED_TO_CONTROLLED_GATE;
 
-extern const LinearBijectiveMap<ket::Gate, std::string, 31> PRIMITIVE_GATES_TO_STRING;
+extern const LinearBijectiveMap<ket::Gate, std::string, 32> PRIMITIVE_GATES_TO_STRING;
 
 extern const LinearBijectiveMap<ket::Gate, GateFuncPtr1T, 10> GATE_TO_FUNCTION_1T;
 

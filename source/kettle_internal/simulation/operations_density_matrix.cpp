@@ -459,6 +459,7 @@ void simulate_gate_info_(
             break;
         }
         case G::M : {
+            // TODO: make this multithreaded
             // this operation is more complicated to make multithreaded because the threads have already been
             // spawned before entering the simulation loop; thus, it is easier to just make the measurement
             // a single-threaded operation
@@ -467,6 +468,17 @@ void simulate_gate_info_(
                 const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
                 const auto measured = simulate_measurement_(state, gate_info, prng_seed);
                 c_register.set(bit_index, measured);
+            }
+            break;
+        }
+        case G::RESET : {
+            // TODO: make this multithreaded
+            // this operation is more complicated to make multithreaded because the threads have already been
+            // spawned before entering the simulation loop; thus, it is easier to just make the measurement
+            // a single-threaded operation
+            if (thread_id == MEASURING_THREAD_ID) {
+                const auto measure = MeasurementOutcome::FORCE_RESET_TO_0;
+                simulate_measurement_(state, gate_info, prng_seed, measure);
             }
             break;
         }

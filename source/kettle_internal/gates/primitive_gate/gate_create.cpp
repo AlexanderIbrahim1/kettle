@@ -212,6 +212,25 @@ auto unpack_m_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::si
 }
 
 /*
+    Create a RESET-gate.
+
+    NOTE: we can't use the `create_one_target_gate()` function because it assumes that the gate is
+    unitary. So we have a separate pair of functions for creating and unpacking the reset gate.
+*/
+auto create_reset_gate(std::size_t target_index) -> ket::GateInfo
+{
+    return {.gate=ket::Gate::RESET, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+}
+
+/*
+    Returns the `target_qubit` of a RESET gate.
+*/
+auto unpack_reset_gate(const ket::GateInfo& info) -> std::size_t
+{
+    return info.arg0;  // target index
+}
+
+/*
     Returns the `target_qubit` of a single-qubit gate, with or without parameters.
 */
 auto unpack_single_qubit_gate_index(const ket::GateInfo& info) -> std::size_t

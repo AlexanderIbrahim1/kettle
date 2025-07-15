@@ -12,6 +12,7 @@
 #include <kettle/simulation/simulate.hpp>
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/simulation/measure_helper.hpp"
 #include <kettle_internal/simulation/measure.hpp>
 
 namespace cre = ket::internal::create;
@@ -310,6 +311,173 @@ TEST_CASE("simulate_measurement_()")
             auto expected_state = ket::Statevector {testcase.expected_amplitudes};
 
             simulate_measurement_wrapper(state, info, testcase.measured_state);
+
+            REQUIRE(ket::almost_eq(state, expected_state));
+        }
+    }
+}
+
+TEST_CASE("simulate reset")
+{
+    struct TestCase
+    {
+        std::size_t measured_qubit;
+        ket::Statevector expected;
+    };
+
+    const auto reset_function = ket::internal::simulate_measurement_<RiggedDiscreteDistribution<0>>;
+    const auto reset_to_0_flag = ket::internal::MeasurementOutcome::FORCE_RESET_TO_0;
+
+    SECTION("2 qubits; Hadamard on each")
+    {
+        auto testcase = GENERATE_REF(
+            TestCase {
+                .measured_qubit=0,
+                .expected=ket::Statevector {{{M_SQRT1_2, 0.0}, {0.0, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}}}
+            },
+            TestCase {
+                .measured_qubit=1,
+                .expected=ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}, {0.0, 0.0}, {0.0, 0.0}}}
+            }
+        );
+
+        // the measured bit doesn't matter for now
+        const auto info = cre::create_reset_gate(testcase.measured_qubit);
+
+        auto state = ket::Statevector {"00"};
+        auto circuit = ket::QuantumCircuit {2};
+        circuit.add_h_gate({0, 1});
+        ket::simulate(circuit, state);
+
+        reset_function(state, info, std::nullopt, reset_to_0_flag);
+
+        REQUIRE(ket::almost_eq(state, testcase.expected));
+    }
+
+    SECTION("3 qubits")
+    {
+        auto testcase = GENERATE_REF(
+            TestCase {
+                .measured_qubit=0,
+                .expected=ket::Statevector {{
+                    {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0},
+                    {0.5, 0.0}, {0.0, 0.0}, {0.5, 0.0}, {0.0, 0.0}
+                }}
+            },
+            TestCase {
+                .measured_qubit=1,
+                .expected=ket::Statevector {{
+                    {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0},
+                    {0.5, 0.0}, {0.5, 0.0}, {0.0, 0.0}, {0.0, 0.0}
+                }}
+            },
+            TestCase {
+                .measured_qubit=2,
+                .expected=ket::Statevector {{
+                    {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0},
+                    {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}
+                }}
+            }
+        );
+
+        // the measured bit doesn't matter for now
+        const auto info = cre::create_reset_gate(testcase.measured_qubit);
+
+        auto state = ket::Statevector {"000"};
+        auto circuit = ket::QuantumCircuit {3};
+        circuit.add_h_gate({0, 1, 2});
+
+        ket::simulate(circuit, state);
+
+        reset_function(state, info, std::nullopt, reset_to_0_flag);
+
+        REQUIRE(ket::almost_eq(state, testcase.expected));
+    }
+
+    SECTION("random")
+    {
+        struct RandomTestCase
+        {
+            std::size_t measured_qubit;
+            std::vector<std::complex<double>> initial_amplitudes;
+            std::vector<std::complex<double>> expected_amplitudes;
+        };
+
+        auto prng = std::mt19937 {std::random_device {}()};
+
+        SECTION("2 qubits")
+        {
+            const auto coeff00 = create_random_complex(prng);
+            const auto coeff10 = create_random_complex(prng);
+            const auto coeff01 = create_random_complex(prng);
+            const auto coeff11 = create_random_complex(prng);
+
+            auto testcase = GENERATE_REF(
+                RandomTestCase {
+                    .measured_qubit=0,
+                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
+                    .expected_amplitudes={coeff00, {0.0, 0.0}, coeff01, {0.0, 0.0}}
+                },
+                RandomTestCase {
+                    .measured_qubit=1,
+                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
+                    .expected_amplitudes={coeff00, coeff10, {0.0, 0.0}, {0.0, 0.0}},
+                }
+            );
+
+            normalize(testcase.initial_amplitudes);
+            normalize(testcase.expected_amplitudes);
+
+            // the measured bit doesn't matter for now
+            const auto info = cre::create_reset_gate(testcase.measured_qubit);
+
+            auto state = ket::Statevector {testcase.initial_amplitudes};
+            auto expected_state = ket::Statevector {testcase.expected_amplitudes};
+
+            reset_function(state, info, std::nullopt, reset_to_0_flag);
+
+            REQUIRE(ket::almost_eq(state, expected_state));
+        }
+
+        SECTION("3 qubits")
+        {
+            const auto c000 = create_random_complex(prng);
+            const auto c100 = create_random_complex(prng);
+            const auto c010 = create_random_complex(prng);
+            const auto c110 = create_random_complex(prng);
+            const auto c001 = create_random_complex(prng);
+            const auto c101 = create_random_complex(prng);
+            const auto c011 = create_random_complex(prng);
+            const auto c111 = create_random_complex(prng);
+
+            auto testcase = GENERATE_REF(
+                RandomTestCase {
+                    .measured_qubit=0,
+                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes={c000, 0.0, c010, 0.0, c001, 0.0, c011, 0.0}
+                },
+                RandomTestCase {
+                    .measured_qubit=1,
+                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes={c000, c100, 0.0, 0.0, c001, c101, 0.0, 0.0}
+                },
+                RandomTestCase {
+                    .measured_qubit=2,
+                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes={c000, c100, c010, c110, 0.0, 0.0, 0.0, 0.0}
+                }
+            );
+
+            normalize(testcase.initial_amplitudes);
+            normalize(testcase.expected_amplitudes);
+
+            // the measured bit doesn't matter for now
+            const auto info = cre::create_reset_gate(testcase.measured_qubit);
+
+            auto state = ket::Statevector {testcase.initial_amplitudes};
+            auto expected_state = ket::Statevector {testcase.expected_amplitudes};
+
+            reset_function(state, info, std::nullopt, reset_to_0_flag);
 
             REQUIRE(ket::almost_eq(state, expected_state));
         }

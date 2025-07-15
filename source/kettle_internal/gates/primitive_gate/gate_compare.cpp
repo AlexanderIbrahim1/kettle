@@ -12,6 +12,11 @@ auto is_m_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> 
     return create::unpack_m_gate(info0) == create::unpack_m_gate(info1);
 }
 
+auto is_reset_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool
+{
+    return create::unpack_reset_gate(info0) == create::unpack_reset_gate(info1);
+}
+
 auto is_1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool
 {
     return create::unpack_one_target_gate(info0) == create::unpack_one_target_gate(info1);
