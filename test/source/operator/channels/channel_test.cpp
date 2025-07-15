@@ -2,6 +2,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include <Eigen/Dense>
+#include <cstddef>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
@@ -10,6 +11,7 @@
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
+#include "kettle/operator/noise/standard_errors.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
 
@@ -138,37 +140,6 @@ auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedCirc
     };
 }
 
-auto depolarizing_noise_pauli_1qubit(double parameter) -> ket::PauliChannel
-{
-    using PT = ket::PauliTerm;
-
-    if (parameter < 0.0 || parameter > 1.0) {
-        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
-    }
-
-    const auto coeff0 = 1.0 - parameter;
-    const auto coeff123 = parameter / 3.0;
-
-    return ket::PauliChannel {
-        {.coefficient=coeff0,   .pauli_string={PT::I}},
-        {.coefficient=coeff123, .pauli_string={PT::X}},
-        {.coefficient=coeff123, .pauli_string={PT::Y}},
-        {.coefficient=coeff123, .pauli_string={PT::Z}},
-    };
-}
-
-/*
-    The symmetric depolarizing error channel applied to a single qubit.
-
-    Kraus channels are not unique, and there are multiple definitions in the literature.
-    For this definition:
-      - p = 0 gives a noiseless channel
-      - p = 3/4 gives a full depolarized channel, and the output will be proportional to the identity matrix
-      - p = 1 gives the uniform Pauli error channel, where X, Y, and Z are applied equally to the 1-qubit density matrix
-    
-    NOTE: replace this function with the Pauli gate implementation at some point in the future
-      - because that one naturally extends to multiple qubits
-*/
 auto depolarizing_noise_kraus_1qubit(double parameter, std::size_t target_index) -> ket::OneQubitKrausChannel
 {
     if (parameter < 0.0 || parameter > 1.0) {
@@ -256,7 +227,7 @@ TEST_CASE("Kraus channel depolarizing noise")
 
         SECTION("using `simulate_pauli_channel()`")
         {
-            const auto depol_channel = depolarizing_noise_pauli_1qubit(parameter);
+            const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
             ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
@@ -348,4 +319,28 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
     ket::simulate_multi_qubit_kraus_channel(state, channel, buffer);
 
     REQUIRE(ki::almost_eq_with_print_(state, expected));
+}
+
+TEST_CASE("CartesianTicker")
+{
+    auto ticker = ket::internal::CartesianTicker {3, 3};
+
+    const auto expected = std::vector<std::vector<std::size_t>> {
+        {0, 0, 0}, {0, 0, 1}, {0, 0, 2},
+        {0, 1, 0}, {0, 1, 1}, {0, 1, 2},
+        {0, 2, 0}, {0, 2, 1}, {0, 2, 2},
+        {1, 0, 0}, {1, 0, 1}, {1, 0, 2},
+        {1, 1, 0}, {1, 1, 1}, {1, 1, 2},
+        {1, 2, 0}, {1, 2, 1}, {1, 2, 2},
+        {2, 0, 0}, {2, 0, 1}, {2, 0, 2},
+        {2, 1, 0}, {2, 1, 1}, {2, 1, 2},
+        {2, 2, 0}, {2, 2, 1}, {2, 2, 2},
+    };
+
+    REQUIRE(ticker.size() == expected.size());
+
+    for (const auto& elem : expected) {
+        REQUIRE(ticker.ticker() == elem);
+        ticker.increment();
+    }
 }
