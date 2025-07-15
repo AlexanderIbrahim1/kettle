@@ -42,30 +42,30 @@ public:
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
-        return weighted_unitaries_.size();
+        return weighted_operators_.size();
     }
 
     [[nodiscard]]
-    constexpr auto weighted_unitaries() const noexcept -> const std::vector<ProbabilisticPauliString>&
+    constexpr auto weighted_operators() const noexcept -> const std::vector<ProbabilisticPauliString>&
     {
-        return weighted_unitaries_;
+        return weighted_operators_;
     }
 
     [[nodiscard]]
     auto at(std::size_t index) const -> const ProbabilisticPauliString&
     {
-        return weighted_unitaries_[index];
+        return weighted_operators_[index];
     }
 
     [[nodiscard]]
     auto at(std::size_t index) -> ProbabilisticPauliString&
     {
-        return weighted_unitaries_[index];
+        return weighted_operators_[index];
     }
 
 private:
     std::size_t n_qubits_;
-    std::vector<ProbabilisticPauliString> weighted_unitaries_;
+    std::vector<ProbabilisticPauliString> weighted_operators_;
 };
 
 // TODO: replace magic number

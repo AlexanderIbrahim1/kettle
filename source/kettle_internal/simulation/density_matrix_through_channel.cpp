@@ -134,7 +134,7 @@ void simulate_pauli_channel(
     const auto n_qubits = static_cast<Eigen::Index>(state.n_qubits());
 
     for (std::size_t i {0}; i < channel.size(); ++i) {
-        const auto& [coefficient, pauli_string] = channel.weighted_unitaries()[i];
+        const auto& [coefficient, pauli_string] = channel.weighted_operators()[i];
 
         state_buffer = state.matrix();
         apply_pauli_string_(n_qubits, pauli_string, pair, multiplication_buffer, state_buffer);
@@ -172,7 +172,7 @@ void simulate_mixed_circuit_channel(
     state_buffer = state.matrix();
 
     for (std::size_t i {0}; i < channel.size(); ++i) {
-        const auto& [coefficient, unitary] = channel.weighted_unitaries()[i];
+        const auto& [coefficient, unitary] = channel.weighted_operators()[i];
 
         if (i != 0) {
             state.matrix() = state_buffer;

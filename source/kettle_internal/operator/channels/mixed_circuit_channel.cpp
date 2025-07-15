@@ -18,9 +18,9 @@ namespace
     Channels that are probabilistic linear combinations of quantum circuits can only have unitary gates
     and non-unitary gates (M, RESET). However, they cannot have classical control flow.
 */
-auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_unitaries)
+auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_operators)
 {
-    for ([[maybe_unused]] const auto& [ignore, unitary] : weighted_unitaries) {
+    for ([[maybe_unused]] const auto& [ignore, unitary] : weighted_operators) {
         for (const auto& circ_element : unitary) {
             if (!circ_element.is_gate() && !circ_element.is_circuit_logger()) {
                 throw std::runtime_error{"ERROR: MixedCircuitChannel only allows gates and loggers as circuit elements.\n"};
@@ -37,11 +37,11 @@ namespace ket
 
 // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
 MixedCircuitChannel::MixedCircuitChannel(
-    std::vector<WeightedCircuit> weighted_unitaries,
+    std::vector<WeightedCircuit> weighted_operators,
     double tolerance
 )
     : n_qubits_ {0}
-    , weighted_unitaries_ {std::move(weighted_unitaries)}
+    , weighted_operators_ {std::move(weighted_operators)}
 {
     namespace ki = ket::internal;
     const auto name = std::string {"MixedCircuitChannel"};
@@ -49,21 +49,21 @@ MixedCircuitChannel::MixedCircuitChannel(
     const auto n_qubits_getter = [](const auto& elem) { return elem.unitary.n_qubits(); };
     const auto coefficient_getter = [](const auto& elem) { return elem.coefficient; };
 
-    ki::check_nonempty_(weighted_unitaries_, name);
-    n_qubits_ = weighted_unitaries_[0].unitary.n_qubits();
+    ki::check_nonempty_(weighted_operators_, name);
+    n_qubits_ = weighted_operators_[0].unitary.n_qubits();
     ki::check_number_of_qubits_is_nonzero_(n_qubits_, name);
 
-    ki::check_unitaries_have_same_n_qubits_(weighted_unitaries_, n_qubits_getter, name);
-    ki::check_probabilities_add_up_to_1_(weighted_unitaries_, coefficient_getter, tolerance, name);
-    check_only_gates_(weighted_unitaries_);
+    ki::check_unitaries_have_same_n_qubits_(weighted_operators_, n_qubits_getter, name);
+    ki::check_probabilities_add_up_to_1_(weighted_operators_, coefficient_getter, tolerance, name);
+    check_only_gates_(weighted_operators_);
 }
 
 
 MixedCircuitChannel::MixedCircuitChannel(
-    const std::initializer_list<WeightedCircuit>& weighted_unitaries,
+    const std::initializer_list<WeightedCircuit>& weighted_operators,
     double tolerance
 )
-    : MixedCircuitChannel {std::vector<WeightedCircuit> {weighted_unitaries}, tolerance}
+    : MixedCircuitChannel {std::vector<WeightedCircuit> {weighted_operators}, tolerance}
 {}
 
 

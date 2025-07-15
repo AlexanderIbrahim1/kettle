@@ -28,10 +28,10 @@ class MixedCircuitChannel
 public:
     // TODO: get rid of magic number
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    MixedCircuitChannel(std::vector<WeightedCircuit> weighted_unitaries, double tolerance = 1.0e-6);
+    MixedCircuitChannel(std::vector<WeightedCircuit> weighted_operators, double tolerance = 1.0e-6);
 
     // TODO: get rid of magic number
-    MixedCircuitChannel(const std::initializer_list<WeightedCircuit>& weighted_unitaries, double tolerance = 1.0e-6);
+    MixedCircuitChannel(const std::initializer_list<WeightedCircuit>& weighted_operators, double tolerance = 1.0e-6);
 
     [[nodiscard]]
     constexpr auto n_qubits() const noexcept -> std::size_t
@@ -42,30 +42,30 @@ public:
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
     {
-        return weighted_unitaries_.size();
+        return weighted_operators_.size();
     }
 
     [[nodiscard]]
-    constexpr auto weighted_unitaries() const noexcept -> const std::vector<WeightedCircuit>&
+    constexpr auto weighted_operators() const noexcept -> const std::vector<WeightedCircuit>&
     {
-        return weighted_unitaries_;
+        return weighted_operators_;
     }
 
     [[nodiscard]]
     auto at(std::size_t index) const -> const WeightedCircuit&
     {
-        return weighted_unitaries_[index];
+        return weighted_operators_[index];
     }
 
     [[nodiscard]]
     auto at(std::size_t index) -> WeightedCircuit&
     {
-        return weighted_unitaries_[index];
+        return weighted_operators_[index];
     }
 
 private:
     std::size_t n_qubits_;
-    std::vector<WeightedCircuit> weighted_unitaries_;
+    std::vector<WeightedCircuit> weighted_operators_;
 };
 
 // TODO: replace magic number
