@@ -91,6 +91,33 @@ auto result_amplitude_damping_2qubit(
     return ket::DensityMatrix {densmat_after};
 }
 
+auto result_phase_amplitude_damping_1qubit(
+    const ket::Matrix2X2& dens_mat,
+    const ket::PhaseAmplitudeDampingParameters parameters
+) -> ket::Matrix2X2
+{
+    auto check_in_0_1 = [](double param) {
+        if (param < 0.0 || param > 1.0) {
+            throw std::runtime_error {"ERROR: found out-of-bounds parameter in unit test\n"};
+        }
+    };
+
+    check_in_0_1(parameters.amplitude);
+    check_in_0_1(parameters.phase);
+    check_in_0_1(parameters.excited_population);
+    check_in_0_1(parameters.amplitude + parameters.phase);
+
+    const auto [amp, pha, pop] = parameters;
+    const auto offdiag = std::sqrt(1.0 - amp - pha);
+
+    const auto output00 = (1.0 - (pop * amp)) * dens_mat.elem00 + (1.0 - pop) * amp * dens_mat.elem11;
+    const auto output01 = offdiag * dens_mat.elem01;
+    const auto output10 = offdiag * dens_mat.elem10;
+    const auto output11 = (1.0 + (pop * amp) - amp) * dens_mat.elem11 + pop * amp * dens_mat.elem00;
+
+    return {.elem00=output00, .elem01=output01, .elem10=output10, .elem11=output11};
+}
+
 /*
     Apply the depolarizing noise to a 1-qubit system manually, in the Kraus manner.
 */
@@ -157,7 +184,6 @@ auto depolarizing_noise_kraus_1qubit(double parameter, std::size_t target_index)
     return ket::OneQubitKrausChannel {{mat0, mat1, mat2, mat3}, target_index};
 }
 
-
 auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
 {
     auto output = Eigen::MatrixXcd(2, 2);
@@ -167,6 +193,20 @@ auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
     output(1, 1) = matrix.elem11;
 
     return output;
+}
+
+auto eigen_to_mat2x2(const Eigen::MatrixXcd& matrix) -> ket::Matrix2X2
+{
+    if (matrix.cols() != 2 || matrix.rows() != 2) {
+        throw std::runtime_error {"ERROR: can only do this for a 2x2 matrix.\n"};
+    }
+
+    return ket::Matrix2X2 {
+        .elem00=matrix(0, 0),
+        .elem01=matrix(0, 1),
+        .elem10=matrix(1, 0),
+        .elem11=matrix(1, 1),
+    };
 }
 
 }  // namespace
@@ -189,13 +229,7 @@ TEST_CASE("Kraus channel depolarizing noise")
         return state_;
     }();
 
-    const auto matrix = ket::Matrix2X2 {
-        .elem00=state.matrix()(0, 0),
-        .elem01=state.matrix()(0, 1),
-        .elem10=state.matrix()(1, 0),
-        .elem11=state.matrix()(1, 1),
-    };
-
+    const auto matrix = eigen_to_mat2x2(state.matrix());
     const auto expected = result_depolarizing_noise_1qubit(matrix, parameter);
 
     SECTION("manual application of Matrix2X2 instances above")
@@ -430,7 +464,6 @@ TEST_CASE("depolarizing noise : 2 qubits")
     REQUIRE(!ki::almost_eq_with_print_(tensor_prod_then_depol, depol_then_tensor_prod));
 }
 
-
 TEST_CASE("depolarizing channel coefficients")
 {
     constexpr auto abs_tol = 1.0e-6;
@@ -463,4 +496,46 @@ TEST_CASE("depolarizing channel coefficients")
             REQUIRE_THAT(depol_channel.at(i).coefficient, within_abs(parameter / 15.0, abs_tol));
         }
     }
+}
+
+
+TEST_CASE("one_qubit_phase_amplitude_damping_error_channel()")
+{
+    const auto parameters = ket::PhaseAmplitudeDampingParameters {
+        .amplitude=0.3,
+        .phase=0.4,
+        .excited_population=0.2,
+    };
+
+    // TODO: create separate function for this state, since I use it so often
+    // TODO: split functions into separate file; this file is getting too crowded
+    // state should be simple but not completely arbitrary, so we don't use a random state
+    auto state = [&]() {
+        auto circuit = ket::QuantumCircuit {1};
+        circuit.add_h_gate(0);
+        circuit.add_ry_gate(0, 0.15 * M_PI);
+        circuit.add_rx_gate(0, 0.25 * M_PI);
+
+        auto state_ = ket::DensityMatrix {"0"};
+        ket::simulate(circuit, state_);
+
+        return state_;
+    }();
+
+    const auto matrix = eigen_to_mat2x2(state.matrix());
+    const auto expected = result_phase_amplitude_damping_1qubit(matrix, parameters);
+    const auto expected_state = ket::DensityMatrix {mat2x2_to_eigen(expected)};
+
+    const auto channel = ket::one_qubit_phase_amplitude_damping_error_channel(parameters, 0);
+
+    auto buffer0 = Eigen::MatrixXcd(2, 2);
+    auto buffer1 = Eigen::MatrixXcd(2, 2);
+    auto buffer2 = Eigen::MatrixXcd(2, 2);
+
+    // the only pair of indices for a 2-qubit system is (0, 1)
+    const auto n_single_gate_pairs = Eigen::Index {1};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    ket::simulate_one_qubit_kraus_channel(state, channel, single_pair, buffer0, buffer1, buffer2);
+
+    REQUIRE(ki::almost_eq_with_print_(expected_state, state));
 }
