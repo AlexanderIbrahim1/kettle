@@ -215,16 +215,15 @@ auto one_qubit_thermal_relaxation_error_channel(
 
     auto kraus_matrices = std::vector<ket::Matrix2X2> {};
     kraus_matrices.emplace_back(1.0, 0.0, 0.0, (evalue0 - a) / exp_t2);
-    kraus_matrices.emplace_back(0.0, 1.0, 0.0, 0.0);
     kraus_matrices.emplace_back(0.0, 0.0, 1.0, 0.0);
+    kraus_matrices.emplace_back(0.0, 1.0, 0.0, 0.0);
     kraus_matrices.emplace_back(1.0, 0.0, 0.0, (evalue3 - a) / exp_t2);
 
     // normalize and multiply by eigenvalues at the same time
-    kraus_matrices[0] *= (evalue0 / ket::norm(kraus_matrices[0]));
-    kraus_matrices[1] *= evalue1;
-    kraus_matrices[2] *= evalue2;
-    kraus_matrices[3] *= (evalue1 / ket::norm(kraus_matrices[3]));
-
+    kraus_matrices[0] *= (std::sqrt(evalue0) / ket::norm(kraus_matrices[0]));
+    kraus_matrices[1] *= std::sqrt(evalue1);
+    kraus_matrices[2] *= std::sqrt(evalue2);
+    kraus_matrices[3] *= (std::sqrt(evalue3) / ket::norm(kraus_matrices[3]));
 
     const auto norm_too_small = [&](const auto& matrix) { return ket::norm(matrix) < tolerance; };
     std::erase_if(kraus_matrices, norm_too_small);

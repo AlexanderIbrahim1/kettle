@@ -378,3 +378,43 @@ TEST_CASE("one_qubit_phase_amplitude_damping_error_channel()")
 
     REQUIRE(ki::almost_eq_with_print_(expected_state, state));
 }
+
+TEST_CASE("phase-amplitude damping and thermal-relaxation")
+{
+    const auto thermal_params = ket::ThermalRelaxationParameters {
+        .t1=ket::RelaxationTime {1.0},
+        .t2=ket::RelaxationTime {2.0},
+        .gate_time=0.5,
+        .excited_population=0.2
+    };
+
+    const auto time1 = thermal_params.t1.time();
+    const auto time2 = thermal_params.t2.time();
+    const auto gate_time = thermal_params.gate_time;
+    const auto time_phase = (time1 * time2) / (2.0 * time1 - time2);
+
+    const auto phaseamp_params = ket::PhaseAmplitudeDampingParameters {
+        .amplitude=1.0 - std::exp(-gate_time / time1),
+        .phase=1.0 - std::exp(-gate_time / time_phase),
+        .excited_population=thermal_params.excited_population
+    };
+
+    const auto phaseamp_channel = ket::one_qubit_phase_amplitude_damping_error_channel(phaseamp_params, 0);
+
+    const auto thermal_channel = ket::one_qubit_thermal_relaxation_error_channel(thermal_params, 0);
+
+    auto buffer0 = Eigen::MatrixXcd(2, 2);
+    auto buffer1 = Eigen::MatrixXcd(2, 2);
+    auto buffer2 = Eigen::MatrixXcd(2, 2);
+
+    auto state_phaseamp = ctestutils::basic_state0();
+    auto state_thermal = ctestutils::basic_state0();
+
+    const auto n_single_gate_pairs = Eigen::Index {1};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+
+    ket::simulate_one_qubit_kraus_channel(state_phaseamp, phaseamp_channel, single_pair, buffer0, buffer1, buffer2);
+    ket::simulate_one_qubit_kraus_channel(state_thermal, thermal_channel, single_pair, buffer0, buffer1, buffer2);
+
+    REQUIRE(ki::almost_eq_with_print_(state_phaseamp, state_thermal));
+}
