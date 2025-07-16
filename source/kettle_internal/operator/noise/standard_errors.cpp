@@ -1,6 +1,10 @@
+#include <format>
+#include <string_view>
 #include <vector>
 
+#include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
+#include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/operator/noise/standard_errors.hpp"
@@ -10,21 +14,35 @@
 
 namespace ki = ket::internal;
 
+namespace
+{
+
+auto check_in_0_1_(double value, std::string_view parameter, std::string_view channel)
+{
+    if (value < 0.0 || value > 1.0) {
+        const auto err_msg = std::format(
+            "ERROR: the '{}' parameter for the '{}' channel must be in [0.0, 1.0]\n", parameter, channel
+        );
+
+        throw std::runtime_error {err_msg};
+    }
+}
+
+}  // namespace
+
 namespace ket
 {
 
 template <QubitIndices Container>
 auto symmetric_depolarizing_error_channel(
-    double parameter,
+    double depolarizing_parameter,
     std::size_t n_qubits,
     const Container& indices
 ) -> ket::PauliChannel
 {
     using PT = ket::PauliTerm;
 
-    if (parameter < 0.0 || parameter > 1.0) {
-        throw std::runtime_error {"ERROR: the depolarizing noise parameter must be in [0.0, 1.0].\n"};
-    }
+    check_in_0_1_(depolarizing_parameter, "depolarizing_parameter", "symmetric_depolarizing_error_channel");
 
     const auto size = ki::get_container_size(indices);
 
@@ -38,8 +56,8 @@ auto symmetric_depolarizing_error_channel(
 
     const auto n_total_pauli_terms = (1UL << (2UL * size));
     const auto n_noisy_pauli_terms = n_total_pauli_terms - 1UL;
-    const auto noiseless_coeff = 1.0 - parameter;
-    const auto noisy_coeff = parameter / static_cast<double>(n_noisy_pauli_terms);
+    const auto noiseless_coeff = 1.0 - depolarizing_parameter;
+    const auto noisy_coeff = depolarizing_parameter / static_cast<double>(n_noisy_pauli_terms);
 
     auto sparse_pauli_strings = std::vector<ket::ProbabilisticPauliString> {};
     sparse_pauli_strings.reserve(n_total_pauli_terms);
@@ -80,5 +98,41 @@ template auto symmetric_depolarizing_error_channel(
     std::size_t n_qubits,
     const QubitIndicesVector& indices
 ) -> ket::PauliChannel;
+
+
+auto one_qubit_phase_amplitude_damping_error_channel(
+    const PhaseAmplitudeDampingParameters& parameters,
+    std::size_t target_index,
+    double tolerance
+) -> ket::OneQubitKrausChannel
+{
+    const auto* func_name = "one_qubit_phase_amplitude_damping_error_channel";
+
+    check_in_0_1_(parameters.amplitude, "amplitude", func_name);
+    check_in_0_1_(parameters.phase, "phase", func_name);
+    check_in_0_1_(parameters.excited_population, "excited_population", func_name);
+    check_in_0_1_(parameters.amplitude + parameters.phase, "amplitude + phase", func_name);
+
+    const auto pop_damp0 = std::sqrt(1.0 - parameters.excited_population);
+    const auto pop_damp1 = std::sqrt(parameters.excited_population);
+
+    const auto param_both = std::sqrt(1.0 - parameters.amplitude - parameters.phase);
+    const auto param_ampp = std::sqrt(parameters.amplitude);
+    const auto param_phas = std::sqrt(parameters.phase);
+
+    auto kraus_matrices = std::vector<ket::Matrix2X2> {};
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {1.0, 0.0, 0.0, param_both}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, param_ampp, 0.0, 0.0}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, 0.0, 0.0, param_phas}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_both, 0.0, 0.0, 1.0}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {0.0, 0.0, param_ampp, 0.0}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_phas, 0.0, 0.0, 0.0}); // NOLINT
+
+    const auto norm_too_small = [&](const auto& matrix) { return ket::norm(matrix) < tolerance; };
+    std::erase_if(kraus_matrices, norm_too_small);
+
+    // TODO: use a version of this that doesn't bother to check the conditions
+    return ket::OneQubitKrausChannel {std::move(kraus_matrices), target_index, tolerance};
+}
 
 }  // namespace ket

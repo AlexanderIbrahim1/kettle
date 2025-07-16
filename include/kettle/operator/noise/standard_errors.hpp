@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/common/utils.hpp"
 
@@ -31,9 +32,31 @@ namespace ket
 */
 template <QubitIndices Container = QubitIndicesIList>
 auto symmetric_depolarizing_error_channel(
-    double parameter,
+    double depolarizing_parameter,
     std::size_t n_qubits,
     const Container& indices
 ) -> ket::PauliChannel;
+
+struct PhaseAmplitudeDampingParameters {
+    double amplitude;
+    double phase;
+    double excited_population;
+};
+
+/*
+    The one-qubit combined phase and amplitude damping error channel, applied to a single qubit.
+
+    For this definition:
+      - `parameters.amplitude`, `parameters.phase`, and `parameters.excited_population`
+         must all lie within [0, 1].
+      - the sum of `parameters.amplitude` and `parameters.phase` must not exceed 1
+    
+    TODO: remove the magic number for the tolerance
+*/
+auto one_qubit_phase_amplitude_damping_error_channel(
+    const PhaseAmplitudeDampingParameters& parameters,
+    std::size_t target_index,
+    double tolerance = 1.0e-6
+) -> ket::OneQubitKrausChannel;
 
 }  // namespace ket

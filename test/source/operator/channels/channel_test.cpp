@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 #include <Eigen/Dense>
@@ -362,7 +363,7 @@ TEST_CASE("CartesianTicker")
 */
 TEST_CASE("depolarizing noise : 2 qubits")
 {
-    const auto parameter = 0.4; // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+    const auto parameter = 0.4;
 
     // state should be simple but not completely arbitrary, so we don't use a random state
     auto state0 = [&]() {
@@ -427,4 +428,39 @@ TEST_CASE("depolarizing noise : 2 qubits")
     }();
 
     REQUIRE(!ki::almost_eq_with_print_(tensor_prod_then_depol, depol_then_tensor_prod));
+}
+
+
+TEST_CASE("depolarizing channel coefficients")
+{
+    constexpr auto abs_tol = 1.0e-6;
+    const auto& within_abs = Catch::Matchers::WithinAbs;
+
+    const auto parameter = GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+
+    SECTION("channel acting on 1 qubit")
+    {
+        const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
+
+        REQUIRE(depol_channel.size() == 4);
+
+        REQUIRE_THAT(depol_channel.at(0).coefficient, within_abs(1.0 - parameter, abs_tol));
+
+        for (std::size_t i {1}; i < depol_channel.size(); ++i) {
+            REQUIRE_THAT(depol_channel.at(i).coefficient, within_abs(parameter / 3.0, abs_tol));
+        }
+    }
+
+    SECTION("channel acting on 2 qubit")
+    {
+        const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 2, {0, 1});
+
+        REQUIRE(depol_channel.size() == 16);
+
+        REQUIRE_THAT(depol_channel.at(0).coefficient, within_abs(1.0 - parameter, abs_tol));
+
+        for (std::size_t i {1}; i < depol_channel.size(); ++i) {
+            REQUIRE_THAT(depol_channel.at(i).coefficient, within_abs(parameter / 15.0, abs_tol));
+        }
+    }
 }
