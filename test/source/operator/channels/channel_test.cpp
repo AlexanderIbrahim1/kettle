@@ -487,7 +487,7 @@ TEST_CASE("depolarizing channel coefficients")
     SECTION("channel acting on 2 qubit")
     {
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 2, {0, 1});
-
+        
         REQUIRE(depol_channel.size() == 16);
 
         REQUIRE_THAT(depol_channel.at(0).coefficient, within_abs(1.0 - parameter, abs_tol));
