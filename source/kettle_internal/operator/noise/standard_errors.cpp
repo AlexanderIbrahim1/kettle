@@ -2,6 +2,8 @@
 #include <string_view>
 #include <vector>
 
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/common/matrix2x2.hpp"
@@ -230,6 +232,65 @@ auto one_qubit_thermal_relaxation_error_channel(
 
     // TODO: use a version of this that doesn't bother to check the conditions
     return ket::OneQubitKrausChannel {std::move(kraus_matrices), target_index, tolerance};
+}
+
+
+auto reset_error(const ResetErrorParameters& parameters) -> ket::MixedCircuitChannel
+{
+    const auto* func_name = "reset_error";
+
+    const auto [prob0, prob1] = parameters;
+
+    check_in_0_1_(prob0, "prob0", func_name);
+    check_in_0_1_(prob1, "prob1", func_name);
+    check_in_0_1_(prob0 + prob1, "prob0 + prob1", func_name);
+
+    auto circuit_no_reset = ket::QuantumCircuit {1};
+
+    auto circuit_reset_to_0 = ket::QuantumCircuit {1};
+    circuit_reset_to_0.add_reset_gate(0);
+
+    auto circuit_reset_to_1 = ket::QuantumCircuit {1};
+    circuit_reset_to_1.add_reset_gate(0);
+    circuit_reset_to_1.add_x_gate(0);
+
+    auto weighted_operators = std::vector<WeightedCircuit> {};
+    weighted_operators.emplace_back(1.0 - prob0 - prob1, std::move(circuit_no_reset));
+    weighted_operators.emplace_back(prob0, std::move(circuit_reset_to_0));
+    weighted_operators.emplace_back(prob1, std::move(circuit_reset_to_1));
+
+    // NOTE: we know from construction the probabilities add up to 1; no tolerance needed
+    return ket::MixedCircuitChannel {std::move(weighted_operators)};
+}
+
+auto one_qubit_amplitude_damping_error_channel(
+    double amplitude_parameter,
+    std::size_t target_index,
+    double tolerance
+) -> ket::OneQubitKrausChannel
+{
+    const auto parameters = ket::PhaseAmplitudeDampingParameters {
+        .amplitude=amplitude_parameter,
+        .phase=0.0,
+        .excited_population=0.0
+    };
+
+    return one_qubit_phase_amplitude_damping_error_channel(parameters, target_index, tolerance);
+}
+
+auto one_qubit_phase_damping_error_channel(
+    double phase_parameter,
+    std::size_t target_index,
+    double tolerance
+) -> ket::OneQubitKrausChannel
+{
+    const auto parameters = ket::PhaseAmplitudeDampingParameters {
+        .amplitude=0.0,
+        .phase=phase_parameter,
+        .excited_population=0.0
+    };
+
+    return one_qubit_phase_amplitude_damping_error_channel(parameters, target_index, tolerance);
 }
 
 }  // namespace ket

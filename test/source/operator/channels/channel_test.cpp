@@ -3,7 +3,9 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include <Eigen/Dense>
-#include <cstddef>
+
+#define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
+#define REQUIRE_THROWS_AS_MSG(statement, exception, msg) do { INFO(msg); REQUIRE_THROWS_AS(statement, exception); } while((void)0, 0)
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
@@ -417,4 +419,68 @@ TEST_CASE("phase-amplitude damping and thermal-relaxation")
     ket::simulate_one_qubit_kraus_channel(state_thermal, thermal_channel, single_pair, buffer0, buffer1, buffer2);
 
     REQUIRE(ki::almost_eq_with_print_(state_phaseamp, state_thermal));
+}
+
+TEST_CASE("reset_error()")
+{
+    auto state = ctestutils::basic_state0();
+
+    const auto n_single_gate_pairs = Eigen::Index {1};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+
+    const auto n_double_gate_pairs = Eigen::Index {0};
+    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+
+    auto buffer0 = Eigen::MatrixXcd(2, 2);
+    auto buffer1 = Eigen::MatrixXcd(2, 2);
+    auto buffer2 = Eigen::MatrixXcd(2, 2);
+
+    struct TestCase
+    {
+        std::string message;
+        ket::ResetErrorParameters parameters;
+        ket::DensityMatrix expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase {
+            "no reset",
+            ket::ResetErrorParameters {.prob0=0.0, .prob1=0.0},
+            ctestutils::basic_state0()
+        },
+        TestCase {
+            "guaranteed reset to 0",
+            ket::ResetErrorParameters {.prob0=1.0, .prob1=0.0},
+            ket::DensityMatrix {"0"}
+        },
+        TestCase {
+            "guaranteed reset to 1",
+            ket::ResetErrorParameters {.prob0=0.0, .prob1=1.0},
+            ket::DensityMatrix {"1"}
+        }
+    );
+
+    const auto channel = ket::reset_error(testcase.parameters);
+    ket::simulate_mixed_circuit_channel(state, channel, single_pair, double_pair, buffer0, buffer1, buffer2);
+
+    REQUIRE_MSG(ki::almost_eq_with_print_(state, testcase.expected), testcase.message);
+}
+
+TEST_CASE("reset_error() parameter conditions")
+{
+    struct TestCase
+    {
+        std::string message;
+        ket::ResetErrorParameters parameters;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase {"prob0 < 0", ket::ResetErrorParameters {-1.0,  0.0}},
+        TestCase {"prob1 < 0", ket::ResetErrorParameters { 0.0, -1.0}},
+        TestCase {"prob0 > 1", ket::ResetErrorParameters { 1.1,  0.0}},
+        TestCase {"prob1 > 1", ket::ResetErrorParameters { 0.0,  1.1}},
+        TestCase {"prob0 + prob1 > 1", ket::ResetErrorParameters { 0.5,  0.6}}
+    );
+
+    REQUIRE_THROWS_AS_MSG(ket::reset_error(testcase.parameters), std::runtime_error, testcase.message);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/common/utils.hpp"
@@ -17,10 +18,19 @@
     Some error types aren't implemented as functions; you should call the constructors directly:
       - general pauli errors (as a PauliChannel)
       - mixed unitary error (as a MixedCircuitChannel)
+    
+    TODO:
+      - implement reset error
+      - create mixed_unitary_error (for 1-qubit) that takes sequence of (Matrix2X2, probability) pairs
 */
 
 namespace ket
 {
+
+struct ChannelPredicate
+{
+
+};
 
 /*
     The symmetric depolarizing error channel applied to a single qubit.
@@ -79,7 +89,7 @@ public:
     }
 
     explicit RelaxationTime([[maybe_unused]] relax_infinite infinite_tag)
-        : time_ {0.0}  // fine if value is invalid; cannot get time under this state
+        : time_ {-1.0}  // fine if value is invalid; cannot get time under this state
         , is_infinite_ {true}
     {}
 
@@ -139,6 +149,49 @@ struct ThermalRelaxationParameters {
 */
 auto one_qubit_thermal_relaxation_error_channel(
     const ThermalRelaxationParameters& parameters,
+    std::size_t target_index,
+    double tolerance = 1.0e-6
+) -> ket::OneQubitKrausChannel;
+
+
+/*
+    The parameters needed to create a one-qubit reset error channel
+      - `prob0` is the probability that the qubit enters the state |0>
+      - `prob1` is the probability that the qubit enters the state |1>
+
+    For this definition:
+      - `prob0` and `prob1` must be non-negative and add up to at most 1
+*/
+struct ResetErrorParameters
+{
+    double prob0;
+    double prob1;
+};
+
+/*
+    The reset quantum error channel, applied to a single qubit.
+      - `tolerance`: checks
+*/
+auto reset_error(const ResetErrorParameters& parameters) -> ket::MixedCircuitChannel;
+
+/*
+    A special version of `one_qubit_phase_amplitude_damping_error_channel()` where the phase damping
+    and excited state population are fixed to 0
+      - `tolerance`: omit Kraus matrices from the channel if their Frobenius norm is less than this
+*/
+auto one_qubit_amplitude_damping_error_channel(
+    double amplitude_parameter,
+    std::size_t target_index,
+    double tolerance = 1.0e-6
+) -> ket::OneQubitKrausChannel;
+
+/*
+    A special version of `one_qubit_phase_amplitude_damping_error_channel()` where the amplitude damping
+    and excited state population are fixed to 0
+      - `tolerance`: omit Kraus matrices from the channel if their Frobenius norm is less than this
+*/
+auto one_qubit_phase_damping_error_channel(
+    double phase_parameter,
     std::size_t target_index,
     double tolerance = 1.0e-6
 ) -> ket::OneQubitKrausChannel;
