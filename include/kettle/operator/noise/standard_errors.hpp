@@ -7,21 +7,17 @@
 
 /*
     This header contains the functions for implementing the following error types:
-      - symmetric depolarizing error (as a Pauli Channel)
-      - amplitude error (as a Kraus channel)
-      - phase damping error (as a Kraus channel)
-      - phase-amplitude damping error (as a Kraus channel)
-      - thermal relaxation error (as a Kraus channel)
-      - reset error (as a Mixed Circuit channel)
-      - coherent unitary error (as a Mixed Circuit channel)
+      - [DONE] symmetric depolarizing error (as a Pauli Channel)
+      - [DONE] amplitude error (as a Kraus channel)
+      - [DONE] phase damping error (as a Kraus channel)
+      - [DONE] phase-amplitude damping error (as a Kraus channel)
+      - [DONE] thermal relaxation error (as a Kraus channel)
+      - [DONE] reset error (as a Mixed Circuit channel)
     
     Some error types aren't implemented as functions; you should call the constructors directly:
       - general pauli errors (as a PauliChannel)
       - mixed unitary error (as a MixedCircuitChannel)
-    
-    TODO:
-      - implement reset error
-      - create mixed_unitary_error (for 1-qubit) that takes sequence of (Matrix2X2, probability) pairs
+      - coherent unitary error (just use a MixedCircuitChannel with a single parameter)
 */
 
 namespace ket
