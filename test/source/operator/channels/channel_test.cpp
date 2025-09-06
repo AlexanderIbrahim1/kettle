@@ -232,6 +232,49 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
     REQUIRE(ki::almost_eq_with_print_(state, expected));
 }
 
+TEST_CASE("kraus_matrix_from_projectors")
+{
+    struct TestCase {
+        std::vector<std::string> bitstrings;
+        std::vector<std::complex<double>> amplitudes;
+        Eigen::MatrixXcd expected;
+    };
+
+    const auto testcase = GENERATE(
+        TestCase {
+            {"00"},
+            {{1.0, 0.0}},
+            []() {
+                auto mat = Eigen::MatrixXcd(4, 4);
+                mat << 1.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0;
+                return mat;
+            }()
+        },
+        TestCase {
+            {"00", "11"},
+            {{1.0, 0.0}, {1.0, 0.0}},
+            []() {
+                auto mat = Eigen::MatrixXcd(4, 4);
+                mat << 1.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 1.0;
+                return mat;
+            }()
+        }
+    );
+
+    const auto actual = ket::kraus_matrix_from_projectors(
+        testcase.bitstrings,
+        testcase.amplitudes
+    );
+
+    REQUIRE(actual.isApprox(testcase.expected));
+}
+
 TEST_CASE("CartesianTicker")
 {
     auto ticker = ket::internal::CartesianTicker {3, 3};
