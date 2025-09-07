@@ -20,7 +20,7 @@ namespace ket
 struct WeightedCircuit
 {
     double coefficient;
-    QuantumCircuit unitary;
+    QuantumCircuit circuit;
 };
 
 class MixedCircuitChannel

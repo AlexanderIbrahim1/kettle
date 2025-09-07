@@ -20,8 +20,8 @@ namespace
 */
 auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_operators)
 {
-    for ([[maybe_unused]] const auto& [ignore, unitary] : weighted_operators) {
-        for (const auto& circ_element : unitary) {
+    for ([[maybe_unused]] const auto& [ignore, element] : weighted_operators) {
+        for (const auto& circ_element : element) {
             if (!circ_element.is_gate() && !circ_element.is_circuit_logger()) {
                 throw std::runtime_error{"ERROR: MixedCircuitChannel only allows gates and loggers as circuit elements.\n"};
             }
@@ -46,11 +46,11 @@ MixedCircuitChannel::MixedCircuitChannel(
     namespace ki = ket::internal;
     const auto name = std::string {"MixedCircuitChannel"};
 
-    const auto n_qubits_getter = [](const auto& elem) { return elem.unitary.n_qubits(); };
+    const auto n_qubits_getter = [](const auto& elem) { return elem.circuit.n_qubits(); };
     const auto coefficient_getter = [](const auto& elem) { return elem.coefficient; };
 
     ki::check_nonempty_(weighted_operators_, name);
-    n_qubits_ = weighted_operators_[0].unitary.n_qubits();
+    n_qubits_ = weighted_operators_[0].circuit.n_qubits();
     ki::check_number_of_qubits_is_nonzero_(n_qubits_, name);
 
     ki::check_unitaries_have_same_n_qubits_(weighted_operators_, n_qubits_getter, name);
@@ -79,7 +79,7 @@ auto almost_eq(
             return false;
         }
 
-        return ket::almost_eq(left.unitary, right.unitary, coeff_tolerance);
+        return ket::almost_eq(left.circuit, right.circuit, coeff_tolerance);
     };
 
     return ki::almost_eq_helper_(left_op, right_op, almost_eq);
