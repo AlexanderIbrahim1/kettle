@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include "kettle/circuit/circuit.hpp"
+#include "kettle/state/density_matrix.hpp"
 
 /*
     This header file contains code to help perform the quantum circuit simulations,
@@ -26,5 +28,7 @@ struct FlatIndexPair
 auto number_of_single_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t;
 
 auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t;
+
+void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::DensityMatrix& state);
 
 }  // namespace ket::internal

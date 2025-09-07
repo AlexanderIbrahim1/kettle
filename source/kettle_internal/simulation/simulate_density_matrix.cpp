@@ -131,17 +131,6 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
     return circuit_loggers;
 }
 
-void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::DensityMatrix& state)
-{
-    if (circuit.n_qubits() != state.n_qubits()) {
-        throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
-    }
-
-    if (circuit.n_qubits() == 0) {
-        throw std::runtime_error {"Cannot simulate a circuit or state with zero qubits."};
-    }
-}
-
 }  // namespace
 
 namespace ket
@@ -162,7 +151,7 @@ void DensityMatrixSimulator::run(const QuantumCircuit& circuit, DensityMatrix& s
 {
     namespace ki = ket::internal;
 
-    check_valid_number_of_qubits_(circuit, state);
+    ki::check_valid_number_of_qubits_(circuit, state);
 
     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits()));
     const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
