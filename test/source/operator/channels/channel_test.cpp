@@ -128,21 +128,21 @@ TEST_CASE("Kraus channel depolarizing noise")
         const auto n_single_gate_pairs = Eigen::Index {1};
         const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
 
-        SECTION("using `simulate_one_qubit_kraus_channel()`")
+        SECTION("using `OneQubitKrausChannelSimulator`")
         {
             const auto depol_channel = depolarizing_noise_kraus_1qubit(parameter, 0);
             auto simulator = ket::OneQubitKrausChannelSimulator {1};
             simulator.run(depol_channel, state);
-//             ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
         }
 
-        SECTION("using `simulate_pauli_channel()`")
+        SECTION("using `PauliChannelSimulator`")
         {
             const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
-            ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+            auto simulator = ket::PauliChannelSimulator {1};
+            simulator.run(depol_channel, state);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -326,38 +326,21 @@ TEST_CASE("depolarizing noise : 2 qubits")
     auto state1 = ctestutils::basic_state1();
 
     const auto tensor_prod_then_depol = [state0, state1, parameter]() mutable {
-        // naming doesn't matter; buffers play different roles within the function
-        auto buffer0 = Eigen::MatrixXcd(4, 4);
-        auto buffer1 = Eigen::MatrixXcd(4, 4);
-        auto buffer2 = Eigen::MatrixXcd(4, 4);
-
-        // the only pair of indices for a 2-qubit system is (0, 1)
-        const auto n_single_gate_pairs = Eigen::Index {2};
-        const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 2, {0, 1});
-
         auto state = ket::tensor_product(state0, state1);
 
-        ket::simulate_pauli_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+        auto simulator = ket::PauliChannelSimulator {2};
+        simulator.run(depol_channel, state);
 
         return state;
     }();
 
     const auto depol_then_tensor_prod = [state0, state1, parameter]() mutable {
-        // naming doesn't matter; buffers play different roles within the function
-        auto buffer0 = Eigen::MatrixXcd(2, 2);
-        auto buffer1 = Eigen::MatrixXcd(2, 2);
-        auto buffer2 = Eigen::MatrixXcd(2, 2);
-
-        // the only pair of indices for a 2-qubit system is (0, 1)
-        const auto n_single_gate_pairs = Eigen::Index {1};
-        const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
 
-        ket::simulate_pauli_channel(state0, depol_channel, single_pair, buffer0, buffer1, buffer2);
-        ket::simulate_pauli_channel(state1, depol_channel, single_pair, buffer0, buffer1, buffer2);
+        auto simulator = ket::PauliChannelSimulator {1};
+        simulator.run(depol_channel, state0);
+        simulator.run(depol_channel, state1);
 
         return ket::tensor_product(state0, state1);
     }();

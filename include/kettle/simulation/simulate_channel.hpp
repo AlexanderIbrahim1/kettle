@@ -8,6 +8,7 @@
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
+#include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/state/density_matrix.hpp"
 
 
@@ -15,6 +16,7 @@ namespace ket
 {
 
 class OneQubitKrausChannelSimulator;
+class PauliChannelSimulator;
 
 template <typename Derived>
 class ChannelSimulatorMixin
@@ -75,6 +77,7 @@ private:
     std::vector<CircuitLogger> circuit_loggers_;
 
     friend OneQubitKrausChannelSimulator;
+    friend PauliChannelSimulator;
 };
 
 
@@ -92,6 +95,22 @@ private:
     std::size_t n_qubits_;
 };
 
+class PauliChannelSimulator : public ChannelSimulatorMixin<PauliChannelSimulator>
+{
+public:
+    explicit PauliChannelSimulator(std::size_t n_qubits);
+
+    void run(const PauliChannel& channel, DensityMatrix& state);
+
+private:
+    Eigen::MatrixXcd accumulation_buffer_;
+    Eigen::MatrixXcd multiplication_buffer_;
+    Eigen::MatrixXcd state_buffer_;
+    std::size_t n_qubits_;
+};
+
 void simulate(const OneQubitKrausChannel& circuit, DensityMatrix& state);
+
+void simulate(const PauliChannel& circuit, DensityMatrix& state);
 
 }  // namespace ket
