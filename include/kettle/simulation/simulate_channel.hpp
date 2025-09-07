@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 
 #include "kettle/circuit/classical_register.hpp"
-#include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
@@ -15,6 +14,8 @@
 
 namespace ket
 {
+
+class OneQubitKrausChannelSimulator;
 
 template <typename Derived>
 class ChannelSimulatorMixin
@@ -67,11 +68,14 @@ protected:
 
 private:
     ChannelSimulatorMixin() = default;
+
     // there is no default constructor for the ClassicalRegsiter (it wouldn't make sense), and we
     // only find out how many bits are needed after the first simulation; hence why we use a pointer
     ket::ClonePtr<ClassicalRegister> cregister_ {nullptr};
     bool has_been_run_ {false};
     std::vector<CircuitLogger> circuit_loggers_;
+
+    friend OneQubitKrausChannelSimulator;
 };
 
 
@@ -87,8 +91,6 @@ private:
     Eigen::MatrixXcd left_mul_buffer_;
     Eigen::MatrixXcd right_mul_buffer_;
     std::size_t n_qubits_;
-
-    friend class ChannelSimulatorMixin<OneQubitKrausChannelSimulator>;
 };
 
 }  // namespace ket

@@ -12,7 +12,7 @@
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
-#include "kettle/simulation/simulate_channel.hpp"
+// #include "kettle/simulation/simulate_channel.hpp"
 
 #include "kettle_internal/common/linear_bijective_map.hpp"
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
@@ -214,62 +214,62 @@ void simulate_mixed_circuit_channel(
 }  // namespace ket
 
 
-namespace ket
-{
-
-
-OneQubitKrausChannelSimulator::OneQubitKrausChannelSimulator(std::size_t n_qubits)
-{
-    if (n_qubits == 0) {
-        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
-    }
-
-    n_qubits_ = n_qubits;
-    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
-
-    writing_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    left_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    right_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-}
-
-void OneQubitKrausChannelSimulator::run(const OneQubitKrausChannel& circuit, DensityMatrix& state, std::optional<int> prng_seed)
-{
-    namespace ki = ket::internal;
-
-    if (state.n_qubits() != n_qubits_) {
-        throw std::runtime_error {"ERROR: Invalid number of qubits in density matrix for OneQubitKrausChannelSimulator.\n"};
-    }
-
-    const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits()));
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
-    const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits()));
-    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
-
-    cregister_mixin() = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
-
-    // the `simulate_loop_body_()` function is used by both the single-threaded and multi-threaded
-    // code, and certain operations are only done on the thread with thread id 0
-    const auto thread_id = ki::MEASURING_THREAD_ID;
-
-    circuit_loggers_mixin() = simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_, buffer_);
-
-    has_been_run_mixin() = true;
-
-    // void simulate_one_qubit_kraus_channel(
-    //     DensityMatrix& state,
-    //     const OneQubitKrausChannel& channel,
-    //     const internal::FlatIndexPair<Eigen::Index>& pair,
-    //     Eigen::MatrixXcd& writing_buffer,
-    //     Eigen::MatrixXcd& left_mul_buffer,
-    //     Eigen::MatrixXcd& right_mul_buffer
-    // )
-}
-
-void simulate(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed)
-{
-    auto simulator = OneQubitKrausChannelSimulator {state.n_qubits()};
-    simulator.run(circuit, state, prng_seed);
-}
-
-}  // namespace ket
+// namespace ket
+// {
+// 
+// 
+// OneQubitKrausChannelSimulator::OneQubitKrausChannelSimulator(std::size_t n_qubits)
+// {
+//     if (n_qubits == 0) {
+//         throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
+//     }
+// 
+//     n_qubits_ = n_qubits;
+//     const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
+// 
+//     writing_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+//     left_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+//     right_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+// }
+// 
+// void OneQubitKrausChannelSimulator::run(const OneQubitKrausChannel& circuit, DensityMatrix& state, std::optional<int> prng_seed)
+// {
+//     namespace ki = ket::internal;
+// 
+//     if (state.n_qubits() != n_qubits_) {
+//         throw std::runtime_error {"ERROR: Invalid number of qubits in density matrix for OneQubitKrausChannelSimulator.\n"};
+//     }
+// 
+//     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits()));
+//     const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+// 
+//     const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits()));
+//     const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+// 
+//     cregister_mixin() = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
+// 
+//     // the `simulate_loop_body_()` function is used by both the single-threaded and multi-threaded
+//     // code, and certain operations are only done on the thread with thread id 0
+//     const auto thread_id = ki::MEASURING_THREAD_ID;
+// 
+//     circuit_loggers_mixin() = simulate_loop_body_iterative_(circuit, state, single_pair, double_pair, thread_id, prng_seed, *cregister_, buffer_);
+// 
+//     has_been_run_mixin() = true;
+// 
+//     // void simulate_one_qubit_kraus_channel(
+//     //     DensityMatrix& state,
+//     //     const OneQubitKrausChannel& channel,
+//     //     const internal::FlatIndexPair<Eigen::Index>& pair,
+//     //     Eigen::MatrixXcd& writing_buffer,
+//     //     Eigen::MatrixXcd& left_mul_buffer,
+//     //     Eigen::MatrixXcd& right_mul_buffer
+//     // )
+// }
+// 
+// void simulate(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed)
+// {
+//     auto simulator = OneQubitKrausChannelSimulator {state.n_qubits()};
+//     simulator.run(circuit, state, prng_seed);
+// }
+// 
+// }  // namespace ket
