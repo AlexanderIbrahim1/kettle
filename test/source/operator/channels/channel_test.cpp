@@ -20,7 +20,6 @@
 
 #include "kettle_internal/common/state_test_utils.hpp"
 #include "kettle_internal/operator/channels/channel_helper.hpp"
-#include "kettle_internal/simulation/density_matrix_through_channel.hpp"
 
 #include "channel_test_utils.hpp"
 #include "channel_test_results.hpp"
@@ -137,7 +136,7 @@ TEST_CASE("Kraus channel depolarizing noise")
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
         }
 
-        SECTION("using `simulate_mixed_circuit_channel()`")
+        SECTION("using `MixedCircuitChannelSimulator`")
         {
             const auto depol_channel = depolarizing_noise_mixed_unitary_1qubit(parameter);
             ket::simulate(depol_channel, state);
@@ -213,10 +212,8 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
         return state_;
     }();
 
-    auto buffer = Eigen::MatrixXcd(4, 4);
-
     const auto expected = ctestutils::result_amplitude_damping_2qubit(state, parameter);
-    ket::simulate_multi_qubit_kraus_channel(state, channel, buffer);
+    ket::simulate(channel, state);
 
     REQUIRE(ki::almost_eq_with_print_(state, expected));
 }

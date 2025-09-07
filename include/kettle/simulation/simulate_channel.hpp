@@ -8,6 +8,7 @@
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
+#include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/state/density_matrix.hpp"
@@ -17,6 +18,7 @@ namespace ket
 {
 
 class MixedCircuitChannelSimulator;
+class MultiQubitKrausChannelSimulator;
 class OneQubitKrausChannelSimulator;
 class PauliChannelSimulator;
 
@@ -79,6 +81,7 @@ private:
     std::vector<CircuitLogger> circuit_loggers_;
 
     friend MixedCircuitChannelSimulator;
+    friend MultiQubitKrausChannelSimulator;
     friend OneQubitKrausChannelSimulator;
     friend PauliChannelSimulator;
 };
@@ -98,6 +101,7 @@ private:
     Eigen::MatrixXcd right_mul_buffer_;
 };
 
+
 class PauliChannelSimulator : public ChannelSimulatorMixin<PauliChannelSimulator>
 {
 public:
@@ -111,6 +115,7 @@ private:
     Eigen::MatrixXcd multiplication_buffer_;
     Eigen::MatrixXcd state_buffer_;
 };
+
 
 class MixedCircuitChannelSimulator : public ChannelSimulatorMixin<MixedCircuitChannelSimulator>
 {
@@ -130,11 +135,26 @@ private:
     Eigen::MatrixXcd state_buffer_;
 };
 
+
+class MultiQubitKrausChannelSimulator : public ChannelSimulatorMixin<MultiQubitKrausChannelSimulator>
+{
+public:
+    explicit MultiQubitKrausChannelSimulator(std::size_t n_qubits);
+
+    void run(const MultiQubitKrausChannel& channel, DensityMatrix& state);
+
+private:
+    std::size_t n_qubits_;
+    Eigen::MatrixXcd writing_buffer_;
+};
+
 void simulate(
     const MixedCircuitChannel& circuit,
     DensityMatrix& state,
     const std::optional<ket::param::EvaluatedParameterDataMap>& param_map = std::nullopt
 );
+
+void simulate(const MultiQubitKrausChannel& circuit, DensityMatrix& state);
 
 void simulate(const OneQubitKrausChannel& circuit, DensityMatrix& state);
 

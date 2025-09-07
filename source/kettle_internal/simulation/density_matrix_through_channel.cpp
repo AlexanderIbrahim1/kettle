@@ -337,4 +337,31 @@ void simulate(
     simulator.run(circuit, state, param_map);
 }
 
+MultiQubitKrausChannelSimulator::MultiQubitKrausChannelSimulator(std::size_t n_qubits)
+    : n_qubits_ {n_qubits}
+{
+    if (n_qubits == 0) {
+        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
+    }
+
+    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
+    writing_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+}
+
+void MultiQubitKrausChannelSimulator::run(const MultiQubitKrausChannel& channel, DensityMatrix& state)
+{
+    if (state.n_qubits() != n_qubits_) {
+        throw std::runtime_error {"ERROR: Invalid number of qubits in density matrix for MultiQubitKrausChannelSimulator.\n"};
+    }
+
+    simulate_multi_qubit_kraus_channel(state, channel, writing_buffer_);
+    has_been_run_mixin() = true;
+}
+
+void simulate(const MultiQubitKrausChannel& circuit, DensityMatrix& state)
+{
+    auto simulator = MultiQubitKrausChannelSimulator {state.n_qubits()};
+    simulator.run(circuit, state);
+}
+
 }  // namespace ket
