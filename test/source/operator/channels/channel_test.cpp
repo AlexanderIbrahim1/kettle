@@ -119,20 +119,10 @@ TEST_CASE("Kraus channel depolarizing noise")
 
     SECTION("using channels")
     {
-        // naming doesn't matter; buffers play different roles within the function
-        auto buffer0 = Eigen::MatrixXcd(2, 2);
-        auto buffer1 = Eigen::MatrixXcd(2, 2);
-        auto buffer2 = Eigen::MatrixXcd(2, 2);
-
-        // the only pair of indices for a 2-qubit system is (0, 1)
-        const auto n_single_gate_pairs = Eigen::Index {1};
-        const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
         SECTION("using `OneQubitKrausChannelSimulator`")
         {
             const auto depol_channel = depolarizing_noise_kraus_1qubit(parameter, 0);
-            auto simulator = ket::OneQubitKrausChannelSimulator {1};
-            simulator.run(depol_channel, state);
+            ket::simulate(depol_channel, state);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -141,8 +131,7 @@ TEST_CASE("Kraus channel depolarizing noise")
         SECTION("using `PauliChannelSimulator`")
         {
             const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
-            auto simulator = ket::PauliChannelSimulator {1};
-            simulator.run(depol_channel, state);
+            ket::simulate(depol_channel, state);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -150,11 +139,8 @@ TEST_CASE("Kraus channel depolarizing noise")
 
         SECTION("using `simulate_mixed_circuit_channel()`")
         {
-            const auto n_double_gate_pairs = Eigen::Index {0};
-            const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
-
             const auto depol_channel = depolarizing_noise_mixed_unitary_1qubit(parameter);
-            ket::simulate_mixed_circuit_channel(state, depol_channel, single_pair, double_pair, buffer0, buffer1, buffer2);
+            ket::simulate(depol_channel, state);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -446,16 +432,6 @@ TEST_CASE("reset_error()")
 {
     auto state = ctestutils::basic_state0();
 
-    const auto n_single_gate_pairs = Eigen::Index {1};
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
-    const auto n_double_gate_pairs = Eigen::Index {0};
-    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
-
-    auto buffer0 = Eigen::MatrixXcd(2, 2);
-    auto buffer1 = Eigen::MatrixXcd(2, 2);
-    auto buffer2 = Eigen::MatrixXcd(2, 2);
-
     struct TestCase
     {
         std::string message;
@@ -482,7 +458,7 @@ TEST_CASE("reset_error()")
     );
 
     const auto channel = ket::reset_error(testcase.parameters);
-    ket::simulate_mixed_circuit_channel(state, channel, single_pair, double_pair, buffer0, buffer1, buffer2);
+    ket::simulate(channel, state);
 
     REQUIRE_MSG(ki::almost_eq_with_print_(state, testcase.expected), testcase.message);
 }

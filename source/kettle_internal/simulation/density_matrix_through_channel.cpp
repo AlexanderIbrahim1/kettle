@@ -59,6 +59,24 @@ void apply_pauli_string_(
     }
 }
 
+void channel_ctr_helper(
+    std::size_t& n_qubits,
+    Eigen::MatrixXcd& buffer0,
+    Eigen::MatrixXcd& buffer1,
+    Eigen::MatrixXcd& buffer2
+)
+{
+    if (n_qubits == 0) {
+        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
+    }
+
+    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
+
+    buffer0 = Eigen::MatrixXcd(n_states, n_states);
+    buffer1 = Eigen::MatrixXcd(n_states, n_states);
+    buffer2 = Eigen::MatrixXcd(n_states, n_states);
+}
+
 }  // namespace
 
 
@@ -218,17 +236,9 @@ namespace ket
 {
 
 OneQubitKrausChannelSimulator::OneQubitKrausChannelSimulator(std::size_t n_qubits)
+    : n_qubits_ {n_qubits}
 {
-    if (n_qubits == 0) {
-        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
-    }
-
-    n_qubits_ = n_qubits;
-    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
-
-    writing_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    left_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    right_mul_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+    channel_ctr_helper(n_qubits_, writing_buffer_, left_mul_buffer_, right_mul_buffer_);
 }
 
 void OneQubitKrausChannelSimulator::run(const OneQubitKrausChannel& channel, DensityMatrix& state)
@@ -253,17 +263,9 @@ void simulate(const OneQubitKrausChannel& circuit, DensityMatrix& state)
 }
 
 PauliChannelSimulator::PauliChannelSimulator(std::size_t n_qubits)
+    : n_qubits_ {n_qubits}
 {
-    if (n_qubits == 0) {
-        throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
-    }
-
-    n_qubits_ = n_qubits;
-    const auto n_states = static_cast<Eigen::Index>(1UL << n_qubits);
-
-    accumulation_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    multiplication_buffer_ = Eigen::MatrixXcd(n_states, n_states);
-    state_buffer_ = Eigen::MatrixXcd(n_states, n_states);
+    channel_ctr_helper(n_qubits_, accumulation_buffer_, multiplication_buffer_, state_buffer_);
 }
 
 void PauliChannelSimulator::run(const PauliChannel& channel, DensityMatrix& state)
@@ -285,6 +287,54 @@ void simulate(const PauliChannel& circuit, DensityMatrix& state)
 {
     auto simulator = PauliChannelSimulator {state.n_qubits()};
     simulator.run(circuit, state);
+}
+
+MixedCircuitChannelSimulator::MixedCircuitChannelSimulator(std::size_t n_qubits)
+    : n_qubits_ {n_qubits}
+{
+    channel_ctr_helper(n_qubits_, accumulation_buffer_, multiplication_buffer_, state_buffer_);
+}
+
+void MixedCircuitChannelSimulator::run(
+    const MixedCircuitChannel& channel,
+    DensityMatrix& state,
+    const std::optional<ket::param::EvaluatedParameterDataMap>& param_map
+)
+{
+    namespace ki = ket::internal;
+
+    if (state.n_qubits() != n_qubits_) {
+        throw std::runtime_error {"ERROR: Invalid number of qubits in density matrix for MixedCircuitChannelSimulator.\n"};
+    }
+
+    const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(n_qubits_));
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+
+    const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(n_qubits_));
+    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+
+    simulate_mixed_circuit_channel(
+        state,
+        channel,
+        single_pair,
+        double_pair,
+        accumulation_buffer_,
+        multiplication_buffer_,
+        state_buffer_,
+        param_map
+    );
+
+    has_been_run_mixin() = true;
+}
+
+void simulate(
+    const MixedCircuitChannel& circuit,
+    DensityMatrix& state,
+    const std::optional<ket::param::EvaluatedParameterDataMap>& param_map
+)
+{
+    auto simulator = MixedCircuitChannelSimulator {state.n_qubits()};
+    simulator.run(circuit, state, param_map);
 }
 
 }  // namespace ket

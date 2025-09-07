@@ -7,6 +7,7 @@
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
+#include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/state/density_matrix.hpp"
@@ -15,6 +16,7 @@
 namespace ket
 {
 
+class MixedCircuitChannelSimulator;
 class OneQubitKrausChannelSimulator;
 class PauliChannelSimulator;
 
@@ -76,6 +78,7 @@ private:
     bool has_been_run_ {false};
     std::vector<CircuitLogger> circuit_loggers_;
 
+    friend MixedCircuitChannelSimulator;
     friend OneQubitKrausChannelSimulator;
     friend PauliChannelSimulator;
 };
@@ -89,10 +92,10 @@ public:
     void run(const OneQubitKrausChannel& channel, DensityMatrix& state);
 
 private:
+    std::size_t n_qubits_;
     Eigen::MatrixXcd writing_buffer_;
     Eigen::MatrixXcd left_mul_buffer_;
     Eigen::MatrixXcd right_mul_buffer_;
-    std::size_t n_qubits_;
 };
 
 class PauliChannelSimulator : public ChannelSimulatorMixin<PauliChannelSimulator>
@@ -103,11 +106,35 @@ public:
     void run(const PauliChannel& channel, DensityMatrix& state);
 
 private:
+    std::size_t n_qubits_;
     Eigen::MatrixXcd accumulation_buffer_;
     Eigen::MatrixXcd multiplication_buffer_;
     Eigen::MatrixXcd state_buffer_;
-    std::size_t n_qubits_;
 };
+
+class MixedCircuitChannelSimulator : public ChannelSimulatorMixin<MixedCircuitChannelSimulator>
+{
+public:
+    explicit MixedCircuitChannelSimulator(std::size_t n_qubits);
+
+    void run(
+        const MixedCircuitChannel& channel,
+        DensityMatrix& state,
+        const std::optional<ket::param::EvaluatedParameterDataMap>& param_map = std::nullopt
+    );
+
+private:
+    std::size_t n_qubits_;
+    Eigen::MatrixXcd accumulation_buffer_;
+    Eigen::MatrixXcd multiplication_buffer_;
+    Eigen::MatrixXcd state_buffer_;
+};
+
+void simulate(
+    const MixedCircuitChannel& circuit,
+    DensityMatrix& state,
+    const std::optional<ket::param::EvaluatedParameterDataMap>& param_map = std::nullopt
+);
 
 void simulate(const OneQubitKrausChannel& circuit, DensityMatrix& state);
 
