@@ -15,6 +15,7 @@
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/noise/standard_errors.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
+#include "kettle/simulation/simulate_channel.hpp"
 #include "kettle/state/density_matrix.hpp"
 
 #include "kettle_internal/common/state_test_utils.hpp"
@@ -72,10 +73,10 @@ auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedCirc
     circuit3.add_z_gate(0);
 
     return ket::MixedCircuitChannel {
-        {.coefficient=coeff0,   .unitary=std::move(circuit0)},
-        {.coefficient=coeff123, .unitary=std::move(circuit1)},
-        {.coefficient=coeff123, .unitary=std::move(circuit2)},
-        {.coefficient=coeff123, .unitary=std::move(circuit3)},
+        {.coefficient=coeff0,   .circuit=std::move(circuit0)},
+        {.coefficient=coeff123, .circuit=std::move(circuit1)},
+        {.coefficient=coeff123, .circuit=std::move(circuit2)},
+        {.coefficient=coeff123, .circuit=std::move(circuit3)},
     };
 }
 
@@ -130,7 +131,9 @@ TEST_CASE("Kraus channel depolarizing noise")
         SECTION("using `simulate_one_qubit_kraus_channel()`")
         {
             const auto depol_channel = depolarizing_noise_kraus_1qubit(parameter, 0);
-            ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
+            auto simulator = ket::OneQubitKrausChannelSimulator {1};
+            simulator.run(depol_channel, state);
+//             ket::simulate_one_qubit_kraus_channel(state, depol_channel, single_pair, buffer0, buffer1, buffer2);
 
             const auto expected_state = ket::DensityMatrix {ctestutils::mat2x2_to_eigen(expected)};
             REQUIRE(ki::almost_eq_with_print_(state, expected_state));
@@ -412,14 +415,8 @@ TEST_CASE("one_qubit_phase_amplitude_damping_error_channel()")
 
     const auto channel = ket::one_qubit_phase_amplitude_damping_error_channel(parameters, 0);
 
-    auto buffer0 = Eigen::MatrixXcd(2, 2);
-    auto buffer1 = Eigen::MatrixXcd(2, 2);
-    auto buffer2 = Eigen::MatrixXcd(2, 2);
-
-    // the only pair of indices for a 2-qubit system is (0, 1)
-    const auto n_single_gate_pairs = Eigen::Index {1};
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-    ket::simulate_one_qubit_kraus_channel(state, channel, single_pair, buffer0, buffer1, buffer2);
+    auto simulator = ket::OneQubitKrausChannelSimulator {1};
+    simulator.run(channel, state);
 
     REQUIRE(ki::almost_eq_with_print_(expected_state, state));
 }
@@ -455,11 +452,9 @@ TEST_CASE("phase-amplitude damping and thermal-relaxation")
     auto state_phaseamp = ctestutils::basic_state0();
     auto state_thermal = ctestutils::basic_state0();
 
-    const auto n_single_gate_pairs = Eigen::Index {1};
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
-
-    ket::simulate_one_qubit_kraus_channel(state_phaseamp, phaseamp_channel, single_pair, buffer0, buffer1, buffer2);
-    ket::simulate_one_qubit_kraus_channel(state_thermal, thermal_channel, single_pair, buffer0, buffer1, buffer2);
+    auto simulator = ket::OneQubitKrausChannelSimulator {1};
+    simulator.run(phaseamp_channel, state_phaseamp);
+    simulator.run(thermal_channel, state_thermal);
 
     REQUIRE(ki::almost_eq_with_print_(state_phaseamp, state_thermal));
 }

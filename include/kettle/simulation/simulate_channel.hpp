@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <vector>
 
 #include <Eigen/Dense>
@@ -84,7 +83,7 @@ class OneQubitKrausChannelSimulator : public ChannelSimulatorMixin<OneQubitKraus
 public:
     explicit OneQubitKrausChannelSimulator(std::size_t n_qubits);
 
-    void run(const OneQubitKrausChannel& circuit, DensityMatrix& state, std::optional<int> prng_seed = std::nullopt);
+    void run(const OneQubitKrausChannel& channel, DensityMatrix& state);
 
 private:
     Eigen::MatrixXcd writing_buffer_;
@@ -92,5 +91,7 @@ private:
     Eigen::MatrixXcd right_mul_buffer_;
     std::size_t n_qubits_;
 };
+
+void simulate(const OneQubitKrausChannel& circuit, DensityMatrix& state);
 
 }  // namespace ket
