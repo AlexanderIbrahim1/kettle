@@ -166,7 +166,6 @@ SpacesInLineCommentPrefix:
   Maximum: -1
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-SpaceBeforeSquareBrackets: false
 Standard: Auto
 StatementMacros:
   - Q_UNUSED

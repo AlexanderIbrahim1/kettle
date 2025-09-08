@@ -6,7 +6,7 @@ macro(default name)
   endif()
 endmacro()
 
-default(FORMAT_COMMAND clang-format)
+default(FORMAT_COMMAND clang-format-20)
 default(
     PATTERNS
     source/*.cpp source/*.hpp
