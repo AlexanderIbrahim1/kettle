@@ -23,7 +23,7 @@ jobs:
       run: pip3 install codespell
 
     - name: Lint
-      run: sudo apt-get install clang-tidy-19 cppcheck -y -q;
+      run: sudo apt-get install clang-format-20 cppcheck -y -q;
            cmake -D FORMAT_COMMAND=clang-format-20 -P cmake/lint.cmake
 
     - name: Spell check
@@ -109,11 +109,11 @@ jobs:
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-24.04'
       run: >-
-        sudo apt-get install clang-tidy-19 cppcheck -y -q
+        sudo apt-get install clang-tidy-20 cppcheck -y -q
 
         sudo update-alternatives --install
         /usr/bin/clang-tidy clang-tidy
-        /usr/bin/clang-tidy-19 140
+        /usr/bin/clang-tidy-20 140
 
 #     - name: Setup MultiToolTask
 #       if: matrix.os == 'windows-2022'
