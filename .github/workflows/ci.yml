@@ -23,7 +23,8 @@ jobs:
       run: pip3 install codespell
 
     - name: Lint
-      run: cmake -D FORMAT_COMMAND=clang-format-20 -P cmake/lint.cmake
+      run: sudo apt-get install clang-tidy-19 cppcheck -y -q;
+           cmake -D FORMAT_COMMAND=clang-format-20 -P cmake/lint.cmake
 
     - name: Spell check
       if: always()
