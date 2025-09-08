@@ -8,7 +8,7 @@ set(
     "; separated patterns relative to the project source dir to format"
 )
 
-set(FORMAT_COMMAND clang-format-20)
+set(FORMAT_COMMAND clang-format-19)
 
 add_custom_target(
     format-check
