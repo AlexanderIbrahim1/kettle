@@ -71,7 +71,7 @@ jobs:
 
     runs-on: ubuntu-24.04
 
-    env: { CXX: clang++-14 }
+    env: { CXX: clang++-19 }
 
     steps:
     - uses: actions/checkout@v3
@@ -108,17 +108,17 @@ jobs:
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-24.04'
       run: >-
-        sudo apt-get install clang-tidy-14 cppcheck -y -q
+        sudo apt-get install clang-tidy-19 cppcheck -y -q
 
         sudo update-alternatives --install
         /usr/bin/clang-tidy clang-tidy
-        /usr/bin/clang-tidy-14 140
+        /usr/bin/clang-tidy-19 140
 
-    - name: Setup MultiToolTask
-      if: matrix.os == 'windows-2022'
-      run: |
-        Add-Content "$env:GITHUB_ENV" 'UseMultiToolTask=true'
-        Add-Content "$env:GITHUB_ENV" 'EnforceProcessCountAcrossBuilds=true'
+#     - name: Setup MultiToolTask
+#       if: matrix.os == 'windows-2022'
+#       run: |
+#         Add-Content "$env:GITHUB_ENV" 'UseMultiToolTask=true'
+#         Add-Content "$env:GITHUB_ENV" 'EnforceProcessCountAcrossBuilds=true'
 
     - name: Configure
       shell: pwsh
