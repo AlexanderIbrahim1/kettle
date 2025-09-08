@@ -6,17 +6,16 @@
 #include <sstream>
 #include <string>
 
+#include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
-#include "kettle/circuit/circuit.hpp"
 #include "kettle/io/write_tangelo_file.hpp"
 
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
 #include "kettle_internal/io/io_control_flow.hpp"
 #include "kettle_internal/io/write_tangelo_file_internal.hpp"
-
 
 namespace ket::internal
 {
@@ -108,7 +107,6 @@ auto format_cu_gate_(const ket::GateInfo& info, const ket::Matrix2X2& mat) -> st
 
 }  // namespace ket::internal
 
-
 namespace ket
 {
 
@@ -155,7 +153,6 @@ void write_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-c
             else {
                 throw std::runtime_error {"DEV ERROR: invalid control flow statement encountered for write\n"};
             }
-
         }
         else if (circuit_element.is_gate()) {
             const auto& gate_info = circuit_element.get_gate();

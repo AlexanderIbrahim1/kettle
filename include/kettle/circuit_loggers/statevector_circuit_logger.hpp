@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kettle/state/statevector.hpp"
 #include "kettle/common/clone_ptr.hpp"
+#include "kettle/state/statevector.hpp"
 
 namespace ket
 {

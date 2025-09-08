@@ -389,10 +389,7 @@ TEST_CASE("simulate RX gate")
         ket::simulate(circuit, state);
 
         const auto expected_state = ket::Statevector {
-            {{COS_PI_8 * COS_PI_16, 0.0},
-             {0.0, -SIN_PI_8 * COS_PI_16},
-             {0.0, -COS_PI_8 * SIN_PI_16},
-             {-SIN_PI_8 * SIN_PI_16, 0.0}}
+            {{COS_PI_8 * COS_PI_16, 0.0}, {0.0, -SIN_PI_8 * COS_PI_16}, {0.0, -COS_PI_8 * SIN_PI_16}, {-SIN_PI_8 * SIN_PI_16, 0.0}}
         };
         REQUIRE(ket::almost_eq(state, expected_state));
     }

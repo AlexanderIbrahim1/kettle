@@ -1,6 +1,5 @@
-#include "kettle/gates/compound_gate.hpp"
 #include "kettle_internal/gates/compound_gate/gate_id.hpp"
-
+#include "kettle/gates/compound_gate.hpp"
 
 namespace ket::internal::gate_id
 {

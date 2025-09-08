@@ -14,9 +14,6 @@ namespace ket
 
 class QuantumCircuit;
 
-auto transpile_to_primitive(
-    const QuantumCircuit& circuit,
-    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> QuantumCircuit;
+auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ) -> QuantumCircuit;
 
 }  // namespace ket

@@ -1,5 +1,5 @@
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 
 namespace ket::internal::gate_id
 {
@@ -7,10 +7,8 @@ namespace ket::internal::gate_id
 auto is_one_target_transform_gate(ket::Gate gate) -> bool
 {
     using G = ket::Gate;
-    return gate == G::H || \
-        gate == G::X || gate == G::Y || gate == G::Z || \
-        gate == G::S || gate == G::T || gate == G::SX || \
-        gate == G::SDAG || gate == G::TDAG || gate == G::SXDAG;
+    return gate == G::H || gate == G::X || gate == G::Y || gate == G::Z || gate == G::S || gate == G::T || gate == G::SX || gate == G::SDAG
+        || gate == G::TDAG || gate == G::SXDAG;
 }
 
 auto is_one_target_one_angle_transform_gate(ket::Gate gate) -> bool
@@ -22,10 +20,8 @@ auto is_one_target_one_angle_transform_gate(ket::Gate gate) -> bool
 auto is_one_control_one_target_transform_gate(ket::Gate gate) -> bool
 {
     using G = ket::Gate;
-    return gate == G::CH || \
-        gate == G::CX || gate == G::CY || gate == G::CZ || \
-        gate == G::CS || gate == G::CT || gate == G::CSX || \
-        gate == G::CSDAG || gate == G::CTDAG || gate == G::CSXDAG;
+    return gate == G::CH || gate == G::CX || gate == G::CY || gate == G::CZ || gate == G::CS || gate == G::CT || gate == G::CSX
+        || gate == G::CSDAG || gate == G::CTDAG || gate == G::CSXDAG;
 }
 
 auto is_one_control_one_target_one_angle_transform_gate(ket::Gate gate) -> bool
@@ -43,9 +39,7 @@ auto is_single_qubit_transform_gate(ket::Gate gate) -> bool
 auto is_double_qubit_transform_gate(ket::Gate gate) -> bool
 {
     using G = ket::Gate;
-    return is_one_control_one_target_one_angle_transform_gate(gate) \
-        || is_one_control_one_target_transform_gate(gate) \
-        || gate == G::CU;
+    return is_one_control_one_target_one_angle_transform_gate(gate) || is_one_control_one_target_transform_gate(gate) || gate == G::CU;
 }
 
 auto is_non_angle_transform_gate(ket::Gate gate) -> bool
@@ -69,4 +63,3 @@ auto is_unitary_gate(ket::Gate gate) -> bool
 }
 
 }  // namespace ket::internal::gate_id
-

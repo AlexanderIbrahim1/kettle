@@ -19,10 +19,11 @@ TEST_CASE("n_local construction")
         const auto n_repetitions = static_cast<std::size_t>(GENERATE(1, 2, 3, 4));
         const auto skip = GENERATE(Skip::FALSE, Skip::TRUE);
 
-        [[maybe_unused]]
-        const auto [n_local_circuit, ignore] = ket::n_local(n_qubits, {G::X}, {G::CX}, Entangle::LINEAR, n_repetitions, skip);
+        [[maybe_unused]] const auto [n_local_circuit, ignore] =
+            ket::n_local(n_qubits, {G::X}, {G::CX}, Entangle::LINEAR, n_repetitions, skip);
 
-        const auto n_x_gates_expected = [&]() {
+        const auto n_x_gates_expected = [&]()
+        {
             auto output = n_qubits * n_repetitions;
             if (skip == Skip::FALSE) {
                 output += n_qubits;
@@ -43,14 +44,15 @@ TEST_CASE("n_local construction")
 
         const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::X}, {G::CX}, Entangle::LINEAR, n_repetitions);
 
-        const auto expected = [n_repetitions, n_qubits]() {
+        const auto expected = [n_repetitions, n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_rep {0}; i_rep < n_repetitions; ++i_rep) {
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                     circuit.add_x_gate(i_qubit);
                 }
-                
+
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits - 1; ++i_qubit) {
                     circuit.add_cx_gate(i_qubit, i_qubit + 1);
                 }
@@ -73,7 +75,8 @@ TEST_CASE("n_local construction")
 
         const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::X, G::Y}, {G::CX}, Entangle::LINEAR, n_repetitions);
 
-        const auto expected = [n_repetitions, n_qubits]() {
+        const auto expected = [n_repetitions, n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_rep {0}; i_rep < n_repetitions; ++i_rep) {
@@ -84,7 +87,7 @@ TEST_CASE("n_local construction")
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                     circuit.add_y_gate(i_qubit);
                 }
-                
+
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits - 1; ++i_qubit) {
                     circuit.add_cx_gate(i_qubit, i_qubit + 1);
                 }
@@ -110,14 +113,15 @@ TEST_CASE("n_local construction")
 
         const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::RX}, {G::CX}, Entangle::LINEAR, n_repetitions);
 
-        const auto expected = [n_repetitions, n_qubits]() {
+        const auto expected = [n_repetitions, n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_rep {0}; i_rep < n_repetitions; ++i_rep) {
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                     circuit.add_rx_gate(i_qubit, ket::DEFAULT_NLOCAL_GATE_PARAMETER);
                 }
-                
+
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits - 1; ++i_qubit) {
                     circuit.add_cx_gate(i_qubit, i_qubit + 1);
                 }
@@ -140,7 +144,8 @@ TEST_CASE("n_local construction")
 
         const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::RX, G::RY}, {G::CX}, Entangle::LINEAR, n_repetitions);
 
-        const auto expected = [n_repetitions, n_qubits]() {
+        const auto expected = [n_repetitions, n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_rep {0}; i_rep < n_repetitions; ++i_rep) {
@@ -150,7 +155,7 @@ TEST_CASE("n_local construction")
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                     circuit.add_ry_gate(i_qubit, ket::DEFAULT_NLOCAL_GATE_PARAMETER);
                 }
-                
+
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits - 1; ++i_qubit) {
                     circuit.add_cx_gate(i_qubit, i_qubit + 1);
                 }
@@ -175,7 +180,8 @@ TEST_CASE("n_local construction")
 
         const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::RX, G::RY}, {CG::CCX}, Entangle::LINEAR, 1);
 
-        const auto expected = [n_qubits]() {
+        const auto expected = [n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
@@ -184,7 +190,7 @@ TEST_CASE("n_local construction")
             for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                 circuit.add_ry_gate(i_qubit, ket::DEFAULT_NLOCAL_GATE_PARAMETER);
             }
-            
+
             for (std::size_t i_qubit {0}; i_qubit < n_qubits - 2; ++i_qubit) {
                 circuit.add_ccx_gate(i_qubit, i_qubit + 1, i_qubit + 2);
             }
@@ -208,9 +214,11 @@ TEST_CASE("n_local construction")
         const auto n_qubits = static_cast<std::size_t>(GENERATE(2, 3, 4, 5));
         const auto n_repetitions = static_cast<std::size_t>(GENERATE(1, 2, 3, 4));
 
-        const auto [n_local_circuit, parameters] = ket::n_local(n_qubits, {G::RX, G::RY}, {G::CRX, G::CRZ}, Entangle::LINEAR, n_repetitions);
+        const auto [n_local_circuit, parameters] =
+            ket::n_local(n_qubits, {G::RX, G::RY}, {G::CRX, G::CRZ}, Entangle::LINEAR, n_repetitions);
 
-        const auto expected = [n_repetitions, n_qubits]() {
+        const auto expected = [n_repetitions, n_qubits]()
+        {
             auto circuit = ket::QuantumCircuit {n_qubits};
 
             for (std::size_t i_rep {0}; i_rep < n_repetitions; ++i_rep) {
@@ -220,7 +228,7 @@ TEST_CASE("n_local construction")
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits; ++i_qubit) {
                     circuit.add_ry_gate(i_qubit, ket::DEFAULT_NLOCAL_GATE_PARAMETER);
                 }
-                
+
                 for (std::size_t i_qubit {0}; i_qubit < n_qubits - 1; ++i_qubit) {
                     circuit.add_crx_gate(i_qubit, i_qubit + 1, ket::DEFAULT_NLOCAL_GATE_PARAMETER);
                 }
@@ -246,7 +254,6 @@ TEST_CASE("n_local construction")
     }
 }
 
-
 TEST_CASE("n_local assign parameters")
 {
     // set the parameter values at the very beginning
@@ -264,7 +271,8 @@ TEST_CASE("n_local assign parameters")
     }
 
     // create an identical circuit manually
-    const auto identical_circuit = [&]() {
+    const auto identical_circuit = [&]()
+    {
         auto circuit = ket::QuantumCircuit {2};
         circuit.add_rx_gate(0, parameter_values[0]);
         circuit.add_rx_gate(1, parameter_values[1]);

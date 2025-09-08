@@ -1,6 +1,6 @@
-#include "kettle_internal/common/linear_bijective_map.hpp"
 #include "kettle/gates/compound_gate.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle_internal/common/linear_bijective_map.hpp"
 
 #include "kettle_internal/gates/compound_gate_map.hpp"
 
@@ -14,6 +14,5 @@ const ket::internal::LinearBijectiveMap<ket::CompoundGate, GateFuncPtr2C1T, 3> G
     std::pair {CG::CCY, static_cast<GateFuncPtr2C1T>(&ket::QuantumCircuit::add_ccy_gate)},
     std::pair {CG::CCZ, static_cast<GateFuncPtr2C1T>(&ket::QuantumCircuit::add_ccz_gate)},
 };
-
 
 }  // namespace ket::internal

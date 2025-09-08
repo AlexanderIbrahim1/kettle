@@ -3,7 +3,6 @@
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/state/statevector.hpp"
 
-
 namespace ket
 {
 

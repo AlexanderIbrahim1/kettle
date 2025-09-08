@@ -15,14 +15,10 @@ namespace ki = ket::internal;
 namespace
 {
 
-auto is_valid_one_qubit_kraus_channel(
-    const std::vector<ket::Matrix2X2>& matrices,
-    double tolerance
-) -> bool
+auto is_valid_one_qubit_kraus_channel(const std::vector<ket::Matrix2X2>& matrices, double tolerance) -> bool
 {
-    const auto product = [](const ket::Matrix2X2& current, const ket::Matrix2X2& mat) -> ket::Matrix2X2 {
-        return current + (ket::conjugate_transpose(mat) * mat);
-    };
+    const auto product = [](const ket::Matrix2X2& current, const ket::Matrix2X2& mat) -> ket::Matrix2X2
+    { return current + (ket::conjugate_transpose(mat) * mat); };
 
     const auto total = std::accumulate(matrices.begin(), matrices.end(), ket::Matrix2X2 {}, product);
 
@@ -30,7 +26,6 @@ auto is_valid_one_qubit_kraus_channel(
 }
 
 }  // namespace
-
 
 namespace ket
 {
@@ -40,11 +35,7 @@ namespace ket
     whether or not the matrices form a valid channel.
 */
 
-OneQubitKrausChannel::OneQubitKrausChannel(
-    std::vector<Matrix2X2> kraus_matrices,
-    std::size_t target_index,
-    double tolerance
-)
+OneQubitKrausChannel::OneQubitKrausChannel(std::vector<Matrix2X2> kraus_matrices, std::size_t target_index, double tolerance)
     : kraus_matrices_ {std::move(kraus_matrices)}
     , target_index_ {target_index}
 {
@@ -70,15 +61,10 @@ OneQubitKrausChannel::OneQubitKrausChannel(
     }
 }
 
-auto almost_eq(
-    const OneQubitKrausChannel& left_op,
-    const OneQubitKrausChannel& right_op,
-    double coeff_tolerance
-) -> bool
+auto almost_eq(const OneQubitKrausChannel& left_op, const OneQubitKrausChannel& right_op, double coeff_tolerance) -> bool
 {
-    const auto almost_eq = [coeff_tolerance](const ket::Matrix2X2& left, const ket::Matrix2X2& right) {
-        return ket::almost_eq(left, right, coeff_tolerance);
-    };
+    const auto almost_eq = [coeff_tolerance](const ket::Matrix2X2& left, const ket::Matrix2X2& right)
+    { return ket::almost_eq(left, right, coeff_tolerance); };
 
     return ki::almost_eq_helper_(left_op, right_op, almost_eq);
 }

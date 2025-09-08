@@ -10,18 +10,15 @@ namespace ket::internal
 
 auto is_valid_marginal_bitstring_(const std::string& bitstring) -> bool
 {
-    const auto is_bitstring_char = [](char bitchar) {
-        return bitchar == '0' || bitchar == '1' || bitchar == ket::internal::MARGINALIZED_QUBIT;
-    };
+    const auto is_bitstring_char = [](char bitchar)
+    { return bitchar == '0' || bitchar == '1' || bitchar == ket::internal::MARGINALIZED_QUBIT; };
 
     return std::all_of(bitstring.begin(), bitstring.end(), is_bitstring_char);
 }
 
 auto is_valid_nonmarginal_bitstring_(const std::string& bitstring) -> bool
 {
-    const auto is_nonmarginal_bitstring_char = [](char bitchar) {
-        return bitchar == '0' || bitchar == '1';
-    };
+    const auto is_nonmarginal_bitstring_char = [](char bitchar) { return bitchar == '0' || bitchar == '1'; };
 
     return std::all_of(bitstring.begin(), bitstring.end(), is_nonmarginal_bitstring_char);
 }

@@ -5,23 +5,23 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/statevector.hpp"
-#include "kettle/state/random.hpp"
-#include "kettle/simulation/simulate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/primitive_gate.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/random.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
 namespace cre = ket::internal::create;
 
-
 /*
     A primitive way of putting the minimum image of the angle within [0, 2pi);
     none of the unit tests are expected to create very large angles anyways
 */
-static constexpr auto between_0_and_period(double x, double period) -> double {
+static constexpr auto between_0_and_period(double x, double period) -> double
+{
     while (x < 0.0) {
         x += period;
     }
@@ -32,7 +32,6 @@ static constexpr auto between_0_and_period(double x, double period) -> double {
 
     return x;
 }
-
 
 TEST_CASE("decomp_to_single_primitive_gate_()")
 {
@@ -49,7 +48,9 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
         SECTION("successful decomposition")
         {
             const auto testcase = GENERATE(
-                TestCase {ket::h_gate(), Info {ket::Gate::H, {}}},
+                TestCase {
+                    ket::h_gate(), Info {ket::Gate::H, {}}
+            },
                 TestCase {ket::x_gate(), Info {ket::Gate::X, {}}},
                 TestCase {ket::y_gate(), Info {ket::Gate::Y, {}}},
                 TestCase {ket::z_gate(), Info {ket::Gate::Z, {}}},
@@ -65,7 +66,7 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
 
         SECTION("unsuccessful decomposition")
         {
-            auto testcase = TestCase {.input=ket::h_gate() * ket::rx_gate(1.2345), .expected=std::nullopt};
+            auto testcase = TestCase {.input = ket::h_gate() * ket::rx_gate(1.2345), .expected = std::nullopt};
 
             const auto output = ket::internal::decomp_to_single_primitive_gate_(testcase.input);
             REQUIRE(!output.has_value());
@@ -79,7 +80,9 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
         const auto angle = GENERATE(0.01, 1.45 * M_PI, 1.99 * M_PI);
 
         const auto testcase = GENERATE_COPY(
-            TestCase {ket::rx_gate(angle), Info {ket::Gate::RX, angle}},
+            TestCase {
+                ket::rx_gate(angle), Info {ket::Gate::RX, angle}
+        },
             TestCase {ket::ry_gate(angle), Info {ket::Gate::RY, angle}},
             TestCase {ket::rz_gate(angle), Info {ket::Gate::RZ, angle}},
             TestCase {ket::p_gate(angle), Info {ket::Gate::P, angle}}
@@ -97,14 +100,15 @@ TEST_CASE("decomp_to_single_primitive_gate_()")
     }
 }
 
-TEST_CASE("decompose to primtive gates; general")
+TEST_CASE("decompose to primitive gates; general")
 {
     double angle0 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
     double angle1 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
     double angle2 = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
     double angle_global = M_PI * GENERATE(0.01, 0.25, 0.75, 1.1, 1.75);
 
-    const auto unitary = [&]() {
+    const auto unitary = [&]()
+    {
         auto matrix = ket::rz_gate(angle2) * ket::ry_gate(angle1) * ket::rz_gate(angle0);
         const auto global_phase = std::complex<double> {std::cos(angle_global), std::sin(angle_global)};
         matrix *= global_phase;

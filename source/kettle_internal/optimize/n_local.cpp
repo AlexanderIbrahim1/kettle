@@ -17,7 +17,7 @@
 namespace gid = ket::internal::gate_id;
 namespace kp = ket::param;
 
-namespace 
+namespace
 {
 
 void verify_valid_rotation_gates_(const std::vector<ket::GeneralGate>& gates)
@@ -29,11 +29,11 @@ void verify_valid_rotation_gates_(const std::vector<ket::GeneralGate>& gates)
                 throw std::runtime_error {"ERROR: cannot create n-local circuit with U, CU, M, or RESET gates.\n"};
             }
         }
-// basically not needed right now; all CompoundGates are valid
-//         else if (std::holds_alternative<ket::CompoundGate>(gen_gate)) {
-//             // NOLINT
-//         }
-//         else {}
+        // basically not needed right now; all CompoundGates are valid
+        //         else if (std::holds_alternative<ket::CompoundGate>(gen_gate)) {
+        //             // NOLINT
+        //         }
+        //         else {}
     }
 }
 
@@ -46,11 +46,11 @@ void verify_valid_entanglement_gates_(const std::vector<ket::GeneralGate>& gates
                 throw std::runtime_error {"ERROR: entanglement gate must be controlled\n"};
             }
         }
-// basically not needed right now; all CompoundGates are valid
-//         else if (std::holds_alternative<ket::CompoundGate>(gen_gate)) {
-//             // NOLINT
-//         }
-//         else {}
+        // basically not needed right now; all CompoundGates are valid
+        //         else if (std::holds_alternative<ket::CompoundGate>(gen_gate)) {
+        //             // NOLINT
+        //         }
+        //         else {}
     }
 }
 
@@ -103,13 +103,11 @@ void apply_rotation_gates_2c1t_(ket::CompoundGate gate, ket::QuantumCircuit& cir
     }
 }
 
-auto apply_rotation_gates_(
-    ket::QuantumCircuit& circuit,
-    const std::vector<ket::GeneralGate>& rotation_blocks
-) -> std::vector<kp::ParameterID>
+auto apply_rotation_gates_(ket::QuantumCircuit& circuit, const std::vector<ket::GeneralGate>& rotation_blocks)
+    -> std::vector<kp::ParameterID>
 {
     auto parameter_ids = std::vector<kp::ParameterID> {};
-    
+
     for (auto gen_gate : rotation_blocks) {
         if (std::holds_alternative<ket::Gate>(gen_gate)) {
             const auto gate = std::get<ket::Gate>(gen_gate);
@@ -146,11 +144,7 @@ auto apply_rotation_gates_(
     return parameter_ids;
 }
 
-void apply_entanglement_gates_1c1t_(
-    ket::Gate gate,
-    ket::QuantumCircuit& circuit,
-    ket::NLocalEntangelement entanglement_kind
-)
+void apply_entanglement_gates_1c1t_(ket::Gate gate, ket::QuantumCircuit& circuit, ket::NLocalEntangelement entanglement_kind)
 {
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T.at(gate);
 
@@ -200,11 +194,7 @@ void apply_entanglement_gates_1c1t1a_(
 
 // TODO: find a way to get rid of all of this repetition, after I get it working!
 // - probably by making it a circuit member function
-void apply_entanglement_gates_2c1t_(
-    ket::CompoundGate gate,
-    ket::QuantumCircuit& circuit,
-    ket::NLocalEntangelement entanglement_kind
-)
+void apply_entanglement_gates_2c1t_(ket::CompoundGate gate, ket::QuantumCircuit& circuit, ket::NLocalEntangelement entanglement_kind)
 {
     const auto func = ket::internal::GATE_TO_FUNCTION_2C1T.at(gate);
 
@@ -225,7 +215,6 @@ void apply_entanglement_gates_2c1t_(
     else {
         throw std::runtime_error {"DEV ERROR: Invalid entanglement chosen for applying 2c1t entanglement gates.\n"};
     }
-
 }
 
 auto apply_entanglement_gates_(
@@ -235,7 +224,7 @@ auto apply_entanglement_gates_(
 ) -> std::vector<kp::ParameterID>
 {
     auto parameter_ids = std::vector<kp::ParameterID> {};
-    
+
     for (auto gen_gate : entanglement_blocks) {
         if (std::holds_alternative<ket::Gate>(gen_gate)) {
             const auto gate = std::get<ket::Gate>(gen_gate);
@@ -268,7 +257,6 @@ auto apply_entanglement_gates_(
 
 }  // namespace
 
-
 namespace ket
 {
 
@@ -289,15 +277,15 @@ auto n_local(
     auto parameter_ids = std::vector<kp::ParameterID> {};
 
     for (std::size_t i {0}; i < n_repetitions; ++i) {
-        const auto rotation_param_ids= apply_rotation_gates_(circuit, rotation_blocks);
+        const auto rotation_param_ids = apply_rotation_gates_(circuit, rotation_blocks);
         parameter_ids.insert(parameter_ids.end(), rotation_param_ids.begin(), rotation_param_ids.end());
 
-        const auto entanglement_param_ids= apply_entanglement_gates_(circuit, entanglement_blocks, entanglement_kind);
+        const auto entanglement_param_ids = apply_entanglement_gates_(circuit, entanglement_blocks, entanglement_kind);
         parameter_ids.insert(parameter_ids.end(), entanglement_param_ids.begin(), entanglement_param_ids.end());
     }
 
     if (flag == SkipLastRotationLayerFlag::FALSE) {
-        const auto rotation_param_ids= apply_rotation_gates_(circuit, rotation_blocks);
+        const auto rotation_param_ids = apply_rotation_gates_(circuit, rotation_blocks);
         parameter_ids.insert(parameter_ids.end(), rotation_param_ids.begin(), rotation_param_ids.end());
     }
 

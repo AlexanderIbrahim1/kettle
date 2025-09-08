@@ -3,8 +3,8 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit/control_flow_predicate.hpp"
@@ -12,26 +12,29 @@
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/statevector.hpp"
 
-
-static auto get_zero_state_result(double angle) -> ket::Statevector {
+static auto get_zero_state_result(double angle) -> ket::Statevector
+{
     const auto real0 = std::cos(angle / 2.0);
     const auto imag0 = 0.0;
     const auto real1 = 0.0;
-    const auto imag1 = - std::sin(angle / 2.0);
+    const auto imag1 = -std::sin(angle / 2.0);
 
-    return ket::Statevector {{ {real0, imag0}, {real1, imag1}}};
+    return ket::Statevector {
+        {{real0, imag0}, {real1, imag1}}
+    };
 }
 
-
-static auto get_plus_state_result(double angle) -> ket::Statevector {
+static auto get_plus_state_result(double angle) -> ket::Statevector
+{
     const auto real0 = std::cos(angle / 2.0) / M_SQRT2;
-    const auto imag0 = - std::sin(angle / 2.0) / M_SQRT2;
+    const auto imag0 = -std::sin(angle / 2.0) / M_SQRT2;
     const auto real1 = real0;
     const auto imag1 = imag0;
 
-    return ket::Statevector {{ {real0, imag0}, {real1, imag1}}};
+    return ket::Statevector {
+        {{real0, imag0}, {real1, imag1}}
+    };
 }
-
 
 TEST_CASE("simulate single RX gate with different angles")
 {
@@ -59,7 +62,6 @@ TEST_CASE("simulate single RX gate with different angles")
     REQUIRE_THAT(circuit.parameter_data_map().at(id).value.value(), Catch::Matchers::WithinRel(input_angle));
 }
 
-
 TEST_CASE("manually set parameter of RX gate")
 {
     const auto first_angle = 1.2345 * M_PI;
@@ -85,13 +87,12 @@ TEST_CASE("manually set parameter of RX gate")
     REQUIRE(ket::almost_eq(second_statevector, expected_second_statevector));
 }
 
-
 TEST_CASE("throw if no parameter id found")
 {
     const auto param = ket::param::Parameter {"theta"};
 
     auto circuit = ket::QuantumCircuit {1};
-    
+
     SECTION("no parameters are in")
     {
         REQUIRE_THROWS_AS(circuit.set_parameter_value(param.id(), 1.2345), std::out_of_range);
@@ -103,7 +104,6 @@ TEST_CASE("throw if no parameter id found")
         REQUIRE_THROWS_AS(circuit.set_parameter_value(param.id(), 1.2345), std::out_of_range);
     }
 }
-
 
 TEST_CASE("simulate single-qubit gate with two identical parameters")
 {
@@ -117,44 +117,52 @@ TEST_CASE("simulate single-qubit gate with two identical parameters")
 
     const auto testcase = GENERATE_REF(
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_rx_gate(0, angle);
                 circuit.add_rx_gate(0, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_rx_gate(0, angle, ket::param::parameterized {});
                 circuit.add_rx_gate(0, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_ry_gate(0, angle);
                 circuit.add_ry_gate(0, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_ry_gate(0, angle, ket::param::parameterized {});
                 circuit.add_ry_gate(0, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_rz_gate(0, angle);
                 circuit.add_rz_gate(0, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_rz_gate(0, angle, ket::param::parameterized {});
                 circuit.add_rz_gate(0, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_p_gate(0, angle);
                 circuit.add_p_gate(0, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_p_gate(0, angle, ket::param::parameterized {});
                 circuit.add_p_gate(0, id);
                 return id;
@@ -181,7 +189,6 @@ TEST_CASE("simulate single-qubit gate with two identical parameters")
     REQUIRE(circuit1.parameter_data_map().at(id).count == 2);
 }
 
-
 TEST_CASE("simulate double-qubit gate with two identical parameters")
 {
     const auto angle = 1.2345 * M_PI;
@@ -194,44 +201,52 @@ TEST_CASE("simulate double-qubit gate with two identical parameters")
 
     const auto testcase = GENERATE_REF(
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_crx_gate(0, 1, angle);
                 circuit.add_crx_gate(0, 1, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_crx_gate(0, 1, angle, ket::param::parameterized {});
                 circuit.add_crx_gate(0, 1, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_cry_gate(0, 1, angle);
                 circuit.add_cry_gate(0, 1, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_cry_gate(0, 1, angle, ket::param::parameterized {});
                 circuit.add_cry_gate(0, 1, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_crz_gate(0, 1, angle);
                 circuit.add_crz_gate(0, 1, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_crz_gate(0, 1, angle, ket::param::parameterized {});
                 circuit.add_crz_gate(0, 1, id);
                 return id;
             }
         },
         TestCase {
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 circuit.add_cp_gate(0, 1, angle);
                 circuit.add_cp_gate(0, 1, angle);
             },
-            [&angle](auto& circuit) {
+            [&angle](auto& circuit)
+            {
                 const auto id = circuit.add_cp_gate(0, 1, angle, ket::param::parameterized {});
                 circuit.add_cp_gate(0, 1, id);
                 return id;
@@ -258,7 +273,6 @@ TEST_CASE("simulate double-qubit gate with two identical parameters")
     REQUIRE(circuit1.parameter_data_map().at(id).count == 2);
 }
 
-
 TEST_CASE("parameters of control flow subcircuits")
 {
     const auto angle = 1.2345 * M_PI;
@@ -272,10 +286,7 @@ TEST_CASE("parameters of control flow subcircuits")
         auto subcircuit = ket::QuantumCircuit {2};
         const auto param_id1 = subcircuit.add_rx_gate(1, angle, ket::param::parameterized {});
 
-        circuit.add_if_statement(
-            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
-            std::move(subcircuit)
-        );
+        circuit.add_if_statement(ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF}, std::move(subcircuit));
 
         REQUIRE(circuit.parameter_data_map().contains(param_id0));
         REQUIRE(circuit.parameter_data_map().contains(param_id1));
@@ -286,10 +297,7 @@ TEST_CASE("parameters of control flow subcircuits")
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_rx_gate(1, param_id0);
 
-        circuit.add_if_statement(
-            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
-            std::move(subcircuit)
-        );
+        circuit.add_if_statement(ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF}, std::move(subcircuit));
 
         REQUIRE(circuit.parameter_data_map().contains(param_id0));
 
@@ -302,10 +310,7 @@ TEST_CASE("parameters of control flow subcircuits")
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_rx_gate(1, ket::param::ParameterID {});
 
-        circuit.add_if_statement(
-            ket::ControlFlowPredicate { {0}, {1}, ket::ControlFlowBooleanKind::IF},
-            std::move(subcircuit)
-        );
+        circuit.add_if_statement(ket::ControlFlowPredicate {{0}, {1}, ket::ControlFlowBooleanKind::IF}, std::move(subcircuit));
 
         auto statevector = ket::Statevector {"00"};
         REQUIRE_THROWS_AS(ket::simulate(circuit, statevector), std::runtime_error);

@@ -12,21 +12,16 @@
 
 namespace ki = ket::internal;
 
-
 namespace
 {
 
-auto is_valid_multi_qubit_kraus_channel(
-    const std::vector<Eigen::MatrixXcd>& matrices,
-    Eigen::Index n_input_qubits,
-    double tolerance
-) -> bool
+auto is_valid_multi_qubit_kraus_channel(const std::vector<Eigen::MatrixXcd>& matrices, Eigen::Index n_input_qubits, double tolerance)
+    -> bool
 {
     // NOTE: this function assumes that the sizes of the matrices have already been checked
     // and are all the same
-    const auto product = [](const Eigen::MatrixXcd& current, const Eigen::MatrixXcd& mat) -> Eigen::MatrixXcd {
-        return current + (mat.adjoint() * mat);
-    };
+    const auto product = [](const Eigen::MatrixXcd& current, const Eigen::MatrixXcd& mat) -> Eigen::MatrixXcd
+    { return current + (mat.adjoint() * mat); };
 
     const auto n_states = ki::pow_2_int(n_input_qubits);
 
@@ -40,9 +35,7 @@ auto is_valid_multi_qubit_kraus_channel(
 
 auto are_all_matrices_same_size_(const std::vector<Eigen::MatrixXcd>& matrices) -> bool
 {
-    const auto get_size = [](const auto& matrix) {
-        return std::pair {matrix.rows(), matrix.cols()};
-    };
+    const auto get_size = [](const auto& matrix) { return std::pair {matrix.rows(), matrix.cols()}; };
 
     return ki::all_same(matrices, get_size);
 }
@@ -53,10 +46,7 @@ namespace ket
 {
 
 // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-MultiQubitKrausChannel::MultiQubitKrausChannel(
-    std::vector<Eigen::MatrixXcd> kraus_matrices,
-    double tolerance
-)
+MultiQubitKrausChannel::MultiQubitKrausChannel(std::vector<Eigen::MatrixXcd> kraus_matrices, double tolerance)
     : kraus_matrices_ {std::move(kraus_matrices)}
 {
     if (kraus_matrices_.empty()) {
@@ -85,24 +75,16 @@ MultiQubitKrausChannel::MultiQubitKrausChannel(
     }
 }
 
-MultiQubitKrausChannel::MultiQubitKrausChannel(
-    std::vector<Eigen::MatrixXcd> kraus_matrices,
-    [[maybe_unused]] kraus_channel_nocheck tag
-)
+MultiQubitKrausChannel::MultiQubitKrausChannel(std::vector<Eigen::MatrixXcd> kraus_matrices, [[maybe_unused]] kraus_channel_nocheck tag)
     : kraus_matrices_ {std::move(kraus_matrices)}
     , n_input_qubits_ {ki::log_2_int(kraus_matrices_[0].cols())}
     , n_output_qubits_ {ki::log_2_int(kraus_matrices_[0].rows())}
 {}
 
-auto almost_eq(
-    const MultiQubitKrausChannel& left_op,
-    const MultiQubitKrausChannel& right_op,
-    double coeff_tolerance
-) -> bool
+auto almost_eq(const MultiQubitKrausChannel& left_op, const MultiQubitKrausChannel& right_op, double coeff_tolerance) -> bool
 {
-    const auto almost_eq = [coeff_tolerance](const Eigen::MatrixXcd& left, const Eigen::MatrixXcd& right) {
-        return left.isApprox(right, coeff_tolerance);
-    };
+    const auto almost_eq = [coeff_tolerance](const Eigen::MatrixXcd& left, const Eigen::MatrixXcd& right)
+    { return left.isApprox(right, coeff_tolerance); };
 
     return ki::almost_eq_helper_(left_op, right_op, almost_eq);
 }

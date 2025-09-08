@@ -4,13 +4,18 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
+#define REQUIRE_MSG(cond, msg) \
+    do {                       \
+        INFO(msg);             \
+        REQUIRE(cond);         \
+    }                          \
+    while ((void)0, 0)
 
-#include "kettle/common/mathtools.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/common/mathtools.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/marginal.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle_internal/state/marginal_internal.hpp"
 
 TEST_CASE("Statevector endian representation")
@@ -413,10 +418,7 @@ TEST_CASE("state_as_bitstring")
         SECTION("2 qubit")
         {
             auto pair = GENERATE(
-                InputAndOutput {0, 2, "00"},
-                InputAndOutput {1, 2, "10"},
-                InputAndOutput {2, 2, "01"},
-                InputAndOutput {3, 2, "11"}
+                InputAndOutput {0, 2, "00"}, InputAndOutput {1, 2, "10"}, InputAndOutput {2, 2, "01"}, InputAndOutput {3, 2, "11"}
             );
 
             REQUIRE(ket::state_index_to_bitstring_little_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
@@ -451,10 +453,7 @@ TEST_CASE("state_as_bitstring")
         SECTION("2 qubit")
         {
             auto pair = GENERATE(
-                InputAndOutput {0, 2, "00"},
-                InputAndOutput {1, 2, "01"},
-                InputAndOutput {2, 2, "10"},
-                InputAndOutput {3, 2, "11"}
+                InputAndOutput {0, 2, "00"}, InputAndOutput {1, 2, "01"}, InputAndOutput {2, 2, "10"}, InputAndOutput {3, 2, "11"}
             );
 
             REQUIRE(ket::state_index_to_bitstring_big_endian(pair.i_state, pair.n_qubits) == pair.bitstring);
@@ -623,9 +622,15 @@ TEST_CASE("tensor product")
 
     SECTION("direct 1-qubit x 1-qubit")
     {
-        const auto state0 = ket::Statevector {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto state1 = ket::Statevector {Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}};
-        const auto expected = ket::Statevector {Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}};
+        const auto state0 = ket::Statevector {
+            Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
+        };
+        const auto state1 = ket::Statevector {
+            Amplitudes {{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}
+        };
+        const auto expected = ket::Statevector {
+            Amplitudes {{0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}, {0.5, 0.0}}
+        };
 
         const auto actual = ket::tensor_product(state0, state1);
 
@@ -650,7 +655,8 @@ TEST_CASE("tensor product")
 
         auto testcase = GENERATE_REF(
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit0.add_h_gate(0);
                     circuit1.add_h_gate(0);
                     product_circuit.add_h_gate({0, 1});
@@ -658,14 +664,16 @@ TEST_CASE("tensor product")
                 "H on each circuit"
             },
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit1.add_h_gate({0, 0});
                     product_circuit.add_h_gate({1, 1});
                 },
                 "H twice on circuit1"
             },
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit0.add_h_gate(0);
                     circuit1.add_x_gate(0);
                     product_circuit.add_h_gate(0);
@@ -674,7 +682,8 @@ TEST_CASE("tensor product")
                 "H on circuit0, X on circuit1"
             },
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit0.add_h_gate(0);
                     circuit0.add_x_gate(0);
                     circuit1.add_z_gate(0);
@@ -715,7 +724,8 @@ TEST_CASE("tensor product")
 
         auto testcase = GENERATE_REF(
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit0.add_h_gate({0, 1});
                     circuit1.add_h_gate({0, 1, 2});
                     product_circuit.add_h_gate({0, 1, 2, 3, 4});
@@ -723,7 +733,8 @@ TEST_CASE("tensor product")
                 "circuit0 : H(1)H(0), circuit1: H(2)H(1)H(0)"
             },
             TestCase {
-                [&]() {
+                [&]()
+                {
                     circuit0.add_h_gate({0, 1});
                     circuit1.add_x_gate({1, 2});
                     circuit1.add_h_gate(0);

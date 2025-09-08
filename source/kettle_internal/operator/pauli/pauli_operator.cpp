@@ -12,7 +12,7 @@
 #include "kettle_internal/operator/channels/channel_helper.hpp"
 
 /*
-    This file contains the `PauliOperator` class for 
+    This file contains the `PauliOperator` class for
 */
 
 namespace ket
@@ -36,9 +36,8 @@ PauliOperator::PauliOperator(std::vector<WeightedPauliString> weighted_pauli_str
         };
     }
 
-    const auto has_nonequal_n_qubits = [](const auto& left, const auto& right) -> bool {
-        return left.pauli_string.n_qubits() != right.pauli_string.n_qubits();
-    };
+    const auto has_nonequal_n_qubits = [](const auto& left, const auto& right) -> bool
+    { return left.pauli_string.n_qubits() != right.pauli_string.n_qubits(); };
 
     if (std::ranges::adjacent_find(strings_, has_nonequal_n_qubits) != strings_.end()) {
         throw std::runtime_error {
@@ -74,7 +73,6 @@ void PauliOperator::remove(std::size_t index)
     weighted_pauli_strings_.erase(std::next(weighted_pauli_strings_.begin(), position));
 }
 
-
 auto expectation_value(const PauliOperator& pauli_op, const Statevector& state) -> std::complex<double>
 {
     auto expval = std::complex<double> {};
@@ -92,7 +90,6 @@ auto expectation_value(const PauliOperator& pauli_op, const Statevector& state) 
     return expval;
 }
 
-
 auto expectation_value(const SparsePauliString& sparse_pauli_string, const Statevector& state) -> std::complex<double>
 {
     auto ket = state;
@@ -106,14 +103,11 @@ auto expectation_value(const SparsePauliString& sparse_pauli_string, const State
     return expval;
 }
 
-auto almost_eq(
-    const PauliOperator& left_op,
-    const PauliOperator& right_op,
-    double coeff_tolerance
-) -> bool
+auto almost_eq(const PauliOperator& left_op, const PauliOperator& right_op, double coeff_tolerance) -> bool
 {
     using WPS = WeightedPauliString;
-    const auto almost_eq = [coeff_tolerance](const WPS& left, const WPS& right) {
+    const auto almost_eq = [coeff_tolerance](const WPS& left, const WPS& right)
+    {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
         }

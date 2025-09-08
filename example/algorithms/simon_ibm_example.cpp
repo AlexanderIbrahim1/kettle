@@ -14,7 +14,7 @@
     The function `f` has the following properties:
       1. it is a "two-to-one" function:
         - every possible output in `{0, 1}^m` is mapped to by exactly `0` or `2` possible inputs in `{0, 1}^n`
-      2. two inputs `a` and `b` map to the same value IFF `a != b`
+      2. two inputs `a` and `b` map to the same value if and only if `a != b`
         - i.e. f(a) == f(b)  <->  a != b
       3. any two inputs that satisfy this property are called a matching pair
         - and there are 2^(n - 1) matching pairs
@@ -59,7 +59,8 @@ void apply_simon_function(ket::QuantumCircuit& circuit, const std::vector<std::u
 /*
     Check if the measured portion of the bitstring is "orthogonal" (mod 2) to the hidden bitset
 */
-void check_bitstring(const std::string& bitstring, const std::string& hidden_bitstring) {
+void check_bitstring(const std::string& bitstring, const std::string& hidden_bitstring)
+{
     const auto bitset = ket::bitstring_to_dynamic_bitset(bitstring);
     const auto hidden_bitset = ket::bitstring_to_dynamic_bitset(hidden_bitstring);
     const auto product = std::inner_product(bitset.begin(), bitset.end(), hidden_bitset.begin(), std::uint8_t {0});
@@ -67,7 +68,8 @@ void check_bitstring(const std::string& bitstring, const std::string& hidden_bit
     if (product % 2 == 0) {
         std::cout << "VALID:   " << bitstring;
         std::cout << " is 'orthogonal' to the hidden bitstring " << hidden_bitstring << '\n';
-    } else {
+    }
+    else {
         std::cout << "INVALID: " << bitstring;
         std::cout << " is NOT 'orthogonal' to the hidden bitstring" << hidden_bitstring << '\n';
     }

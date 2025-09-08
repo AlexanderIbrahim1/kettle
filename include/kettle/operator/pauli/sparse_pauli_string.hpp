@@ -3,11 +3,9 @@
 #include <complex>
 #include <cstddef>
 #include <cstdint>
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 #include <vector>
-
-
 
 namespace ket
 {
@@ -30,8 +28,8 @@ enum class PauliPhase : std::uint8_t
 
 // NOLINTNEXTLINE(cert-err58-cpp)
 const auto PAULI_PHASE_MAP = std::unordered_map<PauliPhase, std::complex<double>> {
-    {PauliPhase::PLUS_ONE, {1.0, 0.0}},
-    {PauliPhase::PLUS_EYE, {0.0, 1.0}},
+    {PauliPhase::PLUS_ONE,  {1.0, 0.0} },
+    {PauliPhase::PLUS_EYE,  {0.0, 1.0} },
     {PauliPhase::MINUS_ONE, {-1.0, 0.0}},
     {PauliPhase::MINUS_EYE, {0.0, -1.0}},
 };
@@ -44,7 +42,11 @@ class SparsePauliString
 public:
     explicit SparsePauliString(std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
 
-    SparsePauliString(std::vector<std::pair<std::size_t, PauliTerm>> pauli_indexed_terms, std::size_t n_qubits, PauliPhase phase = PauliPhase::PLUS_ONE);
+    SparsePauliString(
+        std::vector<std::pair<std::size_t, PauliTerm>> pauli_indexed_terms,
+        std::size_t n_qubits,
+        PauliPhase phase = PauliPhase::PLUS_ONE
+    );
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     SparsePauliString(const std::vector<PauliTerm>& pauli_terms, PauliPhase phase = PauliPhase::PLUS_ONE);
@@ -116,8 +118,7 @@ public:
     [[nodiscard]]
     auto equal_up_to_phase(const SparsePauliString& other) const -> bool;
 
-    friend
-    auto operator==(const SparsePauliString& left, const SparsePauliString& right) -> bool;
+    friend auto operator==(const SparsePauliString& left, const SparsePauliString& right) -> bool;
 
 private:
     std::size_t n_qubits_;

@@ -10,7 +10,6 @@
 #include "kettle/operator/channels/kraus_common.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
 
-
 namespace ket
 {
 
@@ -18,15 +17,9 @@ class MultiQubitKrausChannel
 {
 public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    MultiQubitKrausChannel(
-        std::vector<Eigen::MatrixXcd> kraus_matrices,
-        double tolerance = 1.0e-6
-    );
+    MultiQubitKrausChannel(std::vector<Eigen::MatrixXcd> kraus_matrices, double tolerance = 1.0e-6);
 
-    MultiQubitKrausChannel(
-        std::vector<Eigen::MatrixXcd> kraus_matrices,
-        kraus_channel_nocheck tag
-    );
+    MultiQubitKrausChannel(std::vector<Eigen::MatrixXcd> kraus_matrices, kraus_channel_nocheck tag);
 
     [[nodiscard]]
     constexpr auto size() const noexcept -> std::size_t
@@ -35,7 +28,8 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto matrices() const -> const std::vector<Eigen::MatrixXcd>& {
+    constexpr auto matrices() const -> const std::vector<Eigen::MatrixXcd>&
+    {
         return kraus_matrices_;
     }
 
@@ -70,11 +64,7 @@ private:
 };
 
 // TODO: replace magic number
-auto almost_eq(
-    const MultiQubitKrausChannel& left_op,
-    const MultiQubitKrausChannel& right_op,
-    double coeff_tolerance = 1.0e-6
-) -> bool;
+auto almost_eq(const MultiQubitKrausChannel& left_op, const MultiQubitKrausChannel& right_op, double coeff_tolerance = 1.0e-6) -> bool;
 
 inline auto kraus_matrix_from_projectors(
     std::span<const std::string> bitstrings,
@@ -113,10 +103,7 @@ inline auto kraus_matrix_from_projectors(
     Overload that assumes that the amplitudes in front of the projection
     terms are all 1.
 */
-inline auto kraus_matrix_from_projectors(
-    std::span<const std::string> bitstrings,
-    Endian input_endian = Endian::LITTLE
-) -> Eigen::MatrixXcd
+inline auto kraus_matrix_from_projectors(std::span<const std::string> bitstrings, Endian input_endian = Endian::LITTLE) -> Eigen::MatrixXcd
 {
     auto amplitudes = std::vector<std::complex<double>>(bitstrings.size(), {1.0, 0.0});
     return kraus_matrix_from_projectors(bitstrings, amplitudes, input_endian);

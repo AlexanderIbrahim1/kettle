@@ -24,7 +24,7 @@ auto make_binary_controlled_circuit_naive(
 /*
     This function creates a binary-controlled circuit by accepting a container of
     increasing binary powers of the subcircuit in question.
-    
+
     It assumes that the circuits are the correct binary powers. This results in
     fewer gates than the naive approach.
 */

@@ -3,8 +3,8 @@
 #include <variant>
 
 #include "kettle/circuit_loggers/classical_register_circuit_logger.hpp"
-#include "kettle/circuit_loggers/statevector_circuit_logger.hpp"
 #include "kettle/circuit_loggers/density_matrix_circuit_logger.hpp"
+#include "kettle/circuit_loggers/statevector_circuit_logger.hpp"
 
 namespace ket
 {

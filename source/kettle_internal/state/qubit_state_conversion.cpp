@@ -34,10 +34,7 @@ constexpr auto bitstring_to_state_index_bigendian_(const std::string& bitstring)
 namespace ket
 {
 
-auto bitstring_to_state_index(
-    const std::string& bitstring,
-    ket::Endian input_endian
-) -> std::size_t
+auto bitstring_to_state_index(const std::string& bitstring, ket::Endian input_endian) -> std::size_t
 {
     ket::internal::check_bitstring_is_valid_nonmarginal_(bitstring);
 
@@ -53,11 +50,7 @@ auto bitstring_to_state_index(
     }
 }
 
-auto state_index_to_dynamic_bitset(
-    std::size_t i_state,
-    std::size_t n_qubits,
-    ket::Endian input_endian
-) -> std::vector<std::uint8_t>
+auto state_index_to_dynamic_bitset(std::size_t i_state, std::size_t n_qubits, ket::Endian input_endian) -> std::vector<std::uint8_t>
 {
     const auto n_states = ket::internal::pow_2_int(n_qubits);
     if (i_state >= n_states) {
@@ -99,28 +92,19 @@ auto dynamic_bitset_to_bitstring(const std::vector<std::uint8_t>& bits) -> std::
     return bitstring;
 }
 
-auto state_index_to_bitstring(
-    std::size_t i_state,
-    std::size_t n_qubits,
-    ket::Endian input_endian
-) -> std::string
+auto state_index_to_bitstring(std::size_t i_state, std::size_t n_qubits, ket::Endian input_endian) -> std::string
 {
     const auto dyn_bitset = state_index_to_dynamic_bitset(i_state, n_qubits, input_endian);
     return dynamic_bitset_to_bitstring(dyn_bitset);
 }
 
-auto dynamic_bitset_to_state_index(
-    const std::vector<std::uint8_t>& dyn_bitset,
-    ket::Endian input_endian
-) -> std::size_t
+auto dynamic_bitset_to_state_index(const std::vector<std::uint8_t>& dyn_bitset, ket::Endian input_endian) -> std::size_t
 {
     const auto bitstring = dynamic_bitset_to_bitstring(dyn_bitset);
     return bitstring_to_state_index(bitstring, input_endian);
 }
 
-auto bitstring_to_dynamic_bitset(
-    const std::string& bitstring
-) -> std::vector<std::uint8_t>
+auto bitstring_to_dynamic_bitset(const std::string& bitstring) -> std::vector<std::uint8_t>
 {
     ket::internal::check_bitstring_is_valid_nonmarginal_(bitstring);
 
@@ -179,10 +163,7 @@ auto dynamic_bitset_to_state_index_big_endian(const std::vector<std::uint8_t>& d
     return dynamic_bitset_to_state_index(dyn_bitset, ket::Endian::BIG);
 }
 
-auto binary_fraction_expansion(
-    const std::string& bitstring,
-    Endian endian
-) -> double
+auto binary_fraction_expansion(const std::string& bitstring, Endian endian) -> double
 {
     ket::internal::check_bitstring_is_valid_nonmarginal_(bitstring);
 
@@ -196,7 +177,8 @@ auto binary_fraction_expansion(
                 output += contrib;
             }
         }
-    } else {
+    }
+    else {
         for (auto bitchar : bitstring | std::views::reverse) {
             contrib *= 0.5;
             if (bitchar == '1') {

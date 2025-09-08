@@ -6,7 +6,6 @@
 
 #include "kettle_internal/simulation/operations.hpp"
 
-
 namespace ket::internal
 {
 
@@ -75,7 +74,7 @@ void apply_tdag_gate(ket::Statevector& state, std::size_t i1)
     const auto state1 = state[i1];
 
     const auto real1 = M_SQRT1_2 * (state1.real() + state1.imag());
-    const auto imag1 = - M_SQRT1_2 * (state1.real() - state1.imag());
+    const auto imag1 = -M_SQRT1_2 * (state1.real() - state1.imag());
 
     state[i1] = {real1, imag1};
 }
@@ -85,10 +84,10 @@ void apply_sx_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
     const auto state0 = state[i0];
     const auto state1 = state[i1];
 
-    const auto real0 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
-    const auto imag0 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
-    const auto real1 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
-    const auto imag1 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
+    const auto real0 = 0.5 * (state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag0 = 0.5 * (state0.real() + state0.imag() - state1.real() + state1.imag());
+    const auto real1 = 0.5 * (state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag1 = 0.5 * (-state0.real() + state0.imag() + state1.real() + state1.imag());
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};
@@ -99,10 +98,10 @@ void apply_sxdag_gate(ket::Statevector& state, std::size_t i0, std::size_t i1)
     const auto state0 = state[i0];
     const auto state1 = state[i1];
 
-    const auto real0 = 0.5 * (  state0.real() + state0.imag() + state1.real() - state1.imag());
-    const auto imag0 = 0.5 * (- state0.real() + state0.imag() + state1.real() + state1.imag());
-    const auto real1 = 0.5 * (  state0.real() - state0.imag() + state1.real() + state1.imag());
-    const auto imag1 = 0.5 * (  state0.real() + state0.imag() - state1.real() + state1.imag());
+    const auto real0 = 0.5 * (state0.real() + state0.imag() + state1.real() - state1.imag());
+    const auto imag0 = 0.5 * (-state0.real() + state0.imag() + state1.real() + state1.imag());
+    const auto real1 = 0.5 * (state0.real() - state0.imag() + state1.real() + state1.imag());
+    const auto imag1 = 0.5 * (state0.real() + state0.imag() - state1.real() + state1.imag());
 
     state[i0] = std::complex<double> {real0, imag0};
     state[i1] = std::complex<double> {real1, imag1};

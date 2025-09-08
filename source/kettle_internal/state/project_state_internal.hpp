@@ -6,7 +6,6 @@
 
 #include "kettle/state/statevector.hpp"
 
-
 namespace ket::internal
 {
 
@@ -19,10 +18,7 @@ auto is_index_set_(std::size_t index, std::size_t value) -> bool;
 class QubitStateChecker_
 {
 public:
-    QubitStateChecker_(
-        std::vector<std::size_t> qubit_indices,
-        std::vector<std::uint8_t> expected_measurements
-    );
+    QubitStateChecker_(std::vector<std::size_t> qubit_indices, std::vector<std::uint8_t> expected_measurements);
 
     [[nodiscard]]
     auto all_indices_match(std::size_t value) const -> bool;

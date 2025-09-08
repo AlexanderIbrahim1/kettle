@@ -6,7 +6,6 @@
 #include "kettle/parameter/parameter.hpp"
 #include "kettle_internal/parameter/parameter_internal.hpp"
 
-
 namespace ket::param::internal
 {
 

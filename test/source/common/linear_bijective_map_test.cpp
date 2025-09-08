@@ -3,13 +3,12 @@
 
 #include "kettle_internal/common/linear_bijective_map.hpp"
 
-
 TEST_CASE("LinearBijectiveMap")
 {
     const auto map = ket::internal::LinearBijectiveMap<int, char, 10> {
         std::pair {1, 'a'},
-        std::pair {2, 'b'},
-        std::pair {5, 'c'}
+         std::pair {2, 'b'},
+         std::pair {5, 'c'}
     };
 
     SECTION("forward lookup")

@@ -36,8 +36,7 @@ public:
 
     constexpr ClonePtr& operator=(const ClonePtr& other)
     {
-        if (this != &other)
-        {
+        if (this != &other) {
             data_ = other.data_ ? std::make_unique<T>(*other.data_) : nullptr;
         }
         return *this;

@@ -4,8 +4,8 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_vector.hpp>
 
-#include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/io/read_pauli_operator.hpp"
+#include "kettle/operator/pauli/pauli_operator.hpp"
 
 using PT = ket::PauliTerm;
 
@@ -20,9 +20,9 @@ TEST_CASE("read_pauli_operator()")
     const auto pauli_op = ket::read_pauli_operator(sstream, 6);
 
     const auto expected = ket::PauliOperator {
-        {.coefficient={11.0000, 0.0}, .pauli_string={PT::I, PT::I, PT::I, PT::I, PT::I, PT::I}},
-        {.coefficient={-0.1875, 0.0}, .pauli_string={PT::X, PT::X, PT::X, PT::X, PT::X, PT::X}},
-        {.coefficient={ 0.1875, 0.0}, .pauli_string={PT::X, PT::X, PT::X, PT::Z, PT::I, PT::I}},
+        {.coefficient = {11.0000, 0.0}, .pauli_string = {PT::I, PT::I, PT::I, PT::I, PT::I, PT::I}},
+        {.coefficient = {-0.1875, 0.0}, .pauli_string = {PT::X, PT::X, PT::X, PT::X, PT::X, PT::X}},
+        {.coefficient = {0.1875, 0.0},  .pauli_string = {PT::X, PT::X, PT::X, PT::Z, PT::I, PT::I}},
     };
 
     REQUIRE(ket::almost_eq(pauli_op, expected));

@@ -20,7 +20,6 @@ inline constexpr auto CONTROL_FLOW_WHITESPACE_DEFAULT = std::size_t {4};
 
 }  // namespace ket::internal
 
-
 namespace ket::internal::format
 {
 
@@ -34,7 +33,6 @@ auto format_classical_if_statement_header_(const ket::ControlFlowPredicate& pred
 auto format_classical_if_else_statement_header_(const ket::ControlFlowPredicate& predicate) -> std::tuple<std::string, std::string>;
 
 }  // namespace ket::internal::format
-
 
 namespace ket::internal::parse
 {

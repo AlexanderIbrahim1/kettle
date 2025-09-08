@@ -2,16 +2,15 @@
 
 #include <variant>
 
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 
 /*
     This header file contains the CircuitElement type, which holds all the different
     constructs that determine how the quantum circuit will evolve (gates, control flow
     instructions, etc.).
 */
-
 
 namespace ket
 {

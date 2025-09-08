@@ -18,7 +18,6 @@ RZ        target : [5]   parameter : 12.533816585267923
 ```
 */
 
-
 namespace ket
 {
 

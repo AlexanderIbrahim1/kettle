@@ -4,12 +4,12 @@
 
 #include <Eigen/Dense>
 
-#include "kettle/parameter/parameter.hpp"
-#include "kettle/state/density_matrix.hpp"
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
+#include "kettle/parameter/parameter.hpp"
+#include "kettle/state/density_matrix.hpp"
 
 #include "kettle_internal/simulation/simulate_utils.hpp"
 
@@ -30,11 +30,7 @@ void simulate_one_qubit_kraus_channel(
     Eigen::MatrixXcd& right_mul_buffer
 );
 
-void simulate_multi_qubit_kraus_channel(
-    DensityMatrix& state,
-    const MultiQubitKrausChannel& channel,
-    Eigen::MatrixXcd& writing_buffer
-);
+void simulate_multi_qubit_kraus_channel(DensityMatrix& state, const MultiQubitKrausChannel& channel, Eigen::MatrixXcd& writing_buffer);
 
 void simulate_pauli_channel(
     DensityMatrix& state,

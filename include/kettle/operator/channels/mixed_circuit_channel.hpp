@@ -69,10 +69,6 @@ private:
 };
 
 // TODO: replace magic number
-auto almost_eq(
-    const MixedCircuitChannel& left_op,
-    const MixedCircuitChannel& right_op,
-    double coeff_tolerance = 1.0e-6
-) -> bool;
+auto almost_eq(const MixedCircuitChannel& left_op, const MixedCircuitChannel& right_op, double coeff_tolerance = 1.0e-6) -> bool;
 
 }  // namespace ket

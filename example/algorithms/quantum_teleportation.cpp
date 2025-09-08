@@ -9,7 +9,7 @@
 
 auto main() -> int
 {
-    // Alice initally holds the state
+    // Alice initially holds the state
     const auto alice_qubit = ket::generate_random_state(1);
 
     // now we create the two resource qubits
@@ -29,22 +29,30 @@ auto main() -> int
     circuit.add_cx_gate(0, 1);
     circuit.add_h_gate(0);
 
-    // now perform the measurements, and modify the behaviour of qubit 2 based on these measurements
+    // now perform the measurements, and modify the behavior of qubit 2 based on these measurements
     circuit.add_m_gate({0, 1});
 
     // if qubit 1 is measured as set, apply the X gate to qubit 2
-    circuit.add_if_statement(1, [] {
-        auto subcircuit = ket::QuantumCircuit {3};
-        subcircuit.add_x_gate(2);
-        return subcircuit;
-    }());
+    circuit.add_if_statement(
+        1,
+        []
+        {
+            auto subcircuit = ket::QuantumCircuit {3};
+            subcircuit.add_x_gate(2);
+            return subcircuit;
+        }()
+    );
 
     // if qubit 0 is measured as set, apply the Z gate to qubit 2
-    circuit.add_if_statement(0, [] {
-        auto subcircuit_ = ket::QuantumCircuit {3};
-        subcircuit_.add_z_gate(2);
-        return subcircuit_;
-    }());
+    circuit.add_if_statement(
+        0,
+        []
+        {
+            auto subcircuit_ = ket::QuantumCircuit {3};
+            subcircuit_.add_z_gate(2);
+            return subcircuit_;
+        }()
+    );
 
     // what is the probability distribution of the original qubit that Alice had?
     const auto alice_counts = ket::perform_measurements_as_counts_marginal(alice_qubit, 1 << 12);

@@ -16,7 +16,7 @@
       - `gcd(a, N) = 1`
     and find the "period" `r`, which is defined as the smallest positive integer such that
       - `a^r == 1 (mod N)`
-    
+
     This example fixes `N = 15`, and allows choices of `a = 2, 4, 7, 8, 11, 13`
 
     This executable takes a command line argument (the integer `a`)
@@ -32,7 +32,6 @@
     mutually prime with 15
 */
 const auto VALID_BASES = std::unordered_set<int> {2, 4, 7, 8, 11, 13};
-
 
 /*
     This function applies the unitary operator of interest to the circuit in the manner
@@ -105,10 +104,7 @@ auto parse_base(int argc, char** argv) -> int
     A (naive) function for estimating the numerator and denominator from a
     floating-point number.
 */
-auto numerator_and_denominator(
-    double value,
-    std::size_t max_denominator
-) -> std::tuple<std::size_t, std::size_t>
+auto numerator_and_denominator(double value, std::size_t max_denominator) -> std::tuple<std::size_t, std::size_t>
 {
     using Pair = std::tuple<std::size_t, std::size_t>;
 

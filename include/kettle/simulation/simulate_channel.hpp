@@ -13,7 +13,6 @@
 #include "kettle/operator/channels/pauli_channel.hpp"
 #include "kettle/state/density_matrix.hpp"
 
-
 namespace ket
 {
 
@@ -59,15 +58,18 @@ public:
 
 protected:
     // these member functions provide the derived channels with access to the private data members
-    auto cregister_mixin() noexcept -> ket::ClonePtr<ClassicalRegister>& {
+    auto cregister_mixin() noexcept -> ket::ClonePtr<ClassicalRegister>&
+    {
         return cregister_;
     }
 
-    auto has_been_run_mixin() noexcept -> bool& {
+    auto has_been_run_mixin() noexcept -> bool&
+    {
         return has_been_run_;
     }
 
-    auto circuit_loggers_mixin() noexcept -> std::vector<CircuitLogger>& {
+    auto circuit_loggers_mixin() noexcept -> std::vector<CircuitLogger>&
+    {
         return circuit_loggers_;
     }
 
@@ -86,7 +88,6 @@ private:
     friend PauliChannelSimulator;
 };
 
-
 class OneQubitKrausChannelSimulator : public ChannelSimulatorMixin<OneQubitKrausChannelSimulator>
 {
 public:
@@ -101,7 +102,6 @@ private:
     Eigen::MatrixXcd right_mul_buffer_;
 };
 
-
 class PauliChannelSimulator : public ChannelSimulatorMixin<PauliChannelSimulator>
 {
 public:
@@ -115,7 +115,6 @@ private:
     Eigen::MatrixXcd multiplication_buffer_;
     Eigen::MatrixXcd state_buffer_;
 };
-
 
 class MixedCircuitChannelSimulator : public ChannelSimulatorMixin<MixedCircuitChannelSimulator>
 {
@@ -134,7 +133,6 @@ private:
     Eigen::MatrixXcd multiplication_buffer_;
     Eigen::MatrixXcd state_buffer_;
 };
-
 
 class MultiQubitKrausChannelSimulator : public ChannelSimulatorMixin<MultiQubitKrausChannelSimulator>
 {

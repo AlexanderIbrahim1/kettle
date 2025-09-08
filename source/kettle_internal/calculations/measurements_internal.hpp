@@ -5,7 +5,6 @@
 #include <random>
 #include <vector>
 
-
 namespace ket::internal
 {
 
@@ -13,7 +12,7 @@ constexpr inline auto CUMULATIVE_END_OFFSET_FRACTION = double {1.0e-4};
 
 /*
     We want to avoid sampling entries beyond the end of the probability distribution,
-    because this correponds to an index for a computational state that does not exist.
+    because this corresponds to an index for a computational state that does not exist.
 
     To prevent this, we need to offset the largest value produced by the random number
     generator by a small amount, to make sure the largest value is never sampled.

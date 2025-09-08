@@ -4,10 +4,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/project_state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle_internal/state/project_state_internal.hpp"
-
 
 namespace ket::internal
 {
@@ -17,14 +16,11 @@ auto is_index_set_(std::size_t index, std::size_t value) -> bool
     return (value & (1UL << index)) != 0;
 }
 
-QubitStateChecker_::QubitStateChecker_(
-    std::vector<std::size_t> qubit_indices,
-    std::vector<std::uint8_t> expected_measurements
-)
+QubitStateChecker_::QubitStateChecker_(std::vector<std::size_t> qubit_indices, std::vector<std::uint8_t> expected_measurements)
     : qubit_indices_ {std::move(qubit_indices)}
     , expected_measurements_ {std::move(expected_measurements)}
 {
-    if (!std::ranges::all_of(expected_measurements_, [](std::uint8_t x) {return x == 0 || x == 1; })) {
+    if (!std::ranges::all_of(expected_measurements_, [](std::uint8_t x) { return x == 0 || x == 1; })) {
         throw std::runtime_error {"ERROR: all expected measurements must be 0 or 1.\n"};
     }
 
@@ -36,8 +32,7 @@ QubitStateChecker_::QubitStateChecker_(
 [[nodiscard]]
 auto QubitStateChecker_::all_indices_match(std::size_t value) const -> bool
 {
-    for (std::size_t i {0}; i < qubit_indices_.size(); ++i)
-    {
+    for (std::size_t i {0}; i < qubit_indices_.size(); ++i) {
         const auto binary_at_index = static_cast<std::uint8_t>(is_index_set_(qubit_indices_[i], value));
 
         if (binary_at_index != expected_measurements_[i]) {
@@ -92,7 +87,6 @@ void normalize_amplitudes_(std::vector<std::complex<double>>& amplitudes, double
 }
 
 }  // namespace ket::internal
-
 
 namespace ket
 {

@@ -5,9 +5,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <kettle/state/statevector.hpp>
 #include <kettle/io/numpy_statevector.hpp>
-
+#include <kettle/state/statevector.hpp>
 
 TEST_CASE("read_numpy_statevector()")
 {
@@ -25,7 +24,8 @@ TEST_CASE("read_numpy_statevector()")
 
     const auto actual = ket::read_numpy_statevector(stream);
 
-    auto expected_amplitudes = []() {
+    auto expected_amplitudes = []()
+    {
         auto output = std::vector<std::complex<double>> {};
         output.reserve(8);
 

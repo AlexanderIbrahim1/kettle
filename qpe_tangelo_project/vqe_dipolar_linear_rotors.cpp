@@ -248,7 +248,7 @@ auto main(int argc, char** argv) -> int
         }
     }();
 
-    // creat the optimization function, and set some parameters to make sure it converges or stops
+    // create the optimization function, and set some parameters to make sure it converges or stops
     auto opt = nlopt::opt {nlopt::LN_COBYLA, static_cast<unsigned int>(n_parameters)};
     opt.set_min_objective(cost_function, &context);
     opt.set_xtol_rel(1.0e-4);

@@ -9,9 +9,8 @@
 #include "kettle/state/statevector.hpp"
 
 /*
-    This file contains the `PauliOperator` class for 
+    This file contains the `PauliOperator` class for
 */
-
 
 namespace ket
 {
@@ -73,11 +72,8 @@ private:
     std::vector<WeightedPauliString> weighted_pauli_strings_;
 };
 
-auto almost_eq(
-    const PauliOperator& left_op,
-    const PauliOperator& right_op,
-    double coeff_tolerance = COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> bool;
+auto almost_eq(const PauliOperator& left_op, const PauliOperator& right_op, double coeff_tolerance = COMPLEX_ALMOST_EQ_TOLERANCE_SQ)
+    -> bool;
 
 auto expectation_value(const PauliOperator& pauli_op, const Statevector& state) -> std::complex<double>;
 

@@ -1,10 +1,10 @@
+#include <map>
 #include <stdexcept>
 #include <string>
-#include <map>
 #include <vector>
 
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle/calculations/probabilities.hpp"
 
@@ -46,8 +46,7 @@ void QuantumNoise::check_index_(std::size_t index) const
     }
 }
 
-auto calculate_probabilities_raw(const Statevector& state, const QuantumNoise* noise)
-    -> std::vector<double>
+auto calculate_probabilities_raw(const Statevector& state, const QuantumNoise* noise) -> std::vector<double>
 {
     const auto n_states = state.n_states();
     const auto n_qubits = state.n_qubits();
@@ -70,8 +69,7 @@ auto calculate_probabilities_raw(const Statevector& state, const QuantumNoise* n
     return probabilities;
 }
 
-auto calculate_probabilities(const Statevector& state, const QuantumNoise* noise)
-    -> std::map<std::string, double>
+auto calculate_probabilities(const Statevector& state, const QuantumNoise* noise) -> std::map<std::string, double>
 {
     const auto n_states = state.n_states();
     const auto n_qubits = state.n_qubits();

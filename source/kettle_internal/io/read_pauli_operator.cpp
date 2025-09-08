@@ -6,8 +6,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "kettle/operator/pauli/pauli_operator.hpp"
 #include "kettle/io/read_pauli_operator.hpp"
+#include "kettle/operator/pauli/pauli_operator.hpp"
 
 /*
     This file contains the `read_pauli_operator()` function, which takes an output file
@@ -22,7 +22,6 @@ const auto MAP_PAULI_GATE_STRING_TO_TERM = std::unordered_map<char, ket::PauliTe
     {'Z', ket::PauliTerm::Z},
 };
 
-
 namespace ket
 {
 
@@ -30,7 +29,7 @@ auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::P
 {
     auto pauli_op = ket::PauliOperator {n_qubits};
 
-    char ch;  // NOLINT
+    char ch;           // NOLINT
     std::string line;  // NOLINT
 
     while (std::getline(instream, line)) {
@@ -43,14 +42,14 @@ auto read_pauli_operator(std::istream& instream, std::size_t n_qubits) -> ket::P
 
         const auto coeff = std::complex<double> {real, imag};
 
-        linestream >> ch; // :
+        linestream >> ch;  // :
 
         auto pauli_string = ket::SparsePauliString {n_qubits};
 
         while (linestream >> ch) {
             if (ch == '(') {
                 std::size_t qubit_index;  // NOLINT
-                char pauli_gate;  // NOLINT
+                char pauli_gate;          // NOLINT
 
                 linestream >> qubit_index;
                 linestream >> ch;  // ,

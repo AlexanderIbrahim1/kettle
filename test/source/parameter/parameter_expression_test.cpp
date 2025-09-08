@@ -5,7 +5,6 @@
 #include "kettle/parameter/parameter_expression.hpp"
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
 
-
 namespace kp = ket::param;
 namespace kpi = ket::param::internal;
 
@@ -25,7 +24,9 @@ TEST_CASE("EvaluateExpression")
     SECTION("a single parameter")
     {
         const auto parameter = kp::Parameter {"theta"};
-        const auto map = kp::EvaluatedParameterDataMap { {parameter.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap {
+            {parameter.id(), 1.5}
+        };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto evaluator = kpi::Evaluator {};
@@ -35,9 +36,9 @@ TEST_CASE("EvaluateExpression")
     SECTION("addition between two literals")
     {
         const auto expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::ADD,
-            .left=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.4}}}
+            .operation = kp::BinaryOperation::ADD,
+            .left = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
+            .right = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.4}}}
         };
 
         const auto evaluator = kpi::Evaluator {};
@@ -47,13 +48,15 @@ TEST_CASE("EvaluateExpression")
     SECTION("addition between literal and parameter")
     {
         const auto parameter = kp::Parameter {"theta"};
-        const auto map = kp::EvaluatedParameterDataMap { {parameter.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap {
+            {parameter.id(), 1.5}
+        };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::ADD,
-            .left=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {kp::ParameterExpression {parameter}}
+            .operation = kp::BinaryOperation::ADD,
+            .left = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
+            .right = ket::ClonePtr {kp::ParameterExpression {parameter}}
         };
 
         const auto evaluator = kpi::Evaluator {};
@@ -64,13 +67,16 @@ TEST_CASE("EvaluateExpression")
     {
         const auto theta = kp::Parameter {"theta"};
         const auto phi = kp::Parameter {"phi"};
-        const auto map = kp::EvaluatedParameterDataMap { {theta.id(), 1.5}, {phi.id(), -0.4} };
+        const auto map = kp::EvaluatedParameterDataMap {
+            {theta.id(), 1.5 },
+            {phi.id(),   -0.4}
+        };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::ADD,
-            .left=ket::ClonePtr {kp::ParameterExpression {theta}},
-            .right=ket::ClonePtr {kp::ParameterExpression {phi}}
+            .operation = kp::BinaryOperation::ADD,
+            .left = ket::ClonePtr {kp::ParameterExpression {theta}},
+            .right = ket::ClonePtr {kp::ParameterExpression {phi}}
         };
 
         const auto evaluator = kpi::Evaluator {};
@@ -80,9 +86,9 @@ TEST_CASE("EvaluateExpression")
     SECTION("multiplication between two literals")
     {
         const auto expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::MUL,
-            .left=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
-            .right=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.5}}}
+            .operation = kp::BinaryOperation::MUL,
+            .left = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {1.1}}},
+            .right = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.5}}}
         };
 
         const auto evaluator = kpi::Evaluator {};
@@ -92,21 +98,23 @@ TEST_CASE("EvaluateExpression")
     SECTION("multiply parameter and literal, then add literal")
     {
         const auto theta = kp::Parameter {"theta"};
-        const auto map = kp::EvaluatedParameterDataMap { {theta.id(), 1.5} };
+        const auto map = kp::EvaluatedParameterDataMap {
+            {theta.id(), 1.5}
+        };
         const auto map_variant = kpi::MapVariant {std::reference_wrapper {map}};
 
         const auto left_expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::MUL,
-            .left=ket::ClonePtr {kp::ParameterExpression {theta}},
-            .right=ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.5}}}
+            .operation = kp::BinaryOperation::MUL,
+            .left = ket::ClonePtr {kp::ParameterExpression {theta}},
+            .right = ket::ClonePtr {kp::ParameterExpression {kp::LiteralExpression {0.5}}}
         };
 
         const auto right_expr = kp::LiteralExpression {2.2};
 
         const auto expr = kp::BinaryExpression {
-            .operation=kp::BinaryOperation::ADD,
-            .left=ket::ClonePtr {kp::ParameterExpression {left_expr}},
-            .right=ket::ClonePtr {kp::ParameterExpression {right_expr}}
+            .operation = kp::BinaryOperation::ADD,
+            .left = ket::ClonePtr {kp::ParameterExpression {left_expr}},
+            .right = ket::ClonePtr {kp::ParameterExpression {right_expr}}
         };
 
         const auto evaluator = kpi::Evaluator {};

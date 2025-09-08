@@ -5,12 +5,11 @@
 
 #include <Eigen/Dense>
 
-#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/state/density_matrix.hpp"
-
 
 namespace ket
 {
@@ -41,7 +40,6 @@ private:
     std::vector<CircuitLogger> circuit_loggers_;
     Eigen::MatrixXcd buffer_;
 };
-
 
 void simulate(const QuantumCircuit& circuit, DensityMatrix& state, std::optional<int> prng_seed = std::nullopt);
 

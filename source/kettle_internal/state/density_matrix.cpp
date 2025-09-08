@@ -12,7 +12,8 @@ namespace ki = ket::internal;
 namespace
 {
 
-void check_is_hermitian_(const Eigen::MatrixXcd& matrix, double tolerance) {
+void check_is_hermitian_(const Eigen::MatrixXcd& matrix, double tolerance)
+{
     if (!matrix.isApprox(matrix.adjoint(), tolerance)) {
         throw std::runtime_error {"ERROR: provided matrix is not Hermitian.\n"};
     }
@@ -136,7 +137,6 @@ private:
 
 }  // namespace
 
-
 namespace ket
 {
 
@@ -219,7 +219,7 @@ auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> De
     const auto b_rows = right.matrix().rows();
     const auto b_cols = right.matrix().cols();
 
-    auto result = Eigen::MatrixXcd{a_rows * b_rows, a_cols * b_cols};
+    auto result = Eigen::MatrixXcd {a_rows * b_rows, a_cols * b_cols};
 
     for (Eigen::Index i_col_left = 0; i_col_left < a_cols; ++i_col_left) {
         for (Eigen::Index i_row_left = 0; i_row_left < a_rows; ++i_row_left) {
@@ -237,7 +237,7 @@ auto tensor_product(const DensityMatrix& left, const DensityMatrix& right) -> De
         }
     }
 
-    return DensityMatrix {result, density_matrix_nocheck{}};
+    return DensityMatrix {result, density_matrix_nocheck {}};
 }
 
 auto tensor_product(const std::vector<DensityMatrix>& density_matrices) -> DensityMatrix
@@ -262,7 +262,7 @@ auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t>
     // indices are passed as type `std::size_t` everywhere else, we'll just deal with it to avoid annoying
     // the user; not a big deal anyways
 
-    const auto is_out_of_range = [n_qubits=density_matrix.n_qubits()](auto index) { return index >= n_qubits; };
+    const auto is_out_of_range = [n_qubits = density_matrix.n_qubits()](auto index) { return index >= n_qubits; };
     if (std::ranges::any_of(qubit_indices, is_out_of_range)) {
         throw std::runtime_error {"ERROR: Cannot take partial trace; found qubit index out of bounds\n"};
     }
@@ -302,7 +302,7 @@ auto partial_trace(const DensityMatrix& density_matrix, std::vector<std::size_t>
         current = reduced;
     }
 
-    return DensityMatrix {current, density_matrix_nocheck{}};
+    return DensityMatrix {current, density_matrix_nocheck {}};
 }
 
 }  // namespace ket

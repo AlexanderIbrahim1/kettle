@@ -4,15 +4,14 @@
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/circuit_operations/make_controlled_circuit.hpp"
-#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
 #include "kettle/gates/primitive_gate.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
-
 
 namespace
 {
@@ -30,19 +29,15 @@ void check_all_indices_are_unique_(const Container& container)
     }
 }
 
-
 template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_valid_number_of_mapped_indices_(const Container& container, const ket::QuantumCircuit& circuit)
 {
     const auto size = ket::internal::get_container_size(container);
 
     if (size != circuit.n_qubits()) {
-        throw std::runtime_error {
-            "The number of proposed new qubit indices does not match the number of qubits in the subcircuit."
-        };
+        throw std::runtime_error {"The number of proposed new qubit indices does not match the number of qubits in the subcircuit."};
     }
 }
-
 
 template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std::size_t control_qubit)
@@ -54,7 +49,6 @@ void check_control_qubit_is_not_a_mapped_qubit_(const Container& container, std:
         throw std::runtime_error {"The control qubit cannot be one of the mapped qubit indices"};
     }
 }
-
 
 template <ket::QubitIndices Container = ket::QubitIndicesIList>
 void check_no_overlap_(const Container& mapped_qubits, const Container& control_qubits)
@@ -68,9 +62,12 @@ void check_no_overlap_(const Container& mapped_qubits, const Container& control_
     }
 }
 
-
 template <ket::QubitIndices Container = ket::QubitIndicesIList>
-void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, const Container& control_qubits, std::size_t n_qubits_on_new_circuit)
+void check_new_indices_fit_onto_new_circuit_(
+    const Container& mapped_qubits,
+    const Container& control_qubits,
+    std::size_t n_qubits_on_new_circuit
+)
 {
     const auto n_mapped_indices = ket::internal::get_container_size(mapped_qubits);
     const auto n_control_indices = ket::internal::get_container_size(control_qubits);
@@ -91,19 +88,12 @@ void check_new_indices_fit_onto_new_circuit_(const Container& mapped_qubits, con
     }
 }
 
-
-void make_one_target_gate_controlled(
-    ket::QuantumCircuit& circuit,
-    ket::Gate gate,
-    std::size_t control,
-    std::size_t target
-)
+void make_one_target_gate_controlled(ket::QuantumCircuit& circuit, ket::Gate gate, std::size_t control, std::size_t target)
 {
     const auto controlled_gate = ket::internal::UNCONTROLLED_TO_CONTROLLED_GATE.at(gate);
     const auto controlled_gate_operation = ket::internal::GATE_TO_FUNCTION_1C1T.at(controlled_gate);
     (circuit.*controlled_gate_operation)(control, target);
 }
-
 
 void make_one_target_one_angle_gate_controlled(
     ket::QuantumCircuit& circuit,
@@ -119,7 +109,6 @@ void make_one_target_one_angle_gate_controlled(
 }
 
 }  // namespace
-
 
 namespace ket
 {
@@ -160,8 +149,7 @@ auto make_controlled_circuit(
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             make_one_target_gate_controlled(new_circuit, gate_info.gate, control, new_target);
         }
-        else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate))
-        {
+        else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate)) {
             const auto [original_target, angle] = cre::unpack_one_target_one_angle_gate(gate_info);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             make_one_target_one_angle_gate_controlled(new_circuit, gate_info.gate, control, new_target, angle);
@@ -204,21 +192,18 @@ auto make_controlled_circuit(
 
     return new_circuit;
 }
-template
-auto make_controlled_circuit<ket::QubitIndicesVector>(
+template auto make_controlled_circuit<ket::QubitIndicesVector>(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     std::size_t control,
     const ket::QubitIndicesVector& mapped_qubits
 ) -> ket::QuantumCircuit;
-template
-auto make_controlled_circuit<ket::QubitIndicesIList>(
+template auto make_controlled_circuit<ket::QubitIndicesIList>(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     std::size_t control,
     const ket::QubitIndicesIList& mapped_qubits
 ) -> ket::QuantumCircuit;
-
 
 template <QubitIndices Container>
 auto make_multiplicity_controlled_circuit(
@@ -262,8 +247,7 @@ auto make_multiplicity_controlled_circuit(
             const auto matrix = non_angle_gate(gate_info.gate);
             apply_multiplicity_controlled_u_gate(new_circuit, matrix, new_target, control_qubits);
         }
-        else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate))
-        {
+        else if (gid::is_one_target_one_angle_transform_gate(gate_info.gate)) {
             const auto [original_target, angle] = cre::unpack_one_target_one_angle_gate(gate_info);
             const auto new_target = ket::internal::get_container_index(mapped_qubits, original_target);
             const auto matrix = angle_gate(gate_info.gate, angle);
@@ -310,15 +294,13 @@ auto make_multiplicity_controlled_circuit(
 
     return new_circuit;
 }
-template
-auto make_multiplicity_controlled_circuit<ket::QubitIndicesVector>(
+template auto make_multiplicity_controlled_circuit<ket::QubitIndicesVector>(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     const ket::QubitIndicesVector& control_qubits,
     const ket::QubitIndicesVector& mapped_qubits
 ) -> ket::QuantumCircuit;
-template
-auto make_multiplicity_controlled_circuit<ket::QubitIndicesIList>(
+template auto make_multiplicity_controlled_circuit<ket::QubitIndicesIList>(
     const ket::QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     const ket::QubitIndicesIList& control_qubits,

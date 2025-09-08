@@ -4,26 +4,22 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/gates/primitive_gate.hpp"
-#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
+#include "kettle/gates/common_u_gates.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 
-#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
 using G = ket::Gate;
 namespace cre = ket::internal::create;
 namespace comp = ket::internal::compare;
 
-
 TEST_CASE("add multiple X gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
-    {
-        return std::distance(circ.begin(), circ.end());
-    };
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ) { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 1")
     {
@@ -83,12 +79,15 @@ TEST_CASE("add multiple RX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
-    { return std::distance(circ.begin(), circ.end()); };
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ) { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
     {
-        circuit.add_rx_gate({{0, 0.25}, {1, 0.5}, {2, 0.75}});
+        circuit.add_rx_gate({
+            {0, 0.25},
+            {1, 0.5 },
+            {2, 0.75}
+        });
 
         const auto expected0 = cre::create_one_target_one_angle_gate(G::RX, 0, 0.25);
         const auto expected1 = cre::create_one_target_one_angle_gate(G::RX, 1, 0.50);
@@ -105,12 +104,15 @@ TEST_CASE("add multiple CX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
-    { return std::distance(circ.begin(), circ.end()); };
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ) { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
     {
-        circuit.add_cx_gate({{0, 1}, {1, 2}, {2, 0}});
+        circuit.add_cx_gate({
+            {0, 1},
+            {1, 2},
+            {2, 0}
+        });
 
         const auto expected0 = cre::create_one_control_one_target_gate(G::CX, 0, 1);
         const auto expected1 = cre::create_one_control_one_target_gate(G::CX, 1, 2);
@@ -127,12 +129,15 @@ TEST_CASE("add multiple CRX gates")
 {
     auto circuit = ket::QuantumCircuit {3};
 
-    const auto number_of_elements = [](const ket::QuantumCircuit& circ)
-    { return std::distance(circ.begin(), circ.end()); };
+    const auto number_of_elements = [](const ket::QuantumCircuit& circ) { return std::distance(circ.begin(), circ.end()); };
 
     SECTION("add 0, 1, 2 via initializer list")
     {
-        circuit.add_crx_gate({{0, 1, 0.25}, {1, 2, 0.5}, {2, 0, 0.75}});
+        circuit.add_crx_gate({
+            {0, 1, 0.25},
+            {1, 2, 0.5 },
+            {2, 0, 0.75}
+        });
 
         const auto expected0 = cre::create_one_control_one_target_one_angle_gate(G::CRX, 0, 1, 0.25);
         const auto expected1 = cre::create_one_control_one_target_one_angle_gate(G::CRX, 1, 2, 0.50);

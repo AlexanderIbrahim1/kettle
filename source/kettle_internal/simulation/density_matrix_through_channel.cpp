@@ -5,21 +5,21 @@
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/common_u_gates.hpp"
-#include "kettle/operator/pauli/sparse_pauli_string.hpp"
-#include "kettle/parameter/parameter.hpp"
-#include "kettle/state/density_matrix.hpp"
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
+#include "kettle/operator/pauli/sparse_pauli_string.hpp"
+#include "kettle/parameter/parameter.hpp"
 #include "kettle/simulation/simulate_channel.hpp"
+#include "kettle/state/density_matrix.hpp"
 
 #include "kettle_internal/common/linear_bijective_map.hpp"
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/density_matrix_through_channel.hpp"
-#include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
+#include "kettle_internal/simulation/simulate_utils.hpp"
 
 /*
     This file contains code for applying a quantum channel to a density matrix, thus evolving
@@ -59,12 +59,7 @@ void apply_pauli_string_(
     }
 }
 
-void channel_ctr_helper(
-    std::size_t& n_qubits,
-    Eigen::MatrixXcd& buffer0,
-    Eigen::MatrixXcd& buffer1,
-    Eigen::MatrixXcd& buffer2
-)
+void channel_ctr_helper(std::size_t& n_qubits, Eigen::MatrixXcd& buffer0, Eigen::MatrixXcd& buffer1, Eigen::MatrixXcd& buffer2)
 {
     if (n_qubits == 0) {
         throw std::runtime_error {"ERROR: cannot perform a DensityMatrix simulation with 0 qubits.\n"};
@@ -78,7 +73,6 @@ void channel_ctr_helper(
 }
 
 }  // namespace
-
 
 namespace ket
 {
@@ -113,7 +107,8 @@ void simulate_one_qubit_kraus_channel(
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
             writing_buffer = right_mul_buffer;
-        } else {
+        }
+        else {
             writing_buffer += right_mul_buffer;
         }
     }
@@ -121,11 +116,7 @@ void simulate_one_qubit_kraus_channel(
     state.matrix() = writing_buffer;
 }
 
-void simulate_multi_qubit_kraus_channel(
-    DensityMatrix& state,
-    const MultiQubitKrausChannel& channel,
-    Eigen::MatrixXcd& writing_buffer
-)
+void simulate_multi_qubit_kraus_channel(DensityMatrix& state, const MultiQubitKrausChannel& channel, Eigen::MatrixXcd& writing_buffer)
 {
     const auto n_kraus_matrices = channel.matrices().size();
 
@@ -133,7 +124,8 @@ void simulate_multi_qubit_kraus_channel(
         const auto& matrix = channel.matrices()[i];
         if (i == 0) {
             writing_buffer = matrix * state.matrix() * matrix.adjoint();
-        } else {
+        }
+        else {
             writing_buffer += matrix * state.matrix() * matrix.adjoint();
         }
     }
@@ -161,7 +153,8 @@ void simulate_pauli_channel(
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
             accumulation_buffer = (coefficient * state_buffer);
-        } else {
+        }
+        else {
             accumulation_buffer += (coefficient * state_buffer);
         }
     }
@@ -221,7 +214,8 @@ void simulate_mixed_circuit_channel(
         // skip setting all elements in the buffer to 0, by overwriting on the first iteration
         if (i == 0) {
             accumulation_buffer = (coefficient * state.matrix());
-        } else {
+        }
+        else {
             accumulation_buffer += (coefficient * state.matrix());
         }
     }
@@ -230,7 +224,6 @@ void simulate_mixed_circuit_channel(
 }
 
 }  // namespace ket
-
 
 namespace ket
 {
@@ -250,7 +243,7 @@ void OneQubitKrausChannelSimulator::run(const OneQubitKrausChannel& channel, Den
     }
 
     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(n_qubits_));
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     simulate_one_qubit_kraus_channel(state, channel, single_pair, writing_buffer_, left_mul_buffer_, right_mul_buffer_);
     has_been_run_mixin() = true;
@@ -277,7 +270,7 @@ void PauliChannelSimulator::run(const PauliChannel& channel, DensityMatrix& stat
     }
 
     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(n_qubits_));
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     simulate_pauli_channel(state, channel, single_pair, accumulation_buffer_, multiplication_buffer_, state_buffer_);
     has_been_run_mixin() = true;
@@ -308,20 +301,13 @@ void MixedCircuitChannelSimulator::run(
     }
 
     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(n_qubits_));
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(n_qubits_));
-    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_double_gate_pairs};
 
     simulate_mixed_circuit_channel(
-        state,
-        channel,
-        single_pair,
-        double_pair,
-        accumulation_buffer_,
-        multiplication_buffer_,
-        state_buffer_,
-        param_map
+        state, channel, single_pair, double_pair, accumulation_buffer_, multiplication_buffer_, state_buffer_, param_map
     );
 
     has_been_run_mixin() = true;

@@ -7,7 +7,6 @@
 #include "kettle/parameter/parameter.hpp"
 #include "kettle_internal/common/prng.hpp"
 
-
 namespace ket::param::internal
 {
 

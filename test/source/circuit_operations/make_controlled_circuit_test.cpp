@@ -3,13 +3,13 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/statevector.hpp"
-#include "kettle/simulation/simulate.hpp"
+#include "kettle/circuit_operations/append_circuits.hpp"
+#include "kettle/circuit_operations/compare_circuits.hpp"
+#include "kettle/circuit_operations/make_controlled_circuit.hpp"
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/gates/multiplicity_controlled_u_gate.hpp"
-#include "kettle/circuit_operations/append_circuits.hpp"
-#include "kettle/circuit_operations/make_controlled_circuit.hpp"
-#include "kettle/circuit_operations/compare_circuits.hpp"
+#include "kettle/simulation/simulate.hpp"
+#include "kettle/state/statevector.hpp"
 
 TEST_CASE("make_controlled_circuit()")
 {
@@ -65,13 +65,10 @@ TEST_CASE("make_controlled_circuit()")
         auto subcircuit = ket::QuantumCircuit {2};
         auto expected = ket::QuantumCircuit {3};
 
-        const auto init_bitstring = std::string {
-            GENERATE("000", "100", "010", "110", "001", "101", "011", "111")
-        };
+        const auto init_bitstring = std::string {GENERATE("000", "100", "010", "110", "001", "101", "011", "111")};
 
         auto state0 = ket::Statevector {init_bitstring};
         auto state1 = ket::Statevector {init_bitstring};
-
 
         // NOTE: for these cases, we generate two different circuits that both do the same thing to all
         // 8 possible initial computational basis states
@@ -135,14 +132,40 @@ TEST_CASE("make_controlled_circuit()")
     {
         const auto angle = double {1.2345};
 
-        const auto init_bitstring = std::string {
-            GENERATE(
-                "00000", "10000", "01000", "11000", "00100", "10100", "01100", "11100",
-                "00010", "10010", "01010", "11010", "00110", "10110", "01110", "11110",
-                "00001", "10001", "01001", "11001", "00101", "10101", "01101", "11101",
-                "00011", "10011", "01011", "11011", "00111", "10111", "01111", "11111"
-            )
-        };
+        const auto init_bitstring = std::string {GENERATE(
+            "00000",
+            "10000",
+            "01000",
+            "11000",
+            "00100",
+            "10100",
+            "01100",
+            "11100",
+            "00010",
+            "10010",
+            "01010",
+            "11010",
+            "00110",
+            "10110",
+            "01110",
+            "11110",
+            "00001",
+            "10001",
+            "01001",
+            "11001",
+            "00101",
+            "10101",
+            "01101",
+            "11101",
+            "00011",
+            "10011",
+            "01011",
+            "11011",
+            "00111",
+            "10111",
+            "01111",
+            "11111"
+        )};
 
         auto subcircuit = ket::QuantumCircuit {3};
         subcircuit.add_x_gate(0);
@@ -183,7 +206,10 @@ TEST_CASE("make_controlled_circuit()")
 TEST_CASE("throwing with make_controlled_circuit()")
 {
     auto subcircuit = ket::QuantumCircuit {2};
-    subcircuit.add_cx_gate({{0, 1}, {1, 0}});
+    subcircuit.add_cx_gate({
+        {0, 1},
+        {1, 0}
+    });
 
     SECTION("throws when all indices are not unique")
     {
@@ -221,9 +247,7 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         auto subcircuit = ket::QuantumCircuit {1};
         auto expected = ket::QuantumCircuit {3};
 
-        const auto init_bitstring = std::string {
-            GENERATE("000", "100", "010", "110", "001", "101", "011", "111")
-        };
+        const auto init_bitstring = std::string {GENERATE("000", "100", "010", "110", "001", "101", "011", "111")};
 
         auto state0 = ket::Statevector {init_bitstring};
         auto state1 = ket::Statevector {init_bitstring};
@@ -287,12 +311,9 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
         auto subcircuit = ket::QuantumCircuit {2};
         auto expected = ket::QuantumCircuit {4};
 
-        const auto init_bitstring = std::string {
-            GENERATE(
-                "0000", "1000", "0100", "1100", "0010", "1010", "0110", "1110",
-                "0001", "1001", "0101", "1101", "0011", "1011", "0111", "1111"
-            )
-        };
+        const auto init_bitstring = std::string {GENERATE(
+            "0000", "1000", "0100", "1100", "0010", "1010", "0110", "1110", "0001", "1001", "0101", "1101", "0011", "1011", "0111", "1111"
+        )};
 
         auto state0 = ket::Statevector {init_bitstring};
         auto state1 = ket::Statevector {init_bitstring};
@@ -359,14 +380,40 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
     {
         const auto angle = double {1.2345};
 
-        const auto init_bitstring = std::string {
-            GENERATE(
-                "00000", "10000", "01000", "11000", "00100", "10100", "01100", "11100",
-                "00010", "10010", "01010", "11010", "00110", "10110", "01110", "11110",
-                "00001", "10001", "01001", "11001", "00101", "10101", "01101", "11101",
-                "00011", "10011", "01011", "11011", "00111", "10111", "01111", "11111"
-            )
-        };
+        const auto init_bitstring = std::string {GENERATE(
+            "00000",
+            "10000",
+            "01000",
+            "11000",
+            "00100",
+            "10100",
+            "01100",
+            "11100",
+            "00010",
+            "10010",
+            "01010",
+            "11010",
+            "00110",
+            "10110",
+            "01110",
+            "11110",
+            "00001",
+            "10001",
+            "01001",
+            "11001",
+            "00101",
+            "10101",
+            "01101",
+            "11101",
+            "00011",
+            "10011",
+            "01011",
+            "11011",
+            "00111",
+            "10111",
+            "01111",
+            "11111"
+        )};
 
         auto subcircuit = ket::QuantumCircuit {3};
         subcircuit.add_x_gate(0);
@@ -407,7 +454,10 @@ TEST_CASE("make_multiplicity_controlled_circuit()")
 TEST_CASE("throwing with make_multiplicity_controlled_circuit()")
 {
     auto subcircuit = ket::QuantumCircuit {2};
-    subcircuit.add_cx_gate({{0, 1}, {1, 0}});
+    subcircuit.add_cx_gate({
+        {0, 1},
+        {1, 0}
+    });
 
     SECTION("throws when all mapped indices are not unique")
     {
@@ -457,7 +507,8 @@ TEST_CASE("controlled circuits with circuit logger")
 
     const auto is_circuit_logger = [](const auto& element) { return element.is_circuit_logger(); };
 
-    const auto logger_position = [&](const auto& circuit) {
+    const auto logger_position = [&](const auto& circuit)
+    {
         const auto position = std::ranges::find_if(circuit, is_circuit_logger);
         return std::distance(circuit.begin(), position);
     };
@@ -465,7 +516,8 @@ TEST_CASE("controlled circuits with circuit logger")
     SECTION("make_controlled_circuit()")
     {
         // create the overall circuit with the logger between the parts, THEN make it controlled
-        auto append_then_control = [&]() {
+        auto append_then_control = [&]()
+        {
             auto before_middle = ket::append_circuits(before, middle);
             auto total = ket::append_circuits(before_middle, after);
 
@@ -473,7 +525,8 @@ TEST_CASE("controlled circuits with circuit logger")
         }();
 
         // make each of the circuit parts controlled, THEN append them
-        auto control_then_append = [&]() {
+        auto control_then_append = [&]()
+        {
             auto control_before = ket::make_controlled_circuit(before, 3, 0, {1, 2});
             auto control_middle = ket::make_controlled_circuit(middle, 3, 0, {1, 2});
             auto control_after = ket::make_controlled_circuit(after, 3, 0, {1, 2});
@@ -491,7 +544,8 @@ TEST_CASE("controlled circuits with circuit logger")
     SECTION("make_multiplicity_controlled_circuit()")
     {
         // create the overall circuit with the logger between the parts, THEN make it controlled
-        auto append_then_control = [&]() {
+        auto append_then_control = [&]()
+        {
             auto before_middle = ket::append_circuits(before, middle);
             auto total = ket::append_circuits(before_middle, after);
 
@@ -499,7 +553,8 @@ TEST_CASE("controlled circuits with circuit logger")
         }();
 
         // make each of the circuit parts controlled, THEN append them
-        auto control_then_append = [&]() {
+        auto control_then_append = [&]()
+        {
             auto control_before = ket::make_multiplicity_controlled_circuit(before, 4, {0, 1}, {2, 3});
             auto control_middle = ket::make_multiplicity_controlled_circuit(middle, 4, {0, 1}, {2, 3});
             auto control_after = ket::make_multiplicity_controlled_circuit(after, 4, {0, 1}, {2, 3});

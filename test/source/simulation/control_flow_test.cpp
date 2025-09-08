@@ -1,13 +1,12 @@
 #include <functional>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include <kettle/circuit/circuit.hpp>
-#include <kettle/state/statevector.hpp>
 #include <kettle/simulation/simulate.hpp>
-
+#include <kettle/state/statevector.hpp>
 
 TEST_CASE("add_if_statement()")
 {
@@ -18,16 +17,8 @@ TEST_CASE("add_if_statement()")
     };
 
     auto testcase = GENERATE(
-        TestCase {
-            [](ket::QuantumCircuit& circuit) {
-                circuit.add_x_gate(0);
-            },
-            ket::Statevector {"11"}
-        },
-        TestCase {
-            []([[maybe_unused]] ket::QuantumCircuit& circuit) {},
-            ket::Statevector {"00"}
-        }
+        TestCase {[](ket::QuantumCircuit& circuit) { circuit.add_x_gate(0); }, ket::Statevector {"11"}},
+        TestCase {[]([[maybe_unused]] ket::QuantumCircuit& circuit) {}, ket::Statevector {"00"}}
     );
 
     auto circuit = ket::QuantumCircuit {2};
@@ -35,11 +26,15 @@ TEST_CASE("add_if_statement()")
     circuit.add_m_gate(0);
 
     // this statement might flip the 1st qubit from '0' to '1'
-    circuit.add_if_statement(0, [] {
-        auto subcircuit = ket::QuantumCircuit {2};
-        subcircuit.add_x_gate(1);
-        return subcircuit;
-    }());
+    circuit.add_if_statement(
+        0,
+        []
+        {
+            auto subcircuit = ket::QuantumCircuit {2};
+            subcircuit.add_x_gate(1);
+            return subcircuit;
+        }()
+    );
 
     auto statevector = ket::Statevector {"00"};
     ket::simulate(circuit, statevector);
@@ -58,7 +53,12 @@ TEST_CASE("add_if_not_statement()")
     circuit.add_m_gate(0);
     circuit.add_if_not_statement(
         0,
-        [] { auto circ = ket::QuantumCircuit {2}; circ.add_x_gate(0); return circ; }()
+        []
+        {
+            auto circ = ket::QuantumCircuit {2};
+            circ.add_x_gate(0);
+            return circ;
+        }()
     );
 
     auto statevector = ket::Statevector {"00"};
@@ -70,13 +70,15 @@ TEST_CASE("add_if_not_statement()")
 
 TEST_CASE("add_if_else_statement()")
 {
-    auto if_circuit = []() {
+    auto if_circuit = []()
+    {
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_x_gate(1);
         return subcircuit;
     }();
 
-    auto else_circuit = []() {
+    auto else_circuit = []()
+    {
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_x_gate(0);
         return subcircuit;
@@ -118,13 +120,15 @@ TEST_CASE("add_if_else_statement()")
 
 TEST_CASE("add_if_not_else_statement()")
 {
-    auto if_circuit = []() {
+    auto if_circuit = []()
+    {
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_x_gate(1);
         return subcircuit;
     }();
 
-    auto else_circuit = []() {
+    auto else_circuit = []()
+    {
         auto subcircuit = ket::QuantumCircuit {2};
         subcircuit.add_x_gate(0);
         return subcircuit;

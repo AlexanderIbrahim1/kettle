@@ -2,21 +2,24 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
+#define REQUIRE_MSG(cond, msg) \
+    do {                       \
+        INFO(msg);             \
+        REQUIRE(cond);         \
+    }                          \
+    while ((void)0, 0)
 
 #include <Eigen/Dense>
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/gates/random_u_gates.hpp"
-#include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/simulation/simulate.hpp"
-#include "kettle/state/statevector.hpp"
+#include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle_internal/common/state_test_utils.hpp"
 
-
 namespace ki = ket::internal;
-
 
 TEST_CASE("statevector_to_density_matrix()")
 {
@@ -28,17 +31,13 @@ TEST_CASE("statevector_to_density_matrix()")
             Eigen::Index idx;
         };
 
-        const auto testcase = GENERATE(
-            TestCase {"00", 0},
-            TestCase {"10", 1},
-            TestCase {"01", 2},
-            TestCase {"11", 3}
-        );
+        const auto testcase = GENERATE(TestCase {"00", 0}, TestCase {"10", 1}, TestCase {"01", 2}, TestCase {"11", 3});
 
         auto statevector = ket::Statevector {testcase.basis_state};
         const auto density_matrix = ket::statevector_to_density_matrix(statevector);
 
-        const auto expected = [&]() {
+        const auto expected = [&]()
+        {
             auto matrix = Eigen::MatrixXcd::Zero(4, 4).eval();
             matrix(testcase.idx, testcase.idx) = 1.0;
 
@@ -59,7 +58,8 @@ TEST_CASE("statevector_to_density_matrix()")
 
         const auto density_matrix = ket::statevector_to_density_matrix(statevector);
 
-        const auto expected = []() {
+        const auto expected = []()
+        {
             auto matrix = Eigen::MatrixXcd::Zero(4, 4).eval();
             matrix(0, 0) = 0.5;
             matrix(0, 3) = 0.5;
@@ -95,11 +95,11 @@ TEST_CASE("density matrix tensor product")
             TestCase {
                 "H-gate on (state 0, qubit 0)",
                 [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
-                []([[maybe_unused]] ket::QuantumCircuit& circ) { }
+                []([[maybe_unused]] ket::QuantumCircuit& circ) {}
             },
             TestCase {
                 "H-gate on (state 1, qubit 0)",
-                []([[maybe_unused]] ket::QuantumCircuit& circ) { },
+                []([[maybe_unused]] ket::QuantumCircuit& circ) {},
                 [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); }
             },
             TestCase {
@@ -114,7 +114,11 @@ TEST_CASE("density matrix tensor product")
             },
             TestCase {
                 "H-gate, Y-gate on (state 0, qubit 0), Z-gate on (state 1, qubit 0)",
-                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_y_gate(0); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_h_gate(0);
+                    circ.add_y_gate(0);
+                },
                 [](ket::QuantumCircuit& circ) { circ.add_z_gate(0); }
             }
         );
@@ -150,11 +154,11 @@ TEST_CASE("density matrix tensor product")
             TestCase {
                 "H-gate on (state 0, qubit 0, qubit 1)",
                 [](ket::QuantumCircuit& circ) { circ.add_h_gate({0, 1}); },
-                []([[maybe_unused]] ket::QuantumCircuit& circ) { }
+                []([[maybe_unused]] ket::QuantumCircuit& circ) {}
             },
             TestCase {
                 "H-gate on (state 1, qubit 0, qubit 1)",
-                []([[maybe_unused]] ket::QuantumCircuit& circ) { },
+                []([[maybe_unused]] ket::QuantumCircuit& circ) {},
                 [](ket::QuantumCircuit& circ) { circ.add_h_gate({0, 1}); }
             },
             TestCase {
@@ -164,13 +168,25 @@ TEST_CASE("density matrix tensor product")
             },
             TestCase {
                 "X-gate on (state 0, qubit 0), H-gate on (state 0, qubit 1), Z-gate on (state 1, qubit 0, qubit 1)",
-                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_h_gate(1); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_x_gate(0);
+                    circ.add_h_gate(1);
+                },
                 [](ket::QuantumCircuit& circ) { circ.add_z_gate(0); }
             },
             TestCase {
                 "H-gate, Y-gate on (state 0, qubit 0), Y-gate on (state 1, qubit 0) Z-gate on (state 1, qubit 1)",
-                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_y_gate(0); },
-                [](ket::QuantumCircuit& circ) { circ.add_y_gate(0); circ.add_z_gate(1); }
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_h_gate(0);
+                    circ.add_y_gate(0);
+                },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_y_gate(0);
+                    circ.add_z_gate(1);
+                }
             }
         );
 
@@ -202,7 +218,8 @@ TEST_CASE("density matrix tensor product")
     SECTION("tensor product of several density matrices at once")
     {
         // make the three density matrices somewhat non-trivial
-        const auto dens_mat0 = []() {
+        const auto dens_mat0 = []()
+        {
             auto output = ket::DensityMatrix {"00"};
 
             auto circuit = ket::QuantumCircuit {2};
@@ -215,7 +232,8 @@ TEST_CASE("density matrix tensor product")
             return output;
         }();
 
-        const auto dens_mat1 = []() {
+        const auto dens_mat1 = []()
+        {
             auto output = ket::DensityMatrix {"0"};
 
             auto circuit = ket::QuantumCircuit {1};
@@ -228,7 +246,8 @@ TEST_CASE("density matrix tensor product")
             return output;
         }();
 
-        const auto dens_mat2 = []() {
+        const auto dens_mat2 = []()
+        {
             auto output = ket::DensityMatrix {"000"};
 
             auto circuit = ket::QuantumCircuit {3};
@@ -274,8 +293,16 @@ TEST_CASE("partial trace [take tensor product, then partial trace, and check for
             },
             TestCase {
                 "X, Y on 0, H, Z on 1",
-                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); },
-                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_x_gate(0);
+                    circ.add_y_gate(0);
+                },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_h_gate(0);
+                    circ.add_z_gate(0);
+                },
             }
         );
 
@@ -429,18 +456,40 @@ TEST_CASE("partial trace [take tensor product, then partial trace, and check for
             },
             TestCase {
                 "X on 0, Y on 1 (left) | H on 0 (right)",
-                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_x_gate(0);
+                    circ.add_y_gate(0);
+                },
                 [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); },
             },
             TestCase {
                 "X, Y on 0, Z on 1 (left) | H, Z on 0 (right)",
-                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); circ.add_z_gate(1); },
-                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_x_gate(0);
+                    circ.add_y_gate(0);
+                    circ.add_z_gate(1);
+                },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_h_gate(0);
+                    circ.add_z_gate(0);
+                },
             },
             TestCase {
                 "X, Y on 0, CX on (0, 1) (left) | H, Z on 0 (right)",
-                [](ket::QuantumCircuit& circ) { circ.add_x_gate(0); circ.add_y_gate(0); circ.add_cx_gate(0, 1); },
-                [](ket::QuantumCircuit& circ) { circ.add_h_gate(0); circ.add_z_gate(0); },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_x_gate(0);
+                    circ.add_y_gate(0);
+                    circ.add_cx_gate(0, 1);
+                },
+                [](ket::QuantumCircuit& circ)
+                {
+                    circ.add_h_gate(0);
+                    circ.add_z_gate(0);
+                },
             }
         );
 

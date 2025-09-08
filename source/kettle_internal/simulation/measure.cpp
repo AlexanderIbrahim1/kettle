@@ -19,10 +19,7 @@ template <int StateToCollapse>
 struct state_collapse_always_false : std::false_type
 {};
 
-auto probabilities_of_collapsed_states_(
-    ket::Statevector& state,
-    const ket::GateInfo& info
-) -> std::tuple<double, double>
+auto probabilities_of_collapsed_states_(ket::Statevector& state, const ket::GateInfo& info) -> std::tuple<double, double>
 {
     const auto target_index = ket::internal::create::unpack_single_qubit_gate_index(info);
 
@@ -43,11 +40,7 @@ auto probabilities_of_collapsed_states_(
 }
 
 template <int StateToCollapse>
-void collapse_and_renormalize_(
-    ket::Statevector& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-)
+void collapse_and_renormalize_(ket::Statevector& state, const ket::GateInfo& info, double norm_of_surviving_state)
 {
     const auto target_index = ket::internal::create::unpack_single_qubit_gate_index(info);
 
@@ -70,17 +63,7 @@ void collapse_and_renormalize_(
         }
     }
 }
-template
-void collapse_and_renormalize_<0>(
-    ket::Statevector& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-);
-template
-void collapse_and_renormalize_<1>(
-    ket::Statevector& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-);
+template void collapse_and_renormalize_<0>(ket::Statevector& state, const ket::GateInfo& info, double norm_of_surviving_state);
+template void collapse_and_renormalize_<1>(ket::Statevector& state, const ket::GateInfo& info, double norm_of_surviving_state);
 
 }  // namespace ket::internal

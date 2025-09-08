@@ -16,11 +16,8 @@ enum class MarginalBitsSide : std::uint8_t
     RIGHT
 };
 
-auto state_index_to_bitstring_marginal_(
-    std::size_t i_state,
-    const std::vector<std::uint8_t>& marginal_bitmask,
-    ket::Endian input_endian
-) -> std::string;
+auto state_index_to_bitstring_marginal_(std::size_t i_state, const std::vector<std::uint8_t>& marginal_bitmask, ket::Endian input_endian)
+    -> std::string;
 
 template <MarginalBitsSide Side>
 auto are_all_marginal_bits_on_side_(const std::string& marginal_bitstring) -> bool;

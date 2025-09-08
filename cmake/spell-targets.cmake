@@ -1,4 +1,4 @@
-set(SPELL_COMMAND codespell CACHE STRING "Spell checker to use")
+set(SPELL_COMMAND codespell)
 
 add_custom_target(
     spell-check

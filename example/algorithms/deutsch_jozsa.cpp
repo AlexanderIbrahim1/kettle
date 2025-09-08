@@ -12,14 +12,12 @@
     of the main() function below.
 */
 
-
 enum class QueryCase
 {
     CONSTANT_0 = 0,  // all inputs map to 0
     CONSTANT_1 = 1,  // all inputs map to 1
     BALANCED = 2,    // half of all inputs map to 0, the other half map to 1
 };
-
 
 /*
     Randomly select which of the 2^(n_data_qubits - 1) will be mapped to 1
@@ -59,7 +57,8 @@ void apply_deutsch_jozsa_function(ket::QuantumCircuit& circuit, QueryCase query)
     }
 
     // helper function need to map specific inputs in the query function to 1
-    const auto add_x_gates_on_set_bits = [&](const std::vector<std::uint8_t>& bitset_) {
+    const auto add_x_gates_on_set_bits = [&](const std::vector<std::uint8_t>& bitset_)
+    {
         for (std::size_t i_qubit {0}; i_qubit < bitset_.size(); ++i_qubit) {
             if (bitset_[i_qubit]) {
                 circuit.add_x_gate(i_qubit);

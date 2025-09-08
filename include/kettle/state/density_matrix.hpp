@@ -17,14 +17,15 @@
 namespace ket
 {
 
-struct density_matrix_nocheck {};
+struct density_matrix_nocheck
+{};
 
 class DensityMatrix
 {
 public:
     /*
         Construct the `DensityMatrix` type from an existing `Eigen::MatrixXcd` instance `matrix`.
-        
+
         This constructor checks if the instance provided is a valid density matrix. It checks if
         the matrix is:
           - a square matrix with a side length equal to a positive power of 2
@@ -44,10 +45,7 @@ public:
 
         All checks that determine if a density matrix is valid are all skipped.
     */
-    explicit DensityMatrix(
-        Eigen::MatrixXcd matrix,
-        [[maybe_unused]] const density_matrix_nocheck& key
-    );
+    explicit DensityMatrix(Eigen::MatrixXcd matrix, [[maybe_unused]] const density_matrix_nocheck& key);
 
     /*
         Construct the `DensityMatrix` type for a single computational basis state, represented by
@@ -56,10 +54,7 @@ public:
         The resulting density matrix will have a 0 for every entry, except for the diagonal element
         given by the index calculated from the bistring.
     */
-    explicit DensityMatrix(
-        const std::string& bitstring,
-        Endian input_endian = Endian::LITTLE
-    );
+    explicit DensityMatrix(const std::string& bitstring, Endian input_endian = Endian::LITTLE);
 
     [[nodiscard]]
     constexpr auto matrix() const -> const Eigen::MatrixXcd&

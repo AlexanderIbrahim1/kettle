@@ -2,7 +2,6 @@
 
 #include "kettle/circuit/circuit.hpp"
 
-
 namespace ket
 {
 

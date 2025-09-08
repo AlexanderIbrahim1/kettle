@@ -18,10 +18,7 @@ template <int StateToCollapse>
 struct state_collapse_always_false : std::false_type
 {};
 
-auto probabilities_of_collapsed_states_(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info
-) -> std::tuple<double, double>
+auto probabilities_of_collapsed_states_(ket::DensityMatrix& state, const ket::GateInfo& info) -> std::tuple<double, double>
 {
     const auto target_index_st = ket::internal::create::unpack_single_qubit_gate_index(info);
     const auto target_index = static_cast<Eigen::Index>(target_index_st);
@@ -32,7 +29,7 @@ auto probabilities_of_collapsed_states_(
 
     auto prob_of_0_states = double {0.0};
     auto prob_of_1_states = double {0.0};
-   
+
     // TODO: change the initial and final pairs when multithreading is reintroduced
     pair_iterator_outer.set_state(0);
     for (auto i_pair_outer {0}; i_pair_outer < pair_iterator_outer.size(); ++i_pair_outer) {
@@ -51,11 +48,7 @@ auto probabilities_of_collapsed_states_(
 }
 
 template <int StateToCollapse>
-void collapse_and_renormalize_(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-)
+void collapse_and_renormalize_(ket::DensityMatrix& state, const ket::GateInfo& info, double norm_of_surviving_state)
 {
     const auto target_index_st = ket::internal::create::unpack_single_qubit_gate_index(info);
     const auto target_index = static_cast<Eigen::Index>(target_index_st);
@@ -86,25 +79,14 @@ void collapse_and_renormalize_(
             }
             else {
                 static_assert(
-                    state_collapse_always_false<StateToCollapse>::value,
-                    "Invalid integer provided for state collapse of density matrix."
+                    state_collapse_always_false<StateToCollapse>::value, "Invalid integer provided for state collapse of density matrix."
                 );
             }
         }
     }
 }
 
-template
-void collapse_and_renormalize_<0>(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-);
-template
-void collapse_and_renormalize_<1>(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-);
+template void collapse_and_renormalize_<0>(ket::DensityMatrix& state, const ket::GateInfo& info, double norm_of_surviving_state);
+template void collapse_and_renormalize_<1>(ket::DensityMatrix& state, const ket::GateInfo& info, double norm_of_surviving_state);
 
 }  // namespace ket::internal

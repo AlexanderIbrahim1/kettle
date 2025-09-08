@@ -2,7 +2,6 @@
 
 #include <kettle/kettle.hpp>
 
-
 auto main() -> int
 {
     auto circuit = ket::QuantumCircuit {4};

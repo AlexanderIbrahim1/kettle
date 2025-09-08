@@ -2,7 +2,6 @@
 
 #include "kettle/gates/primitive_gate.hpp"
 
-
 namespace ket::internal::gate_id
 {
 
@@ -32,4 +31,3 @@ constexpr inline auto is_1c1t_gate = is_one_control_one_target_transform_gate;
 constexpr inline auto is_1c1t1a_gate = is_one_control_one_target_one_angle_transform_gate;
 
 }  // namespace ket::internal::gate_id
-

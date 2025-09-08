@@ -14,7 +14,6 @@
 namespace io_fmt = ket::internal::format;
 namespace io_par = ket::internal::parse;
 
-
 TEST_CASE("format_csv_integers_()")
 {
     struct TestCase
@@ -24,7 +23,10 @@ TEST_CASE("format_csv_integers_()")
     };
 
     const auto testcase = GENERATE(
-        TestCase {{}, "[]"},
+        TestCase {
+            {},
+            "[]"
+    },
         TestCase {{0}, "[0]"},
         TestCase {{0, 3}, "[0, 3]"},
         TestCase {{0, 3, 1}, "[0, 3, 1]"}
@@ -45,11 +47,14 @@ TEST_CASE("format_control_flow_predicate_()")
     };
 
     const auto testcase = GENERATE(
-        TestCase {Predicate { {0}, {1}, Kind::IF}, "BITS[0] == [1]"},
-        TestCase {Predicate { {0}, {1}, Kind::IF_NOT}, "BITS[0] != [1]"},
-        TestCase {Predicate { {0, 3}, {1, 0}, Kind::IF}, "BITS[0, 3] == [1, 0]"},
-        TestCase {Predicate { {0, 3}, {1, 0}, Kind::IF_NOT}, "BITS[0, 3] != [1, 0]"},
-        TestCase {Predicate { {0, 3, 1}, {0, 0, 1}, Kind::IF}, "BITS[0, 3, 1] == [0, 0, 1]"}
+        TestCase {
+            Predicate {{0}, {1}, Kind::IF},
+             "BITS[0] == [1]"
+    },
+        TestCase {Predicate {{0}, {1}, Kind::IF_NOT}, "BITS[0] != [1]"},
+        TestCase {Predicate {{0, 3}, {1, 0}, Kind::IF}, "BITS[0, 3] == [1, 0]"},
+        TestCase {Predicate {{0, 3}, {1, 0}, Kind::IF_NOT}, "BITS[0, 3] != [1, 0]"},
+        TestCase {Predicate {{0, 3, 1}, {0, 0, 1}, Kind::IF}, "BITS[0, 3, 1] == [0, 0, 1]"}
     );
 
     REQUIRE(io_fmt::format_control_flow_predicate_(testcase.input) == testcase.expected);
@@ -60,17 +65,28 @@ TEST_CASE("format classical control flow statements")
     using Predicate = ket::ControlFlowPredicate;
     using Kind = ket::ControlFlowBooleanKind;
 
-    const auto predicate = Predicate { {0, 3}, {1, 0}, Kind::IF};
+    const auto predicate = Predicate {
+        {0, 3},
+        {1, 0},
+        Kind::IF
+    };
 
-    auto if_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_x_gate(0); return circ; }();
-    auto else_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_h_gate(0); return circ; }();
+    auto if_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_x_gate(0);
+        return circ;
+    }();
+    auto else_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_h_gate(0);
+        return circ;
+    }();
 
     SECTION("if statement")
     {
-        const auto if_stmt = ket::ClassicalIfStatement {
-            predicate,
-            std::make_unique<ket::QuantumCircuit>(if_subcirc)
-        };
+        const auto if_stmt = ket::ClassicalIfStatement {predicate, std::make_unique<ket::QuantumCircuit>(if_subcirc)};
 
         const auto expected = std::string {"IF BITS[0, 3] == [1, 0]"};
         const auto actual = io_fmt::format_classical_if_statement_header_(if_stmt.predicate());
@@ -81,9 +97,7 @@ TEST_CASE("format classical control flow statements")
     SECTION("if else statement")
     {
         const auto if_else_stmt = ket::ClassicalIfElseStatement {
-            predicate,
-            std::make_unique<ket::QuantumCircuit>(if_subcirc),
-            std::make_unique<ket::QuantumCircuit>(else_subcirc)
+            predicate, std::make_unique<ket::QuantumCircuit>(if_subcirc), std::make_unique<ket::QuantumCircuit>(else_subcirc)
         };
         const auto expected0 = std::string {"IF BITS[0, 3] == [1, 0]"};
         const auto expected1 = std::string {"ELSE"};
@@ -103,7 +117,9 @@ TEST_CASE("parse_csv_in_backets_()")
     };
 
     const auto testcase = GENERATE(
-        TestCase {"[]", std::vector<int> {}},
+        TestCase {
+            "[]", std::vector<int> {}
+    },
         TestCase {"[0]", std::vector<int> {0}},
         TestCase {"[0, 2]", std::vector<int> {0, 2}},
         TestCase {"[2, 3, 1]", std::vector<int> {2, 3, 1}}
@@ -126,11 +142,13 @@ TEST_CASE("parse_control_flow_predicate_()")
     };
 
     const auto testcase = GENERATE(
-        TestCase {"BITS[0] == [1]", Predicate { {0}, {1}, Kind::IF}},
-        TestCase {"BITS[0] != [1]", Predicate { {0}, {1}, Kind::IF_NOT}},
-        TestCase {"BITS[0, 3] == [1, 0]", Predicate { {0, 3}, {1, 0}, Kind::IF}},
-        TestCase {"BITS[0, 3] != [1, 0]", Predicate { {0, 3}, {1, 0}, Kind::IF_NOT}},
-        TestCase {"BITS[0, 3, 1] == [0, 0, 1]", Predicate { {0, 3, 1}, {0, 0, 1}, Kind::IF}}
+        TestCase {
+            "BITS[0] == [1]", Predicate {{0}, {1}, Kind::IF}
+    },
+        TestCase {"BITS[0] != [1]", Predicate {{0}, {1}, Kind::IF_NOT}},
+        TestCase {"BITS[0, 3] == [1, 0]", Predicate {{0, 3}, {1, 0}, Kind::IF}},
+        TestCase {"BITS[0, 3] != [1, 0]", Predicate {{0, 3}, {1, 0}, Kind::IF_NOT}},
+        TestCase {"BITS[0, 3, 1] == [0, 0, 1]", Predicate {{0, 3, 1}, {0, 0, 1}, Kind::IF}}
     );
 
     auto stream = std::stringstream {testcase.input};

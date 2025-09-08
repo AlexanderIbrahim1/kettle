@@ -6,8 +6,8 @@
 #include "kettle/common/mathtools.hpp"
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 
-#include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 #include "kettle_internal/operator/channels/channel_helper.hpp"
+#include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
 namespace ki = ket::internal;
 
@@ -23,7 +23,7 @@ auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_operato
     for ([[maybe_unused]] const auto& [ignore, element] : weighted_operators) {
         for (const auto& circ_element : element) {
             if (!circ_element.is_gate() && !circ_element.is_circuit_logger()) {
-                throw std::runtime_error{"ERROR: MixedCircuitChannel only allows gates and loggers as circuit elements.\n"};
+                throw std::runtime_error {"ERROR: MixedCircuitChannel only allows gates and loggers as circuit elements.\n"};
             }
         }
     }
@@ -31,15 +31,11 @@ auto check_only_gates_(const std::vector<ket::WeightedCircuit>& weighted_operato
 
 }  // namespace
 
-
 namespace ket
 {
 
 // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-MixedCircuitChannel::MixedCircuitChannel(
-    std::vector<WeightedCircuit> weighted_operators,
-    double tolerance
-)
+MixedCircuitChannel::MixedCircuitChannel(std::vector<WeightedCircuit> weighted_operators, double tolerance)
     : n_qubits_ {0}
     , weighted_operators_ {std::move(weighted_operators)}
 {
@@ -58,23 +54,15 @@ MixedCircuitChannel::MixedCircuitChannel(
     check_only_gates_(weighted_operators_);
 }
 
-
-MixedCircuitChannel::MixedCircuitChannel(
-    const std::initializer_list<WeightedCircuit>& weighted_operators,
-    double tolerance
-)
+MixedCircuitChannel::MixedCircuitChannel(const std::initializer_list<WeightedCircuit>& weighted_operators, double tolerance)
     : MixedCircuitChannel {std::vector<WeightedCircuit> {weighted_operators}, tolerance}
 {}
 
-
-auto almost_eq(
-    const MixedCircuitChannel& left_op,
-    const MixedCircuitChannel& right_op,
-    double coeff_tolerance
-) -> bool
+auto almost_eq(const MixedCircuitChannel& left_op, const MixedCircuitChannel& right_op, double coeff_tolerance) -> bool
 {
     using PU = WeightedCircuit;
-    const auto almost_eq = [coeff_tolerance](const PU& left, const PU& right) {
+    const auto almost_eq = [coeff_tolerance](const PU& left, const PU& right)
+    {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
         }

@@ -1,5 +1,5 @@
-#include <string>
 #include <optional>
+#include <string>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -10,8 +10,8 @@
 #include "kettle/gates/common_u_gates.hpp"
 #include "kettle/simulation/simulate.hpp"
 
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 
 using G = ket::Gate;
 using Matrices = std::vector<ket::Matrix2X2>;
@@ -27,8 +27,7 @@ static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg
     auto output = ket::i_gate();
 
     for (const auto& pg_info : pg_infos) {
-        switch (pg_info.gate)
-        {
+        switch (pg_info.gate) {
             case ket::Gate::H : {
                 output = ket::h_gate() * output;
                 break;
@@ -74,14 +73,15 @@ static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg
     return output;
 }
 
-
 TEST_CASE("transpile_to_primitive()")
 {
-
     SECTION("1 qubit circuit, one gate")
     {
         const auto unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})},
+            Matrices {
+                make_matrix({{G::H}}
+                )
+        },
             Matrices {make_matrix({{G::H}, {G::X}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
@@ -89,7 +89,9 @@ TEST_CASE("transpile_to_primitive()")
         );
 
         auto state0 = GENERATE(
-            ket::Statevector {"0"},
+            ket::Statevector {
+                "0"
+        },
             ket::Statevector {"1"},
             ket::Statevector {{{M_SQRT1_2, 0.0}, {M_SQRT1_2, 0.0}}},
             ket::Statevector {{{0.0, M_SQRT1_2}, {0.0, M_SQRT1_2}}},
@@ -127,7 +129,10 @@ TEST_CASE("transpile_to_primitive() with control flow if_statement()")
     SECTION("2 qubit circuit, qubit 0 is measured, qubit 1 is dependent")
     {
         const auto unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})},
+            Matrices {
+                make_matrix({{G::H}}
+                )
+        },
             Matrices {make_matrix({{G::H}, {G::X}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
@@ -189,7 +194,10 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
     SECTION("2 qubit circuit, qubit 0 is measured, qubit 1 is dependent")
     {
         const auto if_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})},
+            Matrices {
+                make_matrix({{G::H}}
+                )
+        },
             Matrices {make_matrix({{G::H}, {G::X}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},
@@ -197,7 +205,10 @@ TEST_CASE("transpile_to_primitive() with control flow if_else_statement()")
         );
 
         const auto else_unitaries = GENERATE_COPY(
-            Matrices {make_matrix({{G::H}})},
+            Matrices {
+                make_matrix({{G::H}}
+                )
+        },
             Matrices {make_matrix({{G::H}, {G::X}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}})},
             Matrices {make_matrix({{G::H}, {G::X}, {G::RZ, 0.432}, {G::P, 2.232}})},

@@ -5,7 +5,6 @@
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 
-
 namespace ket::internal
 {
 

@@ -20,9 +20,9 @@
 #include "kettle/circuit/circuit.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
+#include "kettle_internal/common/utils_internal.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
-#include "kettle_internal/common/utils_internal.hpp"
 
 // NOTE:
 // - there is the potential for a lot of code reduction here
@@ -66,14 +66,12 @@ void apply_fourier_transform_swaps_(ket::QuantumCircuit& circuit, const Containe
     }
 }
 template void apply_fourier_transform_swaps_<ket::QubitIndicesVector>(
-    ket::QuantumCircuit& circuit, const ket::QubitIndicesVector& container
+    ket::QuantumCircuit& circuit,
+    const ket::QubitIndicesVector& container
 );
-template void apply_fourier_transform_swaps_<ket::QubitIndicesIList>(
-    ket::QuantumCircuit& circuit, const ket::QubitIndicesIList& container
-);
+template void apply_fourier_transform_swaps_<ket::QubitIndicesIList>(ket::QuantumCircuit& circuit, const ket::QubitIndicesIList& container);
 
 }  // namespace
-
 
 namespace ket
 {
@@ -253,11 +251,8 @@ void QuantumCircuit::add_rx_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::RX);
 }
 
-auto QuantumCircuit::add_rx_gate(
-    std::size_t target_index,
-    double initial_angle,
-    [[maybe_unused]] ket::param::parameterized key
-) -> ket::param::ParameterID
+auto QuantumCircuit::add_rx_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+    -> ket::param::ParameterID
 {
     return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RX, key);
 }
@@ -282,11 +277,8 @@ void QuantumCircuit::add_ry_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::RY);
 }
 
-auto QuantumCircuit::add_ry_gate(
-    std::size_t target_index,
-    double initial_angle,
-    [[maybe_unused]] ket::param::parameterized key
-) -> ket::param::ParameterID
+auto QuantumCircuit::add_ry_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+    -> ket::param::ParameterID
 {
     return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RY, key);
 }
@@ -311,11 +303,8 @@ void QuantumCircuit::add_rz_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::RZ);
 }
 
-auto QuantumCircuit::add_rz_gate(
-    std::size_t target_index,
-    double initial_angle,
-    [[maybe_unused]] ket::param::parameterized key
-) -> ket::param::ParameterID
+auto QuantumCircuit::add_rz_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+    -> ket::param::ParameterID
 {
     return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::RZ, key);
 }
@@ -340,11 +329,8 @@ void QuantumCircuit::add_p_gate(std::size_t target_index, double angle)
     add_one_target_one_angle_gate_(target_index, angle, Gate::P);
 }
 
-auto QuantumCircuit::add_p_gate(
-    std::size_t target_index,
-    double initial_angle,
-    [[maybe_unused]] ket::param::parameterized key
-) -> ket::param::ParameterID
+auto QuantumCircuit::add_p_gate(std::size_t target_index, double initial_angle, [[maybe_unused]] ket::param::parameterized key)
+    -> ket::param::ParameterID
 {
     return add_one_target_one_parameter_gate_with_angle_(target_index, initial_angle, Gate::P, key);
 }
@@ -529,11 +515,7 @@ auto QuantumCircuit::add_crx_gate(
     return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRX, key);
 }
 
-void QuantumCircuit::add_crx_gate(
-    std::size_t control_index,
-    std::size_t target_index,
-    const ket::param::ParameterID& id
-)
+void QuantumCircuit::add_crx_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id)
 {
     add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRX, id);
 }
@@ -563,11 +545,7 @@ auto QuantumCircuit::add_cry_gate(
     return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRY, key);
 }
 
-void QuantumCircuit::add_cry_gate(
-    std::size_t control_index,
-    std::size_t target_index,
-    const ket::param::ParameterID& id
-)
+void QuantumCircuit::add_cry_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id)
 {
     add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRY, id);
 }
@@ -597,11 +575,7 @@ auto QuantumCircuit::add_crz_gate(
     return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CRZ, key);
 }
 
-void QuantumCircuit::add_crz_gate(
-    std::size_t control_index,
-    std::size_t target_index,
-    const ket::param::ParameterID& id
-)
+void QuantumCircuit::add_crz_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id)
 {
     add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CRZ, id);
 }
@@ -631,11 +605,7 @@ auto QuantumCircuit::add_cp_gate(
     return add_one_control_one_target_one_parameter_gate_with_angle_(control_index, target_index, initial_angle, Gate::CP, key);
 }
 
-void QuantumCircuit::add_cp_gate(
-    std::size_t control_index,
-    std::size_t target_index,
-    const ket::param::ParameterID& id
-)
+void QuantumCircuit::add_cp_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id)
 {
     add_one_control_one_target_one_parameter_gate_without_angle_(control_index, target_index, Gate::CP, id);
 }
@@ -682,7 +652,10 @@ void QuantumCircuit::add_cu_gate(const Matrix2X2& gate, const Container& pairs)
         add_cu_gate(gate, pair.first, pair.second);
     }
 }
-template void QuantumCircuit::add_cu_gate<ControlAndTargetIndicesVector>(const Matrix2X2& gate, const ControlAndTargetIndicesVector& indices);
+template void QuantumCircuit::add_cu_gate<ControlAndTargetIndicesVector>(
+    const Matrix2X2& gate,
+    const ControlAndTargetIndicesVector& indices
+);
 template void QuantumCircuit::add_cu_gate<ControlAndTargetIndicesIList>(const Matrix2X2& gate, const ControlAndTargetIndicesIList& indices);
 
 void QuantumCircuit::add_m_gate(std::size_t target_index)
@@ -791,7 +764,12 @@ void QuantumCircuit::add_ccz_gate(const Container& triplets)
 template void QuantumCircuit::add_ccz_gate<TwoControlOneTargetIndicesVector>(const TwoControlOneTargetIndicesVector& indices);
 template void QuantumCircuit::add_ccz_gate<TwoControlOneTargetIndicesIList>(const TwoControlOneTargetIndicesIList& indices);
 
-void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, std::size_t control_index0, std::size_t control_index1, std::size_t target_index)
+void QuantumCircuit::add_ccu_gate(
+    const Matrix2X2& unitary,
+    std::size_t control_index0,
+    std::size_t control_index1,
+    std::size_t target_index
+)
 {
     const auto mat_sqrt = matrix_square_root(unitary);
     const auto mat_sqrt_adj = conjugate_transpose(mat_sqrt);
@@ -810,8 +788,14 @@ void QuantumCircuit::add_ccu_gate(const Matrix2X2& unitary, const Container& tri
         add_ccu_gate(unitary, control0, control1, target);
     }
 }
-template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesVector>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesVector& indices);
-template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesIList>(const Matrix2X2& unitary, const TwoControlOneTargetIndicesIList& indices);
+template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesVector>(
+    const Matrix2X2& unitary,
+    const TwoControlOneTargetIndicesVector& indices
+);
+template void QuantumCircuit::add_ccu_gate<TwoControlOneTargetIndicesIList>(
+    const Matrix2X2& unitary,
+    const TwoControlOneTargetIndicesIList& indices
+);
 
 void QuantumCircuit::add_swap_gate(std::size_t target_index0, std::size_t target_index1)
 {
@@ -860,7 +844,6 @@ void QuantumCircuit::add_cswap_gate(const Container& triplets)
 }
 template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesIList>(const OneControlTwoTargetIndicesIList& indices);
 template void QuantumCircuit::add_cswap_gate<OneControlTwoTargetIndicesVector>(const OneControlTwoTargetIndicesVector& indices);
-
 
 template <QubitIndices Container>
 void QuantumCircuit::add_qft_gate(const Container& indices)
@@ -917,11 +900,7 @@ template void QuantumCircuit::add_iqft_gate<ket::QubitIndicesIList>(const ket::Q
 
 // --- NON-GATE CIRCUIT ELEMENTS ---
 
-void QuantumCircuit::add_if_statement(
-    ControlFlowPredicate predicate,
-    QuantumCircuit circuit,
-    double tolerance
-)
+void QuantumCircuit::add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit, double tolerance)
 {
     for (auto bit_index : predicate.bit_indices_to_check()) {
         check_bit_range_(bit_index);
@@ -929,40 +908,27 @@ void QuantumCircuit::add_if_statement(
 
     merge_subcircuit_parameters_(circuit, tolerance);
 
-    auto cfi = ClassicalIfStatement {
-        std::move(predicate),
-        std::make_unique<QuantumCircuit>(std::move(circuit))
-    };
+    auto cfi = ClassicalIfStatement {std::move(predicate), std::make_unique<QuantumCircuit>(std::move(circuit))};
 
     elements_.emplace_back(std::move(cfi));
 }
 
 // TODO: account for parameterization here
-void QuantumCircuit::add_if_statement(
-    std::size_t bit_index,
-    QuantumCircuit subcircuit
-)
+void QuantumCircuit::add_if_statement(std::size_t bit_index, QuantumCircuit subcircuit)
 {
     auto predicate = ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF};
     add_if_statement(std::move(predicate), std::move(subcircuit));
 }
 
 // TODO: account for parameterization here
-void QuantumCircuit::add_if_not_statement(
-    std::size_t bit_index,
-    QuantumCircuit subcircuit
-)
+void QuantumCircuit::add_if_not_statement(std::size_t bit_index, QuantumCircuit subcircuit)
 {
     auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
     add_if_statement(std::move(predicate), std::move(subcircuit));
 }
 
 // TODO: account for parameterization here
-void QuantumCircuit::add_if_else_statement(
-    ControlFlowPredicate predicate,
-    QuantumCircuit if_subcircuit,
-    QuantumCircuit else_subcircuit
-)
+void QuantumCircuit::add_if_else_statement(ControlFlowPredicate predicate, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit)
 {
     for (auto bit_index : predicate.bit_indices_to_check()) {
         check_bit_range_(bit_index);
@@ -978,22 +944,14 @@ void QuantumCircuit::add_if_else_statement(
 }
 
 // TODO: account for parameterization here
-void QuantumCircuit::add_if_else_statement(
-    std::size_t bit_index,
-    QuantumCircuit if_subcircuit,
-    QuantumCircuit else_subcircuit
-)
+void QuantumCircuit::add_if_else_statement(std::size_t bit_index, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit)
 {
     auto predicate = ControlFlowPredicate {{bit_index}, {1}, ControlFlowBooleanKind::IF};
     add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
 }
 
 // TODO: account for parameterization here
-void QuantumCircuit::add_if_not_else_statement(
-    std::size_t bit_index,
-    QuantumCircuit if_subcircuit,
-    QuantumCircuit else_subcircuit
-)
+void QuantumCircuit::add_if_not_else_statement(std::size_t bit_index, QuantumCircuit if_subcircuit, QuantumCircuit else_subcircuit)
 {
     auto predicate = ControlFlowPredicate {{bit_index}, {0}, ControlFlowBooleanKind::IF};
     add_if_else_statement(std::move(predicate), std::move(if_subcircuit), std::move(else_subcircuit));
@@ -1041,32 +999,21 @@ void QuantumCircuit::check_bit_range_(std::size_t bit_index) const
     }
 }
 
-void QuantumCircuit::add_one_target_gate_(
-    std::size_t target_index,
-    ket::Gate gate
-)
+void QuantumCircuit::add_one_target_gate_(std::size_t target_index, ket::Gate gate)
 {
     const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
     elements_.emplace_back(create::create_one_target_gate(gate, target_index));
 }
 
-void QuantumCircuit::add_one_target_one_angle_gate_(
-    std::size_t target_index,
-    double angle,
-    ket::Gate gate
-)
+void QuantumCircuit::add_one_target_one_angle_gate_(std::size_t target_index, double angle, ket::Gate gate)
 {
     const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(target_index, "qubit", gate_name);
     elements_.emplace_back(create::create_one_target_one_angle_gate(gate, target_index, angle));
 }
 
-void QuantumCircuit::add_one_control_one_target_gate_(
-    std::size_t control_index,
-    std::size_t target_index,
-    ket::Gate gate
-)
+void QuantumCircuit::add_one_control_one_target_gate_(std::size_t control_index, std::size_t target_index, ket::Gate gate)
 {
     const auto gate_name = ki::PRIMITIVE_GATES_TO_STRING.at(gate);
     check_qubit_range_(control_index, "control qubit", gate_name);
@@ -1139,7 +1086,9 @@ auto QuantumCircuit::add_one_control_one_target_one_parameter_gate_with_angle_(
     check_qubit_range_(target_index, "target qubit", gate_name);
 
     auto [expression, id] = create_initialized_parameter_data_(initial_angle);
-    elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+    elements_.emplace_back(
+        create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression))
+    );
 
     return id;
 }
@@ -1159,29 +1108,27 @@ void QuantumCircuit::add_one_control_one_target_one_parameter_gate_without_angle
         // if the parameter is already present;
         // no need to change its value; just update the count and create the new gate
         auto expression = update_existing_parameter_data_(id);
-        elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+        elements_.emplace_back(
+            create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression))
+        );
     }
     else {
         // if the parameter is not here;
         // create a new entry, with an empty value
         auto expression = create_uninitialized_parameter_data_(id);
-        elements_.emplace_back(create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression)));
+        elements_.emplace_back(
+            create::create_one_control_one_target_one_parameter_gate(gate, control_index, target_index, std::move(expression))
+        );
     }
 }
 
-
-void QuantumCircuit::merge_subcircuit_parameters_(
-    const QuantumCircuit& subcircuit,
-    double tolerance
-)
+void QuantumCircuit::merge_subcircuit_parameters_(const QuantumCircuit& subcircuit, double tolerance)
 {
     // TODO: currently if the names of the parameters do not match, then no exception is thrown,
     // and the name of the parent circuit takes precedence;
-    // maybe this behaviour should change in the future?
-    for (const auto& [id, sub_data]: subcircuit.parameter_data_)
-    {
-        [[maybe_unused]]
-        auto [insert_it, is_inserted] = parameter_data_.insert({id, sub_data});
+    // maybe this behavior should change in the future?
+    for (const auto& [id, sub_data] : subcircuit.parameter_data_) {
+        [[maybe_unused]] auto [insert_it, is_inserted] = parameter_data_.insert({id, sub_data});
 
         if (is_inserted) {
             continue;
@@ -1190,18 +1137,14 @@ void QuantumCircuit::merge_subcircuit_parameters_(
         auto& curr_data = parameter_data_.at(id);
         curr_data.count += sub_data.count;
 
-        if (curr_data.value == std::nullopt && sub_data.value != std::nullopt)
-        {
+        if (curr_data.value == std::nullopt && sub_data.value != std::nullopt) {
             curr_data.value = sub_data.value;
             continue;
         }
 
-        if (curr_data.value != std::nullopt && sub_data.value != std::nullopt)
-        {
+        if (curr_data.value != std::nullopt && sub_data.value != std::nullopt) {
             if (std::fabs(curr_data.value.value() - sub_data.value.value()) > tolerance) {
-                throw std::runtime_error {
-                    "ERROR: found two parameter instances with same id but different non-optional values\n"
-                };
+                throw std::runtime_error {"ERROR: found two parameter instances with same id but different non-optional values\n"};
             }
             continue;
         }
@@ -1226,21 +1169,20 @@ auto QuantumCircuit::create_uninitialized_parameter_data_(const ket::param::Para
     auto name = default_parameter_name_(parameter_count_++);
     auto parameter = ket::param::Parameter {name, id};
 
-    parameter_data_[id] = ket::param::ParameterData {.value=std::nullopt, .name=parameter.name(), .count=1};
+    parameter_data_[id] = ket::param::ParameterData {.value = std::nullopt, .name = parameter.name(), .count = 1};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 
     return expression;
 }
 
-auto QuantumCircuit::create_initialized_parameter_data_(
-    double value
-) -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>
+auto QuantumCircuit::create_initialized_parameter_data_(double value)
+    -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>
 {
     auto parameter = ket::param::Parameter {default_parameter_name_(parameter_count_++)};
     auto id = parameter.id();
 
-    parameter_data_[id] = ket::param::ParameterData {.value=value, .name=parameter.name(), .count=1};
+    parameter_data_[id] = ket::param::ParameterData {.value = value, .name = parameter.name(), .count = 1};
 
     auto expression = ket::param::ParameterExpression {std::move(parameter)};
 

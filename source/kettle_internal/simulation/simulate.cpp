@@ -3,8 +3,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/gates/primitive_gate.hpp"
@@ -17,9 +17,8 @@
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
 #include "kettle_internal/simulation/measure.hpp"
 #include "kettle_internal/simulation/measure_helper.hpp"
-#include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/operations.hpp"
-
+#include "kettle_internal/simulation/simulate_utils.hpp"
 
 namespace ki = ket::internal;
 namespace kpi = ket::param::internal;
@@ -38,11 +37,7 @@ struct gate_always_false : std::false_type
 constexpr inline auto MEASURING_THREAD_ID = int {0};
 
 template <ket::Gate GateType>
-void simulate_one_target_gate_(
-    ket::Statevector& state,
-    const ket::GateInfo& info,
-    const ki::FlatIndexPair<std::size_t>& pair
-)
+void simulate_one_target_gate_(ket::Statevector& state, const ket::GateInfo& info, const ki::FlatIndexPair<std::size_t>& pair)
 {
     namespace cre = ki::create;
     using Gate = ket::Gate;
@@ -92,7 +87,6 @@ void simulate_one_target_gate_(
     }
 }
 
-
 template <ket::Gate GateType>
 void simulate_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
@@ -130,7 +124,6 @@ void simulate_one_target_one_angle_gate_(
     }
 }
 
-
 void simulate_u_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
@@ -149,13 +142,8 @@ void simulate_u_gate_(
     }
 }
 
-
 template <ket::Gate GateType>
-void simulate_one_control_one_target_gate_(
-    ket::Statevector& state,
-    const ket::GateInfo& info,
-    const ki::FlatIndexPair<std::size_t>& pair
-)
+void simulate_one_control_one_target_gate_(ket::Statevector& state, const ket::GateInfo& info, const ki::FlatIndexPair<std::size_t>& pair)
 {
     namespace cre = ki::create;
     using Gate = ket::Gate;
@@ -205,7 +193,6 @@ void simulate_one_control_one_target_gate_(
     }
 }
 
-
 template <ket::Gate GateType>
 void simulate_one_control_one_target_one_angle_gate_(
     const kpi::MapVariant& parameter_values_map,
@@ -243,7 +230,6 @@ void simulate_one_control_one_target_one_angle_gate_(
     }
 }
 
-
 void simulate_cu_gate_(
     ket::Statevector& state,
     const ket::GateInfo& info,
@@ -261,7 +247,6 @@ void simulate_cu_gate_(
         ki::apply_u_gate(state, state0_index, state1_index, mat);
     }
 }
-
 
 void simulate_gate_info_(
     const kpi::MapVariant& parameter_values_map,
@@ -406,8 +391,7 @@ void simulate_gate_info_(
             // spawned before entering the simulation loop; thus, it is easier to just make the measurement
             // a single-threaded operation
             if (thread_id == MEASURING_THREAD_ID) {
-                [[maybe_unused]]
-                const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
+                [[maybe_unused]] const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
                 const auto measured = ki::simulate_measurement_(state, gate_info, prng_seed);
                 c_register.set(bit_index, measured);
             }
@@ -496,10 +480,12 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
                 const auto& if_else_stmt = control_flow.get_if_else_statement();
 
                 // NOTE: omitting the return type here causes a dangling reference
-                const auto& subcircuit = [&]() -> const ket::QuantumCircuit& {
+                const auto& subcircuit = [&]() -> const ket::QuantumCircuit&
+                {
                     if (if_else_stmt(cregister)) {
                         return *if_else_stmt.if_circuit();
-                    } else {
+                    }
+                    else {
                         return *if_else_stmt.else_circuit();
                     }
                 }();
@@ -514,16 +500,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
         else if (element.is_gate()) {
             const auto gate_info = element.get_gate();
 
-            simulate_gate_info_(
-                parameter_values_map,
-                state,
-                single_pair,
-                double_pair,
-                gate_info,
-                thread_id,
-                prng_seed,
-                cregister
-            );
+            simulate_gate_info_(parameter_values_map, state, single_pair, double_pair, gate_info, thread_id, prng_seed, cregister);
         }
         else {
             throw std::runtime_error {"DEV ERROR: unimplemented circuit element in `simulate_loop_body_iterative_()`\n"};
@@ -556,10 +533,10 @@ void StatevectorSimulator::run(const QuantumCircuit& circuit, Statevector& state
     check_valid_number_of_qubits_(circuit, state);
 
     const auto n_single_gate_pairs = ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
-    const auto single_pair = ki::FlatIndexPair<std::size_t> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<std::size_t> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     const auto n_double_gate_pairs = ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
-    const auto double_pair = ki::FlatIndexPair<std::size_t> {.i_lower=0, .i_upper=n_double_gate_pairs};
+    const auto double_pair = ki::FlatIndexPair<std::size_t> {.i_lower = 0, .i_upper = n_double_gate_pairs};
 
     cregister_ = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 
@@ -609,9 +586,7 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
     simulator.run(circuit, state, prng_seed);
 }
 
-
 }  // namespace ket
-
 
 // void simulate_multithreaded_loop_(
 //     std::barrier<>& sync_point,
@@ -632,7 +607,7 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 // /*
 //     WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
 //     I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
-// 
+//
 //     A quick benchmark shows that the threads spend a large amount of time waiting.
 // */
 // void simulate_multithreaded(
@@ -645,22 +620,22 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 //     if (n_threads == 0) {
 //         throw std::runtime_error {"Cannot perform simulation with 0 threads.\n"};
 //     }
-// 
+//
 //     im::check_valid_number_of_qubits_(circuit, state);
-// 
+//
 //     const auto n_single_gate_pairs = im::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
 //     const auto single_flat_index_pairs = im::partial_sum_pairs_(n_single_gate_pairs, n_threads);
-// 
+//
 //     const auto n_double_gate_pairs = im::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
 //     const auto double_flat_index_pairs = im::partial_sum_pairs_(n_double_gate_pairs, n_threads);
-// 
+//
 //     auto c_register = ClassicalRegister {circuit.n_bits()};
-// 
+//
 //     auto threads = std::vector<std::jthread> {};
 //     threads.reserve(n_threads);
-// 
+//
 //     auto barrier = std::barrier {static_cast<std::ptrdiff_t>(n_threads)};
-// 
+//
 //     for (std::size_t i {0}; i < n_threads; ++i) {
 //         threads.emplace_back(
 //             im::simulate_multithreaded_loop_,
@@ -674,7 +649,7 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 //             std::ref(c_register)
 //         );
 //     }
-// 
+//
 //     for (auto& thread : threads) {
 //         thread.join();
 //     }

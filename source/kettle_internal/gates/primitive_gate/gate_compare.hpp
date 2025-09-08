@@ -15,16 +15,8 @@ auto is_1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) ->
 
 auto is_1c1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) -> bool;
 
-auto is_1t1a_gate_equal(
-    const ket::GateInfo& info0,
-    const ket::GateInfo& info1,
-    double tol = GATE_ANGLE_TOLERANCE_
-) -> bool;
+auto is_1t1a_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1, double tol = GATE_ANGLE_TOLERANCE_) -> bool;
 
-auto is_1c1t1a_gate_equal(
-    const ket::GateInfo& info0,
-    const ket::GateInfo& info1,
-    double tol = GATE_ANGLE_TOLERANCE_
-) -> bool;
+auto is_1c1t1a_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1, double tol = GATE_ANGLE_TOLERANCE_) -> bool;
 
 }  // namespace ket::internal::compare

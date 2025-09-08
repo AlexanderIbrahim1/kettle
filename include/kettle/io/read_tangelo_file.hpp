@@ -11,13 +11,12 @@ This script parses the file of gates produced by the tangelo code.
 
 Some examples:
 ```
-H         target : [4]   
+H         target : [4]
 RX        target : [5]   parameter : 1.5707963267948966
-CNOT      target : [4]   control : [2]   
+CNOT      target : [4]   control : [2]
 RZ        target : [5]   parameter : 12.533816585267923
 ```
 */
-
 
 namespace ket
 {
@@ -42,10 +41,6 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
     For the time being, only primitive gates, SWAP gates, and control flow elements can be read.
     Any circuit elements related to logging are ignored.
 */
-auto read_tangelo_circuit(
-    std::size_t n_qubits,
-    const std::filesystem::path& filepath,
-    std::size_t n_skip_lines
-) -> QuantumCircuit;
+auto read_tangelo_circuit(std::size_t n_qubits, const std::filesystem::path& filepath, std::size_t n_skip_lines) -> QuantumCircuit;
 
 }  // namespace ket

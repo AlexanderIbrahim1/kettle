@@ -1,8 +1,8 @@
 #pragma once
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/common/tolerance.hpp"
 #include "kettle/common/matrix2x2.hpp"
+#include "kettle/common/tolerance.hpp"
 #include "kettle/common/utils.hpp"
 
 namespace ket

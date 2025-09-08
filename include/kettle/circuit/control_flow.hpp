@@ -7,14 +7,12 @@
 #include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/common/clone_ptr.hpp"
 
-
 namespace ket
 {
 
 class QuantumCircuit;
 
 }  // namespace ket
-
 
 /*
     A class that holds a single predicate and a single pointer to a circuit that
@@ -28,10 +26,7 @@ class QuantumCircuit;
 class ClassicalOneBranchBooleanStatement
 {
 public:
-    ClassicalOneBranchBooleanStatement(
-        ket::ControlFlowPredicate control_flow_predicate,
-        std::unique_ptr<ket::QuantumCircuit> circuit
-    )
+    ClassicalOneBranchBooleanStatement(ket::ControlFlowPredicate control_flow_predicate, std::unique_ptr<ket::QuantumCircuit> circuit)
         : control_flow_predicate_ {std::move(control_flow_predicate)}
         , circuit_ {std::move(circuit)}
     {}
@@ -58,7 +53,6 @@ private:
     ket::ClonePtr<ket::QuantumCircuit> circuit_;
 };
 
-
 namespace ket
 {
 
@@ -67,7 +61,6 @@ class ClassicalIfStatement : public ClassicalOneBranchBooleanStatement
 public:
     using ClassicalOneBranchBooleanStatement::ClassicalOneBranchBooleanStatement;
 };
-
 
 class ClassicalIfElseStatement
 {
@@ -111,7 +104,6 @@ private:
     ket::ClonePtr<ket::QuantumCircuit> else_circuit_;
 };
 
-
 class ClassicalControlFlowInstruction
 {
 public:
@@ -154,4 +146,3 @@ private:
 };
 
 }  // namespace ket
-

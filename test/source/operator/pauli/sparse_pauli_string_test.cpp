@@ -2,9 +2,7 @@
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
-
 using PT = ket::PauliTerm;
-
 
 TEST_CASE("SparsePauliString.set_phase()")
 {
@@ -13,7 +11,6 @@ TEST_CASE("SparsePauliString.set_phase()")
 
     REQUIRE(pauli_string.phase() == ket::PauliPhase::MINUS_EYE);
 }
-
 
 TEST_CASE("SparsePauliString.contains_index()")
 {
@@ -58,7 +55,6 @@ TEST_CASE("SparsePauliString.contains_index()")
     }
 }
 
-
 TEST_CASE("SparsePauliString.add()")
 {
     auto pauli_string = ket::SparsePauliString {5};
@@ -94,7 +90,6 @@ TEST_CASE("SparsePauliString.add()")
     }
 }
 
-
 TEST_CASE("SparsePauliString.overwrite()")
 {
     auto pauli_string = ket::SparsePauliString {5};
@@ -124,7 +119,6 @@ TEST_CASE("SparsePauliString.overwrite()")
         REQUIRE_THROWS_AS(pauli_string.overwrite(5, PT::Y), std::runtime_error);
     }
 }
-
 
 TEST_CASE("SparsePauliString.remove()")
 {
@@ -165,17 +159,17 @@ TEST_CASE("SparsePauliString.remove()")
     }
 }
 
-
 TEST_CASE("SparsePauliString construct from vector of terms")
 {
-    auto pauli_string = ket::SparsePauliString {{PT::X, PT::Y, PT::Z}};
+    auto pauli_string = ket::SparsePauliString {
+        {PT::X, PT::Y, PT::Z}
+    };
     REQUIRE(pauli_string.size() == 3);
     REQUIRE(pauli_string.phase() == ket::PauliPhase::PLUS_ONE);
     REQUIRE(pauli_string.at(0) == PT::X);
     REQUIRE(pauli_string.at(1) == PT::Y);
     REQUIRE(pauli_string.at(2) == PT::Z);
 }
-
 
 TEST_CASE("SparsePauliString operator==")
 {
@@ -231,8 +225,14 @@ TEST_CASE("SparsePauliString operator==")
 
             SECTION("2 terms, different order")
             {
-                auto string0 = ket::SparsePauliString {{{0, PT::X}, {2, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
-                auto string1 = ket::SparsePauliString {{{2, PT::X}, {0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string0 = ket::SparsePauliString {
+                    {{0, PT::X}, {2, PT::X}},
+                    3, ket::PauliPhase::MINUS_EYE
+                };
+                auto string1 = ket::SparsePauliString {
+                    {{2, PT::X}, {0, PT::X}},
+                    3, ket::PauliPhase::MINUS_EYE
+                };
 
                 REQUIRE(string0 == string1);
                 REQUIRE(string0.equal_up_to_phase(string1));
@@ -261,8 +261,14 @@ TEST_CASE("SparsePauliString operator==")
 
             SECTION("2 terms, different paulis")
             {
-                auto string0 = ket::SparsePauliString {{{0, PT::X}, {2, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
-                auto string1 = ket::SparsePauliString {{{2, PT::Y}, {0, PT::X}}, 3, ket::PauliPhase::MINUS_EYE};
+                auto string0 = ket::SparsePauliString {
+                    {{0, PT::X}, {2, PT::X}},
+                    3, ket::PauliPhase::MINUS_EYE
+                };
+                auto string1 = ket::SparsePauliString {
+                    {{2, PT::Y}, {0, PT::X}},
+                    3, ket::PauliPhase::MINUS_EYE
+                };
 
                 REQUIRE(string0 != string1);
                 REQUIRE(!string0.equal_up_to_phase(string1));

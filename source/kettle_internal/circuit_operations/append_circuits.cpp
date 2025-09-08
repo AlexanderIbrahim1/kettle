@@ -22,7 +22,7 @@ void check_matching_number_of_bits_(const ket::QuantumCircuit& left, const ket::
 
 namespace ket
 {
-    
+
 void extend_circuit(QuantumCircuit& left, const QuantumCircuit& right)
 {
     check_matching_number_of_qubits_(left, right);
@@ -39,6 +39,5 @@ auto append_circuits(QuantumCircuit left, const QuantumCircuit& right) -> Quantu
     extend_circuit(left, right);
     return left;
 }
-
 
 }  // namespace ket

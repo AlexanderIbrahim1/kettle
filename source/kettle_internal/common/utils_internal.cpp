@@ -45,20 +45,24 @@ auto extend_container_to_vector(const Container0& container0, const Container1& 
     for (auto elem : container1) {
         new_container.push_back(elem);
     }
-    
+
     return new_container;
 }
 template auto extend_container_to_vector<ket::QubitIndicesVector, ket::QubitIndicesVector>(
-    const ket::QubitIndicesVector& container0, const ket::QubitIndicesVector& container1
+    const ket::QubitIndicesVector& container0,
+    const ket::QubitIndicesVector& container1
 ) -> std::vector<std::size_t>;
 template auto extend_container_to_vector<ket::QubitIndicesIList, ket::QubitIndicesVector>(
-    const ket::QubitIndicesIList& container0, const ket::QubitIndicesVector& container1
+    const ket::QubitIndicesIList& container0,
+    const ket::QubitIndicesVector& container1
 ) -> std::vector<std::size_t>;
 template auto extend_container_to_vector<ket::QubitIndicesVector, ket::QubitIndicesIList>(
-    const ket::QubitIndicesVector& container0, const ket::QubitIndicesIList& container1
+    const ket::QubitIndicesVector& container0,
+    const ket::QubitIndicesIList& container1
 ) -> std::vector<std::size_t>;
 template auto extend_container_to_vector<ket::QubitIndicesIList, ket::QubitIndicesIList>(
-    const ket::QubitIndicesIList& container0, const ket::QubitIndicesIList& container1
+    const ket::QubitIndicesIList& container0,
+    const ket::QubitIndicesIList& container1
 ) -> std::vector<std::size_t>;
 
 }  // namespace ket::internal

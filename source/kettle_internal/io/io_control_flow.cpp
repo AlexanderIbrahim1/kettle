@@ -40,7 +40,8 @@ auto format_control_flow_predicate_(const ket::ControlFlowPredicate& predicate) 
 
     if (predicate.control_kind() == ket::ControlFlowBooleanKind::IF) {
         output << " == ";
-    } else {
+    }
+    else {
         output << " != ";
     }
 
@@ -49,16 +50,12 @@ auto format_control_flow_predicate_(const ket::ControlFlowPredicate& predicate) 
     return output.str();
 }
 
-auto format_classical_if_statement_header_(
-    const ket::ControlFlowPredicate& predicate
-) -> std::string
+auto format_classical_if_statement_header_(const ket::ControlFlowPredicate& predicate) -> std::string
 {
     return std::string {"IF "} + format_control_flow_predicate_(predicate);
 }
 
-auto format_classical_if_else_statement_header_(
-    const ket::ControlFlowPredicate& predicate
-) -> std::tuple<std::string, std::string>
+auto format_classical_if_else_statement_header_(const ket::ControlFlowPredicate& predicate) -> std::tuple<std::string, std::string>
 {
     const auto if_part = std::string {"IF "} + format_control_flow_predicate_(predicate);
     const auto else_part = std::string {"ELSE"};
@@ -67,7 +64,6 @@ auto format_classical_if_else_statement_header_(
 }
 
 }  // namespace ket::internal::format
-
 
 namespace ket::internal::parse
 {
@@ -92,7 +88,8 @@ auto parse_csv_in_brackets_(std::stringstream& stream) -> std::vector<Integer>
         stream >> str;
 
         output.push_back(value);
-    } while (str != "]");
+    }
+    while (str != "]");
 
     return output;
 }

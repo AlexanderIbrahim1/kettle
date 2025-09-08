@@ -4,8 +4,8 @@
 
 #include <Eigen/Dense>
 
-#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/simulation/simulate_density_matrix.hpp"
@@ -14,7 +14,6 @@
 #include "kettle_internal/parameter/parameter_expression_internal.hpp"
 #include "kettle_internal/simulation/operations_density_matrix.hpp"
 #include "kettle_internal/simulation/simulate_utils.hpp"
-
 
 namespace ki = ket::internal;
 namespace kpi = ket::param::internal;
@@ -93,10 +92,12 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
                 const auto& if_else_stmt = control_flow.get_if_else_statement();
 
                 // NOTE: omitting the return type here causes a dangling reference
-                const auto& subcircuit = [&]() -> const ket::QuantumCircuit& {
+                const auto& subcircuit = [&]() -> const ket::QuantumCircuit&
+                {
                     if (if_else_stmt(cregister)) {
                         return *if_else_stmt.if_circuit();
-                    } else {
+                    }
+                    else {
                         return *if_else_stmt.else_circuit();
                     }
                 }();
@@ -111,17 +112,7 @@ auto simulate_loop_body_iterative_(  // NOLINT(readability-function-cognitive-co
         else if (element.is_gate()) {
             const auto gate_info = element.get_gate();
 
-            simulate_gate_info_(
-                parameter_values_map,
-                state,
-                single_pair,
-                double_pair,
-                gate_info,
-                thread_id,
-                prng_seed,
-                cregister,
-                buffer
-            );
+            simulate_gate_info_(parameter_values_map, state, single_pair, double_pair, gate_info, thread_id, prng_seed, cregister, buffer);
         }
         else {
             throw std::runtime_error {"DEV ERROR: unimplemented circuit element in `simulate_loop_body_iterative_()`\n"};
@@ -154,10 +145,10 @@ void DensityMatrixSimulator::run(const QuantumCircuit& circuit, DensityMatrix& s
     ki::check_valid_number_of_qubits_(circuit, state);
 
     const auto n_single_gate_pairs = static_cast<Eigen::Index>(ki::number_of_single_qubit_gate_pairs_(circuit.n_qubits()));
-    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     const auto n_double_gate_pairs = static_cast<Eigen::Index>(ki::number_of_double_qubit_gate_pairs_(circuit.n_qubits()));
-    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower=0, .i_upper=n_double_gate_pairs};
+    const auto double_pair = ki::FlatIndexPair<Eigen::Index> {.i_lower = 0, .i_upper = n_double_gate_pairs};
 
     cregister_ = ket::ClonePtr<ClassicalRegister> {ClassicalRegister {circuit.n_bits()}};
 
@@ -206,6 +197,5 @@ void simulate(const QuantumCircuit& circuit, DensityMatrix& state, std::optional
     auto simulator = DensityMatrixSimulator {state.n_qubits()};
     simulator.run(circuit, state, prng_seed);
 }
-
 
 }  // namespace ket
