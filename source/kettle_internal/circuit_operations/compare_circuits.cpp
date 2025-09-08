@@ -109,6 +109,8 @@ auto all_remaining_elements_are_circuit_loggers_(const ket::QuantumCircuit& circ
 namespace ket
 {
 
+// TODO: split the branching inside the "is_circuit_logger" and "is_gate" sections into separate functions,
+// to make the function easier to read
 auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-complexity)
     const QuantumCircuit& left,
     const QuantumCircuit& right,
@@ -116,6 +118,7 @@ auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-com
 ) -> bool
 {
     namespace comp = ket::internal::compare;
+    namespace gid = ket::internal::gate_id;
 
     // begin with the fastest checks first (qubits, bits, and bitmask values)
     if (left.n_qubits() != right.n_qubits()) {
@@ -191,7 +194,12 @@ auto almost_eq(  // NOLINT(misc-no-recursion, readability-function-cognitive-com
                     return false;
                 }
             }
-            else if (left_gate.gate != Gate::M && right_gate.gate != Gate::M) {
+            else if (left_gate.gate == Gate::RESET && right_gate.gate == Gate::RESET) {
+                if (!comp::is_reset_gate_equal(left_gate, right_gate)) {
+                    return false;
+                }
+            }
+            else if (gid::is_unitary_gate(left_gate.gate) && gid::is_unitary_gate(right_gate.gate)) {
                 const auto new_left_gate = as_u_gate_(left_param_map, left_gate);
                 const auto new_right_gate = as_u_gate_(right_param_map, right_gate);
 

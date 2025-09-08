@@ -45,6 +45,12 @@ auto determinant(const Matrix2X2& mat) -> std::complex<double>;
 
 auto trace(const Matrix2X2& mat) -> std::complex<double>;
 
+/*
+    Returns the Frobenius norm of the matrix, which is the square root of the sum of the
+    squared norms of all its elements.
+*/
+auto norm(const Matrix2X2& mat) -> double;
+
 auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,

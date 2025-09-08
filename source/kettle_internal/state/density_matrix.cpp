@@ -42,13 +42,36 @@ void check_has_trace_of_one_(const Eigen::MatrixXcd& matrix, double tolerance)
     }
 }
 
-void check_is_positive_semi_definite_(const Eigen::MatrixXcd& matrix)
+void check_is_positive_semi_definite_(const Eigen::MatrixXcd& matrix, double tolerance)
 {
-    // perform the LDL^T decomposition, which should be faster than finding all the eigenvalues
-    // an earlier check should have determined if the matrix is Hermitian
-    const auto ldlt = Eigen::LDLT<Eigen::MatrixXcd> {matrix};
-    if (!ldlt.isPositive() || (ldlt.info() != Eigen::Success)) {
-        throw std::runtime_error {"ERROR: provided matrix is not positive semidefinite.\n"};
+    // NOTE: we don't do the LDL^T decomposition check because despite being (in principle) faster,
+    // there were too many cases where a matrix that *was* PSD was incorrectly found to not be PSD
+    // const auto ldlt = Eigen::LDLT<Eigen::MatrixXcd> {matrix};
+    // if (!ldlt.isPositive() || (ldlt.info() != Eigen::Success)) {
+    //     throw std::runtime_error {"ERROR: provided matrix is not positive semidefinite.\n"};
+    // }
+
+    // NOTE: we already checked that the matrix is square in a previous function (since we do
+    // checks starting from the cheapest check to the most expensive check), but it doesn't hurt
+    // too much to repeat it, in case this function is ever used in isolation.
+    if (matrix.rows() != matrix.cols()) {
+        throw std::runtime_error {"ERROR: matrix must be square to check if it is positive semi-definite.\n"};
+    }
+
+    auto compute_eigenvectors_flag = false;
+    auto solver = Eigen::ComplexEigenSolver<Eigen::MatrixXcd> {matrix, compute_eigenvectors_flag};
+    if (solver.info() != Eigen::Success) {
+        throw std::runtime_error {"ERROR: unable to solve matrix, in check for positive semi-definiteness.\n"};
+    }
+
+    for (auto evalue : solver.eigenvalues()) {
+        if (std::abs(evalue.imag()) > tolerance) {
+            throw std::runtime_error {"ERROR: found eigenvalue with non-zero imaginary component in PSD check.\n"};
+        }
+
+        if (evalue.real() < -tolerance) {
+            throw std::runtime_error {"ERROR: found eigenvalue with negative real component in PSD check.\n"};
+        }
     }
 }
 
@@ -117,7 +140,12 @@ private:
 namespace ket
 {
 
-DensityMatrix::DensityMatrix(Eigen::MatrixXcd matrix, double trace_tolerance, double hermitian_tolerance)
+DensityMatrix::DensityMatrix(
+    Eigen::MatrixXcd matrix,
+    double trace_tolerance,
+    double hermitian_tolerance,
+    double positive_semidefinite_tolerance
+)
     : n_qubits_ {ki::log_2_int(matrix.cols())}
     , n_states_ {static_cast<std::size_t>(matrix.cols())}
     , matrix_ {std::move(matrix)}
@@ -126,7 +154,7 @@ DensityMatrix::DensityMatrix(Eigen::MatrixXcd matrix, double trace_tolerance, do
     check_is_square_matrix_(matrix_);
     check_has_trace_of_one_(matrix_, trace_tolerance);
     check_is_hermitian_(matrix_, hermitian_tolerance);
-    check_is_positive_semi_definite_(matrix_);
+    check_is_positive_semi_definite_(matrix_, positive_semidefinite_tolerance);
     check_side_length_is_power_of_2_(matrix_);
 }
 

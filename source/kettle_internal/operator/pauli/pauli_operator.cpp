@@ -9,6 +9,8 @@
 #include "kettle/simulation/simulate_pauli.hpp"
 #include "kettle/state/statevector.hpp"
 
+#include "kettle_internal/operator/channels/channel_helper.hpp"
+
 /*
     This file contains the `PauliOperator` class for 
 */
@@ -110,28 +112,16 @@ auto almost_eq(
     double coeff_tolerance
 ) -> bool
 {
-    // TODO: if there is only a single pauli string in the pauli operator, then technically the phase
-    // might not matter;
-    // not sure if this is something I even want to account for; the behaviour might be unexpected
-    if (left_op.size() != right_op.size()) {
-        return false;
-    }
-
-    const auto size = left_op.size();
-    for (std::size_t i {0}; i < size; ++i) {
-        const auto& left = left_op.at(i);
-        const auto& right = right_op.at(i);
-
+    using WPS = WeightedPauliString;
+    const auto almost_eq = [coeff_tolerance](const WPS& left, const WPS& right) {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
         }
 
-        if (left.pauli_string != right.pauli_string) {
-            return false;
-        }
-    }
+        return left.pauli_string == right.pauli_string;
+    };
 
-    return true;
+    return ket::internal::almost_eq_helper_(left_op, right_op, almost_eq);
 }
 
 }  // namespace ket

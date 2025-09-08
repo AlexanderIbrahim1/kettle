@@ -44,5 +44,15 @@ auto number_of_double_qubit_gate_pairs_(std::size_t n_qubits) -> std::size_t
     }
 }
 
+void check_valid_number_of_qubits_(const ket::QuantumCircuit& circuit, const ket::DensityMatrix& state)
+{
+    if (circuit.n_qubits() != state.n_qubits()) {
+        throw std::runtime_error {"Invalid simulation; circuit and state have different number of qubits."};
+    }
+
+    if (circuit.n_qubits() == 0) {
+        throw std::runtime_error {"Cannot simulate a circuit or state with zero qubits."};
+    }
+}
 
 }  // namespace ket::internal

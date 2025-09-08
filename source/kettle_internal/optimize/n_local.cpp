@@ -25,8 +25,8 @@ void verify_valid_rotation_gates_(const std::vector<ket::GeneralGate>& gates)
     for (auto gen_gate : gates) {
         if (std::holds_alternative<ket::Gate>(gen_gate)) {
             const auto gate = std::get<ket::Gate>(gen_gate);
-            if (gate == ket::Gate::U || gate == ket::Gate::CU || gate == ket::Gate::M) {
-                throw std::runtime_error {"ERROR: cannot create n-local circuit with U, CU, or M gates.\n"};
+            if (gate == ket::Gate::U || gate == ket::Gate::CU || gate == ket::Gate::M || gate == ket::Gate::RESET) {
+                throw std::runtime_error {"ERROR: cannot create n-local circuit with U, CU, M, or RESET gates.\n"};
             }
         }
 // basically not needed right now; all CompoundGates are valid

@@ -7,6 +7,8 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/statevector.hpp"
 
+#include "kettle_internal/simulation/measure_helper.hpp"
+
 
 namespace ket::internal
 {
@@ -34,15 +36,13 @@ template <ket::internal::DiscreteDistribution Distribution = std::discrete_distr
 auto simulate_measurement_(
     ket::Statevector& state,
     const ket::GateInfo& info,
-    std::optional<int> seed = std::nullopt
+    std::optional<int> seed = std::nullopt,
+    MeasurementOutcome measure = MeasurementOutcome::MEASURE_BASED_ON_PROBABILITIES
 ) -> Distribution::result_type
 {
     const auto [prob_of_0_states, prob_of_1_states] = probabilities_of_collapsed_states_(state, info);
 
-    auto prng = ket::internal::get_prng_(seed);
-    auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
-
-    const auto collapsed_state = coin_flipper(prng);
+    const auto collapsed_state = collapse_state<Distribution>(measure, seed, prob_of_0_states, prob_of_1_states);
 
     if (collapsed_state == 0) {
         const auto norm = std::sqrt(1.0 / prob_of_0_states);

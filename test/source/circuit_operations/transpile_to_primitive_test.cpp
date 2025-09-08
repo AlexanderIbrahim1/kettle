@@ -19,6 +19,8 @@ namespace gid = ket::internal::gate_id;
 
 /*
     Create a unitary 2x2 matrix that is a product of primitive gates.
+
+    TODO: simplify this function with the recent primitive gate mapping functions.
 */
 static auto make_matrix(const std::vector<ket::internal::PrimitiveGateInfo_>& pg_infos) -> ket::Matrix2X2
 {

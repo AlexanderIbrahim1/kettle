@@ -192,7 +192,10 @@ auto make_controlled_circuit(
             new_circuit.add_ccu_gate(*unitary_ptr, control, new_control, new_target);
         }
         else if (gate_info.gate == Gate::M) {
-            throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};
+            throw std::runtime_error {"Cannot make an M-gate controlled.\n"};
+        }
+        else if (gate_info.gate == Gate::RESET) {
+            throw std::runtime_error {"Cannot make a RESET-gate controlled.\n"};
         }
         else {
             throw std::runtime_error {"UNREACHABLE: dev error, invalid gate found when making controlled circuit.\n"};
@@ -295,7 +298,10 @@ auto make_multiplicity_controlled_circuit(
             apply_multiplicity_controlled_u_gate(new_circuit, *unitary_ptr, new_target, new_controls);
         }
         else if (gate_info.gate == Gate::M) {
-            throw std::runtime_error {"Cannot make a measurement gate controlled.\n"};
+            throw std::runtime_error {"Cannot make an M-gate controlled.\n"};
+        }
+        else if (gate_info.gate == Gate::RESET) {
+            throw std::runtime_error {"Cannot make a RESET-gate controlled.\n"};
         }
         else {
             throw std::runtime_error {"UNREACHABLE: dev error, invalid gate found when making controlled circuit.\n"};

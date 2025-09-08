@@ -719,6 +719,21 @@ void QuantumCircuit::add_m_gate(const Container& pairs)
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesVector>(const QubitAndBitIndicesVector& indices);
 template void QuantumCircuit::add_m_gate<QubitAndBitIndicesIList>(const QubitAndBitIndicesIList& indices);
 
+void QuantumCircuit::add_reset_gate(std::size_t target_index)
+{
+    check_qubit_range_(target_index, "qubit", "RESET");
+    elements_.emplace_back(create::create_reset_gate(target_index));
+}
+
+template <QubitIndices Container>
+void QuantumCircuit::add_reset_gate(const Container& indices)
+{
+    for (auto index : indices) {
+        add_reset_gate(index);
+    }
+}
+template void QuantumCircuit::add_reset_gate<QubitIndicesVector>(const QubitIndicesVector& indices);
+template void QuantumCircuit::add_reset_gate<QubitIndicesIList>(const QubitIndicesIList& indices);
 
 // --- NON-PRIMITIVE GATES ---
 void QuantumCircuit::add_ccx_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index)

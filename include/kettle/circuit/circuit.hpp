@@ -237,6 +237,10 @@ public:
     template <QubitAndBitIndices Container = QubitAndBitIndicesIList>
     void add_m_gate(const Container& pairs);
 
+    void add_reset_gate(std::size_t target_index);
+    template <QubitIndices Container = QubitIndicesIList>
+    void add_reset_gate(const Container& indices);
+
     // --- NON-PRIMITIVE GATES ---
     void add_ccx_gate(std::size_t control_index0, std::size_t control_index1, std::size_t target_index);
     template <TwoControlOneTargetIndices Container = TwoControlOneTargetIndicesIList>

@@ -48,7 +48,8 @@ enum class Gate : std::uint8_t
     CP,
     U,
     CU,
-    M
+    M,
+    RESET
 };
 
 /*

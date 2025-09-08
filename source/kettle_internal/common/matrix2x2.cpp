@@ -154,6 +154,17 @@ auto trace(const Matrix2X2& mat) -> std::complex<double>
     return mat.elem00 + mat.elem11;
 }
 
+auto norm(const Matrix2X2& mat) -> double
+{
+    // NOTE: there are too few elements in a non-STL object to do anything with the STL iterators
+    const auto norm00 = std::norm(mat.elem00);
+    const auto norm01 = std::norm(mat.elem01);
+    const auto norm10 = std::norm(mat.elem10);
+    const auto norm11 = std::norm(mat.elem11);
+
+    return std::sqrt(norm00 + norm01 + norm10 + norm11);
+}
+
 auto almost_eq(
     const Matrix2X2& left,
     const Matrix2X2& right,
