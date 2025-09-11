@@ -23,7 +23,9 @@ namespace ket::internal
 template <typename T>
 concept DiscreteDistribution = requires(T t, std::mt19937& prng) {
     typename T::result_type;
-    T {{0.0, 1.0}};
+    T {
+        {0.0, 1.0}
+    };
     { t(prng) } -> std::integral;
 };
 

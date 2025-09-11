@@ -344,14 +344,12 @@ TEST_CASE("partial trace [take tensor product, then partial trace, and check for
         };
 
         // TODO: remove the random matrices here; I should use nontrivial, but deterministic matrices
-        const auto testcase = GENERATE(
-            TestCase {
-                "random unitary operation on each",
-                [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
-                [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
-                [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
-            }
-        );
+        const auto testcase = GENERATE(TestCase {
+            "random unitary operation on each",
+            [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
+            [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
+            [](ket::QuantumCircuit& circ) { circ.add_u_gate(ket::generate_random_unitary2x2(), 0); },
+        });
 
         auto dens_mat0 = ket::DensityMatrix {"0"};
         auto dens_mat1 = ket::DensityMatrix {"0"};
