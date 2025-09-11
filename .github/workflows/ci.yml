@@ -14,31 +14,41 @@ jobs:
     runs-on: ubuntu-24.04
 
     container:
-        image: alexib1995/simplehttpserver
+        image: alexib1995/kettle-image
         options: --user root
     
     steps:
         - uses: actions/checkout@v4
-        - name: No-op test
-          run: echo "workflow reached this step"
 
-#     steps:
-#     - uses: actions/checkout@v3
+        - name: Configure with CMake presets
+          run: cmake --preset=dev
+
+        - name: Build
+          run: cmake --build --preset=dev
+
+        - name: Run codespell
+          run: cmake --build --preset=dev -t spell-check
+
+        - name: Clang-format check
+          run: cmake --build --preset=dev -t format-check
+
+        - name: Run unit tests
+          run: ctest --preset=dev --output-on-failure
+
+#         - uses: actions/setup-python@v4
+#           with: { python-version: "3.12" }
 # 
-#     - uses: actions/setup-python@v4
-#       with: { python-version: "3.12" }
+#         - name: Install codespell
+#           run: pip3 install codespell
 # 
-#     - name: Install codespell
-#       run: pip3 install codespell
+#         - name: Lint
+#           run: sudo apt-get install clang-format-19 cppcheck -y -q;
+#                sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-19 140;
+#                cmake -D FORMAT_COMMAND=clang-format-19 -P cmake/lint.cmake
 # 
-#     - name: Lint
-#       run: sudo apt-get install clang-format-19 cppcheck -y -q;
-#            sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-19 140;
-#            cmake -D FORMAT_COMMAND=clang-format-19 -P cmake/lint.cmake
-# 
-#     - name: Spell check
-#       if: always()
-#       run: cmake -P cmake/spell.cmake
+#         - name: Spell check
+#           if: always()
+#           run: cmake -P cmake/spell.cmake
 # 
 #   coverage:
 #     needs: [lint]
