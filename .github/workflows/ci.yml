@@ -3,11 +3,11 @@ name: Continuous Integration
 on:
   push:
     branches:
-    - actions
+    - '**'
 
   pull_request:
     branches:
-    - actions
+    - '**'
 
 jobs:
   lint:
@@ -34,124 +34,3 @@ jobs:
 
         - name: Run unit tests
           run: ctest --preset=dev --output-on-failure
-
-#         - uses: actions/setup-python@v4
-#           with: { python-version: "3.12" }
-# 
-#         - name: Install codespell
-#           run: pip3 install codespell
-# 
-#         - name: Lint
-#           run: sudo apt-get install clang-format-19 cppcheck -y -q;
-#                sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-19 140;
-#                cmake -D FORMAT_COMMAND=clang-format-19 -P cmake/lint.cmake
-# 
-#         - name: Spell check
-#           if: always()
-#           run: cmake -P cmake/spell.cmake
-# 
-#   coverage:
-#     needs: [lint]
-# 
-#     runs-on: ubuntu-24.04
-# 
-#     # To enable coverage, delete the last line from the conditional below and
-#     # edit the "<name>" placeholder to your GitHub name.
-#     # If you do not wish to use codecov, then simply delete this job from the
-#     # workflow.
-#     if: github.repository_owner == '<name>'
-#       && false
-# 
-#     steps:
-#     - uses: actions/checkout@v3
-# 
-#     - name: Install LCov
-#       run: sudo apt-get update -q
-#         && sudo apt-get install lcov -q -y
-# 
-#     - name: Configure
-#       run: cmake --preset=ci-coverage
-# 
-#     - name: Build
-#       run: cmake --build build/coverage -j 2
-# 
-#     - name: Test
-#       working-directory: build/coverage
-#       run: ctest --output-on-failure --no-tests=error -j 2
-# 
-#     - name: Process coverage info
-#       run: cmake --build build/coverage -t coverage
-# 
-#     - name: Submit to codecov.io
-#       uses: codecov/codecov-action@v3
-#       with:
-#         file: build/coverage/coverage.info
-# 
-#   sanitize:
-#     needs: [lint]
-# 
-#     runs-on: ubuntu-24.04
-# 
-#     env: { CXX: clang++-19 }
-# 
-#     steps:
-#     - uses: actions/checkout@v3
-# 
-#     - name: Configure
-#       run: cmake --preset=ci-sanitize
-# 
-#     - name: Build
-#       run: cmake --build build/sanitize -j 2
-# 
-#     - name: Test
-#       working-directory: build/sanitize
-#       env:
-#         ASAN_OPTIONS: "strict_string_checks=1:\
-#           detect_stack_use_after_return=1:\
-#           check_initialization_order=1:\
-#           strict_init_order=1:\
-#           detect_leaks=1"
-#         UBSAN_OPTIONS: print_stacktrace=1
-#       run: ctest --output-on-failure --no-tests=error -j 2
-# 
-#   test:
-#     needs: [lint]
-# 
-#     strategy:
-#       matrix:
-#         os: [macos-15, ubuntu-24.04]
-# 
-#     runs-on: ${{ matrix.os }}
-# 
-#     steps:
-#     - uses: actions/checkout@v3
-# 
-#     - name: Install static analyzers
-#       if: matrix.os == 'ubuntu-24.04'
-#       run: >-
-#         sudo apt-get install clang-tidy-19 cppcheck -y -q
-# 
-#         sudo update-alternatives --install
-#         /usr/bin/clang-tidy clang-tidy
-#         /usr/bin/clang-tidy-19 140
-# 
-# #     - name: Setup MultiToolTask
-# #       if: matrix.os == 'windows-2022'
-# #       run: |
-# #         Add-Content "$env:GITHUB_ENV" 'UseMultiToolTask=true'
-# #         Add-Content "$env:GITHUB_ENV" 'EnforceProcessCountAcrossBuilds=true'
-# 
-#     - name: Configure
-#       shell: pwsh
-#       run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
-# 
-#     - name: Build
-#       run: cmake --build build --config Release -j 2
-# 
-#     - name: Install
-#       run: cmake --install build --config Release --prefix prefix
-# 
-#     - name: Test
-#       working-directory: build
-#       run: ctest --output-on-failure --no-tests=error -C Release -j 2
-# 
