@@ -10,7 +10,7 @@ on:
     - '**'
 
 jobs:
-  lint:
+  build-format-test:
     runs-on: ubuntu-24.04
 
     container:
