@@ -15,6 +15,7 @@ jobs:
 
     container:
         image: alexib1995/simplehttpserver
+        options: --user root
     
     steps:
         - uses: actions/checkout@v4
