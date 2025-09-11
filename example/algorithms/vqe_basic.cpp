@@ -9,7 +9,7 @@
     of the following operator:
 
         E = 2 * II  -  2 * XX  +  3 * YY  -  3 * ZZ
-    
+
     REFERENCE: https://learning.quantum.ibm.com/course/variational-algorithm-design/examples-and-applications
 
     The exact eigenvalues are {-6, 4, 4, 6}, so we should expect a result of approximately -6.
@@ -30,10 +30,10 @@ auto main() -> int
 {
     // this is the Pauli Operator that acts as the cost function
     auto pauli_op = ket::PauliOperator {
-        {.coefficient= 2.0, .pauli_string={PT::I, PT::I}},
-        {.coefficient=-2.0, .pauli_string={PT::X, PT::X}},
-        {.coefficient= 3.0, .pauli_string={PT::Y, PT::Y}},
-        {.coefficient=-3.0, .pauli_string={PT::Z, PT::Z}}
+        {.coefficient = 2.0,  .pauli_string = {PT::I, PT::I}},
+        {.coefficient = -2.0, .pauli_string = {PT::X, PT::X}},
+        {.coefficient = 3.0,  .pauli_string = {PT::Y, PT::Y}},
+        {.coefficient = -3.0, .pauli_string = {PT::Z, PT::Z}}
     };
 
     // this is the circuit we use to find the ideal parameters
@@ -47,10 +47,10 @@ auto main() -> int
     ket::extend_circuit(circuit, n_local);
 
     auto context = OptimizationContext {
-        .circuit=std::move(circuit),
-        .parameter_ids=parameter_ids,
-        .pauli_op=std::move(pauli_op),
-        .iteration=0,
+        .circuit = std::move(circuit),
+        .parameter_ids = parameter_ids,
+        .pauli_op = std::move(pauli_op),
+        .iteration = 0,
     };
 
     const auto n_parameters = context.parameter_ids.size();
@@ -58,11 +58,7 @@ auto main() -> int
     std::cout << std::fixed << std::setprecision(12);
 
     // this is the function that gets passed to the optimizer
-    const auto cost_function = [](
-        const std::vector<double> &parameters,
-        [[maybe_unused]] std::vector<double> &grad,
-        void *data
-    ) -> double
+    const auto cost_function = [](const std::vector<double>& parameters, [[maybe_unused]] std::vector<double>& grad, void* data) -> double
     {
         auto* ctx = static_cast<OptimizationContext*>(data);
 
@@ -84,7 +80,7 @@ auto main() -> int
     // create the initial set of parameters
     auto parameters = std::vector<double>(n_parameters, 1.0);
 
-    // creat the optimization function, and set some parameters to make sure it converges or stops
+    // create the optimization function, and set some parameters to make sure it converges or stops
     auto opt = nlopt::opt {nlopt::LN_COBYLA, static_cast<unsigned int>(n_parameters)};
     opt.set_min_objective(cost_function, &context);
     opt.set_xtol_rel(1.0e-4);

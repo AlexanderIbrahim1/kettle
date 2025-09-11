@@ -30,7 +30,7 @@ template auto is_power_of_2<std::size_t>(std::size_t value) noexcept -> bool;
 template auto is_power_of_2<std::ptrdiff_t>(std::ptrdiff_t value) noexcept -> bool;
 
 template <typename T>
-auto log_2_int(T power) noexcept -> std::size_t 
+auto log_2_int(T power) noexcept -> std::size_t
 {
     auto size_t_power = static_cast<std::size_t>(power);
 
@@ -57,7 +57,8 @@ auto flat_index_to_grid_indices_2d(T i_flat, T size1) -> std::tuple<T, T>
     return {i0, i1};
 }
 template auto flat_index_to_grid_indices_2d<std::size_t>(std::size_t i_flat, std::size_t size1) -> std::tuple<std::size_t, std::size_t>;
-template auto flat_index_to_grid_indices_2d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
+template auto flat_index_to_grid_indices_2d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1)
+    -> std::tuple<std::ptrdiff_t, std::ptrdiff_t>;
 
 template <typename T>
 auto flat_index_to_grid_indices_3d(T i_flat, T size1, T size2) -> std::tuple<T, T, T>
@@ -72,19 +73,17 @@ auto flat_index_to_grid_indices_3d(T i_flat, T size1, T size2) -> std::tuple<T, 
 
     return {i0, i1, i2};
 }
-template auto flat_index_to_grid_indices_3d<std::size_t>(std::size_t i_flat, std::size_t size1, std::size_t size2) -> std::tuple<std::size_t, std::size_t, std::size_t>;
-template auto flat_index_to_grid_indices_3d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1, std::ptrdiff_t size2) -> std::tuple<std::ptrdiff_t, std::ptrdiff_t, std::ptrdiff_t>;
+template auto flat_index_to_grid_indices_3d<std::size_t>(std::size_t i_flat, std::size_t size1, std::size_t size2)
+    -> std::tuple<std::size_t, std::size_t, std::size_t>;
+template auto flat_index_to_grid_indices_3d<std::ptrdiff_t>(std::ptrdiff_t i_flat, std::ptrdiff_t size1, std::ptrdiff_t size2)
+    -> std::tuple<std::ptrdiff_t, std::ptrdiff_t, std::ptrdiff_t>;
 
 }  // namespace ket::internal
 
 namespace ket
 {
 
-auto almost_eq(
-    const std::complex<double>& left,
-    const std::complex<double>& right,
-    double tolerance_sq
-) noexcept -> bool
+auto almost_eq(const std::complex<double>& left, const std::complex<double>& right, double tolerance_sq) noexcept -> bool
 {
     const auto diff_real = left.real() - right.real();
     const auto diff_imag = left.imag() - right.imag();
@@ -105,6 +104,5 @@ auto endian_flip(std::size_t value, std::size_t n_relevant_bits) -> std::size_t
 
     return backward;
 }
-
 
 }  // namespace ket

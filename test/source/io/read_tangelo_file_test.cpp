@@ -10,28 +10,23 @@
 #include <kettle/io/read_tangelo_file.hpp>
 #include <kettle/io/write_tangelo_file.hpp>
 
-#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
-
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 
 using G = ket::Gate;
 namespace cre = ket::internal::create;
 namespace comp = ket::internal::compare;
-
 
 static auto number_of_elements(const ket::QuantumCircuit& circuit) -> std::size_t
 {
     return static_cast<std::size_t>(std::distance(circuit.begin(), circuit.end()));
 }
 
-
 TEST_CASE("read_tangelo_file()")
 {
     SECTION("single h gate")
     {
-        auto stream = std::stringstream {
-            "H         target : [4]   \n"
-        };
+        auto stream = std::stringstream {"H         target : [4]   \n"};
 
         const auto actual = ket::read_tangelo_circuit(9, stream, 0);
         const auto expected = cre::create_one_target_gate(G::H, 4);
@@ -67,9 +62,7 @@ TEST_CASE("read_tangelo_file()")
 
     SECTION("single SWAP gate")
     {
-        auto stream = std::stringstream {
-            "SWAP      target : [12, 9]\n"
-        };
+        auto stream = std::stringstream {"SWAP      target : [12, 9]\n"};
 
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
         const auto gate0 = actual[0].get_gate();
@@ -93,9 +86,7 @@ TEST_CASE("read_tangelo_file()")
 
     SECTION("single PHASE gate")
     {
-        auto stream = std::stringstream {
-            "PHASE     target : [11]   parameter : -1.3474016644659843\n"
-        };
+        auto stream = std::stringstream {"PHASE     target : [11]   parameter : -1.3474016644659843\n"};
 
         const auto actual = ket::read_tangelo_circuit(13, stream, 0);
         const auto expected0 = cre::create_one_target_one_angle_gate(G::P, 11, -1.3474016644659843);
@@ -117,26 +108,10 @@ TEST_CASE("read_tangelo_file()")
         const auto create = cre::create_one_control_one_target_one_angle_gate;
 
         auto testcase = GENERATE_REF(
-            TestCase {
-                "CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CP,
-                unpack
-            },
-            TestCase {
-                "CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRX,
-                unpack
-            },
-            TestCase {
-                "CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRY,
-                unpack
-            },
-            TestCase {
-                "CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n",
-                ket::Gate::CRZ,
-                unpack
-            }
+            TestCase {"CPHASE    target : [9]   control : [12]   parameter : -0.39269908169872414\n", ket::Gate::CP, unpack},
+            TestCase {"CRX    target : [9]   control : [12]   parameter : -0.39269908169872414\n", ket::Gate::CRX, unpack},
+            TestCase {"CRY    target : [9]   control : [12]   parameter : -0.39269908169872414\n", ket::Gate::CRY, unpack},
+            TestCase {"CRZ    target : [9]   control : [12]   parameter : -0.39269908169872414\n", ket::Gate::CRZ, unpack}
         );
 
         auto stream = std::stringstream {testcase.stream_contents};
@@ -172,12 +147,12 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(gate.gate == ket::Gate::U);
 
         const auto [target, unitary_ptr] = cre::unpack_u_gate(gate);
-        
+
         const auto expected_matrix = ket::Matrix2X2 {
-            .elem00={1.234, -4.321},
-            .elem01={2.345, -5.432},
-            .elem10={3.456, -6.543},
-            .elem11={4.567, -7.654}
+            .elem00 = {1.234, -4.321},
+              .elem01 = {2.345, -5.432},
+              .elem10 = {3.456, -6.543},
+              .elem11 = {4.567, -7.654}
         };
 
         REQUIRE(target == 1);
@@ -198,12 +173,12 @@ TEST_CASE("read_tangelo_file()")
         REQUIRE(gate.gate == ket::Gate::CU);
 
         const auto [control, target, unitary_ptr] = cre::unpack_cu_gate(gate);
-        
+
         const auto expected_matrix = ket::Matrix2X2 {
-            .elem00={1.234, -4.321},
-            .elem01={2.345, -5.432},
-            .elem10={3.456, -6.543},
-            .elem11={4.567, -7.654}
+            .elem00 = {1.234, -4.321},
+              .elem01 = {2.345, -5.432},
+              .elem10 = {3.456, -6.543},
+              .elem11 = {4.567, -7.654}
         };
 
         REQUIRE(target == 1);
@@ -238,7 +213,8 @@ TEST_CASE("read_tangelo_file() with control flow")
     };
 
     // this circuit was taken directly from one of the user-facing examples
-    const auto original = [&]() {
+    const auto original = [&]()
+    {
         auto circuit = ket::QuantumCircuit {3};
         circuit.add_x_gate({0, 1});
         circuit.add_h_gate({0, 1, 2});

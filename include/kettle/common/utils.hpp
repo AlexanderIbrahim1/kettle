@@ -10,16 +10,14 @@ namespace ket
 
 // TODO: simplify the other concepts with the Iterable concept
 template <typename Container>
-concept Iterable = requires(Container container)
-{
+concept Iterable = requires(Container container) {
     typename Container::value_type;
     container.begin();
     container.end();
 };
 
 template <typename Container>
-concept QubitIndices = requires(Container container)
-{
+concept QubitIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::size_t>;
     container.begin();
@@ -27,8 +25,7 @@ concept QubitIndices = requires(Container container)
 };
 
 template <typename Container>
-concept QubitIndicesAndAngles = requires(Container container)
-{
+concept QubitIndicesAndAngles = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::pair<std::size_t, double>>;
     container.begin();
@@ -36,8 +33,7 @@ concept QubitIndicesAndAngles = requires(Container container)
 };
 
 template <typename Container>
-concept ControlAndTargetIndices = requires(Container container)
-{
+concept ControlAndTargetIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::pair<std::size_t, std::size_t>>;
     container.begin();
@@ -46,8 +42,7 @@ concept ControlAndTargetIndices = requires(Container container)
 
 // identical to the `ControlAndTargetIndices`, but I figured a distinct name would be helpful for users
 template <typename Container>
-concept QubitAndBitIndices = requires(Container container)
-{
+concept QubitAndBitIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::pair<std::size_t, std::size_t>>;
     container.begin();
@@ -55,8 +50,7 @@ concept QubitAndBitIndices = requires(Container container)
 };
 
 template <typename Container>
-concept ControlAndTargetIndicesAndAngles = requires(Container container)
-{
+concept ControlAndTargetIndicesAndAngles = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::tuple<std::size_t, std::size_t, double>>;
     container.begin();
@@ -64,8 +58,7 @@ concept ControlAndTargetIndicesAndAngles = requires(Container container)
 };
 
 template <typename Container>
-concept TwoControlOneTargetIndices = requires(Container container)
-{
+concept TwoControlOneTargetIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::tuple<std::size_t, std::size_t, std::size_t>>;
     container.begin();
@@ -73,8 +66,7 @@ concept TwoControlOneTargetIndices = requires(Container container)
 };
 
 template <typename Container>
-concept TwoTargetIndices = requires(Container container)
-{
+concept TwoTargetIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::pair<std::size_t, std::size_t>>;
     container.begin();
@@ -82,8 +74,7 @@ concept TwoTargetIndices = requires(Container container)
 };
 
 template <typename Container>
-concept OneControlTwoTargetIndices = requires(Container container)
-{
+concept OneControlTwoTargetIndices = requires(Container container) {
     typename Container::value_type;
     requires std::is_same_v<typename Container::value_type, std::tuple<std::size_t, std::size_t, std::size_t>>;
     container.begin();

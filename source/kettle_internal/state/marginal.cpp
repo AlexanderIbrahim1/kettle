@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "kettle/state/endian.hpp"
-#include "kettle/state/qubit_state_conversion.hpp"
 #include "kettle/state/marginal.hpp"
+#include "kettle/state/qubit_state_conversion.hpp"
 
 #include "kettle_internal/common/utils_internal.hpp"
 #include "kettle_internal/state/marginal_internal.hpp"
@@ -16,11 +16,8 @@
 namespace ket::internal
 {
 
-auto state_index_to_bitstring_marginal_(
-    std::size_t i_state,
-    const std::vector<std::uint8_t>& marginal_bitmask,
-    ket::Endian input_endian
-) -> std::string
+auto state_index_to_bitstring_marginal_(std::size_t i_state, const std::vector<std::uint8_t>& marginal_bitmask, ket::Endian input_endian)
+    -> std::string
 {
     const auto n_qubits = marginal_bitmask.size();
     const auto dyn_bitset = ket::state_index_to_dynamic_bitset(i_state, n_qubits, input_endian);
@@ -77,7 +74,6 @@ template auto are_all_marginal_bits_on_side_<MarginalBitsSide::RIGHT>(const std:
 
 }  // namespace ket::internal
 
-
 namespace ket
 {
 
@@ -108,10 +104,7 @@ auto lstrip_marginal_bits(const std::string& marginal_bitstring) -> std::string
         throw std::runtime_error {err_msg.str()};
     }
 
-    const auto it = std::ranges::find_if_not(
-        marginal_bitstring,
-        [](auto bitchar) { return bitchar == ket::internal::MARGINALIZED_QUBIT; }
-    );
+    const auto it = std::ranges::find_if_not(marginal_bitstring, [](auto bitchar) { return bitchar == ket::internal::MARGINALIZED_QUBIT; });
 
     return std::string {it, marginal_bitstring.end()};
 }

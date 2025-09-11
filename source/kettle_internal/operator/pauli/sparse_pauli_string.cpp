@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstddef>
-#include <stdexcept>
 #include <optional>
+#include <stdexcept>
 #include <vector>
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
@@ -49,10 +49,7 @@ SparsePauliString::SparsePauliString(
     check_n_qubits_not_zero_();
 }
 
-SparsePauliString::SparsePauliString(
-    const std::vector<PauliTerm>& pauli_terms,
-    PauliPhase phase
-)
+SparsePauliString::SparsePauliString(const std::vector<PauliTerm>& pauli_terms, PauliPhase phase)
     : n_qubits_ {pauli_terms.size()}
     , phase_ {phase}
 {
@@ -63,10 +60,7 @@ SparsePauliString::SparsePauliString(
     }
 }
 
-SparsePauliString::SparsePauliString(
-    const std::initializer_list<PauliTerm>& pauli_terms,
-    PauliPhase phase
-)
+SparsePauliString::SparsePauliString(const std::initializer_list<PauliTerm>& pauli_terms, PauliPhase phase)
     : SparsePauliString {std::vector<PauliTerm> {pauli_terms}, phase}
 {}
 
@@ -106,7 +100,8 @@ void SparsePauliString::overwrite(std::size_t qubit_index, PauliTerm term)
 
     if (existing_index) {
         pauli_indexed_terms_[existing_index.value()].second = term;
-    } else {
+    }
+    else {
         pauli_indexed_terms_.emplace_back(qubit_index, term);
     }
 }
@@ -149,9 +144,7 @@ auto SparsePauliString::vector_index_(std::size_t qubit_index) const -> std::opt
 void SparsePauliString::check_index_in_qubit_range_(std::size_t index) const
 {
     if (index >= n_qubits_) {
-        throw std::runtime_error {
-            "ERROR: cannot perform operation on SparsePauliString with index beyond qubit range.\n"
-        };
+        throw std::runtime_error {"ERROR: cannot perform operation on SparsePauliString with index beyond qubit range.\n"};
     }
 }
 

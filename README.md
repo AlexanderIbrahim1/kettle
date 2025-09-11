@@ -124,6 +124,6 @@ within the `ket::` namespace.
 Thank you for considering making contributions to this project!
 You can use the issue tab to open a bug report or feature request.
 
-## Acknowledgements
+## Acknowledgments
 
 This project was initially generated with the [`cmake-init`](https://github.com/friendlyanon/cmake-init) project.

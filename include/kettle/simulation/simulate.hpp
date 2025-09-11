@@ -3,12 +3,11 @@
 #include <optional>
 #include <vector>
 
-#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit/classical_register.hpp"
 #include "kettle/circuit_loggers/circuit_logger.hpp"
 #include "kettle/common/clone_ptr.hpp"
 #include "kettle/state/statevector.hpp"
-
 
 namespace ket
 {
@@ -37,11 +36,9 @@ private:
     std::vector<CircuitLogger> circuit_loggers_;
 };
 
-
 void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<int> prng_seed = std::nullopt);
 
 }  // namespace ket
-
 
 // inline void simulate_multithreaded_loop_(
 //     std::barrier<>& sync_point,
@@ -62,7 +59,7 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 // /*
 //     WARNING: the current multithreaded implementation is slower than the singlethreaded implementation;
 //     I'm not sure of the reasons yet (too much waiting at the barrier, multiple states per cache line, etc.)
-// 
+//
 //     A quick benchmark shows that the threads spend a large amount of time waiting.
 // */
 // inline void simulate_multithreaded(
@@ -75,22 +72,22 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 //     if (n_threads == 0) {
 //         throw std::runtime_error {"Cannot perform simulation with 0 threads.\n"};
 //     }
-// 
+//
 //     im::check_valid_number_of_qubits_(circuit, state);
-// 
+//
 //     const auto n_single_gate_pairs = im::number_of_single_qubit_gate_pairs_(circuit.n_qubits());
 //     const auto single_flat_index_pairs = im::partial_sum_pairs_(n_single_gate_pairs, n_threads);
-// 
+//
 //     const auto n_double_gate_pairs = im::number_of_double_qubit_gate_pairs_(circuit.n_qubits());
 //     const auto double_flat_index_pairs = im::partial_sum_pairs_(n_double_gate_pairs, n_threads);
-// 
+//
 //     auto c_register = ClassicalRegister {circuit.n_bits()};
-// 
+//
 //     auto threads = std::vector<std::jthread> {};
 //     threads.reserve(n_threads);
-// 
+//
 //     auto barrier = std::barrier {static_cast<std::ptrdiff_t>(n_threads)};
-// 
+//
 //     for (std::size_t i {0}; i < n_threads; ++i) {
 //         threads.emplace_back(
 //             im::simulate_multithreaded_loop_,
@@ -104,7 +101,7 @@ void simulate(const QuantumCircuit& circuit, Statevector& state, std::optional<i
 //             std::ref(c_register)
 //         );
 //     }
-// 
+//
 //     for (auto& thread : threads) {
 //         thread.join();
 //     }

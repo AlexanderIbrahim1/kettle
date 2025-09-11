@@ -1,11 +1,11 @@
 #include <complex>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <vector>
 
-#include "kettle/state/statevector.hpp"
 #include "kettle/io/numpy_statevector.hpp"
+#include "kettle/state/statevector.hpp"
 
 namespace
 {
@@ -15,30 +15,27 @@ auto read_complex_numpy_format_(std::istream& stream) -> std::complex<double>
     // reads in text that looks like (1.23456e005+5.43210e002j) into a std::complex<double> instance
     double real;  // NOLINT(cppcoreguidelines-init-variables)
     double imag;  // NOLINT(cppcoreguidelines-init-variables)
-    char ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char ch;      // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> ch; // '('
+    stream >> ch;  // '('
     stream >> real;
     stream >> imag;
-    stream >> ch; // 'j'
-    stream >> ch; // ')'
+    stream >> ch;  // 'j'
+    stream >> ch;  // ')'
 
     return {real, imag};
 }
 
 }  // namespace
 
-
 namespace ket
 {
 
-auto read_numpy_statevector(
-    std::istream& instream,
-    Endian input_endian
-) -> Statevector
+auto read_numpy_statevector(std::istream& instream, Endian input_endian) -> Statevector
 {
     // the very first line contains the number of qubits
-    const auto n_qubits = [&]() {
+    const auto n_qubits = [&]()
+    {
         std::size_t n_qubits_;  // NOLINT(cppcoreguidelines-init-variables)
         instream >> n_qubits_;
 
@@ -57,10 +54,7 @@ auto read_numpy_statevector(
     return Statevector {std::move(amplitudes), input_endian};
 }
 
-auto read_numpy_statevector(
-    const std::filesystem::path& filepath,
-    Endian input_endian
-) -> Statevector
+auto read_numpy_statevector(const std::filesystem::path& filepath, Endian input_endian) -> Statevector
 {
     auto instream = std::ifstream {filepath};
 

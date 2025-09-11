@@ -6,7 +6,6 @@
 #include "kettle/state/density_matrix.hpp"
 #include "kettle/state/statevector.hpp"
 
-
 namespace ket::internal
 {
 

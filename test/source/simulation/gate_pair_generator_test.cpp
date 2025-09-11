@@ -1,7 +1,7 @@
 #include <algorithm>
+#include <map>
 #include <optional>
 #include <string>
-#include <map>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -28,10 +28,7 @@ struct IndexPair
 };
 
 template <typename Generator>
-static auto get_generated_index_pairs(
-    Generator& generator,
-    std::optional<std::size_t> end_index = std::nullopt
-) -> std::vector<IndexPair>
+static auto get_generated_index_pairs(Generator& generator, std::optional<std::size_t> end_index = std::nullopt) -> std::vector<IndexPair>
 {
     const auto end = end_index.value_or(generator.size());
 
@@ -83,8 +80,8 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("00"), .index1=coeff_map.at("10")},
-             IndexPair {.index0=coeff_map.at("01"), .index1=coeff_map.at("11")}
+            IndexPair {.index0 = coeff_map.at("00"), .index1 = coeff_map.at("10")},
+            IndexPair {.index0 = coeff_map.at("01"), .index1 = coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -103,8 +100,8 @@ TEST_CASE("SingleQubitGatePairGenerator with two qubits")
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("00"), .index1=coeff_map.at("01")},
-             IndexPair {.index0=coeff_map.at("10"), .index1=coeff_map.at("11")}
+            IndexPair {.index0 = coeff_map.at("00"), .index1 = coeff_map.at("01")},
+            IndexPair {.index0 = coeff_map.at("10"), .index1 = coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -140,10 +137,10 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("100")},
-            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("110")},
-            IndexPair {.index0=coeff_map.at("001"), .index1=coeff_map.at("101")},
-            IndexPair {.index0=coeff_map.at("011"), .index1=coeff_map.at("111")}
+            IndexPair {.index0 = coeff_map.at("000"), .index1 = coeff_map.at("100")},
+            IndexPair {.index0 = coeff_map.at("010"), .index1 = coeff_map.at("110")},
+            IndexPair {.index0 = coeff_map.at("001"), .index1 = coeff_map.at("101")},
+            IndexPair {.index0 = coeff_map.at("011"), .index1 = coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -162,10 +159,10 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("010")},
-            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("110")},
-            IndexPair {.index0=coeff_map.at("001"), .index1=coeff_map.at("011")},
-            IndexPair {.index0=coeff_map.at("101"), .index1=coeff_map.at("111")}
+            IndexPair {.index0 = coeff_map.at("000"), .index1 = coeff_map.at("010")},
+            IndexPair {.index0 = coeff_map.at("100"), .index1 = coeff_map.at("110")},
+            IndexPair {.index0 = coeff_map.at("001"), .index1 = coeff_map.at("011")},
+            IndexPair {.index0 = coeff_map.at("101"), .index1 = coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -184,10 +181,10 @@ TEST_CASE("SingleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_single_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("000"), .index1=coeff_map.at("001")},
-            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("101")},
-            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("011")},
-            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")}
+            IndexPair {.index0 = coeff_map.at("000"), .index1 = coeff_map.at("001")},
+            IndexPair {.index0 = coeff_map.at("100"), .index1 = coeff_map.at("101")},
+            IndexPair {.index0 = coeff_map.at("010"), .index1 = coeff_map.at("011")},
+            IndexPair {.index0 = coeff_map.at("110"), .index1 = coeff_map.at("111")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -219,7 +216,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("10"), .index1=coeff_map.at("11")}
+            IndexPair {.index0 = coeff_map.at("10"), .index1 = coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -238,7 +235,7 @@ TEST_CASE("DoubleQubitGatePairGenerator with two qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("01"), .index1=coeff_map.at("11")}
+            IndexPair {.index0 = coeff_map.at("01"), .index1 = coeff_map.at("11")}
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -274,8 +271,8 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("110")},
-            IndexPair {.index0=coeff_map.at("101"), .index1=coeff_map.at("111")},
+            IndexPair {.index0 = coeff_map.at("100"), .index1 = coeff_map.at("110")},
+            IndexPair {.index0 = coeff_map.at("101"), .index1 = coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -294,8 +291,8 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("110")},
-            IndexPair {.index0=coeff_map.at("011"), .index1=coeff_map.at("111")},
+            IndexPair {.index0 = coeff_map.at("010"), .index1 = coeff_map.at("110")},
+            IndexPair {.index0 = coeff_map.at("011"), .index1 = coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -314,8 +311,8 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("100"), .index1=coeff_map.at("101")},
-            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")},
+            IndexPair {.index0 = coeff_map.at("100"), .index1 = coeff_map.at("101")},
+            IndexPair {.index0 = coeff_map.at("110"), .index1 = coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -334,8 +331,8 @@ TEST_CASE("DoubleQubitGatePairGenerator with three qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("010"), .index1=coeff_map.at("011")},
-            IndexPair {.index0=coeff_map.at("110"), .index1=coeff_map.at("111")},
+            IndexPair {.index0 = coeff_map.at("010"), .index1 = coeff_map.at("011")},
+            IndexPair {.index0 = coeff_map.at("110"), .index1 = coeff_map.at("111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -381,10 +378,10 @@ TEST_CASE("DoubleQubitGatePairGenerator with four qubits")
         REQUIRE(generator.size() == num_pairs_for_double_qubit_gate(n_qubits));
 
         auto expected = std::vector<IndexPair> {
-            IndexPair {.index0=coeff_map.at("1000"), .index1=coeff_map.at("1100")},
-            IndexPair {.index0=coeff_map.at("1010"), .index1=coeff_map.at("1110")},
-            IndexPair {.index0=coeff_map.at("1001"), .index1=coeff_map.at("1101")},
-            IndexPair {.index0=coeff_map.at("1011"), .index1=coeff_map.at("1111")},
+            IndexPair {.index0 = coeff_map.at("1000"), .index1 = coeff_map.at("1100")},
+            IndexPair {.index0 = coeff_map.at("1010"), .index1 = coeff_map.at("1110")},
+            IndexPair {.index0 = coeff_map.at("1001"), .index1 = coeff_map.at("1101")},
+            IndexPair {.index0 = coeff_map.at("1011"), .index1 = coeff_map.at("1111")},
         };
 
         auto actual = get_generated_index_pairs(generator);
@@ -413,20 +410,14 @@ TEST_CASE("SingleQubitGatePairGenerator set_state()")
         std::size_t i_end;
     };
 
-    const auto testcase = GENERATE(
-        TestCase {10, 15},
-        TestCase {7, 10},
-        TestCase {3, 7},
-        TestCase {0, 5},
-        TestCase {9, 13}
-    );
+    const auto testcase = GENERATE(TestCase {10, 15}, TestCase {7, 10}, TestCase {3, 7}, TestCase {0, 5}, TestCase {9, 13});
 
     auto partial_generator = ket::internal::SingleQubitGatePairGenerator {target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 
     // check that the partial output matches the corresponding subset in the full output
-    const auto full_output_subset = std::vector<IndexPair> (
+    const auto full_output_subset = std::vector<IndexPair>(
         std::next(full_output.begin(), static_cast<std::ptrdiff_t>(testcase.i_begin)),
         std::next(full_output.begin(), static_cast<std::ptrdiff_t>(testcase.i_end))
     );
@@ -451,20 +442,14 @@ TEST_CASE("DoubleQubitGatePairGenerator set_state()")
         std::size_t i_end;
     };
 
-    const auto testcase = GENERATE(
-        TestCase {10, 15},
-        TestCase {7, 10},
-        TestCase {3, 7},
-        TestCase {0, 5},
-        TestCase {9, 13}
-    );
+    const auto testcase = GENERATE(TestCase {10, 15}, TestCase {7, 10}, TestCase {3, 7}, TestCase {0, 5}, TestCase {9, 13});
 
     auto partial_generator = ket::internal::DoubleQubitGatePairGenerator {control_index, target_index, n_qubits};
     partial_generator.set_state(testcase.i_begin);
     const auto partial_output = get_generated_index_pairs(partial_generator, testcase.i_end - testcase.i_begin);
 
     // check that the partial output matches the corresponding subset in the full output
-    const auto full_output_subset = std::vector<IndexPair> (
+    const auto full_output_subset = std::vector<IndexPair>(
         std::next(full_output.begin(), static_cast<std::ptrdiff_t>(testcase.i_begin)),
         std::next(full_output.begin(), static_cast<std::ptrdiff_t>(testcase.i_end))
     );

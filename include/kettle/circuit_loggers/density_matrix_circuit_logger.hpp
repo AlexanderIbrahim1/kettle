@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kettle/state/density_matrix.hpp"
 #include "kettle/common/clone_ptr.hpp"
+#include "kettle/state/density_matrix.hpp"
 
 namespace ket
 {

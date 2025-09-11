@@ -4,8 +4,8 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/state/statevector.hpp"
 #include "kettle/simulation/simulate.hpp"
+#include "kettle/state/statevector.hpp"
 
 TEST_CASE("control swap gate on 3-qubit circuit")
 {
@@ -146,11 +146,11 @@ TEST_CASE("control swap gate on 4-qubit circuit")
         TestInfo {"1111", "1111"}
     );
     // clang-format on
- 
+
     auto state = ket::Statevector {info.input_bitstring};
     auto expected = ket::Statevector {info.expected_bitstring};
     auto circuit = ket::QuantumCircuit {4};
- 
+
     circuit.add_cswap_gate(0, 1, 3);
     ket::simulate(circuit, state);
     REQUIRE(ket::almost_eq(state, expected));
@@ -167,11 +167,13 @@ TEST_CASE("control swap gate throws exceptions on invalid inputs")
 
     SECTION("control qubit matches a swap qubit")
     {
-        SECTION("matches first swap qubit") {
+        SECTION("matches first swap qubit")
+        {
             REQUIRE_THROWS_AS(circuit.add_cswap_gate(0, 0, 1), std::runtime_error);
         }
 
-        SECTION("matches second swap qubit") {
+        SECTION("matches second swap qubit")
+        {
             REQUIRE_THROWS_AS(circuit.add_cswap_gate(0, 1, 0), std::runtime_error);
         }
     }

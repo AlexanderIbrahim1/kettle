@@ -40,14 +40,8 @@ private:
     void check_index_(std::size_t index) const;
 };
 
-auto calculate_probabilities_raw(
-    const Statevector& state,
-    const QuantumNoise* noise = nullptr
-) -> std::vector<double>;
+auto calculate_probabilities_raw(const Statevector& state, const QuantumNoise* noise = nullptr) -> std::vector<double>;
 
-auto calculate_probabilities(
-    const Statevector& state,
-    const QuantumNoise* noise = nullptr
-) -> std::map<std::string, double>;
+auto calculate_probabilities(const Statevector& state, const QuantumNoise* noise = nullptr) -> std::map<std::string, double>;
 
 }  // namespace ket

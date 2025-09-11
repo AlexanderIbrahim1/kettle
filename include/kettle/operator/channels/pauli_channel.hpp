@@ -2,7 +2,6 @@
 
 #include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
-
 namespace ket
 {
 
@@ -20,9 +19,9 @@ public:
         NOTE: this function shares a lot of similar code with `PauliOperator`, but:
           - there are functions that make sense for `PauliOperator` that don't make sense for `PauliChannel`
           - the coefficients have different types and restrictions
-          - there isn't enough code to justify the increased complexity of uisng mixins, or forcing
+          - there isn't enough code to justify the increased complexity of using mixins, or forcing
             the user to use templates
-        
+
         So I'll just deal with the code duplication
     */
 
@@ -69,10 +68,6 @@ private:
 };
 
 // TODO: replace magic number
-auto almost_eq(
-    const PauliChannel& left_op,
-    const PauliChannel& right_op,
-    double coeff_tolerance = 1.0e-6
-) -> bool;
+auto almost_eq(const PauliChannel& left_op, const PauliChannel& right_op, double coeff_tolerance = 1.0e-6) -> bool;
 
 }  // namespace ket

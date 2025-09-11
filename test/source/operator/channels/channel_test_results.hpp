@@ -9,23 +9,17 @@
 namespace ctestutils
 {
 
-inline auto result_depolarizing_noise_1qubit(
-    const ket::Matrix2X2& dens_mat,
-    double parameter
-) -> ket::Matrix2X2
+inline auto result_depolarizing_noise_1qubit(const ket::Matrix2X2& dens_mat, double parameter) -> ket::Matrix2X2
 {
     const auto elem00 = dens_mat.elem00 * (1.0 - (4.0 * parameter / 3.0)) + (2.0 * parameter / 3.0);
     const auto elem01 = dens_mat.elem01 * (1.0 - (4.0 * parameter / 3.0));
     const auto elem10 = dens_mat.elem10 * (1.0 - (4.0 * parameter / 3.0));
     const auto elem11 = dens_mat.elem11 * (1.0 - (4.0 * parameter / 3.0)) + (2.0 * parameter / 3.0);
 
-    return {.elem00=elem00, .elem01=elem01, .elem10=elem10, .elem11=elem11};
+    return {.elem00 = elem00, .elem01 = elem01, .elem10 = elem10, .elem11 = elem11};
 }
 
-inline auto result_amplitude_damping_2qubit(
-    const ket::DensityMatrix& state,
-    double parameter
-) -> ket::DensityMatrix
+inline auto result_amplitude_damping_2qubit(const ket::DensityMatrix& state, double parameter) -> ket::DensityMatrix
 {
     if (state.n_qubits() != 2) {
         throw std::runtime_error {"ERROR: this function requires a 2-qubit state.\n"};
@@ -51,37 +45,26 @@ inline auto result_amplitude_damping_2qubit(
 
     auto densmat_after = Eigen::MatrixXcd(4, 4);
 
-    densmat_after << \
-        // row 0
-        densmat(0, 0) + lam2 * (densmat(1, 1) + densmat(2, 2)) + lam4 * densmat(3, 3), 
-        eta1 * densmat(0, 1) + eta1 * lam2 * densmat(1, 3),
-        eta1 * densmat(0, 2) + eta1 * lam2 * densmat(2, 3),
-        eta2 * densmat(0, 3),
+    densmat_after <<  // row 0
+        densmat(0, 0) + lam2 * (densmat(1, 1) + densmat(2, 2)) + lam4 * densmat(3, 3),
+        eta1 * densmat(0, 1) + eta1 * lam2 * densmat(1, 3), eta1 * densmat(0, 2) + eta1 * lam2 * densmat(2, 3), eta2 * densmat(0, 3),
         // row 1
-        eta1 * densmat(1, 0) + eta1 * lam2 * densmat(3, 1),
-        eta2 * densmat(1, 1) + eta2 * lam2 * densmat(3, 3),
-        eta2 * densmat(1, 2),
+        eta1 * densmat(1, 0) + eta1 * lam2 * densmat(3, 1), eta2 * densmat(1, 1) + eta2 * lam2 * densmat(3, 3), eta2 * densmat(1, 2),
         eta3 * densmat(1, 3),
         // row 2
-        eta1 * densmat(2, 0) + eta1 * lam2 * densmat(3, 2),
-        eta2 * densmat(2, 1),
-        eta2 * densmat(2, 2) + eta2 * lam2 * densmat(3, 3),
+        eta1 * densmat(2, 0) + eta1 * lam2 * densmat(3, 2), eta2 * densmat(2, 1), eta2 * densmat(2, 2) + eta2 * lam2 * densmat(3, 3),
         eta3 * densmat(2, 3),
         // row 3
-        eta2 * densmat(3, 0),
-        eta3 * densmat(3, 1),
-        eta3 * densmat(3, 2),
-        eta4 * densmat(3, 3);
+        eta2 * densmat(3, 0), eta3 * densmat(3, 1), eta3 * densmat(3, 2), eta4 * densmat(3, 3);
 
     return ket::DensityMatrix {densmat_after};
 }
 
-inline auto result_phase_amplitude_damping_1qubit(
-    const ket::Matrix2X2& dens_mat,
-    const ket::PhaseAmplitudeDampingParameters parameters
-) -> ket::Matrix2X2
+inline auto result_phase_amplitude_damping_1qubit(const ket::Matrix2X2& dens_mat, const ket::PhaseAmplitudeDampingParameters parameters)
+    -> ket::Matrix2X2
 {
-    auto check_in_0_1 = [](double param) {
+    auto check_in_0_1 = [](double param)
+    {
         if (param < 0.0 || param > 1.0) {
             throw std::runtime_error {"ERROR: found out-of-bounds parameter in unit test\n"};
         }
@@ -100,7 +83,7 @@ inline auto result_phase_amplitude_damping_1qubit(
     const auto output10 = offdiag * dens_mat.elem10;
     const auto output11 = (1.0 + (pop * amp) - amp) * dens_mat.elem11 + pop * amp * dens_mat.elem00;
 
-    return {.elem00=output00, .elem01=output01, .elem10=output10, .elem11=output11};
+    return {.elem00 = output00, .elem01 = output01, .elem10 = output10, .elem11 = output11};
 }
 
 }  // namespace ctestutils

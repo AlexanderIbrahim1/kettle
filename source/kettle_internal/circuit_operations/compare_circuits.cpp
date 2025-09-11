@@ -9,10 +9,10 @@
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/parameter/parameter.hpp"
 
-#include "kettle_internal/parameter/parameter_expression_internal.hpp"
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
-#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_create.hpp"
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
+#include "kettle_internal/parameter/parameter_expression_internal.hpp"
 
 namespace kp = ket::param;
 namespace kpi = ket::param::internal;
@@ -27,10 +27,12 @@ auto non_u_gate_to_u_gate_(const kp::EvaluatedParameterDataMap& param_map, const
     }
 
     if (ket::internal::gate_id::is_angle_transform_gate(info.gate)) {
-        const auto angle = [&]() {
+        const auto angle = [&]()
+        {
             if (info.param_expression_ptr) {
-                return kpi::Evaluator{}.evaluate(*info.param_expression_ptr, param_map);
-            } else {
+                return kpi::Evaluator {}.evaluate(*info.param_expression_ptr, param_map);
+            }
+            else {
                 return ket::internal::create::unpack_gate_angle(info);
             }
         }();
@@ -104,7 +106,6 @@ auto all_remaining_elements_are_circuit_loggers_(const ket::QuantumCircuit& circ
 }
 
 }  // namespace
-
 
 namespace ket
 {

@@ -3,8 +3,8 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "kettle_internal/simulation/multithread_simulate_utils.hpp"
 
@@ -20,7 +20,9 @@ TEST_CASE("load_balanced_division()")
         };
 
         const auto testcase = GENERATE(
-            TestCase {50, 7, {8, 7, 7, 7, 7, 7, 7}},
+            TestCase {
+                50, 7, {8, 7, 7, 7, 7, 7, 7}
+        },
             TestCase {49, 7, {7, 7, 7, 7, 7, 7, 7}},
             TestCase {20, 3, {7, 7, 6}},
             TestCase {32, 8, {4, 4, 4, 4, 4, 4, 4, 4}}
@@ -48,9 +50,12 @@ TEST_CASE("partial_sums_from_zero()")
     };
 
     const auto testcase = GENERATE(
-        TestCase { {}, {0} },
-        TestCase { {1, 2, 3}, {0, 1, 3, 6} },
-        TestCase { {2, 2, 2, 2}, {0, 2, 4, 6, 8} }
+        TestCase {
+            {},
+            {0}
+    },
+        TestCase {{1, 2, 3}, {0, 1, 3, 6}},
+        TestCase {{2, 2, 2, 2}, {0, 2, 4, 6, 8}}
     );
 
     const auto actual = ket::internal::partial_sums_from_zero_(testcase.values);
@@ -68,11 +73,13 @@ TEST_CASE("partial_sum_pairs_()")
     };
 
     const auto testcase = GENERATE(
-        TestCase { 8, 1, {{0, 8}} },
-        TestCase { 8, 2, {{0, 4}, {4, 8}} },
-        TestCase { 16, 1, {{0, 16}} },
-        TestCase { 16, 2, {{0, 8}, {8, 16}} },
-        TestCase { 16, 4, {{0, 4}, {4, 8}, {8, 12}, {12, 16}} }
+        TestCase {
+            8, 1, {{0, 8}}
+    },
+        TestCase {8, 2, {{0, 4}, {4, 8}}},
+        TestCase {16, 1, {{0, 16}}},
+        TestCase {16, 2, {{0, 8}, {8, 16}}},
+        TestCase {16, 4, {{0, 4}, {4, 8}, {8, 12}, {12, 16}}}
     );
 
     const auto actual = ket::internal::partial_sum_pairs_(testcase.n_gate_pairs, testcase.n_threads);

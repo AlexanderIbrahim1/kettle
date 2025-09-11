@@ -1,8 +1,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/multithread_simulate_utils.hpp"
+#include "kettle_internal/simulation/simulate_utils.hpp"
 
 /*
     This header file contains code to help perform the multithread quantum circuit simulations.
@@ -20,7 +20,7 @@ auto load_balanced_division_(std::size_t numerator, std::size_t denominator) -> 
     const auto remainder = numerator % denominator;
     const auto divisor = numerator / denominator;
 
-    auto output = std::vector<std::size_t> (denominator, divisor);
+    auto output = std::vector<std::size_t>(denominator, divisor);
     for (std::size_t i {0}; i < remainder; ++i) {
         ++output[i];
     }

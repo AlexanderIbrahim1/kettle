@@ -9,7 +9,6 @@
     but aren't direct simulation code.
 */
 
-
 namespace ket::internal
 {
 

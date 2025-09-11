@@ -1,17 +1,17 @@
 #include <algorithm>
 #include <cstddef>
+#include <map>
 #include <optional>
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <map>
 #include <vector>
 
 #include "kettle/calculations/probabilities.hpp"
 #include "kettle/circuit/circuit.hpp"
-#include "kettle_internal/common/prng.hpp"
 #include "kettle/simulation/simulate.hpp"
 #include "kettle/state/statevector.hpp"
+#include "kettle_internal/common/prng.hpp"
 #include "kettle_internal/state/marginal_internal.hpp"
 
 #include "kettle/calculations/measurements.hpp"
@@ -26,8 +26,7 @@
 namespace ket
 {
 
-auto memory_to_counts(const std::vector<std::size_t>& measurements)
-    -> std::map<std::size_t, std::size_t>
+auto memory_to_counts(const std::vector<std::size_t>& measurements) -> std::map<std::size_t, std::size_t>
 {
     auto map = std::map<std::size_t, std::size_t> {};
 
@@ -74,11 +73,8 @@ auto memory_to_fractions(const std::vector<std::size_t>& measurements) -> std::m
       - memory complexity: O(max(2^n, k))
       - time complexity: O(k * 2^n)
 */
-auto perform_measurements_as_memory(
-    const std::vector<double>& probabilities_raw,
-    std::size_t n_shots,
-    std::optional<int> seed
-) -> std::vector<std::size_t>
+auto perform_measurements_as_memory(const std::vector<double>& probabilities_raw, std::size_t n_shots, std::optional<int> seed)
+    -> std::vector<std::size_t>
 {
     auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
 
@@ -93,22 +89,15 @@ auto perform_measurements_as_memory(
     return measurements;
 }
 
-auto perform_measurements_as_memory(
-    const Statevector& state,
-    std::size_t n_shots,
-    const QuantumNoise* noise,
-    std::optional<int> seed
-) -> std::vector<std::size_t>
+auto perform_measurements_as_memory(const Statevector& state, std::size_t n_shots, const QuantumNoise* noise, std::optional<int> seed)
+    -> std::vector<std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     return perform_measurements_as_memory(probabilities_raw, n_shots, seed);
 }
 
-auto perform_measurements_as_counts_raw(
-    const std::vector<double>& probabilities_raw,
-    std::size_t n_shots,
-    std::optional<int> seed
-) -> std::map<std::size_t, std::size_t>
+auto perform_measurements_as_counts_raw(const std::vector<double>& probabilities_raw, std::size_t n_shots, std::optional<int> seed)
+    -> std::map<std::size_t, std::size_t>
 {
     auto sampler = ket::internal::ProbabilitySampler_ {probabilities_raw, seed};
     auto measurements = std::map<std::size_t, std::size_t> {};
@@ -122,12 +111,8 @@ auto perform_measurements_as_counts_raw(
     return measurements;
 }
 
-auto perform_measurements_as_counts_raw(
-    const Statevector& state,
-    std::size_t n_shots,
-    const QuantumNoise* noise,
-    std::optional<int> seed
-) -> std::map<std::size_t, std::size_t>
+auto perform_measurements_as_counts_raw(const Statevector& state, std::size_t n_shots, const QuantumNoise* noise, std::optional<int> seed)
+    -> std::map<std::size_t, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     return perform_measurements_as_counts_raw(probabilities_raw, n_shots, seed);
@@ -207,12 +192,8 @@ auto perform_measurements_as_counts_marginal(
     return measurements;
 }
 
-auto perform_measurements_as_counts(
-    const Statevector& state,
-    std::size_t n_shots,
-    const QuantumNoise* noise,
-    std::optional<int> seed
-) -> std::map<std::string, std::size_t>
+auto perform_measurements_as_counts(const Statevector& state, std::size_t n_shots, const QuantumNoise* noise, std::optional<int> seed)
+    -> std::map<std::string, std::size_t>
 {
     const auto probabilities_raw = calculate_probabilities_raw(state, noise);
     const auto marginal_qubits = std::vector<std::size_t> {};
@@ -221,13 +202,12 @@ auto perform_measurements_as_counts(
 
 }  // namespace ket
 
-
 namespace ket::internal
 {
 
 /*
     We want to avoid sampling entries beyond the end of the probability distribution,
-    because this correponds to an index for a computational state that does not exist.
+    because this corresponds to an index for a computational state that does not exist.
 
     To prevent this, we need to offset the largest value produced by the random number
     generator by a small amount, to make sure the largest value is never sampled.
@@ -255,7 +235,6 @@ auto cumulative_end_offset_(const std::vector<double>& cumulative_probabilities)
     return (last - second_last) * CUMULATIVE_END_OFFSET_FRACTION;
 }
 
-
 auto calculate_cumulative_sum_(const std::vector<double>& probabilities) -> std::vector<double>
 {
     auto cumulative = std::vector<double> {};
@@ -266,14 +245,10 @@ auto calculate_cumulative_sum_(const std::vector<double>& probabilities) -> std:
     return cumulative;
 }
 
-auto build_marginal_bitmask_(
-    const std::vector<std::size_t>& marginal_qubits,
-    std::size_t n_qubits
-) -> std::vector<std::uint8_t>
+auto build_marginal_bitmask_(const std::vector<std::size_t>& marginal_qubits, std::size_t n_qubits) -> std::vector<std::uint8_t>
 {
     const auto is_in_range = [&](auto i) { return i >= n_qubits; };
-    if (std::ranges::any_of(marginal_qubits, is_in_range))
-    {
+    if (std::ranges::any_of(marginal_qubits, is_in_range)) {
         throw std::runtime_error {"ERROR: marginal qubit index out of range."};
     }
 
@@ -303,7 +278,8 @@ auto ProbabilitySampler_::operator()() -> std::size_t
     if (it_state == cumulative_.end()) {
         throw std::runtime_error {
             "LOGIC BUG: Ended up with measurement of state past end of cumulative\n"
-            "probability distribution, which shouldn't happen?"};
+            "probability distribution, which shouldn't happen?"
+        };
     }
 
     const auto i_state = static_cast<std::size_t>(std::distance(cumulative_.begin(), it_state));

@@ -10,7 +10,6 @@
 
 #include "kettle/gates/primitive_gate.hpp"
 
-
 namespace ket::internal::create
 {
 
@@ -37,12 +36,14 @@ auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<s
 /*
     Create a single-qubit gate with a parameterized angle.
 */
-auto create_one_target_one_parameter_gate(ket::Gate gate, std::size_t target_index, ket::param::ParameterExpression param_expression) -> ket::GateInfo;
+auto create_one_target_one_parameter_gate(ket::Gate gate, std::size_t target_index, ket::param::ParameterExpression param_expression)
+    -> ket::GateInfo;
 
 /*
     Returns the `{target_qubit, param_expression_ptr}` of a single-qubit gate with an angle parameter.
 */
-auto unpack_one_target_one_parameter_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
+auto unpack_one_target_one_parameter_gate(const ket::GateInfo& info)
+    -> std::tuple<std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
 
 /*
     Create a controlled gate with no parameters.
@@ -57,7 +58,8 @@ auto unpack_one_control_one_target_gate(const ket::GateInfo& info) -> std::tuple
 /*
     Create a controlled gate with an angle parameter.
 */
-auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index, double theta) -> ket::GateInfo;
+auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index, double theta)
+    -> ket::GateInfo;
 
 /*
     Returns the `{control_qubit, target_qubit, angle}` of a double-qubit gate with an angle parameter.
@@ -71,9 +73,8 @@ auto create_one_control_one_target_one_parameter_gate(
     ket::param::ParameterExpression param_expression
 ) -> ket::GateInfo;
 
-auto unpack_one_control_one_target_one_parameter_gate(
-    const ket::GateInfo& info
-) -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
+auto unpack_one_control_one_target_one_parameter_gate(const ket::GateInfo& info)
+    -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>;
 
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.

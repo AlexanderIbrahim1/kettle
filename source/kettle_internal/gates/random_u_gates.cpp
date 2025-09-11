@@ -6,7 +6,6 @@
 #include "kettle/gates/random_u_gates.hpp"
 #include "kettle_internal/common/prng.hpp"
 
-
 namespace ket
 {
 
@@ -22,17 +21,17 @@ auto generate_random_unitary2x2(std::mt19937& prng) -> ket::Matrix2X2
 
     const auto cospsi = std::cos(psi);
     const auto sinpsi = std::sin(psi);
-    
+
     const auto gphase = std::complex {std::cos(alpha), std::sin(alpha)};
     const auto expphi = std::complex {std::cos(phi), std::sin(phi)};
     const auto expchi = std::complex {std::cos(chi), std::sin(chi)};
 
-    const auto elem00 =   gphase * cospsi * expphi;
-    const auto elem01 =   gphase * sinpsi * expchi;
-    const auto elem10 = - gphase * sinpsi / expchi;
-    const auto elem11 =   gphase * cospsi / expphi;
+    const auto elem00 = gphase * cospsi * expphi;
+    const auto elem01 = gphase * sinpsi * expchi;
+    const auto elem10 = -gphase * sinpsi / expchi;
+    const auto elem11 = gphase * cospsi / expphi;
 
-    return {.elem00=elem00, .elem01=elem01, .elem10=elem10, .elem11=elem11};
+    return {.elem00 = elem00, .elem01 = elem01, .elem10 = elem10, .elem11 = elem11};
 }
 
 auto generate_random_unitary2x2(int seed) -> ket::Matrix2X2

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-
 namespace ket::internal
 {
 

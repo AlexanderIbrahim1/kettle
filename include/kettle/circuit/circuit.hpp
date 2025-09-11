@@ -5,14 +5,13 @@
 #include <unordered_map>
 #include <vector>
 
-#include "kettle/circuit/control_flow_predicate.hpp"
-#include "kettle/circuit/control_flow.hpp"
 #include "kettle/circuit/circuit_element.hpp"
+#include "kettle/circuit/control_flow.hpp"
+#include "kettle/circuit/control_flow_predicate.hpp"
 #include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/tolerance.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle/parameter/parameter.hpp"
-
 
 namespace ket
 {
@@ -194,25 +193,29 @@ public:
     void add_csxdag_gate(const Container& pairs);
 
     void add_crx_gate(std::size_t control_index, std::size_t target_index, double angle);
-    auto add_crx_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    auto add_crx_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key)
+        -> ket::param::ParameterID;
     void add_crx_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crx_gate(const Container& tuples);
 
     void add_cry_gate(std::size_t control_index, std::size_t target_index, double angle);
-    auto add_cry_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    auto add_cry_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key)
+        -> ket::param::ParameterID;
     void add_cry_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cry_gate(const Container& tuples);
 
     void add_crz_gate(std::size_t control_index, std::size_t target_index, double angle);
-    auto add_crz_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    auto add_crz_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key)
+        -> ket::param::ParameterID;
     void add_crz_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_crz_gate(const Container& tuples);
 
     void add_cp_gate(std::size_t control_index, std::size_t target_index, double angle);
-    auto add_cp_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key) -> ket::param::ParameterID;
+    auto add_cp_gate(std::size_t control_index, std::size_t target_index, double initial_angle, ket::param::parameterized key)
+        -> ket::param::ParameterID;
     void add_cp_gate(std::size_t control_index, std::size_t target_index, const ket::param::ParameterID& id);
     template <ControlAndTargetIndicesAndAngles Container = ControlAndTargetIndicesAndAnglesIList>
     void add_cp_gate(const Container& tuples);
@@ -287,11 +290,7 @@ public:
         This function takes a custom `ControlFlowPredicate` instance, and if it evaluates to `true`
         for the current classical register, then `subcircuit` executed.
     */
-    void add_if_statement(
-        ControlFlowPredicate predicate,
-        QuantumCircuit circuit,
-        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
-    );
+    void add_if_statement(ControlFlowPredicate predicate, QuantumCircuit circuit, double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE);
 
     /*
         Add a classical if statement to the `QuantumCircuit`.
@@ -301,8 +300,8 @@ public:
     */
     void add_if_statement(
         std::size_t bit_index,
-        QuantumCircuit subcircuit//,
-//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+        QuantumCircuit subcircuit  //,
+                                   //        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
     );
 
     /*
@@ -313,8 +312,8 @@ public:
     */
     void add_if_not_statement(
         std::size_t bit_index,
-        QuantumCircuit subcircuit//,
-//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+        QuantumCircuit subcircuit  //,
+                                   //        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
     );
 
     /*
@@ -327,8 +326,8 @@ public:
     void add_if_else_statement(
         ControlFlowPredicate predicate,
         QuantumCircuit if_subcircuit,
-        QuantumCircuit else_subcircuit//,
-//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+        QuantumCircuit else_subcircuit  //,
+                                        //        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
     );
 
     /*
@@ -341,8 +340,8 @@ public:
     void add_if_else_statement(
         std::size_t bit_index,
         QuantumCircuit if_subcircuit,
-        QuantumCircuit else_subcircuit//,
-//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+        QuantumCircuit else_subcircuit  //,
+                                        //        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
     );
 
     /*
@@ -355,8 +354,8 @@ public:
     void add_if_not_else_statement(
         std::size_t bit_index,
         QuantumCircuit if_subcircuit,
-        QuantumCircuit else_subcircuit//,
-//        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
+        QuantumCircuit else_subcircuit  //,
+                                        //        double tolerance = MATCHING_PARAMETER_VALUE_TOLERANCE
     );
 
     void add_classical_register_circuit_logger();
@@ -392,11 +391,7 @@ private:
         [[maybe_unused]] param::parameterized key
     ) -> ket::param::ParameterID;
 
-    void add_one_target_one_parameter_gate_without_angle_(
-        std::size_t target_index,
-        Gate gate,
-        const ket::param::ParameterID& id
-    );
+    void add_one_target_one_parameter_gate_without_angle_(std::size_t target_index, Gate gate, const ket::param::ParameterID& id);
 
     auto add_one_control_one_target_one_parameter_gate_with_angle_(
         std::size_t control_index,
@@ -417,9 +412,7 @@ private:
 
     auto update_existing_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression;
     auto create_uninitialized_parameter_data_(const ket::param::ParameterID& id) -> ket::param::ParameterExpression;
-    auto create_initialized_parameter_data_(
-        double value
-    ) -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>;
+    auto create_initialized_parameter_data_(double value) -> std::tuple<ket::param::ParameterExpression, ket::param::ParameterID>;
 };
 
 }  // namespace ket

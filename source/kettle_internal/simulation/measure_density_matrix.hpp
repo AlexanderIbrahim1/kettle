@@ -3,27 +3,19 @@
 #include <optional>
 #include <random>
 
-#include "kettle_internal/common/prng.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle/state/density_matrix.hpp"
+#include "kettle_internal/common/prng.hpp"
 
 #include "kettle_internal/simulation/measure_helper.hpp"
-
 
 namespace ket::internal
 {
 
-auto probabilities_of_collapsed_states_(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info
-) -> std::tuple<double, double>;
+auto probabilities_of_collapsed_states_(ket::DensityMatrix& state, const ket::GateInfo& info) -> std::tuple<double, double>;
 
 template <int StateToCollapse>
-void collapse_and_renormalize_(
-    ket::DensityMatrix& state,
-    const ket::GateInfo& info,
-    double norm_of_surviving_state
-);
+void collapse_and_renormalize_(ket::DensityMatrix& state, const ket::GateInfo& info, double norm_of_surviving_state);
 
 /*
     Perform a measurement at the target qubit index, which collapses the state.

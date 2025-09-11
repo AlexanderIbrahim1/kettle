@@ -8,7 +8,6 @@
 #include "kettle/state/statevector.hpp"
 #include "kettle_internal/common/state_test_utils.hpp"
 
-
 namespace ket::internal
 {
 

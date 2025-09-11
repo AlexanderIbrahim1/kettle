@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Eigen/Dense>
 #include <cmath>
+#include <Eigen/Dense>
 
 #include "kettle/circuit/classical_register.hpp"
 #include "kettle/common/matrix2x2.hpp"
@@ -22,10 +22,10 @@
     TODO: most of these simulation functions can be specialized because we know the gate type
     beforehand and we can cut down on the number of calculations per transformation by choosing
     the specific form of the transformation at compile-time
-    
+
     We already do this with many other simulation functions, where the overall body of the
     simulation function is smaller and the repetition isn't as horrid
-    
+
     However, the controlled gate transformations for the density matrices take a lot of code
     and require A LOT of repetition to specialize for each gate type, so we aren't doing them;
     they are just a performance enchangement, which isn't the biggest priority right now
@@ -94,28 +94,28 @@ void apply_1t_gate_first_(
                 buffer(i_row1, i_col1) = rho01;
             }
             else if constexpr (GateType == G::Y) {
-                buffer(i_row0, i_col0) = { rho10.imag(), -rho10.real()};
-                buffer(i_row1, i_col0) = {-rho00.imag(),  rho00.real()};
-                buffer(i_row0, i_col1) = { rho11.imag(), -rho11.real()};
-                buffer(i_row1, i_col1) = {-rho01.imag(),  rho01.real()};
+                buffer(i_row0, i_col0) = {rho10.imag(), -rho10.real()};
+                buffer(i_row1, i_col0) = {-rho00.imag(), rho00.real()};
+                buffer(i_row0, i_col1) = {rho11.imag(), -rho11.real()};
+                buffer(i_row1, i_col1) = {-rho01.imag(), rho01.real()};
             }
             else if constexpr (GateType == G::Z) {
-                buffer(i_row0, i_col0) =  rho00;
+                buffer(i_row0, i_col0) = rho00;
                 buffer(i_row1, i_col0) = -rho10;
-                buffer(i_row0, i_col1) =  rho01;
+                buffer(i_row0, i_col1) = rho01;
                 buffer(i_row1, i_col1) = -rho11;
             }
             else if constexpr (GateType == G::S) {
                 buffer(i_row0, i_col0) = rho00;
-                buffer(i_row1, i_col0) = {-rho10.imag(),  rho10.real()};
+                buffer(i_row1, i_col0) = {-rho10.imag(), rho10.real()};
                 buffer(i_row0, i_col1) = rho01;
-                buffer(i_row1, i_col1) = {-rho11.imag(),  rho11.real()};
+                buffer(i_row1, i_col1) = {-rho11.imag(), rho11.real()};
             }
             else if constexpr (GateType == Gate::SDAG) {
                 buffer(i_row0, i_col0) = rho00;
-                buffer(i_row1, i_col0) = { rho10.imag(), -rho10.real()};
+                buffer(i_row1, i_col0) = {rho10.imag(), -rho10.real()};
                 buffer(i_row0, i_col1) = rho01;
-                buffer(i_row1, i_col1) = { rho11.imag(), -rho11.real()};
+                buffer(i_row1, i_col1) = {rho11.imag(), -rho11.real()};
             }
             else if constexpr (GateType == Gate::T) {
                 buffer(i_row0, i_col0) = rho00;
@@ -142,12 +142,13 @@ void apply_1t_gate_first_(
                 buffer(i_row1, i_col1) = (rho01 * plus_half) + (rho11 * minus_half);
             }
             else {
-                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of first multiplication.");
+                static_assert(
+                    dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of first multiplication."
+                );
             }
         }
     }
 }
-
 
 template <ket::Gate GateType>
 void apply_1t_gate_second_(
@@ -191,28 +192,28 @@ void apply_1t_gate_second_(
                 state.matrix()(i_row1, i_col1) = buf10;
             }
             else if constexpr (GateType == G::Y) {
-                state.matrix()(i_row0, i_col0) = {-buf01.imag(),  buf01.real()};
-                state.matrix()(i_row1, i_col0) = {-buf11.imag(),  buf11.real()};
-                state.matrix()(i_row0, i_col1) = { buf00.imag(), -buf00.real()};
-                state.matrix()(i_row1, i_col1) = { buf10.imag(), -buf10.real()};
+                state.matrix()(i_row0, i_col0) = {-buf01.imag(), buf01.real()};
+                state.matrix()(i_row1, i_col0) = {-buf11.imag(), buf11.real()};
+                state.matrix()(i_row0, i_col1) = {buf00.imag(), -buf00.real()};
+                state.matrix()(i_row1, i_col1) = {buf10.imag(), -buf10.real()};
             }
             else if constexpr (GateType == G::Z) {
-                state.matrix()(i_row0, i_col0) =  buf00;
-                state.matrix()(i_row1, i_col0) =  buf10;
+                state.matrix()(i_row0, i_col0) = buf00;
+                state.matrix()(i_row1, i_col0) = buf10;
                 state.matrix()(i_row0, i_col1) = -buf01;
                 state.matrix()(i_row1, i_col1) = -buf11;
             }
             else if constexpr (GateType == G::S) {
                 state.matrix()(i_row0, i_col0) = buf00;
                 state.matrix()(i_row1, i_col0) = buf10;
-                state.matrix()(i_row0, i_col1) = { buf01.imag(), -buf01.real()};
-                state.matrix()(i_row1, i_col1) = { buf11.imag(), -buf11.real()};
+                state.matrix()(i_row0, i_col1) = {buf01.imag(), -buf01.real()};
+                state.matrix()(i_row1, i_col1) = {buf11.imag(), -buf11.real()};
             }
             else if constexpr (GateType == Gate::SDAG) {
                 state.matrix()(i_row0, i_col0) = buf00;
                 state.matrix()(i_row1, i_col0) = buf10;
-                state.matrix()(i_row0, i_col1) = {-buf01.imag(),  buf01.real()};
-                state.matrix()(i_row1, i_col1) = {-buf11.imag(),  buf11.real()};
+                state.matrix()(i_row0, i_col1) = {-buf01.imag(), buf01.real()};
+                state.matrix()(i_row1, i_col1) = {-buf11.imag(), buf11.real()};
             }
             else if constexpr (GateType == Gate::T) {
                 state.matrix()(i_row0, i_col0) = buf00;
@@ -239,12 +240,13 @@ void apply_1t_gate_second_(
                 state.matrix()(i_row1, i_col1) = (buf10 * minus_half) + (buf11 * plus_half);
             }
             else {
-                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of second multiplication.");
+                static_assert(
+                    dm_gate_always_false<GateType>::value, "Invalid 1T gate for density matrix simulation of second multiplication."
+                );
             }
         }
     }
 }
-
 
 template <ket::Gate GateType>
 void apply_1t1a_gate_first_(
@@ -311,12 +313,13 @@ void apply_1t1a_gate_first_(
                 buffer(i_row1, i_col1) = rho11 * plus;
             }
             else {
-                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of first multiplication.");
+                static_assert(
+                    dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of first multiplication."
+                );
             }
         }
     }
 }
-
 
 template <ket::Gate GateType>
 void apply_1t1a_gate_second_(
@@ -383,7 +386,9 @@ void apply_1t1a_gate_second_(
                 state.matrix()(i_row1, i_col1) = buf11 * minus;
             }
             else {
-                static_assert(dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of second multiplication.");
+                static_assert(
+                    dm_gate_always_false<GateType>::value, "Invalid 1T1A gate for density matrix simulation of second multiplication."
+                );
             }
         }
     }
@@ -521,7 +526,6 @@ void simulate_one_target_one_angle_gate_(
     apply_1t1a_gate_second_<GateType>(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, theta);
 }
 
-
 void simulate_cu_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
@@ -529,7 +533,6 @@ void simulate_cu_gate_(
     const FlatIndexPair<Eigen::Index>& pair,
     Eigen::MatrixXcd& buffer
 );
-
 
 template <ket::Gate GateType>
 void simulate_one_control_one_target_gate_(
@@ -555,7 +558,6 @@ void simulate_one_control_one_target_gate_(
     // write the result to the density matrix itself
     apply_1c1t_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, info.gate);
 }
-
 
 template <ket::Gate GateType>
 void simulate_one_control_one_target_one_angle_gate_(

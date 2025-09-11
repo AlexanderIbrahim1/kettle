@@ -6,9 +6,8 @@
 #include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/simulation/gate_pair_generator.hpp"
-#include "kettle_internal/simulation/simulate_utils.hpp"
 #include "kettle_internal/simulation/operations.hpp"
-
+#include "kettle_internal/simulation/simulate_utils.hpp"
 
 namespace ki = ket::internal;
 
@@ -23,13 +22,8 @@ template <ket::PauliTerm Pauli>
 struct pauli_always_false : std::false_type
 {};
 
-
 template <ket::PauliTerm Pauli>
-void simulate_pauli_gate_(
-    ket::Statevector& state,
-    std::size_t target_index,
-    const ki::FlatIndexPair<std::size_t>& pair
-)
+void simulate_pauli_gate_(ket::Statevector& state, std::size_t target_index, const ki::FlatIndexPair<std::size_t>& pair)
 {
     const auto n_qubits = state.n_qubits();
 
@@ -54,7 +48,6 @@ void simulate_pauli_gate_(
     }
 }
 
-
 void simulate_pauli_gates_(
     ket::Statevector& state,
     const ki::FlatIndexPair<std::size_t>& single_pair,
@@ -63,9 +56,8 @@ void simulate_pauli_gates_(
 {
     using PT = ket::PauliTerm;
 
-    for (const auto& [target_index, pauli_term] : pauli_string.terms())
-    {
-        switch(pauli_term) {
+    for (const auto& [target_index, pauli_term] : pauli_string.terms()) {
+        switch (pauli_term) {
             case PT::X : {
                 simulate_pauli_gate_<PT::X>(state, target_index, single_pair);
                 break;
@@ -108,7 +100,7 @@ void StatevectorPauliStringSimulator::run(const SparsePauliString& pauli_string,
     check_valid_number_of_qubits_(pauli_string, state);
 
     const auto n_single_gate_pairs = ki::number_of_single_qubit_gate_pairs_(pauli_string.n_qubits());
-    const auto single_pair = ki::FlatIndexPair<std::size_t> {.i_lower=0, .i_upper=n_single_gate_pairs};
+    const auto single_pair = ki::FlatIndexPair<std::size_t> {.i_lower = 0, .i_upper = n_single_gate_pairs};
 
     simulate_pauli_gates_(state, single_pair, pauli_string);
 
@@ -126,6 +118,5 @@ void simulate(const SparsePauliString& pauli_string, Statevector& state)
     auto simulator = StatevectorPauliStringSimulator {};
     simulator.run(pauli_string, state);
 }
-
 
 }  // namespace ket

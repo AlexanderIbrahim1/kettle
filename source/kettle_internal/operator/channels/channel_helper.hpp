@@ -9,11 +9,7 @@ namespace ket::internal
 {
 
 template <typename T, typename F>
-auto almost_eq_helper_(
-    const T& left_op,
-    const T& right_op,
-    F almost_eq_func
-) -> bool
+auto almost_eq_helper_(const T& left_op, const T& right_op, F almost_eq_func) -> bool
 {
     if (left_op.size() != right_op.size()) {
         return false;
@@ -63,14 +59,13 @@ public:
         namespace sv = std::views;
 
         for (std::size_t i : sv::iota(0UL, ticker_.size()) | sv::reverse) {
-
             ticker_[i] += 1;
 
             if (ticker_[i] == period_) {
                 ticker_[i] = 0;
                 continue;
             }
-        
+
             break;
         }
     }
@@ -79,6 +74,5 @@ private:
     std::size_t period_;
     std::vector<std::size_t> ticker_;
 };
-
 
 }  // namespace ket::internal

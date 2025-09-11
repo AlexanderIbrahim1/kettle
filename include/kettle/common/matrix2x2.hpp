@@ -5,7 +5,6 @@
 
 #include "kettle/common/tolerance.hpp"
 
-
 namespace ket
 {
 
@@ -34,10 +33,7 @@ auto operator*(Number scalar, Matrix2X2 rhs) noexcept -> Matrix2X2;
 
 auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix2X2;
 
-auto matrix_square_root(
-    const Matrix2X2& mat,
-    double matrix_sqrt_tolerance = ket::MATRIX_2X2_SQRT_TOLERANCE
-) -> Matrix2X2;
+auto matrix_square_root(const Matrix2X2& mat, double matrix_sqrt_tolerance = ket::MATRIX_2X2_SQRT_TOLERANCE) -> Matrix2X2;
 
 auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2;
 
@@ -51,10 +47,6 @@ auto trace(const Matrix2X2& mat) -> std::complex<double>;
 */
 auto norm(const Matrix2X2& mat) -> double;
 
-auto almost_eq(
-    const Matrix2X2& left,
-    const Matrix2X2& right,
-    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) noexcept -> bool;
+auto almost_eq(const Matrix2X2& left, const Matrix2X2& right, double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ) noexcept -> bool;
 
 }  // namespace ket

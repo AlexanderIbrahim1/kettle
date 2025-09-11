@@ -7,7 +7,6 @@
 #include "kettle/common/tolerance.hpp"
 #include "kettle/state/statevector.hpp"
 
-
 namespace ket
 {
 

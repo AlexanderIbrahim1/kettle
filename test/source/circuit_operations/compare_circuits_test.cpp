@@ -18,8 +18,18 @@ TEST_CASE("almost_eq() with control flow statements")
     circuit1.add_y_gate(1);
     circuit1.add_m_gate(0);
 
-    auto if_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_x_gate(0); return circ; }();
-    auto else_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_h_gate(0); return circ; }();
+    auto if_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_x_gate(0);
+        return circ;
+    }();
+    auto else_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_h_gate(0);
+        return circ;
+    }();
 
     SECTION("if_statement()")
     {

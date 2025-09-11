@@ -8,10 +8,8 @@
 #include "kettle/parameter/parameter.hpp"
 #include "kettle_internal/parameter/parameter_internal.hpp"
 
-
 namespace kp = ket::param;
 namespace kpi = ket::param::internal;
-
 
 template <std::uint8_t Output>
 struct RiggedUniformIntDistribution
@@ -19,15 +17,13 @@ struct RiggedUniformIntDistribution
 public:
     using result_type = std::uint8_t;
 
-    RiggedUniformIntDistribution([[maybe_unused]] std::uint8_t left, [[maybe_unused]] std::uint8_t right)
-    {}
+    RiggedUniformIntDistribution([[maybe_unused]] std::uint8_t left, [[maybe_unused]] std::uint8_t right) {}
 
     auto operator()([[maybe_unused]] std::mt19937& prng) -> std::uint8_t
     {
         return Output;
     }
 };
-
 
 TEST_CASE("create parameter")
 {
@@ -37,7 +33,6 @@ TEST_CASE("create parameter")
     REQUIRE(param.name() == "theta");
     REQUIRE(param.id() == id);
 }
-
 
 TEST_CASE("create_parameter_id_helper()")
 {

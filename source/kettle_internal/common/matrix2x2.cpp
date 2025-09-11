@@ -17,11 +17,8 @@ namespace
 
     The matrix [-1, 0; 0 -1], or the negative of the identity, is a prime example.
 */
-auto matrix_sqrt_parameters_(
-    std::complex<double> trace,
-    std::complex<double> determinant,
-    double tolerance
-) -> std::tuple<std::complex<double>, std::complex<double>>
+auto matrix_sqrt_parameters_(std::complex<double> trace, std::complex<double> determinant, double tolerance)
+    -> std::tuple<std::complex<double>, std::complex<double>>
 {
     const auto s = std::sqrt(determinant);
     const auto t_arg = trace + 2.0 * s;
@@ -29,14 +26,14 @@ auto matrix_sqrt_parameters_(
     if (std::norm(t_arg) > tolerance) {
         const auto t = std::sqrt(t_arg);
         return {s, t};
-    } else {
+    }
+    else {
         const auto t = std::sqrt(trace - 2.0 * s);
         return {-s, t};
     }
 }
 
 }  // namespace
-
 
 namespace ket
 {
@@ -66,8 +63,8 @@ auto Matrix2X2::operator*=(Number scalar) noexcept -> Matrix2X2
 
     return *this;
 }
-template auto Matrix2X2::operator*=<double>(double scalar) noexcept -> Matrix2X2;
-template auto Matrix2X2::operator*=<std::complex<double>>(std::complex<double> scalar) noexcept -> Matrix2X2;
+template auto Matrix2X2::operator*= <double>(double scalar) noexcept -> Matrix2X2;
+template auto Matrix2X2::operator*= <std::complex<double>>(std::complex<double> scalar) noexcept -> Matrix2X2;
 
 auto Matrix2X2::operator+=(const Matrix2X2& other) noexcept -> Matrix2X2
 {
@@ -97,16 +94,16 @@ auto operator*(Matrix2X2 lhs, Number scalar) noexcept -> Matrix2X2
     return lhs;
 }
 
-template auto operator*<double>(Matrix2X2 lhs, double scalar) noexcept -> Matrix2X2;
-template auto operator*<std::complex<double>>(Matrix2X2 lhs, std::complex<double> scalar) noexcept -> Matrix2X2;
+template auto operator* <double>(Matrix2X2 lhs, double scalar) noexcept -> Matrix2X2;
+template auto operator* <std::complex<double>>(Matrix2X2 lhs, std::complex<double> scalar) noexcept -> Matrix2X2;
 
 template <typename Number>
 auto operator*(Number scalar, Matrix2X2 rhs) noexcept -> Matrix2X2
 {
     return operator*(rhs, scalar);
 }
-template auto operator*<double>(double scalar, Matrix2X2 lhs) noexcept -> Matrix2X2;
-template auto operator*<std::complex<double>>(std::complex<double> scalar, Matrix2X2 lhs) noexcept -> Matrix2X2;
+template auto operator* <double>(double scalar, Matrix2X2 lhs) noexcept -> Matrix2X2;
+template auto operator* <std::complex<double>>(std::complex<double> scalar, Matrix2X2 lhs) noexcept -> Matrix2X2;
 
 auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix2X2
 {
@@ -114,10 +111,7 @@ auto operator+(Matrix2X2 lhs, const Matrix2X2& rhs) noexcept -> Matrix2X2
     return lhs;
 }
 
-auto matrix_square_root(
-    const Matrix2X2& mat,
-    double matrix_sqrt_tolerance
-) -> Matrix2X2
+auto matrix_square_root(const Matrix2X2& mat, double matrix_sqrt_tolerance) -> Matrix2X2
 {
     // uses the following: https://en.wikipedia.org/wiki/Square_root_of_a_2_by_2_matrix#A_general_formula
     // we use the solution with the positive roots of s and t
@@ -131,7 +125,7 @@ auto matrix_square_root(
     const auto new10 = mat.elem10 / t;
     const auto new11 = (mat.elem11 + s) / t;
 
-    return {.elem00=new00, .elem01=new01, .elem10=new10, .elem11=new11};
+    return {.elem00 = new00, .elem01 = new01, .elem10 = new10, .elem11 = new11};
 }
 
 auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
@@ -141,7 +135,7 @@ auto conjugate_transpose(const Matrix2X2& mat) -> Matrix2X2
     const auto new10 = std::conj(mat.elem01);
     const auto new11 = std::conj(mat.elem11);
 
-    return {.elem00=new00, .elem01=new01, .elem10=new10, .elem11=new11};
+    return {.elem00 = new00, .elem01 = new01, .elem10 = new10, .elem11 = new11};
 }
 
 auto determinant(const Matrix2X2& mat) -> std::complex<double>
@@ -165,11 +159,7 @@ auto norm(const Matrix2X2& mat) -> double
     return std::sqrt(norm00 + norm01 + norm10 + norm11);
 }
 
-auto almost_eq(
-    const Matrix2X2& left,
-    const Matrix2X2& right,
-    double tolerance_sq
-) noexcept -> bool
+auto almost_eq(const Matrix2X2& left, const Matrix2X2& right, double tolerance_sq) noexcept -> bool
 {
     // clang-format off
     return \

@@ -3,8 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "kettle_internal/simulation/operations.hpp"
 #include "kettle/state/statevector.hpp"
+#include "kettle_internal/simulation/operations.hpp"
 
 constexpr static auto ABS_TOL = double {1.0e-6};
 

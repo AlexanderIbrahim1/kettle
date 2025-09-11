@@ -3,13 +3,13 @@
 #include <vector>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/common/matrix2x2.hpp"
+#include "kettle/common/utils.hpp"
 #include "kettle/operator/channels/mixed_circuit_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/pauli_channel.hpp"
-#include "kettle/common/matrix2x2.hpp"
-#include "kettle/common/utils.hpp"
-#include "kettle/operator/pauli/sparse_pauli_string.hpp"
 #include "kettle/operator/noise/standard_errors.hpp"
+#include "kettle/operator/pauli/sparse_pauli_string.hpp"
 
 #include "kettle_internal/common/utils_internal.hpp"
 #include "kettle_internal/operator/channels/channel_helper.hpp"
@@ -22,9 +22,7 @@ namespace
 auto check_in_0_1_(double value, std::string_view parameter, std::string_view channel)
 {
     if (value < 0.0 || value > 1.0) {
-        const auto err_msg = std::format(
-            "ERROR: the '{}' parameter for the '{}' channel must be in [0.0, 1.0]\n", parameter, channel
-        );
+        const auto err_msg = std::format("ERROR: the '{}' parameter for the '{}' channel must be in [0.0, 1.0]\n", parameter, channel);
 
         throw std::runtime_error {err_msg};
     }
@@ -33,10 +31,7 @@ auto check_in_0_1_(double value, std::string_view parameter, std::string_view ch
 /*
     A thermal relaxation process requires that `T2 <= 2 * T1`.
 */
-void check_relaxation_times_valid_(
-    const ket::RelaxationTime t1,
-    const ket::RelaxationTime t2
-)
+void check_relaxation_times_valid_(const ket::RelaxationTime t1, const ket::RelaxationTime t2)
 {
     // NOTE: T1 and T2 are very common variables in QC literature, so it's probably better to leave these
     // as is instead of giving them full names; also to prevent confusion with the "gate_time" variable,
@@ -61,11 +56,8 @@ namespace ket
 {
 
 template <QubitIndices Container>
-auto symmetric_depolarizing_error_channel(
-    double depolarizing_parameter,
-    std::size_t n_qubits,
-    const Container& indices
-) -> ket::PauliChannel
+auto symmetric_depolarizing_error_channel(double depolarizing_parameter, std::size_t n_qubits, const Container& indices)
+    -> ket::PauliChannel
 {
     using PT = ket::PauliTerm;
 
@@ -115,17 +107,10 @@ auto symmetric_depolarizing_error_channel(
 
     return ket::PauliChannel {std::move(sparse_pauli_strings)};
 }
-template auto symmetric_depolarizing_error_channel(
-    double parameter,
-    std::size_t n_qubits,
-    const QubitIndicesIList& indices
-) -> ket::PauliChannel;
-template auto symmetric_depolarizing_error_channel(
-    double parameter,
-    std::size_t n_qubits,
-    const QubitIndicesVector& indices
-) -> ket::PauliChannel;
-
+template auto symmetric_depolarizing_error_channel(double parameter, std::size_t n_qubits, const QubitIndicesIList& indices)
+    -> ket::PauliChannel;
+template auto symmetric_depolarizing_error_channel(double parameter, std::size_t n_qubits, const QubitIndicesVector& indices)
+    -> ket::PauliChannel;
 
 auto one_qubit_phase_amplitude_damping_error_channel(
     const PhaseAmplitudeDampingParameters& parameters,
@@ -148,12 +133,12 @@ auto one_qubit_phase_amplitude_damping_error_channel(
     const auto param_phas = std::sqrt(parameters.phase);
 
     auto kraus_matrices = std::vector<ket::Matrix2X2> {};
-    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {1.0, 0.0, 0.0, param_both}); // NOLINT
-    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, param_ampp, 0.0, 0.0}); // NOLINT
-    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, 0.0, 0.0, param_phas}); // NOLINT
-    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_both, 0.0, 0.0, 1.0}); // NOLINT
-    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {0.0, 0.0, param_ampp, 0.0}); // NOLINT
-    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_phas, 0.0, 0.0, 0.0}); // NOLINT
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {1.0, 0.0, 0.0, param_both});  // NOLINT
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, param_ampp, 0.0, 0.0});  // NOLINT
+    kraus_matrices.emplace_back(pop_damp0 * Matrix2X2 {0.0, 0.0, 0.0, param_phas});  // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_both, 0.0, 0.0, 1.0});  // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {0.0, 0.0, param_ampp, 0.0});  // NOLINT
+    kraus_matrices.emplace_back(pop_damp1 * Matrix2X2 {param_phas, 0.0, 0.0, 0.0});  // NOLINT
 
     const auto norm_too_small = [&](const auto& matrix) { return ket::norm(matrix) < tolerance; };
     std::erase_if(kraus_matrices, norm_too_small);
@@ -168,11 +153,8 @@ auto one_qubit_phase_amplitude_damping_error_channel(
 
     TODO: remove the magic number for the tolerance
 */
-auto one_qubit_thermal_relaxation_error_channel(
-    const ThermalRelaxationParameters& parameters,
-    std::size_t target_index,
-    double tolerance
-) -> ket::OneQubitKrausChannel
+auto one_qubit_thermal_relaxation_error_channel(const ThermalRelaxationParameters& parameters, std::size_t target_index, double tolerance)
+    -> ket::OneQubitKrausChannel
 {
     const auto* func_name = "one_qubit_phase_amplitude_damping_error_channel";
 
@@ -185,19 +167,23 @@ auto one_qubit_thermal_relaxation_error_channel(
 
     const auto& [t1, t2, gate_time, pop1] = parameters;
 
-    const auto p_reset = [&]() {
+    const auto p_reset = [&]()
+    {
         if (t1.is_infinite()) {
             return 0.0;
-        } else {
-            return 1.0 - std::exp(- gate_time / t1.time());
+        }
+        else {
+            return 1.0 - std::exp(-gate_time / t1.time());
         }
     }();
 
-    const auto exp_t2 = [&]() {
+    const auto exp_t2 = [&]()
+    {
         if (t2.is_infinite()) {
             return 0.0;
-        } else {
-            return std::exp(- gate_time / t2.time() );
+        }
+        else {
+            return std::exp(-gate_time / t2.time());
         }
     }();
 
@@ -234,7 +220,6 @@ auto one_qubit_thermal_relaxation_error_channel(
     return ket::OneQubitKrausChannel {std::move(kraus_matrices), target_index, tolerance};
 }
 
-
 auto reset_error(const ResetErrorParameters& parameters) -> ket::MixedCircuitChannel
 {
     const auto* func_name = "reset_error";
@@ -263,32 +248,18 @@ auto reset_error(const ResetErrorParameters& parameters) -> ket::MixedCircuitCha
     return ket::MixedCircuitChannel {std::move(weighted_operators)};
 }
 
-auto one_qubit_amplitude_damping_error_channel(
-    double amplitude_parameter,
-    std::size_t target_index,
-    double tolerance
-) -> ket::OneQubitKrausChannel
+auto one_qubit_amplitude_damping_error_channel(double amplitude_parameter, std::size_t target_index, double tolerance)
+    -> ket::OneQubitKrausChannel
 {
-    const auto parameters = ket::PhaseAmplitudeDampingParameters {
-        .amplitude=amplitude_parameter,
-        .phase=0.0,
-        .excited_population=0.0
-    };
+    const auto parameters =
+        ket::PhaseAmplitudeDampingParameters {.amplitude = amplitude_parameter, .phase = 0.0, .excited_population = 0.0};
 
     return one_qubit_phase_amplitude_damping_error_channel(parameters, target_index, tolerance);
 }
 
-auto one_qubit_phase_damping_error_channel(
-    double phase_parameter,
-    std::size_t target_index,
-    double tolerance
-) -> ket::OneQubitKrausChannel
+auto one_qubit_phase_damping_error_channel(double phase_parameter, std::size_t target_index, double tolerance) -> ket::OneQubitKrausChannel
 {
-    const auto parameters = ket::PhaseAmplitudeDampingParameters {
-        .amplitude=0.0,
-        .phase=phase_parameter,
-        .excited_population=0.0
-    };
+    const auto parameters = ket::PhaseAmplitudeDampingParameters {.amplitude = 0.0, .phase = phase_parameter, .excited_population = 0.0};
 
     return one_qubit_phase_amplitude_damping_error_channel(parameters, target_index, tolerance);
 }

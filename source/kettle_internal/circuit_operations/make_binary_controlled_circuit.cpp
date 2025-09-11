@@ -2,33 +2,27 @@
 #include <vector>
 
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/circuit_operations/append_circuits.hpp"
 #include "kettle/circuit_operations/make_binary_controlled_circuit.hpp"
+#include "kettle/circuit_operations/make_controlled_circuit.hpp"
 #include "kettle/common/utils.hpp"
 #include "kettle_internal/common/utils_internal.hpp"
-#include "kettle/circuit_operations/append_circuits.hpp"
-#include "kettle/circuit_operations/make_controlled_circuit.hpp"
-
 
 namespace
 {
 
 template <ket::QubitIndices Container>
-void check_subcircuit_powers_(
-    const std::vector<ket::QuantumCircuit>& subcircuit_powers,
-    const Container& control_qubits
-)
+void check_subcircuit_powers_(const std::vector<ket::QuantumCircuit>& subcircuit_powers, const Container& control_qubits)
 {
     if (subcircuit_powers.size() != ket::internal::get_container_size(control_qubits)) {
         throw std::runtime_error {"The number of circuits passed does not match the number of control qubits."};
     }
 }
-template
-void check_subcircuit_powers_<ket::QubitIndicesVector>(
+template void check_subcircuit_powers_<ket::QubitIndicesVector>(
     const std::vector<ket::QuantumCircuit>& subcircuit_powers,
     const ket::QubitIndicesVector& control_qubits
 );
-template
-void check_subcircuit_powers_<ket::QubitIndicesIList>(
+template void check_subcircuit_powers_<ket::QubitIndicesIList>(
     const std::vector<ket::QuantumCircuit>& subcircuit_powers,
     const ket::QubitIndicesIList& control_qubits
 );
@@ -62,21 +56,18 @@ auto make_binary_controlled_circuit_naive(
 
     return new_circuit;
 }
-template
-auto make_binary_controlled_circuit_naive<QubitIndicesVector>(
+template auto make_binary_controlled_circuit_naive<QubitIndicesVector>(
     const QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     const QubitIndicesVector& control_qubits,
     const QubitIndicesVector& mapped_qubits
 ) -> ket::QuantumCircuit;
-template
-auto make_binary_controlled_circuit_naive<QubitIndicesIList>(
+template auto make_binary_controlled_circuit_naive<QubitIndicesIList>(
     const QuantumCircuit& subcircuit,
     std::size_t n_new_qubits,
     const QubitIndicesIList& control_qubits,
     const QubitIndicesIList& mapped_qubits
 ) -> ket::QuantumCircuit;
-
 
 template <QubitIndices Container>
 auto make_binary_controlled_circuit_from_binary_powers(
@@ -101,15 +92,13 @@ auto make_binary_controlled_circuit_from_binary_powers(
 
     return new_circuit;
 }
-template
-auto make_binary_controlled_circuit_from_binary_powers<QubitIndicesVector>(
+template auto make_binary_controlled_circuit_from_binary_powers<QubitIndicesVector>(
     const std::vector<QuantumCircuit>& subcircuit_powers,
     std::size_t n_new_qubits,
     const QubitIndicesVector& control_qubits,
     const QubitIndicesVector& mapped_qubits
 ) -> ket::QuantumCircuit;
-template
-auto make_binary_controlled_circuit_from_binary_powers<QubitIndicesIList>(
+template auto make_binary_controlled_circuit_from_binary_powers<QubitIndicesIList>(
     const std::vector<QuantumCircuit>& subcircuit_powers,
     std::size_t n_new_qubits,
     const QubitIndicesIList& control_qubits,

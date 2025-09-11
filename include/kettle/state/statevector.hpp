@@ -29,10 +29,7 @@ public:
         double normalization_tolerance = ket::CONSTRUCTION_NORMALIZATION_TOLERANCE
     );
 
-    explicit Statevector(
-        const std::string& computational_state,
-        Endian input_endian = Endian::LITTLE
-    );
+    explicit Statevector(const std::string& computational_state, Endian input_endian = Endian::LITTLE);
 
     constexpr auto operator[](std::size_t index) const noexcept -> const std::complex<double>&
     {
@@ -58,20 +55,14 @@ public:
     }
 
     [[nodiscard]]
-    auto at(
-        const std::string& bitstring,
-        Endian endian = Endian::LITTLE
-    ) const -> const std::complex<double>&
+    auto at(const std::string& bitstring, Endian endian = Endian::LITTLE) const -> const std::complex<double>&
     {
         const auto state_index = bitstring_to_state_index(bitstring, endian);
         check_index_(state_index);
         return coefficients_[state_index];
     }
 
-    auto at(
-        const std::string& bitstring,
-        Endian endian = Endian::LITTLE
-    ) -> std::complex<double>&
+    auto at(const std::string& bitstring, Endian endian = Endian::LITTLE) -> std::complex<double>&
     {
         const auto state_index = bitstring_to_state_index(bitstring, endian);
         check_index_(state_index);
@@ -106,11 +97,8 @@ private:
     void perform_endian_flip_on_coefficients_() noexcept;
 };
 
-auto almost_eq(
-    const Statevector& left,
-    const Statevector& right,
-    double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) noexcept -> bool;
+auto almost_eq(const Statevector& left, const Statevector& right, double tolerance_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ) noexcept
+    -> bool;
 
 auto tensor_product(const Statevector& left, const Statevector& right) -> Statevector;
 

@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "kettle/common/matrix2x2.hpp"
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/gates/common_u_gates.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
 #include "kettle_internal/gates/primitive_gate_map.hpp"
@@ -26,10 +26,7 @@ auto determinant_angle_(const ket::Matrix2X2& matrix) -> double
     return std::atan2(det.imag(), det.real());
 }
 
-auto decomp_to_single_primitive_gate_(
-    const ket::Matrix2X2& unitary,
-    double tolerance_sq
-) -> std::optional<PrimitiveGateInfo_>
+auto decomp_to_single_primitive_gate_(const ket::Matrix2X2& unitary, double tolerance_sq) -> std::optional<PrimitiveGateInfo_>
 {
     using Info = PrimitiveGateInfo_;
     // NOTES:
@@ -92,10 +89,7 @@ auto decomp_to_single_primitive_gate_(
     return std::nullopt;
 }
 
-auto decomp_special_unitary_to_primitive_gates_(
-    const ket::Matrix2X2& unitary,
-    double tolerance_sq
-) -> std::vector<PrimitiveGateInfo_>
+auto decomp_special_unitary_to_primitive_gates_(const ket::Matrix2X2& unitary, double tolerance_sq) -> std::vector<PrimitiveGateInfo_>
 {
     const auto abs00 = std::clamp(std::abs(unitary.elem00), 0.0, 1.0);
 
@@ -120,10 +114,7 @@ auto decomp_special_unitary_to_primitive_gates_(
     return output;
 }
 
-auto decomp_to_primitive_gates_(
-    const ket::Matrix2X2& unitary,
-    double tolerance_sq
-) -> std::vector<PrimitiveGateInfo_>
+auto decomp_to_primitive_gates_(const ket::Matrix2X2& unitary, double tolerance_sq) -> std::vector<PrimitiveGateInfo_>
 {
     const auto primitive = decomp_to_single_primitive_gate_(unitary);
     if (primitive) {
@@ -144,11 +135,8 @@ auto decomp_to_primitive_gates_(
     }
 }
 
-auto decomp_to_one_target_primitive_gates_(
-    std::size_t target,
-    const ket::Matrix2X2& unitary,
-    double tolerance_sq
-) -> std::vector<ket::GateInfo>
+auto decomp_to_one_target_primitive_gates_(std::size_t target, const ket::Matrix2X2& unitary, double tolerance_sq)
+    -> std::vector<ket::GateInfo>
 {
     namespace cre = ket::internal::create;
 
@@ -159,7 +147,8 @@ auto decomp_to_one_target_primitive_gates_(
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
             output.emplace_back(cre::create_one_target_one_angle_gate(primitive.gate, target, angle));
-        } else {
+        }
+        else {
             output.emplace_back(cre::create_one_target_gate(primitive.gate, target));
         }
     }
@@ -185,7 +174,8 @@ auto decomp_to_one_control_one_target_primitive_gates_(
         if (primitive.parameter.has_value()) {
             const auto angle = primitive.parameter.value();
             output.emplace_back(cre::create_one_control_one_target_one_angle_gate(ctrl_gate, control, target, angle));
-        } else {
+        }
+        else {
             output.emplace_back(cre::create_one_control_one_target_gate(ctrl_gate, control, target));
         }
     }

@@ -4,23 +4,21 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/project_state.hpp"
+#include "kettle/state/statevector.hpp"
 #include "kettle_internal/state/project_state_internal.hpp"
-
 
 static constexpr auto get_normalized_amplitudes(const std::vector<int>& values) -> std::vector<std::complex<double>>
 {
     auto amplitudes = std::vector<std::complex<double>> {};
     amplitudes.reserve(values.size());
-    
+
     for (auto value : values) {
         amplitudes.emplace_back(static_cast<double>(value), 0.0);
     }
 
-    const auto sum_of_square_amplitudes = std::accumulate(
-        amplitudes.begin(), amplitudes.end(), 0.0, [](double x, auto y) { return x + std::norm(y); }
-    );
+    const auto sum_of_square_amplitudes =
+        std::accumulate(amplitudes.begin(), amplitudes.end(), 0.0, [](double x, auto y) { return x + std::norm(y); });
 
     const auto norm = std::sqrt(1.0 / sum_of_square_amplitudes);
 
@@ -31,10 +29,10 @@ static constexpr auto get_normalized_amplitudes(const std::vector<int>& values) 
     return amplitudes;
 }
 
-
 TEST_CASE("is_index_set()")
 {
-    struct TestCase {
+    struct TestCase
+    {
         std::size_t index;
         std::size_t value;
         bool expected;
@@ -56,10 +54,10 @@ TEST_CASE("is_index_set()")
     REQUIRE(actual == testcase.expected);
 }
 
-
 TEST_CASE("QubitStateChecker_")
 {
-    struct TestCase {
+    struct TestCase
+    {
         std::size_t value;
         bool expected;
     };
@@ -99,7 +97,10 @@ TEST_CASE("QubitStateChecker_")
     {
         SECTION("qubits at states {0, 2} are {0, 0}")
         {
-            const auto checker = ket::internal::QubitStateChecker_ {{0, 2}, {0, 0}};
+            const auto checker = ket::internal::QubitStateChecker_ {
+                {0, 2},
+                {0, 0}
+            };
 
             const auto testcase = GENERATE(
                 TestCase {0, true},   // 000
@@ -117,7 +118,10 @@ TEST_CASE("QubitStateChecker_")
 
         SECTION("qubits at states {0, 1} are {1, 0}")
         {
-            const auto checker = ket::internal::QubitStateChecker_ {{0, 1}, {1, 0}};
+            const auto checker = ket::internal::QubitStateChecker_ {
+                {0, 1},
+                {1, 0}
+            };
 
             const auto testcase = GENERATE(
                 TestCase {0, false},  // 000
@@ -135,7 +139,6 @@ TEST_CASE("QubitStateChecker_")
     }
 }
 
-
 TEST_CASE("measure_and_collapse()")
 {
     SECTION("uniform linear superposition with 2 qubits")
@@ -143,8 +146,12 @@ TEST_CASE("measure_and_collapse()")
         const auto x_in = std::sqrt(1.0 / 4.0);
         const auto x_out = std::sqrt(1.0 / 2.0);
 
-        const auto input = ket::Statevector{ { {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0} } };
-        const auto expected = ket::Statevector{ { {x_out, 0.0}, {x_out, 0.0} } };
+        const auto input = ket::Statevector {
+            {{x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0}, {x_in, 0.0}}
+        };
+        const auto expected = ket::Statevector {
+            {{x_out, 0.0}, {x_out, 0.0}}
+        };
 
         const auto actual = ket::project_statevector(input, {0}, {0});
 

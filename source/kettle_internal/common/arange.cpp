@@ -35,7 +35,8 @@ auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capa
         for (std::int64_t i {left_}; i < right_; i += step) {
             output.push_back(static_cast<Integer>(i));
         }
-    } else {
+    }
+    else {
         for (std::int64_t i {left_}; i > right_; i += step) {
             output.push_back(static_cast<Integer>(i));
         }
@@ -43,21 +44,22 @@ auto arange_helper_(Integer left, Integer right, std::int64_t step, Integer capa
 
     return output;
 }
-template auto arange_helper_<int, RightCompare_::LESS_THAN>(
-    int left, int right, std::int64_t step, int capacity
-) -> std::vector<int>;
+template auto arange_helper_<int, RightCompare_::LESS_THAN>(int left, int right, std::int64_t step, int capacity) -> std::vector<int>;
 template auto arange_helper_<std::size_t, RightCompare_::LESS_THAN>(
-    std::size_t left, std::size_t right, std::int64_t step, std::size_t capacity
+    std::size_t left,
+    std::size_t right,
+    std::int64_t step,
+    std::size_t capacity
 ) -> std::vector<std::size_t>;
-template auto arange_helper_<int, RightCompare_::GREATER_THAN>(
-    int left, int right, std::int64_t step, int capacity
-) -> std::vector<int>;
+template auto arange_helper_<int, RightCompare_::GREATER_THAN>(int left, int right, std::int64_t step, int capacity) -> std::vector<int>;
 template auto arange_helper_<std::size_t, RightCompare_::GREATER_THAN>(
-    std::size_t left, std::size_t right, std::int64_t step, std::size_t capacity
+    std::size_t left,
+    std::size_t right,
+    std::int64_t step,
+    std::size_t capacity
 ) -> std::vector<std::size_t>;
 
 }  // namespace
-
 
 namespace ket
 {
@@ -76,7 +78,6 @@ auto arange(Integer value) -> std::vector<Integer>
 template auto arange<int>(int value) -> std::vector<int>;
 template auto arange<std::size_t>(std::size_t value) -> std::vector<std::size_t>;
 
-
 template <std::integral Integer>
 auto arange(Integer left, Integer right, std::int64_t step) -> std::vector<Integer>
 {
@@ -91,23 +92,24 @@ auto arange(Integer left, Integer right, std::int64_t step) -> std::vector<Integ
     if (step >= 1) {
         if (left >= right) {
             return {};
-        } else {
-            const auto n_terms = Integer{1} + ((right - left) / abs_step);
+        }
+        else {
+            const auto n_terms = Integer {1} + ((right - left) / abs_step);
             return arange_helper_<Integer, RC::LESS_THAN>(left, right, step, n_terms);
         }
     }
     else {
         if (right >= left) {
             return {};
-        } else {
-            const auto n_terms = Integer{1} + ((left - right) / abs_step);
+        }
+        else {
+            const auto n_terms = Integer {1} + ((left - right) / abs_step);
             return arange_helper_<Integer, RC::GREATER_THAN>(left, right, step, n_terms);
         }
     }
 }
 template auto arange(int left, int right, std::int64_t step) -> std::vector<int>;
 template auto arange(std::size_t left, std::size_t right, std::int64_t step) -> std::vector<std::size_t>;
-
 
 template <std::integral Integer>
 auto revarange(Integer value) -> std::vector<Integer>
@@ -117,9 +119,8 @@ auto revarange(Integer value) -> std::vector<Integer>
 
     return output;
 }
-template auto revarange<int> (int value) -> std::vector<int>;
-template auto revarange<std::size_t> (std::size_t value) -> std::vector<std::size_t>;
-
+template auto revarange<int>(int value) -> std::vector<int>;
+template auto revarange<std::size_t>(std::size_t value) -> std::vector<std::size_t>;
 
 template <std::integral Integer>
 auto revarange(Integer left, Integer right, std::int64_t step) -> std::vector<Integer>

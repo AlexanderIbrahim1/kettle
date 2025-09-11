@@ -10,7 +10,6 @@
     The target state we are interested in finding is `|11>`.
 */
 
-
 auto main() -> int
 {
     // construct the circuit with the gates needed for the Grover algorithm

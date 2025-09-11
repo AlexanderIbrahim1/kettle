@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "kettle/common/mathtools.hpp"
-#include "kettle/state/statevector.hpp"
 #include "kettle/io/statevector.hpp"
+#include "kettle/state/statevector.hpp"
 
 namespace
 {
@@ -61,21 +61,15 @@ auto format_complex_(const std::complex<double>& value) -> std::string
     }
     output << value.imag();
 
-
     return output.str();
 }
 
 }  // namespace
 
-
 namespace ket
 {
 
-void save_statevector(
-    std::ostream& outstream,
-    const Statevector& state,
-    Endian endian
-)
+void save_statevector(std::ostream& outstream, const Statevector& state, Endian endian)
 {
     using QSE = Endian;
 
@@ -85,17 +79,14 @@ void save_statevector(
     for (std::size_t i {0}; i < state.n_states(); ++i) {
         if (endian == QSE::LITTLE) {
             outstream << format_complex_(state[i]) << '\n';
-        } else {
+        }
+        else {
             outstream << format_complex_(state[ket::endian_flip(i, state.n_qubits())]) << '\n';
         }
     }
 }
 
-void save_statevector(
-    const std::filesystem::path& filepath,
-    const Statevector& state,
-    Endian endian
-)
+void save_statevector(const std::filesystem::path& filepath, const Statevector& state, Endian endian)
 {
     auto outstream = std::ofstream {filepath};
 
@@ -113,7 +104,8 @@ void save_statevector(
 auto load_statevector(std::istream& instream) -> Statevector
 {
     // the first line contains the endianness
-    const auto endian = [&]() {
+    const auto endian = [&]()
+    {
         std::string dummy;
         std::string endian_str;
 
@@ -124,7 +116,8 @@ auto load_statevector(std::istream& instream) -> Statevector
     }();
 
     // the next line contains the number of states
-    const auto n_states = [&]() {
+    const auto n_states = [&]()
+    {
         std::string dummy;
         std::size_t n_states_;  // NOLINT(cppcoreguidelines-init-variables)
 

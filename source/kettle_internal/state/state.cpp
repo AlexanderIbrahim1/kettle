@@ -9,8 +9,8 @@
 
 #include "kettle/common/mathtools.hpp"
 #include "kettle/state/endian.hpp"
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/qubit_state_conversion.hpp"
+#include "kettle/state/statevector.hpp"
 
 #include "kettle_internal/common/mathtools_internal.hpp"
 #include "kettle_internal/state/bitstring_utils.hpp"
@@ -27,11 +27,7 @@ Statevector::Statevector(std::size_t n_qubits)
     coefficients_[0] = {1, 0};
 }
 
-Statevector::Statevector(
-    std::vector<std::complex<double>> coefficients,
-    Endian input_endian,
-    double normalization_tolerance
-)
+Statevector::Statevector(std::vector<std::complex<double>> coefficients, Endian input_endian, double normalization_tolerance)
     : n_qubits_ {0}  // can't properly set number of qubits before verifying coefficients
     , n_states_ {coefficients.size()}
     , coefficients_ {std::move(coefficients)}
@@ -50,10 +46,7 @@ Statevector::Statevector(
     }
 }
 
-Statevector::Statevector(
-    const std::string& computational_state,
-    Endian input_endian
-)
+Statevector::Statevector(const std::string& computational_state, Endian input_endian)
     : n_qubits_ {computational_state.size()}
     , n_states_ {ket::internal::pow_2_int(computational_state.size())}
     , coefficients_(n_states_, {0.0, 0.0})
@@ -67,8 +60,7 @@ Statevector::Statevector(
 void Statevector::check_power_of_2_with_at_least_one_qubit_() const
 {
     if (coefficients_.size() < 2) {
-        throw std::runtime_error {
-            "There must be at least 2 coefficients, representing the states for one qubit.\n"};
+        throw std::runtime_error {"There must be at least 2 coefficients, representing the states for one qubit.\n"};
     }
 
     if (!ket::internal::is_power_of_2(coefficients_.size())) {
@@ -122,11 +114,7 @@ void Statevector::perform_endian_flip_on_coefficients_() noexcept
     }
 }
 
-auto almost_eq(
-    const Statevector& left,
-    const Statevector& right,
-    double tolerance_sq
-) noexcept -> bool
+auto almost_eq(const Statevector& left, const Statevector& right, double tolerance_sq) noexcept -> bool
 {
     if (left.n_qubits() != right.n_qubits()) {
         return false;
@@ -174,9 +162,7 @@ auto inner_product(const Statevector& bra_state, const Statevector& ket_state) -
 auto diagonal_expectation_value(const std::vector<std::complex<double>>& eigenvalues, const Statevector& state) -> std::complex<double>
 {
     if (eigenvalues.size() != state.n_states()) {
-        throw std::runtime_error {
-            "ERROR: mismatch in sizes when taking expectation value of diagonal operator.\n"
-        };
+        throw std::runtime_error {"ERROR: mismatch in sizes when taking expectation value of diagonal operator.\n"};
     }
 
     auto output = std::complex<double> {};

@@ -1,11 +1,21 @@
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <Eigen/Dense>
 
-#define REQUIRE_MSG(cond, msg) do { INFO(msg); REQUIRE(cond); } while((void)0, 0)
-#define REQUIRE_THROWS_AS_MSG(statement, exception, msg) do { INFO(msg); REQUIRE_THROWS_AS(statement, exception); } while((void)0, 0)
+#define REQUIRE_MSG(cond, msg) \
+    do {                       \
+        INFO(msg);             \
+        REQUIRE(cond);         \
+    }                          \
+    while ((void)0, 0)
+#define REQUIRE_THROWS_AS_MSG(statement, exception, msg) \
+    do {                                                 \
+        INFO(msg);                                       \
+        REQUIRE_THROWS_AS(statement, exception);         \
+    }                                                    \
+    while ((void)0, 0)
 
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/matrix2x2.hpp"
@@ -14,15 +24,15 @@
 #include "kettle/operator/channels/multi_qubit_kraus_channel.hpp"
 #include "kettle/operator/channels/one_qubit_kraus_channel.hpp"
 #include "kettle/operator/noise/standard_errors.hpp"
-#include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/simulation/simulate_channel.hpp"
+#include "kettle/simulation/simulate_density_matrix.hpp"
 #include "kettle/state/density_matrix.hpp"
 
 #include "kettle_internal/common/state_test_utils.hpp"
 #include "kettle_internal/operator/channels/channel_helper.hpp"
 
-#include "channel_test_utils.hpp"
 #include "channel_test_results.hpp"
+#include "channel_test_utils.hpp"
 
 namespace ki = ket::internal;
 
@@ -32,10 +42,7 @@ namespace
 /*
     Apply the depolarizing noise to a 1-qubit system manually, in the Kraus manner.
 */
-auto depolarizing_noise_manual_1qubit(
-    const ket::Matrix2X2& dens_mat,
-    const ket::OneQubitKrausChannel& channel
-) -> ket::Matrix2X2
+auto depolarizing_noise_manual_1qubit(const ket::Matrix2X2& dens_mat, const ket::OneQubitKrausChannel& channel) -> ket::Matrix2X2
 {
     auto output = ket::Matrix2X2 {};
     for (const auto& mat : channel.matrices()) {
@@ -72,10 +79,10 @@ auto depolarizing_noise_mixed_unitary_1qubit(double parameter) -> ket::MixedCirc
     circuit3.add_z_gate(0);
 
     return ket::MixedCircuitChannel {
-        {.coefficient=coeff0,   .circuit=std::move(circuit0)},
-        {.coefficient=coeff123, .circuit=std::move(circuit1)},
-        {.coefficient=coeff123, .circuit=std::move(circuit2)},
-        {.coefficient=coeff123, .circuit=std::move(circuit3)},
+        {.coefficient = coeff0,   .circuit = std::move(circuit0)},
+        {.coefficient = coeff123, .circuit = std::move(circuit1)},
+        {.coefficient = coeff123, .circuit = std::move(circuit2)},
+        {.coefficient = coeff123, .circuit = std::move(circuit3)},
     };
 }
 
@@ -92,15 +99,17 @@ auto depolarizing_noise_kraus_1qubit(double parameter, std::size_t target_index)
     const auto mat2 = coeff123 * ket::y_gate();
     const auto mat3 = coeff123 * ket::z_gate();
 
-    return ket::OneQubitKrausChannel {{mat0, mat1, mat2, mat3}, target_index};
+    return ket::OneQubitKrausChannel {
+        {mat0, mat1, mat2, mat3},
+        target_index
+    };
 }
 
 }  // namespace
 
-
 TEST_CASE("Kraus channel depolarizing noise")
 {
-    const auto parameter = 0.4; // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+    const auto parameter = 0.4;  // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
 
     // state should be simple but not completely arbitrary, so we don't use a random state
     auto state = ctestutils::basic_state0();
@@ -149,7 +158,7 @@ TEST_CASE("Kraus channel depolarizing noise")
 
 TEST_CASE("MultiQubitKrausChannel amplitude damping")
 {
-    const auto parameter = 0.4; // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
+    const auto parameter = 0.4;  // GENERATE(0.2, 0.4, 0.6, 0.75, 1.0);
 
     // NOTE: parameters don't have meaningful names
     const auto eta = std::sqrt(1.0 - parameter);
@@ -158,46 +167,50 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
     const auto size = Eigen::Index {4};
 
     // create the four Kraus matrices for the 2-qubit amplitude damping Kraus channel
-    auto kraus_matrix00 = [eta]() {
+    auto kraus_matrix00 = [eta]()
+    {
         auto output = Eigen::MatrixXcd::Zero(size, size).eval();
         output(0, 0) = 1.0;
         output(1, 1) = eta;
         output(2, 2) = eta;
         output(3, 3) = eta * eta;
-        
+
         return output;
     }();
 
-    auto kraus_matrix01 = [eta, lam]() {
+    auto kraus_matrix01 = [eta, lam]()
+    {
         auto output = Eigen::MatrixXcd::Zero(size, size).eval();
         output(0, 1) = lam;
         output(1, 3) = eta * lam;
-        
+
         return output;
     }();
 
-    auto kraus_matrix10 = [eta, lam]() {
+    auto kraus_matrix10 = [eta, lam]()
+    {
         auto output = Eigen::MatrixXcd::Zero(size, size).eval();
         output(0, 2) = lam;
         output(2, 3) = eta * lam;
-        
+
         return output;
     }();
 
-    auto kraus_matrix11 = [lam]() {
+    auto kraus_matrix11 = [lam]()
+    {
         auto output = Eigen::MatrixXcd::Zero(size, size).eval();
         output(0, 3) = lam * lam;
-        
+
         return output;
     }();
 
-    const auto channel = ket::MultiQubitKrausChannel {{
-        std::move(kraus_matrix00), std::move(kraus_matrix01),
-        std::move(kraus_matrix10), std::move(kraus_matrix11)
-    }};
+    const auto channel = ket::MultiQubitKrausChannel {
+        {std::move(kraus_matrix00), std::move(kraus_matrix01), std::move(kraus_matrix10), std::move(kraus_matrix11)}
+    };
 
     // state should be simple but not completely arbitrary, so we don't use a random state
-    auto state = [&]() {
+    auto state = [&]()
+    {
         auto circuit = ket::QuantumCircuit {2};
         circuit.add_h_gate({0, 1});
         circuit.add_x_gate(0);
@@ -220,7 +233,8 @@ TEST_CASE("MultiQubitKrausChannel amplitude damping")
 
 TEST_CASE("kraus_matrix_from_projectors")
 {
-    struct TestCase {
+    struct TestCase
+    {
         std::vector<std::string> bitstrings;
         std::vector<std::complex<double>> amplitudes;
         Eigen::MatrixXcd expected;
@@ -230,33 +244,27 @@ TEST_CASE("kraus_matrix_from_projectors")
         TestCase {
             {"00"},
             {{1.0, 0.0}},
-            []() {
+            []()
+            {
                 auto mat = Eigen::MatrixXcd(4, 4);
-                mat << 1.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 0.0;
+                mat << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
                 return mat;
-            }()
-        },
+             }
+            ()
+    },
         TestCase {
             {"00", "11"},
             {{1.0, 0.0}, {1.0, 0.0}},
-            []() {
+            []()
+            {
                 auto mat = Eigen::MatrixXcd(4, 4);
-                mat << 1.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 0.0,
-                       0.0, 0.0, 0.0, 1.0;
+                mat << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
                 return mat;
             }()
         }
     );
 
-    const auto actual = ket::kraus_matrix_from_projectors(
-        testcase.bitstrings,
-        testcase.amplitudes
-    );
+    const auto actual = ket::kraus_matrix_from_projectors(testcase.bitstrings, testcase.amplitudes);
 
     REQUIRE(actual.isApprox(testcase.expected));
 }
@@ -266,15 +274,33 @@ TEST_CASE("CartesianTicker")
     auto ticker = ket::internal::CartesianTicker {3, 3};
 
     const auto expected = std::vector<std::vector<std::size_t>> {
-        {0, 0, 0}, {0, 0, 1}, {0, 0, 2},
-        {0, 1, 0}, {0, 1, 1}, {0, 1, 2},
-        {0, 2, 0}, {0, 2, 1}, {0, 2, 2},
-        {1, 0, 0}, {1, 0, 1}, {1, 0, 2},
-        {1, 1, 0}, {1, 1, 1}, {1, 1, 2},
-        {1, 2, 0}, {1, 2, 1}, {1, 2, 2},
-        {2, 0, 0}, {2, 0, 1}, {2, 0, 2},
-        {2, 1, 0}, {2, 1, 1}, {2, 1, 2},
-        {2, 2, 0}, {2, 2, 1}, {2, 2, 2},
+        {0, 0, 0},
+        {0, 0, 1},
+        {0, 0, 2},
+        {0, 1, 0},
+        {0, 1, 1},
+        {0, 1, 2},
+        {0, 2, 0},
+        {0, 2, 1},
+        {0, 2, 2},
+        {1, 0, 0},
+        {1, 0, 1},
+        {1, 0, 2},
+        {1, 1, 0},
+        {1, 1, 1},
+        {1, 1, 2},
+        {1, 2, 0},
+        {1, 2, 1},
+        {1, 2, 2},
+        {2, 0, 0},
+        {2, 0, 1},
+        {2, 0, 2},
+        {2, 1, 0},
+        {2, 1, 1},
+        {2, 1, 2},
+        {2, 2, 0},
+        {2, 2, 1},
+        {2, 2, 2},
     };
 
     REQUIRE(ticker.size() == expected.size());
@@ -288,15 +314,15 @@ TEST_CASE("CartesianTicker")
 /*
     NOTE: this is more of an integration test, and it's a "negative" test, so maybe I'll get rid
     of it at some point in the future.
-    
+
     In one case:
       - apply the 1-qubit depolarizing noise channel to each of the two 1-qubit state separately
       - take the tensor product to get a 2-qubit state (POST-depolarizing noise)
-    
+
     In another case:
       - take the tensor product to get a 2-qubit state (PRE-depolarizing noise)
       - apply the 2-qubit depolarizing noise channel
-    
+
     The output will NOT be the same in both cases:
       - depolarizing noise is global!
 */
@@ -308,7 +334,8 @@ TEST_CASE("depolarizing noise : 2 qubits")
     auto state0 = ctestutils::basic_state0();
     auto state1 = ctestutils::basic_state1();
 
-    const auto tensor_prod_then_depol = [state0, state1, parameter]() mutable {
+    const auto tensor_prod_then_depol = [state0, state1, parameter]() mutable
+    {
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 2, {0, 1});
         auto state = ket::tensor_product(state0, state1);
 
@@ -318,7 +345,8 @@ TEST_CASE("depolarizing noise : 2 qubits")
         return state;
     }();
 
-    const auto depol_then_tensor_prod = [state0, state1, parameter]() mutable {
+    const auto depol_then_tensor_prod = [state0, state1, parameter]() mutable
+    {
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 1, {0});
 
         auto simulator = ket::PauliChannelSimulator {1};
@@ -354,7 +382,7 @@ TEST_CASE("depolarizing channel coefficients")
     SECTION("channel acting on 2 qubit")
     {
         const auto depol_channel = ket::symmetric_depolarizing_error_channel(parameter, 2, {0, 1});
-        
+
         REQUIRE(depol_channel.size() == 16);
 
         REQUIRE_THAT(depol_channel.at(0).coefficient, within_abs(1.0 - parameter, abs_tol));
@@ -365,13 +393,12 @@ TEST_CASE("depolarizing channel coefficients")
     }
 }
 
-
 TEST_CASE("one_qubit_phase_amplitude_damping_error_channel()")
 {
     const auto parameters = ket::PhaseAmplitudeDampingParameters {
-        .amplitude=0.3,
-        .phase=0.4,
-        .excited_population=0.2,
+        .amplitude = 0.3,
+        .phase = 0.4,
+        .excited_population = 0.2,
     };
 
     auto state = ctestutils::basic_state0();
@@ -390,10 +417,7 @@ TEST_CASE("one_qubit_phase_amplitude_damping_error_channel()")
 TEST_CASE("phase-amplitude damping and thermal-relaxation")
 {
     const auto thermal_params = ket::ThermalRelaxationParameters {
-        .t1=ket::RelaxationTime {1.0},
-        .t2=ket::RelaxationTime {2.0},
-        .gate_time=0.5,
-        .excited_population=0.2
+        .t1 = ket::RelaxationTime {1.0}, .t2 = ket::RelaxationTime {2.0}, .gate_time = 0.5, .excited_population = 0.2
     };
 
     const auto time1 = thermal_params.t1.time();
@@ -402,9 +426,9 @@ TEST_CASE("phase-amplitude damping and thermal-relaxation")
     const auto time_phase = (time1 * time2) / (2.0 * time1 - time2);
 
     const auto phaseamp_params = ket::PhaseAmplitudeDampingParameters {
-        .amplitude=1.0 - std::exp(-gate_time / time1),
-        .phase=1.0 - std::exp(-gate_time / time_phase),
-        .excited_population=thermal_params.excited_population
+        .amplitude = 1.0 - std::exp(-gate_time / time1),
+        .phase = 1.0 - std::exp(-gate_time / time_phase),
+        .excited_population = thermal_params.excited_population
     };
 
     const auto phaseamp_channel = ket::one_qubit_phase_amplitude_damping_error_channel(phaseamp_params, 0);
@@ -438,20 +462,11 @@ TEST_CASE("reset_error()")
 
     const auto testcase = GENERATE(
         TestCase {
-            "no reset",
-            ket::ResetErrorParameters {.prob0=0.0, .prob1=0.0},
-            ctestutils::basic_state0()
-        },
-        TestCase {
-            "guaranteed reset to 0",
-            ket::ResetErrorParameters {.prob0=1.0, .prob1=0.0},
-            ket::DensityMatrix {"0"}
-        },
-        TestCase {
-            "guaranteed reset to 1",
-            ket::ResetErrorParameters {.prob0=0.0, .prob1=1.0},
-            ket::DensityMatrix {"1"}
-        }
+            "no reset", ket::ResetErrorParameters {.prob0 = 0.0, .prob1 = 0.0},
+              ctestutils::basic_state0()
+    },
+        TestCase {"guaranteed reset to 0", ket::ResetErrorParameters {.prob0 = 1.0, .prob1 = 0.0}, ket::DensityMatrix {"0"}},
+        TestCase {"guaranteed reset to 1", ket::ResetErrorParameters {.prob0 = 0.0, .prob1 = 1.0}, ket::DensityMatrix {"1"}}
     );
 
     const auto channel = ket::reset_error(testcase.parameters);
@@ -469,11 +484,13 @@ TEST_CASE("reset_error() parameter conditions")
     };
 
     const auto testcase = GENERATE(
-        TestCase {"prob0 < 0", ket::ResetErrorParameters {-1.0,  0.0}},
-        TestCase {"prob1 < 0", ket::ResetErrorParameters { 0.0, -1.0}},
-        TestCase {"prob0 > 1", ket::ResetErrorParameters { 1.1,  0.0}},
-        TestCase {"prob1 > 1", ket::ResetErrorParameters { 0.0,  1.1}},
-        TestCase {"prob0 + prob1 > 1", ket::ResetErrorParameters { 0.5,  0.6}}
+        TestCase {
+            "prob0 < 0", ket::ResetErrorParameters {-1.0, 0.0}
+    },
+        TestCase {"prob1 < 0", ket::ResetErrorParameters {0.0, -1.0}},
+        TestCase {"prob0 > 1", ket::ResetErrorParameters {1.1, 0.0}},
+        TestCase {"prob1 > 1", ket::ResetErrorParameters {0.0, 1.1}},
+        TestCase {"prob0 + prob1 > 1", ket::ResetErrorParameters {0.5, 0.6}}
     );
 
     REQUIRE_THROWS_AS_MSG(ket::reset_error(testcase.parameters), std::runtime_error, testcase.message);

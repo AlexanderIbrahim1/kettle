@@ -4,23 +4,22 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include <kettle/circuit/circuit.hpp>
+#include <kettle/simulation/simulate.hpp>
+#include <kettle/simulation/simulate_density_matrix.hpp>
 #include <kettle/state/density_matrix.hpp>
 #include <kettle/state/statevector.hpp>
-#include <kettle/simulation/simulate_density_matrix.hpp>
-#include <kettle/simulation/simulate.hpp>
 
+#include <kettle_internal/simulation/measure.hpp>
+#include <kettle_internal/simulation/measure_density_matrix.hpp>
 #include "kettle_internal/common/state_test_utils.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
-#include <kettle_internal/simulation/measure_density_matrix.hpp>
-#include <kettle_internal/simulation/measure.hpp>
 
 namespace cre = ket::internal::create;
 namespace ki = ket::internal;
-
 
 template <int Output>
 struct RiggedDiscreteDistribution
@@ -28,15 +27,13 @@ struct RiggedDiscreteDistribution
 public:
     using result_type = int;
 
-    RiggedDiscreteDistribution([[maybe_unused]] std::initializer_list<double> ignore)
-    {}
+    RiggedDiscreteDistribution([[maybe_unused]] std::initializer_list<double> ignore) {}
 
     auto operator()([[maybe_unused]] std::mt19937& prng) -> int
     {
         return Output;
     }
 };
-
 
 static auto create_random_complex(std::mt19937& prng) -> std::complex<double>
 {
@@ -46,7 +43,6 @@ static auto create_random_complex(std::mt19937& prng) -> std::complex<double>
 
     return {real, imag};
 }
-
 
 static void normalize(std::vector<std::complex<double>>& values)
 {
@@ -63,11 +59,7 @@ static void normalize(std::vector<std::complex<double>>& values)
 }
 
 template <typename StateKind>
-static void simulate_measurement_wrapper(
-    StateKind& state,
-    const ket::GateInfo& info,
-    int measured_state
-)
+static void simulate_measurement_wrapper(StateKind& state, const ket::GateInfo& info, int measured_state)
 {
     const auto n_qubits = state.n_qubits();
 
@@ -93,10 +85,10 @@ TEST_CASE("simulate_measurement_()")
     SECTION("2 qubits; Hadamard on each")
     {
         auto testcase = GENERATE_REF(
-            TestCase {.measured_qubit=0, .measured_state=0},
-            TestCase {.measured_qubit=1, .measured_state=0},
-            TestCase {.measured_qubit=0, .measured_state=1},
-            TestCase {.measured_qubit=1, .measured_state=1}
+            TestCase {.measured_qubit = 0, .measured_state = 0},
+            TestCase {.measured_qubit = 1, .measured_state = 0},
+            TestCase {.measured_qubit = 0, .measured_state = 1},
+            TestCase {.measured_qubit = 1, .measured_state = 1}
         );
 
         // the measured bit doesn't matter for now
@@ -121,14 +113,7 @@ TEST_CASE("simulate_measurement_()")
 
     SECTION("3 qubits")
     {
-        auto testcase = GENERATE_REF(
-            TestCase {0, 0},
-            TestCase {1, 0},
-            TestCase {2, 0},
-            TestCase {0, 1},
-            TestCase {1, 1},
-            TestCase {2, 1}
-        );
+        auto testcase = GENERATE_REF(TestCase {0, 0}, TestCase {1, 0}, TestCase {2, 0}, TestCase {0, 1}, TestCase {1, 1}, TestCase {2, 1});
 
         // the measured bit doesn't matter for now
         const auto info = cre::create_m_gate(testcase.measured_qubit, 0);
@@ -171,28 +156,28 @@ TEST_CASE("simulate_measurement_()")
 
             auto testcase = GENERATE_REF(
                 RandomTestCase {
-                    .measured_qubit=0,
-                    .measured_state=0,
-                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
-                    .expected_amplitudes={coeff00, {0.0, 0.0}, coeff01, {0.0, 0.0}}
+                    .measured_qubit = 0,
+                    .measured_state = 0,
+                    .initial_amplitudes = {coeff00, coeff10,    coeff01, coeff11   },
+                    .expected_amplitudes = {coeff00, {0.0, 0.0}, coeff01, {0.0, 0.0}}
+            },
+                RandomTestCase {
+                    .measured_qubit = 1,
+                    .measured_state = 0,
+                    .initial_amplitudes = {coeff00, coeff10, coeff01, coeff11},
+                    .expected_amplitudes = {coeff00, coeff10, {0.0, 0.0}, {0.0, 0.0}},
                 },
                 RandomTestCase {
-                    .measured_qubit=1,
-                    .measured_state=0,
-                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
-                    .expected_amplitudes={coeff00, coeff10, {0.0, 0.0}, {0.0, 0.0}},
+                    .measured_qubit = 0,
+                    .measured_state = 1,
+                    .initial_amplitudes = {coeff00, coeff10, coeff01, coeff11},
+                    .expected_amplitudes = {{0.0, 0.0}, coeff10, {0.0, 0.0}, coeff11},
                 },
                 RandomTestCase {
-                    .measured_qubit=0,
-                    .measured_state=1,
-                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
-                    .expected_amplitudes={{0.0, 0.0}, coeff10, {0.0, 0.0}, coeff11},
-                },
-                RandomTestCase {
-                    .measured_qubit=1,
-                    .measured_state=1,
-                    .initial_amplitudes={coeff00, coeff10, coeff01, coeff11},
-                    .expected_amplitudes={{0.0, 0.0}, {0.0, 0.0}, coeff01, coeff11},
+                    .measured_qubit = 1,
+                    .measured_state = 1,
+                    .initial_amplitudes = {coeff00, coeff10, coeff01, coeff11},
+                    .expected_amplitudes = {{0.0, 0.0}, {0.0, 0.0}, coeff01, coeff11},
                 }
             );
 
@@ -227,40 +212,40 @@ TEST_CASE("simulate_measurement_()")
 
             auto testcase = GENERATE_REF(
                 RandomTestCase {
-                    .measured_qubit=0,
-                    .measured_state=0,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={c000, 0.0, c010, 0.0, c001, 0.0, c011, 0.0}
+                    .measured_qubit = 0,
+                    .measured_state = 0,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {c000, 0.0,  c010, 0.0,  c001, 0.0,  c011, 0.0 }
+            },
+                RandomTestCase {
+                    .measured_qubit = 1,
+                    .measured_state = 0,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {c000, c100, 0.0, 0.0, c001, c101, 0.0, 0.0}
                 },
                 RandomTestCase {
-                    .measured_qubit=1,
-                    .measured_state=0,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={c000, c100, 0.0, 0.0, c001, c101, 0.0, 0.0}
+                    .measured_qubit = 2,
+                    .measured_state = 0,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {c000, c100, c010, c110, 0.0, 0.0, 0.0, 0.0}
                 },
                 RandomTestCase {
-                    .measured_qubit=2,
-                    .measured_state=0,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={c000, c100, c010, c110, 0.0, 0.0, 0.0, 0.0}
+                    .measured_qubit = 0,
+                    .measured_state = 1,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {0.0, c100, 0.0, c110, 0.0, c101, 0.0, c111}
                 },
                 RandomTestCase {
-                    .measured_qubit=0,
-                    .measured_state=1,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={0.0, c100, 0.0, c110, 0.0, c101, 0.0, c111}
+                    .measured_qubit = 1,
+                    .measured_state = 1,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {0.0, 0.0, c010, c110, 0.0, 0.0, c011, c111}
                 },
                 RandomTestCase {
-                    .measured_qubit=1,
-                    .measured_state=1,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={0.0, 0.0, c010, c110, 0.0, 0.0, c011, c111}
-                },
-                RandomTestCase {
-                    .measured_qubit=2,
-                    .measured_state=1,
-                    .initial_amplitudes={c000, c100, c010, c110, c001, c101, c011, c111},
-                    .expected_amplitudes={0.0, 0.0, 0.0, 0.0, c001, c101, c011, c111}
+                    .measured_qubit = 2,
+                    .measured_state = 1,
+                    .initial_amplitudes = {c000, c100, c010, c110, c001, c101, c011, c111},
+                    .expected_amplitudes = {0.0, 0.0, 0.0, 0.0, c001, c101, c011, c111}
                 }
             );
 

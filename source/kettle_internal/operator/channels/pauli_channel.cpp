@@ -8,15 +8,11 @@
 #include "kettle_internal/operator/channels/channel_helper.hpp"
 #include "kettle_internal/operator/channels/unitary_channel_helper.hpp"
 
-
 namespace ket
 {
 
 // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-PauliChannel::PauliChannel(
-    std::vector<ProbabilisticPauliString> weighted_pauli_strings,
-    double tolerance
-)
+PauliChannel::PauliChannel(std::vector<ProbabilisticPauliString> weighted_pauli_strings, double tolerance)
     : n_qubits_ {0}
     , weighted_operators_ {std::move(weighted_pauli_strings)}
 {
@@ -35,23 +31,15 @@ PauliChannel::PauliChannel(
     ki::check_number_of_qubits_is_nonzero_(n_qubits_, name);
 }
 
-
-PauliChannel::PauliChannel(
-    const std::initializer_list<ProbabilisticPauliString>& weighted_pauli_strings,
-    double tolerance
-)
+PauliChannel::PauliChannel(const std::initializer_list<ProbabilisticPauliString>& weighted_pauli_strings, double tolerance)
     : PauliChannel {std::vector<ProbabilisticPauliString> {weighted_pauli_strings}, tolerance}
 {}
 
-
-auto almost_eq(
-    const PauliChannel& left_op,
-    const PauliChannel& right_op,
-    double coeff_tolerance
-) -> bool
+auto almost_eq(const PauliChannel& left_op, const PauliChannel& right_op, double coeff_tolerance) -> bool
 {
     using PPS = ProbabilisticPauliString;
-    const auto almost_eq = [coeff_tolerance](const PPS& left, const PPS& right) {
+    const auto almost_eq = [coeff_tolerance](const PPS& left, const PPS& right)
+    {
         if (!ket::almost_eq(left.coefficient, right.coefficient, coeff_tolerance)) {
             return false;
         }
@@ -61,6 +49,5 @@ auto almost_eq(
 
     return ket::internal::almost_eq_helper_(left_op, right_op, almost_eq);
 }
-
 
 }  // namespace ket

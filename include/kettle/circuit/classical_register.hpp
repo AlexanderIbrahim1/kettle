@@ -15,7 +15,7 @@ class ClassicalRegister
 {
 public:
     explicit constexpr ClassicalRegister(std::size_t n_bits)
-        : measured_bits_ (n_bits, std::nullopt)
+        : measured_bits_(n_bits, std::nullopt)
     {}
 
     [[nodiscard]]

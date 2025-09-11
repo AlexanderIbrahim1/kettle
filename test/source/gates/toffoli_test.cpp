@@ -114,10 +114,9 @@ TEST_CASE("toffoli gate with 4 qubits")
     REQUIRE(ket::almost_eq(state, info.expected));
 }
 
-
 TEST_CASE("circuit.add_ccx_gate() and circuit.add_ccu_gate() match")
 {
-    using memberfunc = void(ket::QuantumCircuit::*)(std::size_t, std::size_t, std::size_t);
+    using memberfunc = void (ket::QuantumCircuit::*)(std::size_t, std::size_t, std::size_t);
 
     struct TestCase
     {

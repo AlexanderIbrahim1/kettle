@@ -56,6 +56,5 @@ add_example(SUBDIR "general" NAME creating_the_bell_state)
 add_example(SUBDIR "general" NAME inverse_fourier)
 add_example(SUBDIR "general" NAME random_state)
 add_example(SUBDIR "general" NAME save_statevector_example)
-add_example(USE_EIGEN SUBDIR "general" NAME hello_eigen)
 
 add_folders(Example)

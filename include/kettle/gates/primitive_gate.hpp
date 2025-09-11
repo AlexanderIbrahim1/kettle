@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "kettle/common/matrix2x2.hpp"
 #include "kettle/common/clone_ptr.hpp"
+#include "kettle/common/matrix2x2.hpp"
 #include "kettle/parameter/parameter_expression.hpp"
 
 namespace ket
@@ -80,4 +80,3 @@ struct GateInfo
 };
 
 }  // namespace ket
-

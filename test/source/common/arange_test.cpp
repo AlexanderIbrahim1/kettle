@@ -4,7 +4,6 @@
 
 #include <kettle/common/arange.hpp>
 
-
 TEST_CASE("arange() with one argument")
 {
     SECTION("zero argument")

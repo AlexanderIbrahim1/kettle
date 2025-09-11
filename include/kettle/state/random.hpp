@@ -5,7 +5,6 @@
 
 #include "kettle/state/statevector.hpp"
 
-
 namespace ket
 {
 

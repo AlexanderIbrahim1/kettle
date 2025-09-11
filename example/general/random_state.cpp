@@ -1,9 +1,7 @@
-#include "kettle/io/statevector.hpp"
 #include <complex>
 #include <iostream>
 
 #include <kettle/kettle.hpp>
-
 
 auto main() -> int
 {

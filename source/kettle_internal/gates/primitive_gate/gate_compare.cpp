@@ -1,6 +1,6 @@
+#include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 #include "kettle/gates/primitive_gate.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
-#include "kettle_internal/gates/primitive_gate/gate_compare.hpp"
 
 namespace ket::internal::compare
 {
@@ -27,11 +27,7 @@ auto is_1c1t_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1) 
     return create::unpack_one_control_one_target_gate(info0) == create::unpack_one_control_one_target_gate(info1);
 }
 
-auto is_1t1a_gate_equal(
-    const ket::GateInfo& info0,
-    const ket::GateInfo& info1,
-    double tol
-) -> bool
+auto is_1t1a_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1, double tol) -> bool
 {
     const auto [target0, angle0] = create::unpack_one_target_one_angle_gate(info0);
     const auto [target1, angle1] = create::unpack_one_target_one_angle_gate(info1);
@@ -39,11 +35,7 @@ auto is_1t1a_gate_equal(
     return target0 == target1 && std::fabs(angle0 - angle1) < tol;
 }
 
-auto is_1c1t1a_gate_equal(
-    const ket::GateInfo& info0,
-    const ket::GateInfo& info1,
-    double tol
-) -> bool
+auto is_1c1t1a_gate_equal(const ket::GateInfo& info0, const ket::GateInfo& info1, double tol) -> bool
 {
     const auto [control0, target0, angle0] = create::unpack_one_control_one_target_one_angle_gate(info0);
     const auto [control1, target1, angle1] = create::unpack_one_control_one_target_one_angle_gate(info1);

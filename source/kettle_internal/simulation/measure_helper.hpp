@@ -16,16 +16,13 @@ enum class MeasurementOutcome : std::uint8_t
 };
 
 template <ket::internal::DiscreteDistribution Distribution>
-auto collapse_state(
-    MeasurementOutcome measure,
-    std::optional<int> seed,
-    double prob_of_0_states,
-    double prob_of_1_states
-)
+auto collapse_state(MeasurementOutcome measure, std::optional<int> seed, double prob_of_0_states, double prob_of_1_states)
 {
     if (measure == MeasurementOutcome::MEASURE_BASED_ON_PROBABILITIES) {
         auto prng = ket::internal::get_prng_(seed);
-        auto coin_flipper = Distribution {{prob_of_0_states, prob_of_1_states}};
+        auto coin_flipper = Distribution {
+            {prob_of_0_states, prob_of_1_states}
+        };
 
         return coin_flipper(prng);
     }

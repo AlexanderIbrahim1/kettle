@@ -5,9 +5,8 @@
 #include "kettle/gates/primitive_gate.hpp"
 
 #include "kettle_internal/gates/matrix2x2_gate_decomposition.hpp"
-#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 #include "kettle_internal/gates/primitive_gate/gate_create.hpp"
-
+#include "kettle_internal/gates/primitive_gate/gate_id.hpp"
 
 namespace ket
 {
@@ -35,10 +34,7 @@ auto transpile_to_primitive(const QuantumCircuit& circuit, double tolerance_sq) 
                 const auto& current_subcircuit = *if_stmt.circuit();
                 auto transpiled_subcircuit = transpile_to_primitive(current_subcircuit, tolerance_sq);
 
-                auto cfi = ClassicalIfStatement {
-                    if_stmt.predicate(),
-                    std::make_unique<QuantumCircuit>(std::move(transpiled_subcircuit))
-                };
+                auto cfi = ClassicalIfStatement {if_stmt.predicate(), std::make_unique<QuantumCircuit>(std::move(transpiled_subcircuit))};
 
                 new_circuit.elements_.emplace_back(std::move(cfi));
             }

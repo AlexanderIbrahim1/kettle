@@ -4,11 +4,10 @@
 #include "kettle/common/matrix2x2.hpp"
 
 #include "kettle_internal/gates/primitive_gate_map.hpp"
-#include "kettle_internal/simulation/operations_density_matrix.hpp"
 #include "kettle_internal/simulation/measure_density_matrix.hpp"
+#include "kettle_internal/simulation/operations_density_matrix.hpp"
 
 namespace kpi = ket::param::internal;
-
 
 namespace ket::internal
 {
@@ -19,11 +18,11 @@ auto dot(const ElementPair& left, const ElementPair& right) -> std::complex<doub
 }
 
 /*
-    Perform the multiplcation of `K * rho`, where:
+    Perform the multiplication of `K * rho`, where:
       - `K` is a `Matrix2X2` instance representing a single-qubit operator, which we refer to
         as `original_state`
       - `rho` is the density matrix
-    
+
     The output is written to `output_buffer`.
 */
 void apply_left_one_qubit_matrix_(
@@ -56,14 +55,13 @@ void apply_left_one_qubit_matrix_(
     }
 }
 
-
 /*
-    Perform the multiplcation of `(K * rho) * K^t`, where:
+    Perform the multiplication of `(K * rho) * K^t`, where:
       - `(K * rho)` is the product of the 1-qubit operator `K` and the density matrix `rho`,
         which was calculated earlier in the `apply_left_one_qubit_matrix_()` function,
         and which we refer to as `left_product`
       - `K^t` is the adjoint of the 1-qubit operator
-    
+
     The output is written to `output_buffer`.
 */
 void apply_right_one_qubit_matrix_(
@@ -96,7 +94,6 @@ void apply_right_one_qubit_matrix_(
     }
 }
 
-
 void apply_cu_gate_first_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
@@ -106,8 +103,8 @@ void apply_cu_gate_first_(
     const ket::Matrix2X2& mat
 )
 {
-    const auto matpair_00_01 = ElementPair {.x0=mat.elem00, .x1=mat.elem01};
-    const auto matpair_10_11 = ElementPair {.x0=mat.elem10, .x1=mat.elem11};
+    const auto matpair_00_01 = ElementPair {.x0 = mat.elem00, .x1 = mat.elem01};
+    const auto matpair_10_11 = ElementPair {.x0 = mat.elem10, .x1 = mat.elem11};
 
     // TODO: swap which iterator is set to 0, and which is set to i_lower?
     pair_iterator_outer.set_state(0);
@@ -118,10 +115,10 @@ void apply_cu_gate_first_(
         for (auto i_pair_inner {pair.i_lower}; i_pair_inner < pair.i_upper; ++i_pair_inner) {
             const auto [i_row0, i_row2, i_row1, i_row3] = pair_iterator_inner.next_unset_and_set();
 
-            const auto rhopair_10_30 = ElementPair {.x0=state.matrix()(i_row1, i_col0), .x1=state.matrix()(i_row3, i_col0)};
-            const auto rhopair_11_31 = ElementPair {.x0=state.matrix()(i_row1, i_col1), .x1=state.matrix()(i_row3, i_col1)};
-            const auto rhopair_12_32 = ElementPair {.x0=state.matrix()(i_row1, i_col2), .x1=state.matrix()(i_row3, i_col2)};
-            const auto rhopair_13_33 = ElementPair {.x0=state.matrix()(i_row1, i_col3), .x1=state.matrix()(i_row3, i_col3)};
+            const auto rhopair_10_30 = ElementPair {.x0 = state.matrix()(i_row1, i_col0), .x1 = state.matrix()(i_row3, i_col0)};
+            const auto rhopair_11_31 = ElementPair {.x0 = state.matrix()(i_row1, i_col1), .x1 = state.matrix()(i_row3, i_col1)};
+            const auto rhopair_12_32 = ElementPair {.x0 = state.matrix()(i_row1, i_col2), .x1 = state.matrix()(i_row3, i_col2)};
+            const auto rhopair_13_33 = ElementPair {.x0 = state.matrix()(i_row1, i_col3), .x1 = state.matrix()(i_row3, i_col3)};
 
             buffer(i_row0, i_col0) = state.matrix()(i_row0, i_col0);
             buffer(i_row1, i_col0) = dot(matpair_00_01, rhopair_10_30);
@@ -146,7 +143,6 @@ void apply_cu_gate_first_(
     }
 }
 
-
 void apply_cu_gate_second_(
     ket::DensityMatrix& state,
     Eigen::MatrixXcd& buffer,
@@ -156,8 +152,8 @@ void apply_cu_gate_second_(
     const ket::Matrix2X2& mat
 )
 {
-    const auto matpair_00_10 = ElementPair {.x0=mat.elem00, .x1=mat.elem10};
-    const auto matpair_01_11 = ElementPair {.x0=mat.elem01, .x1=mat.elem11};
+    const auto matpair_00_10 = ElementPair {.x0 = mat.elem00, .x1 = mat.elem10};
+    const auto matpair_01_11 = ElementPair {.x0 = mat.elem01, .x1 = mat.elem11};
 
     pair_iterator_outer.set_state(0);
     for (auto i_pair_outer {pair.i_lower}; i_pair_outer < pair.i_upper; ++i_pair_outer) {
@@ -167,10 +163,10 @@ void apply_cu_gate_second_(
         for (auto i_pair_inner {pair.i_lower}; i_pair_inner < pair.i_upper; ++i_pair_inner) {
             const auto [i_col0, i_col2, i_col1, i_col3] = pair_iterator_inner.next_unset_and_set();
 
-            const auto rhopair_01_03 = ElementPair {.x0=buffer(i_row0, i_col1), .x1=buffer(i_row0, i_col3)};
-            const auto rhopair_11_13 = ElementPair {.x0=buffer(i_row1, i_col1), .x1=buffer(i_row1, i_col3)};
-            const auto rhopair_21_23 = ElementPair {.x0=buffer(i_row2, i_col1), .x1=buffer(i_row2, i_col3)};
-            const auto rhopair_31_33 = ElementPair {.x0=buffer(i_row3, i_col1), .x1=buffer(i_row3, i_col3)};
+            const auto rhopair_01_03 = ElementPair {.x0 = buffer(i_row0, i_col1), .x1 = buffer(i_row0, i_col3)};
+            const auto rhopair_11_13 = ElementPair {.x0 = buffer(i_row1, i_col1), .x1 = buffer(i_row1, i_col3)};
+            const auto rhopair_21_23 = ElementPair {.x0 = buffer(i_row2, i_col1), .x1 = buffer(i_row2, i_col3)};
+            const auto rhopair_31_33 = ElementPair {.x0 = buffer(i_row3, i_col1), .x1 = buffer(i_row3, i_col3)};
 
             state.matrix()(i_row0, i_col0) = buffer(i_row0, i_col0);
             state.matrix()(i_row1, i_col0) = buffer(i_row1, i_col0);
@@ -258,12 +254,12 @@ void apply_1c1t1a_gate_second_(
 }
 
 /*
-    Perform the full multiplcation of `((K * rho) * K^t)`, where:
+    Perform the full multiplication of `((K * rho) * K^t)`, where:
       - `(K * rho)` is the product of the 1-qubit operator `K` and the density matrix `rho`,
         which was calculated earlier in the `apply_left_one_qubit_matrix_()` function,
         and which we refer to as `left_product`
       - `K^t` is the adjoint of the 1-qubit operator
-    
+
     The output is written to `output_buffer`.
 */
 void simulate_u_gate_(
@@ -290,7 +286,6 @@ void simulate_u_gate_(
     apply_right_one_qubit_matrix_(buffer, state, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
 }
 
-
 void simulate_cu_gate_(
     ket::DensityMatrix& state,
     const ket::GateInfo& info,
@@ -315,7 +310,6 @@ void simulate_cu_gate_(
     // perform the multiplication of (U * rho) * U^t; write the result to the density matrix itself
     apply_cu_gate_second_(state, buffer, pair_iterator_outer, pair_iterator_inner, pair, mat_adj);
 }
-
 
 void simulate_gate_info_(
     const kpi::MapVariant& parameter_values_map,
@@ -464,8 +458,7 @@ void simulate_gate_info_(
             // spawned before entering the simulation loop; thus, it is easier to just make the measurement
             // a single-threaded operation
             if (thread_id == MEASURING_THREAD_ID) {
-                [[maybe_unused]]
-                const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
+                [[maybe_unused]] const auto [ignore, bit_index] = cre::unpack_m_gate(gate_info);
                 const auto measured = simulate_measurement_(state, gate_info, prng_seed);
                 c_register.set(bit_index, measured);
             }
@@ -487,6 +480,5 @@ void simulate_gate_info_(
         }
     }
 }
-
 
 }  // namespace ket::internal

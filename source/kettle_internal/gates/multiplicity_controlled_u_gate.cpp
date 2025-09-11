@@ -16,9 +16,8 @@ struct MCUGateStackFrame_
     std::size_t target_index;
 };
 
-auto split_control_indices_(
-    const std::vector<std::size_t>& control_indices
-) -> std::tuple<std::vector<std::size_t>, std::vector<std::size_t>>
+auto split_control_indices_(const std::vector<std::size_t>& control_indices)
+    -> std::tuple<std::vector<std::size_t>, std::vector<std::size_t>>
 {
     const auto bottom_control_indices = std::vector<std::size_t> {control_indices[0]};
     const auto top_control_indices = std::vector<std::size_t> {control_indices.begin() + 1, control_indices.end()};
@@ -65,16 +64,14 @@ void apply_multiplicity_controlled_u_gate(
         stack.emplace_back(x_gate(), top_controls, mcx_target_qubit);
     }
 }
-template
-void apply_multiplicity_controlled_u_gate<QubitIndicesVector>(
+template void apply_multiplicity_controlled_u_gate<QubitIndicesVector>(
     QuantumCircuit& circuit,
     const Matrix2X2& unitary,
     std::size_t target_index,
     const QubitIndicesVector& control_indices,
     double matrix_sqrt_tolerance
 );
-template
-void apply_multiplicity_controlled_u_gate<QubitIndicesIList>(
+template void apply_multiplicity_controlled_u_gate<QubitIndicesIList>(
     QuantumCircuit& circuit,
     const Matrix2X2& unitary,
     std::size_t target_index,

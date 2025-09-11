@@ -5,14 +5,10 @@
 
 #include <nlopt.hpp>
 
-
 TEST_CASE("basic 2D nlopt example")
 {
-    const auto objective_function = [](
-        const std::vector<double> &x,
-        [[maybe_unused]] std::vector<double> &grad,
-        [[maybe_unused]] void *data
-    ) -> double
+    const auto objective_function = [](const std::vector<double>& x, [[maybe_unused]] std::vector<double>& grad, [[maybe_unused]] void* data
+                                    ) -> double
     {
         const auto dx = x[0] - 1.0;
         const auto dy = x[1] + 3.0;

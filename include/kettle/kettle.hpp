@@ -3,11 +3,11 @@
 #include <kettle/calculations/measurements.hpp>
 #include <kettle/calculations/probabilities.hpp>
 
-#include <kettle/circuit/circuit_element.hpp>
 #include <kettle/circuit/circuit.hpp>
+#include <kettle/circuit/circuit_element.hpp>
 #include <kettle/circuit/classical_register.hpp>
-#include <kettle/circuit/control_flow_predicate.hpp>
 #include <kettle/circuit/control_flow.hpp>
+#include <kettle/circuit/control_flow_predicate.hpp>
 
 #include <kettle/circuit_loggers/circuit_logger.hpp>
 
@@ -27,9 +27,9 @@
 #include <kettle/gates/primitive_gate.hpp>
 #include <kettle/gates/random_u_gates.hpp>
 
+#include <kettle/io/numpy_statevector.hpp>
 #include <kettle/io/read_pauli_operator.hpp>
 #include <kettle/io/read_tangelo_file.hpp>
-#include <kettle/io/numpy_statevector.hpp>
 #include <kettle/io/statevector.hpp>
 #include <kettle/io/write_tangelo_file.hpp>
 
@@ -38,9 +38,9 @@
 
 #include <kettle/optimize/n_local.hpp>
 
+#include <kettle/simulation/simulate.hpp>
 #include <kettle/simulation/simulate_density_matrix.hpp>
 #include <kettle/simulation/simulate_pauli.hpp>
-#include <kettle/simulation/simulate.hpp>
 
 #include <kettle/state/density_matrix.hpp>
 #include <kettle/state/endian.hpp>

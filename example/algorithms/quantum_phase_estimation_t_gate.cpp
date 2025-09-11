@@ -17,7 +17,7 @@
     We choose T gate, represented by the unitary matrix:
         [ 1    0                 ]
         [ 0    exp(2 pi i (1/8)) ]
-    
+
     This means the |1> state has an eigenvalue of exp(2 pi i (1/8)), and using QPE,
     we can express the eigenvalue exactly using only 3 register qubits.
 */
@@ -37,11 +37,20 @@ void apply_multiplicity_controlled_t_gate_manually(ket::QuantumCircuit& circuit)
     // - 1 time  for the 0th register qubit
     // - 2 times for the 1st register qubit
     // - 3 times for the 2nd register qubit
-    circuit.add_cp_gate({{0, 3, angle}});
-    circuit.add_cp_gate({{1, 3, angle}, {1, 3, angle}});
-    circuit.add_cp_gate({{2, 3, angle}, {2, 3, angle}, {2, 3, angle}, {2, 3, angle}});
+    circuit.add_cp_gate({
+        {0, 3, angle}
+    });
+    circuit.add_cp_gate({
+        {1, 3, angle},
+        {1, 3, angle}
+    });
+    circuit.add_cp_gate({
+        {2, 3, angle},
+        {2, 3, angle},
+        {2, 3, angle},
+        {2, 3, angle}
+    });
 }
-
 
 auto main() -> int
 {
@@ -64,7 +73,7 @@ auto main() -> int
     // of the register qubits, and thus we marginalize the unitary qubit (`3`) here
     const auto counts = ket::perform_measurements_as_counts_marginal(statevector, 1024, {3});
 
-    for (const auto& [bitstring, count]: counts) {
+    for (const auto& [bitstring, count] : counts) {
         std::cout << "(state, count) = (" << bitstring << ", " << count << ")\n";
 
         auto rstripped_bitstring = ket::rstrip_marginal_bits(bitstring);

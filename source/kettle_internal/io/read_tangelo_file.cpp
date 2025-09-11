@@ -5,8 +5,8 @@
 #include <sstream>
 #include <string>
 
-#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/circuit/circuit.hpp"
+#include "kettle/gates/primitive_gate.hpp"
 #include "kettle/io/read_tangelo_file.hpp"
 
 #include "kettle_internal/gates/primitive_gate/gate_id.hpp"
@@ -39,17 +39,17 @@ auto tangelo_to_local_name_(const std::string& name) -> std::string
 void parse_swap_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;              // NOLINT(cppcoreguidelines-init-variables)
     std::size_t target_qubit0;  // NOLINT(cppcoreguidelines-init-variables)
     std::size_t target_qubit1;  // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit0; // target qubit 0
-    stream >> dummy_ch;     // ','
-    stream >> target_qubit1; // target qubit 1
-    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;      // 'target'
+    stream >> dummy_str;      // ':'
+    stream >> dummy_ch;       // '['
+    stream >> target_qubit0;  // target qubit 0
+    stream >> dummy_ch;       // ','
+    stream >> target_qubit1;  // target qubit 1
+    stream >> dummy_ch;       // ']'
 
     circuit.add_swap_gate(target_qubit0, target_qubit1);
 }
@@ -57,18 +57,19 @@ void parse_swap_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
 void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;             // NOLINT(cppcoreguidelines-init-variables)
     std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit; // target qubit
-    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;     // 'target'
+    stream >> dummy_str;     // ':'
+    stream >> dummy_ch;      // '['
+    stream >> target_qubit;  // target qubit
+    stream >> dummy_ch;      // ']'
 
     if (gate == ket::Gate::RESET) {
         circuit.add_reset_gate(target_qubit);
-    } else {
+    }
+    else {
         const auto func = ket::internal::GATE_TO_FUNCTION_1T.at(gate);
         (circuit.*func)(target_qubit);
     }
@@ -77,20 +78,20 @@ void parse_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::s
 void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
-    std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;              // NOLINT(cppcoreguidelines-init-variables)
+    std::size_t target_qubit;   // NOLINT(cppcoreguidelines-init-variables)
     std::size_t control_qubit;  // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit; // target qubit
-    stream >> dummy_ch;     // ']'
-    stream >> dummy_str;    // 'control'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> control_qubit; // control qubit
-    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;      // 'target'
+    stream >> dummy_str;      // ':'
+    stream >> dummy_ch;       // '['
+    stream >> target_qubit;   // target qubit
+    stream >> dummy_ch;       // ']'
+    stream >> dummy_str;      // 'control'
+    stream >> dummy_str;      // ':'
+    stream >> dummy_ch;       // '['
+    stream >> control_qubit;  // control qubit
+    stream >> dummy_ch;       // ']'
 
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T.at(gate);
     (circuit.*func)(control_qubit, target_qubit);
@@ -99,18 +100,18 @@ void parse_one_control_one_target_gate_(ket::Gate gate, ket::QuantumCircuit& cir
 void parse_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;             // NOLINT(cppcoreguidelines-init-variables)
     std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
-    double angle;  // NOLINT(cppcoreguidelines-init-variables)
+    double angle;              // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit; // target qubit
-    stream >> dummy_ch;     // ']'
-    stream >> dummy_str;    // 'parameter'
-    stream >> dummy_str;    // ':'
-    stream >> angle;        // angle
+    stream >> dummy_str;     // 'target'
+    stream >> dummy_str;     // ':'
+    stream >> dummy_ch;      // '['
+    stream >> target_qubit;  // target qubit
+    stream >> dummy_ch;      // ']'
+    stream >> dummy_str;     // 'parameter'
+    stream >> dummy_str;     // ':'
+    stream >> angle;         // angle
 
     const auto func = ket::internal::GATE_TO_FUNCTION_1T1A.at(gate);
     (circuit.*func)(target_qubit, angle);
@@ -119,24 +120,24 @@ void parse_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circu
 void parse_one_control_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
-    std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;              // NOLINT(cppcoreguidelines-init-variables)
+    std::size_t target_qubit;   // NOLINT(cppcoreguidelines-init-variables)
     std::size_t control_qubit;  // NOLINT(cppcoreguidelines-init-variables)
-    double angle;  // NOLINT(cppcoreguidelines-init-variables)
+    double angle;               // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> target_qubit; // target qubit
-    stream >> dummy_ch;     // ']'
-    stream >> dummy_str;    // 'control'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> control_qubit; // control qubit
-    stream >> dummy_ch;     // ']'
-    stream >> dummy_str;    // 'parameter'
-    stream >> dummy_str;    // ':'
-    stream >> angle;        // angle
+    stream >> dummy_str;      // 'target'
+    stream >> dummy_str;      // ':'
+    stream >> dummy_ch;       // '['
+    stream >> target_qubit;   // target qubit
+    stream >> dummy_ch;       // ']'
+    stream >> dummy_str;      // 'control'
+    stream >> dummy_str;      // ':'
+    stream >> dummy_ch;       // '['
+    stream >> control_qubit;  // control qubit
+    stream >> dummy_ch;       // ']'
+    stream >> dummy_str;      // 'parameter'
+    stream >> dummy_str;      // ':'
+    stream >> angle;          // angle
 
     const auto func = ket::internal::GATE_TO_FUNCTION_1C1T1A.at(gate);
     (circuit.*func)(control_qubit, target_qubit, angle);
@@ -145,20 +146,20 @@ void parse_one_control_one_target_one_angle_gate_(ket::Gate gate, ket::QuantumCi
 void parse_m_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;      // NOLINT(cppcoreguidelines-init-variables)
     std::size_t qubit;  // NOLINT(cppcoreguidelines-init-variables)
-    std::size_t bit;  // NOLINT(cppcoreguidelines-init-variables)
+    std::size_t bit;    // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_str;    // 'target'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> qubit;        // qubit
-    stream >> dummy_ch;     // ']'
-    stream >> dummy_str;    // 'bit'
-    stream >> dummy_str;    // ':'
-    stream >> dummy_ch;     // '['
-    stream >> bit;          // bit
-    stream >> dummy_ch;     // ']'
+    stream >> dummy_str;  // 'target'
+    stream >> dummy_str;  // ':'
+    stream >> dummy_ch;   // '['
+    stream >> qubit;      // qubit
+    stream >> dummy_ch;   // ']'
+    stream >> dummy_str;  // 'bit'
+    stream >> dummy_str;  // ':'
+    stream >> dummy_ch;   // '['
+    stream >> bit;        // bit
+    stream >> dummy_ch;   // ']'
 
     circuit.add_m_gate(qubit, bit);
 }
@@ -166,14 +167,14 @@ void parse_m_gate_(ket::QuantumCircuit& circuit, std::stringstream& stream)
 auto parse_complex_(std::stringstream& stream) -> std::complex<double>
 {
     char dummy_char;  // NOLINT(cppcoreguidelines-init-variables)
-    double real;  // NOLINT(cppcoreguidelines-init-variables)
-    double imag;  // NOLINT(cppcoreguidelines-init-variables)
+    double real;      // NOLINT(cppcoreguidelines-init-variables)
+    double imag;      // NOLINT(cppcoreguidelines-init-variables)
 
-    stream >> dummy_char;    // '['
-    stream >> real;          // real component
-    stream >> dummy_char;    // ','
-    stream >> imag;          // imaginary component
-    stream >> dummy_char;    // ']'
+    stream >> dummy_char;  // '['
+    stream >> real;        // real component
+    stream >> dummy_char;  // ','
+    stream >> imag;        // imaginary component
+    stream >> dummy_char;  // ']'
 
     return {real, imag};
 }
@@ -195,20 +196,20 @@ auto parse_matrix2x2_(std::istream& stream) -> ket::Matrix2X2
     const auto elem10 = parse_complex_(sstream_second);
     const auto elem11 = parse_complex_(sstream_second);
 
-    return {.elem00=elem00, .elem01=elem01, .elem10=elem10, .elem11=elem11};
+    return {.elem00 = elem00, .elem01 = elem01, .elem10 = elem10, .elem11 = elem11};
 }
 
 void parse_u_gate_(ket::QuantumCircuit& circuit, std::stringstream& gateline_stream, std::istream& circuit_stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;             // NOLINT(cppcoreguidelines-init-variables)
     std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
 
-    gateline_stream >> dummy_str;    // 'target'
-    gateline_stream >> dummy_str;    // ':'
-    gateline_stream >> dummy_ch;     // '['
-    gateline_stream >> target_qubit; // target qubit
-    gateline_stream >> dummy_ch;     // ']'
+    gateline_stream >> dummy_str;     // 'target'
+    gateline_stream >> dummy_str;     // ':'
+    gateline_stream >> dummy_ch;      // '['
+    gateline_stream >> target_qubit;  // target qubit
+    gateline_stream >> dummy_ch;      // ']'
 
     const auto unitary = parse_matrix2x2_(circuit_stream);
     circuit.add_u_gate(unitary, target_qubit);
@@ -217,27 +218,26 @@ void parse_u_gate_(ket::QuantumCircuit& circuit, std::stringstream& gateline_str
 void parse_cu_gate_(ket::QuantumCircuit& circuit, std::stringstream& gateline_stream, std::istream& circuit_stream)
 {
     std::string dummy_str;
-    char dummy_ch;  // NOLINT(cppcoreguidelines-init-variables)
-    std::size_t target_qubit;  // NOLINT(cppcoreguidelines-init-variables)
+    char dummy_ch;              // NOLINT(cppcoreguidelines-init-variables)
+    std::size_t target_qubit;   // NOLINT(cppcoreguidelines-init-variables)
     std::size_t control_qubit;  // NOLINT(cppcoreguidelines-init-variables)
 
-    gateline_stream >> dummy_str;    // 'target'
-    gateline_stream >> dummy_str;    // ':'
-    gateline_stream >> dummy_ch;     // '['
-    gateline_stream >> target_qubit; // target qubit
-    gateline_stream >> dummy_ch;     // ']'
-    gateline_stream >> dummy_str;    // 'control'
-    gateline_stream >> dummy_str;    // ':'
-    gateline_stream >> dummy_ch;     // '['
-    gateline_stream >> control_qubit; // control qubit
-    gateline_stream >> dummy_ch;     // ']'
+    gateline_stream >> dummy_str;      // 'target'
+    gateline_stream >> dummy_str;      // ':'
+    gateline_stream >> dummy_ch;       // '['
+    gateline_stream >> target_qubit;   // target qubit
+    gateline_stream >> dummy_ch;       // ']'
+    gateline_stream >> dummy_str;      // 'control'
+    gateline_stream >> dummy_str;      // ':'
+    gateline_stream >> dummy_ch;       // '['
+    gateline_stream >> control_qubit;  // control qubit
+    gateline_stream >> dummy_ch;       // ']'
 
     const auto unitary = parse_matrix2x2_(circuit_stream);
     circuit.add_cu_gate(unitary, control_qubit, target_qubit);
 }
 
 }  // namespace
-
 
 namespace ket
 {
@@ -268,8 +268,7 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
         auto gatestream = std::stringstream {line};
 
         // if the start of the line needs to satisfy a certain condition, and it doesn't; break early
-        if (line_starts_with_spaces.has_value())
-        {
+        if (line_starts_with_spaces.has_value()) {
             const auto whitespace = std::string(line_starts_with_spaces.value(), ' ');
 
             if (!line.starts_with(whitespace)) {
@@ -287,7 +286,7 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
 
         if (name == "IF") {
             auto predicate = io_par::parse_control_flow_predicate_(gatestream);
-            
+
             auto if_circuit = read_tangelo_circuit(n_qubits, stream, 0, n_whitespace);
             circuit.add_if_statement(std::move(predicate), std::move(if_circuit));
 
@@ -319,7 +318,8 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
         }
 
         // attempt to parse the gate
-        const auto gate = [&]() {
+        const auto gate = [&]()
+        {
             try {
                 return ket::internal::PRIMITIVE_GATES_TO_STRING.at_reverse(local_name);
             }
@@ -361,11 +361,7 @@ auto read_tangelo_circuit(  // NOLINT(misc-no-recursion, readability-function-co
     return circuit;
 }
 
-auto read_tangelo_circuit(
-    std::size_t n_qubits,
-    const std::filesystem::path& filepath,
-    std::size_t n_skip_lines
-) -> QuantumCircuit
+auto read_tangelo_circuit(std::size_t n_qubits, const std::filesystem::path& filepath, std::size_t n_skip_lines) -> QuantumCircuit
 {
     auto instream = std::ifstream {filepath};
 

@@ -6,7 +6,6 @@
 #include "kettle/simulation/simulate_pauli.hpp"
 #include "kettle/state/statevector.hpp"
 
-
 TEST_CASE("simulate pauli string")
 {
     SECTION("empty pauli string")
@@ -19,7 +18,7 @@ TEST_CASE("simulate pauli string")
         auto expected = ket::Statevector {"000"};
         REQUIRE(ket::almost_eq(statevector, expected));
     }
-    
+
     SECTION("single X gate")
     {
         auto pauli_string = ket::SparsePauliString {3};

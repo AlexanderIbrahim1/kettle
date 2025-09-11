@@ -6,10 +6,9 @@
 #include <random>
 #include <vector>
 
-#include "kettle_internal/common/prng.hpp"
-#include "kettle/state/statevector.hpp"
 #include "kettle/state/random.hpp"
-
+#include "kettle/state/statevector.hpp"
+#include "kettle_internal/common/prng.hpp"
 
 namespace ket
 {
@@ -37,10 +36,7 @@ auto generate_random_state(std::size_t n_qubits, std::mt19937& prng) -> Statevec
 
     // then normalize the magnitudes
     const auto sum_of_squares = std::accumulate(
-        magnitudes.begin(),
-        magnitudes.end(),
-        0.0,
-        [](auto sum_so_far, auto new_elem) { return sum_so_far + (new_elem * new_elem); }
+        magnitudes.begin(), magnitudes.end(), 0.0, [](auto sum_so_far, auto new_elem) { return sum_so_far + (new_elem * new_elem); }
     );
 
     const auto norm = 1.0 / std::sqrt(sum_of_squares);

@@ -1,7 +1,7 @@
 #include <cmath>
+#include <map>
 #include <random>
 #include <string>
-#include <map>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>

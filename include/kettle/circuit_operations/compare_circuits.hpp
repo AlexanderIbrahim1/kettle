@@ -5,7 +5,6 @@
 #include "kettle/circuit/circuit.hpp"
 #include "kettle/common/tolerance.hpp"
 
-
 namespace ket
 {
 
@@ -36,13 +35,9 @@ namespace ket
         auto circuit1 = ket::QuantumCircuit {1};
         circuit1.add_u_gate(ket::x_gate(), 0);
         :
-    
+
     Loggers are ignored entirely
 */
-auto almost_eq(
-    const QuantumCircuit& left,
-    const QuantumCircuit& right,
-    double tol_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ
-) -> bool;
+auto almost_eq(const QuantumCircuit& left, const QuantumCircuit& right, double tol_sq = ket::COMPLEX_ALMOST_EQ_TOLERANCE_SQ) -> bool;
 
 }  // namespace ket

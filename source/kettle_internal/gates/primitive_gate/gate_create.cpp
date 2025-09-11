@@ -37,7 +37,14 @@ auto create_one_target_gate(ket::Gate gate, std::size_t target_index) -> ket::Ga
         throw std::runtime_error {"DEV ERROR: invalid one-target gate provided.\n"};
     }
 
-    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = gate,
+        .arg0 = target_index,
+        .arg1 = DUMMY_ARG1,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -57,7 +64,9 @@ auto create_one_target_one_angle_gate(ket::Gate gate, std::size_t target_index, 
         throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
     }
 
-    return {.gate=gate, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=theta, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = gate, .arg0 = target_index, .arg1 = DUMMY_ARG1, .arg2 = theta, .unitary_ptr = DUMMY_ARG3, .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -71,26 +80,28 @@ auto unpack_one_target_one_angle_gate(const ket::GateInfo& info) -> std::tuple<s
 /*
     Create a single-qubit gate with a parameterized angle.
 */
-auto create_one_target_one_parameter_gate(ket::Gate gate, std::size_t target_index, ket::param::ParameterExpression param_expression) -> ket::GateInfo
+auto create_one_target_one_parameter_gate(ket::Gate gate, std::size_t target_index, ket::param::ParameterExpression param_expression)
+    -> ket::GateInfo
 {
     if (!gate_id::is_one_target_one_angle_transform_gate(gate)) {
         throw std::runtime_error {"DEV ERROR: invalid one-target-one-angle gate provided.\n"};
     }
 
     return {
-        .gate=gate,
-        .arg0=target_index,
-        .arg1=DUMMY_ARG1,
-        .arg2=DUMMY_ARG2,
-        .unitary_ptr=DUMMY_ARG3,
-        .param_expression_ptr=ket::ClonePtr {std::move(param_expression)}
+        .gate = gate,
+        .arg0 = target_index,
+        .arg1 = DUMMY_ARG1,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = ket::ClonePtr {std::move(param_expression)}
     };
 }
 
 /*
     Returns the `{target_qubit, param_expression_ptr}` of a single-qubit gate with an angle parameter.
 */
-auto unpack_one_target_one_parameter_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>
+auto unpack_one_target_one_parameter_gate(const ket::GateInfo& info)
+    -> std::tuple<std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>
 {
     return {info.arg0, info.param_expression_ptr};  // target index, param_expression_ptr
 }
@@ -104,7 +115,14 @@ auto create_one_control_one_target_gate(ket::Gate gate, std::size_t control_inde
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target gate provided.\n"};
     }
 
-    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = gate,
+        .arg0 = control_index,
+        .arg1 = target_index,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -118,13 +136,21 @@ auto unpack_one_control_one_target_gate(const ket::GateInfo& info) -> std::tuple
 /*
     Create a controlled gate with a fixed angle.
 */
-auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index, double theta) -> ket::GateInfo
+auto create_one_control_one_target_one_angle_gate(ket::Gate gate, std::size_t control_index, std::size_t target_index, double theta)
+    -> ket::GateInfo
 {
     if (!gate_id::is_one_control_one_target_one_angle_transform_gate(gate)) {
         throw std::runtime_error {"DEV ERROR: invalid one-control-one-target-one-angle gate provided.\n"};
     }
 
-    return {.gate=gate, .arg0=control_index, .arg1=target_index, .arg2=theta, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = gate,
+        .arg0 = control_index,
+        .arg1 = target_index,
+        .arg2 = theta,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -147,27 +173,34 @@ auto create_one_control_one_target_one_parameter_gate(
     }
 
     return {
-        .gate=gate,
-        .arg0=control_index,
-        .arg1=target_index,
-        .arg2=DUMMY_ARG2,
-        .unitary_ptr=DUMMY_ARG3,
-        .param_expression_ptr=ket::ClonePtr {std::move(param_expression)}
+        .gate = gate,
+        .arg0 = control_index,
+        .arg1 = target_index,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = ket::ClonePtr {std::move(param_expression)}
     };
 }
 
-auto unpack_one_control_one_target_one_parameter_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>
+auto unpack_one_control_one_target_one_parameter_gate(const ket::GateInfo& info)
+    -> std::tuple<std::size_t, std::size_t, const ket::ClonePtr<ket::param::ParameterExpression>&>
 {
     return {info.arg0, info.arg1, info.param_expression_ptr};  // control index, target index, param_expression_ptr
 }
-
 
 /*
     Create a U-gate, which applies the 2x2 unitary matrix `unitary` to the qubit at index `target_index`.
 */
 auto create_u_gate(std::size_t target_index, ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
-    return {.gate=ket::Gate::U, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary), .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = ket::Gate::U,
+        .arg0 = target_index,
+        .arg1 = DUMMY_ARG1,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = std::move(unitary),
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -184,7 +217,14 @@ auto unpack_u_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, const k
 */
 auto create_cu_gate(std::size_t control_index, std::size_t target_index, ket::ClonePtr<ket::Matrix2X2> unitary) -> ket::GateInfo
 {
-    return {.gate=ket::Gate::CU, .arg0=control_index, .arg1=target_index, .arg2=DUMMY_ARG2, .unitary_ptr=std::move(unitary), .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = ket::Gate::CU,
+        .arg0 = control_index,
+        .arg1 = target_index,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = std::move(unitary),
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -200,7 +240,14 @@ auto unpack_cu_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::s
 */
 auto create_m_gate(std::size_t qubit_index, std::size_t bit_index) -> ket::GateInfo
 {
-    return {.gate=ket::Gate::M, .arg0=qubit_index, .arg1=bit_index, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = ket::Gate::M,
+        .arg0 = qubit_index,
+        .arg1 = bit_index,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*
@@ -219,7 +266,14 @@ auto unpack_m_gate(const ket::GateInfo& info) -> std::tuple<std::size_t, std::si
 */
 auto create_reset_gate(std::size_t target_index) -> ket::GateInfo
 {
-    return {.gate=ket::Gate::RESET, .arg0=target_index, .arg1=DUMMY_ARG1, .arg2=DUMMY_ARG2, .unitary_ptr=DUMMY_ARG3, .param_expression_ptr=DUMMY_ARG4};
+    return {
+        .gate = ket::Gate::RESET,
+        .arg0 = target_index,
+        .arg1 = DUMMY_ARG1,
+        .arg2 = DUMMY_ARG2,
+        .unitary_ptr = DUMMY_ARG3,
+        .param_expression_ptr = DUMMY_ARG4
+    };
 }
 
 /*

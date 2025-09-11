@@ -1,10 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "kettle/circuit/circuit.hpp"
-#include "kettle/gates/common_u_gates.hpp"
 #include "kettle/circuit_operations/append_circuits.hpp"
 #include "kettle/circuit_operations/compare_circuits.hpp"
-
+#include "kettle/gates/common_u_gates.hpp"
 
 TEST_CASE("append_circuits working")
 {
@@ -29,14 +28,19 @@ TEST_CASE("append_circuits working")
         auto circuit0 = ket::QuantumCircuit {3};
         auto circuit1 = ket::QuantumCircuit {3};
 
-        const auto add_left_gates = [&](ket::QuantumCircuit& circuit) {
+        const auto add_left_gates = [&](ket::QuantumCircuit& circuit)
+        {
             circuit.add_x_gate(0);
             circuit.add_h_gate(1);
             circuit.add_y_gate({0, 1, 2});
-            circuit.add_rx_gate({{0, M_PI_4}, {2, M_1_PI}});
+            circuit.add_rx_gate({
+                {0, M_PI_4},
+                {2, M_1_PI}
+            });
         };
 
-        const auto add_right_gates = [&](ket::QuantumCircuit& circuit) {
+        const auto add_right_gates = [&](ket::QuantumCircuit& circuit)
+        {
             circuit.add_h_gate({1, 2});
             circuit.add_z_gate(0);
             circuit.add_u_gate(ket::x_gate(), 2);
@@ -90,14 +94,19 @@ TEST_CASE("extend_circuit working")
         auto circuit0 = ket::QuantumCircuit {3};
         auto circuit1 = ket::QuantumCircuit {3};
 
-        const auto add_left_gates = [&](ket::QuantumCircuit& circuit) {
+        const auto add_left_gates = [&](ket::QuantumCircuit& circuit)
+        {
             circuit.add_x_gate(0);
             circuit.add_h_gate(1);
             circuit.add_y_gate({0, 1, 2});
-            circuit.add_rx_gate({{0, M_PI_4}, {2, M_1_PI}});
+            circuit.add_rx_gate({
+                {0, M_PI_4},
+                {2, M_1_PI}
+            });
         };
 
-        const auto add_right_gates = [&](ket::QuantumCircuit& circuit) {
+        const auto add_right_gates = [&](ket::QuantumCircuit& circuit)
+        {
             circuit.add_h_gate({1, 2});
             circuit.add_z_gate(0);
             circuit.add_u_gate(ket::x_gate(), 2);
@@ -130,8 +139,18 @@ TEST_CASE("extend_circuit working")
 
 TEST_CASE("extend_circuit() with control flow")
 {
-    const auto if_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_x_gate(0); return circ; }();
-    const auto else_subcirc = [] { auto circ = ket::QuantumCircuit{2}; circ.add_h_gate(0); return circ; }();
+    const auto if_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_x_gate(0);
+        return circ;
+    }();
+    const auto else_subcirc = []
+    {
+        auto circ = ket::QuantumCircuit {2};
+        circ.add_h_gate(0);
+        return circ;
+    }();
 
     SECTION("if_statement()")
     {

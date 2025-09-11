@@ -2,7 +2,6 @@
 
 #include "kettle/gates/compound_gate.hpp"
 
-
 namespace ket::internal::gate_id
 {
 

@@ -23,7 +23,6 @@ inline auto basic_state0() -> ket::DensityMatrix
     return state_;
 }
 
-
 /*
     Another state that isn't completely trivial but also not arbitrary, used in several unit tests
 */
@@ -39,7 +38,6 @@ inline auto basic_state1() -> ket::DensityMatrix
 
     return state_;
 }
-
 
 inline auto mat2x2_to_eigen(const ket::Matrix2X2& matrix) -> Eigen::MatrixXcd
 {
@@ -59,12 +57,11 @@ inline auto eigen_to_mat2x2(const Eigen::MatrixXcd& matrix) -> ket::Matrix2X2
     }
 
     return ket::Matrix2X2 {
-        .elem00=matrix(0, 0),
-        .elem01=matrix(0, 1),
-        .elem10=matrix(1, 0),
-        .elem11=matrix(1, 1),
+        .elem00 = matrix(0, 0),
+        .elem01 = matrix(0, 1),
+        .elem10 = matrix(1, 0),
+        .elem11 = matrix(1, 1),
     };
 }
-
 
 }  // namespace ctestutils
